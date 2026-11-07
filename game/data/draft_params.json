@@ -1,0 +1,19 @@
+{
+ "need_pen": 0.05,
+ "bal_pen": 0.06,
+ "syn_bonus": 0.04,
+ "cap": 0.15,
+ "fam_w": 0.06,
+ "lane_mod": 0.1,
+ "team_mod_default": 0.0096,
+ "cal_morale": 60.0,
+ "meta_spread": 0.03,
+ "ban_meta_only_p": 0.25,
+ "policy_default": {
+  "fam": 0.35,
+  "meta": 0.2,
+  "comp": 0.2,
+  "counter": 0.25,
+  "noise": 0.04
+ }
+}

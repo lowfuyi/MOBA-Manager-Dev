@@ -2,5 +2,4 @@ __pycache__/
 *.pyc
 .godot/
 *.import
-export_presets.cfg
 .pytest_cache/

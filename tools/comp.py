@@ -2,7 +2,9 @@
 
 comp_eval(heroes) -> (comp_mod, style, parts)   heroes: list of 5 hero dicts
 """
-NEED_PEN, BAL_PEN, SYN_BONUS, CAP = 0.05, 0.06, 0.040, 0.15     # v1 constants (GDD 5.3); calibrated in P-003 (v0 was .03/.04/.025/.10)
+import json as _json, pathlib as _pl
+_DP = _json.loads((_pl.Path(__file__).resolve().parent.parent / "game/data/draft_params.json").read_text())
+NEED_PEN, BAL_PEN, SYN_BONUS, CAP = _DP["need_pen"], _DP["bal_pen"], _DP["syn_bonus"], _DP["cap"]   # GDD 5.3, calibrated in P-003
 SYNERGY_PAIRS = (("engage", "pick"), ("protect", "scaling"), ("poke", "waveclear"), ("frontline", "engage"))
 
 

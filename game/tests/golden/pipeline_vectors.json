@@ -1,0 +1,7368 @@
+{
+ "fam": [
+  {
+   "player": "p098",
+   "hero": "skarrow",
+   "value": 9.04802482531906
+  },
+  {
+   "player": "p009",
+   "hero": "dusken",
+   "value": 6.018739356995168
+  },
+  {
+   "player": "p080",
+   "hero": "hegwin",
+   "value": 16.365129845330664
+  },
+  {
+   "player": "p056",
+   "hero": "brixley",
+   "value": 27.135572972975027
+  },
+  {
+   "player": "p080",
+   "hero": "brixley",
+   "value": 0.9441718169570479
+  },
+  {
+   "player": "p039",
+   "hero": "gravenstone",
+   "value": 26.580228942641604
+  },
+  {
+   "player": "p103",
+   "hero": "brixley",
+   "value": 0.21435593928081254
+  },
+  {
+   "player": "p073",
+   "hero": "embrel",
+   "value": 12.569513653321954
+  },
+  {
+   "player": "p085",
+   "hero": "ellowen",
+   "value": 80.3263348899673
+  },
+  {
+   "player": "p061",
+   "hero": "lanthorn",
+   "value": 25.23518569461666
+  },
+  {
+   "player": "p045",
+   "hero": "quillith",
+   "value": 28.303270618883232
+  },
+  {
+   "player": "p007",
+   "hero": "brixley",
+   "value": 70.1609888743346
+  },
+  {
+   "player": "p132",
+   "hero": "tanglewick",
+   "value": 8.02712347390582
+  },
+  {
+   "player": "p060",
+   "hero": "hegwin",
+   "value": 29.930555374139985
+  },
+  {
+   "player": "p016",
+   "hero": "wyncote",
+   "value": 25.122429821893594
+  },
+  {
+   "player": "p110",
+   "hero": "tanglewick",
+   "value": 13.808383224371983
+  },
+  {
+   "player": "p013",
+   "hero": "skarrow",
+   "value": 17.645844009846016
+  },
+  {
+   "player": "p133",
+   "hero": "dusken",
+   "value": 29.9303327253218
+  },
+  {
+   "player": "p035",
+   "hero": "dunmarrow",
+   "value": 18.57739841617394
+  },
+  {
+   "player": "p133",
+   "hero": "brixley",
+   "value": 27.838975859363543
+  },
+  {
+   "player": "p118",
+   "hero": "pellam",
+   "value": 24.266117242316234
+  },
+  {
+   "player": "p136",
+   "hero": "corvane",
+   "value": 75.63696769912555
+  },
+  {
+   "player": "p119",
+   "hero": "wyncote",
+   "value": 10.514980013644637
+  },
+  {
+   "player": "p111",
+   "hero": "gravenstone",
+   "value": 22.338532647701253
+  },
+  {
+   "player": "p035",
+   "hero": "brixley",
+   "value": 20.069074228604443
+  },
+  {
+   "player": "p124",
+   "hero": "harkin",
+   "value": 28.360681182133675
+  },
+  {
+   "player": "p028",
+   "hero": "alderwyn",
+   "value": 2.164442695825546
+  },
+  {
+   "player": "p067",
+   "hero": "oriel",
+   "value": 10.297109406538507
+  },
+  {
+   "player": "p082",
+   "hero": "orisande",
+   "value": 6.116963377972212
+  },
+  {
+   "player": "p120",
+   "hero": "barrowick",
+   "value": 24.803150834376417
+  },
+  {
+   "player": "p075",
+   "hero": "orisande",
+   "value": 15.08441946076032
+  },
+  {
+   "player": "p073",
+   "hero": "alderwyn",
+   "value": 21.369485918527687
+  },
+  {
+   "player": "p002",
+   "hero": "hegwin",
+   "value": 16.270915570535163
+  },
+  {
+   "player": "p050",
+   "hero": "harkin",
+   "value": 26.788636541348044
+  },
+  {
+   "player": "p042",
+   "hero": "skarrow",
+   "value": 6.14758443291409
+  },
+  {
+   "player": "p109",
+   "hero": "dunmarrow",
+   "value": 2.0915086778443093
+  },
+  {
+   "player": "p066",
+   "hero": "harkin",
+   "value": 28.05081295119217
+  },
+  {
+   "player": "p115",
+   "hero": "alderwyn",
+   "value": 16.25031434098447
+  },
+  {
+   "player": "p026",
+   "hero": "alderwyn",
+   "value": 9.497900941188997
+  },
+  {
+   "player": "p078",
+   "hero": "nimbrel",
+   "value": 5.067888509949333
+  },
+  {
+   "player": "p068",
+   "hero": "wyldrim",
+   "value": 28.85354231575562
+  },
+  {
+   "player": "p017",
+   "hero": "quillith",
+   "value": 26.549494996952106
+  },
+  {
+   "player": "p113",
+   "hero": "oriel",
+   "value": 2.917308632520016
+  },
+  {
+   "player": "p053",
+   "hero": "vellgrim",
+   "value": 20.95442786550964
+  },
+  {
+   "player": "p021",
+   "hero": "alderwyn",
+   "value": 5.289557254480494
+  },
+  {
+   "player": "p055",
+   "hero": "quillith",
+   "value": 18.292542777562005
+  },
+  {
+   "player": "p081",
+   "hero": "vellgrim",
+   "value": 27.896249668299717
+  },
+  {
+   "player": "p031",
+   "hero": "marrek",
+   "value": 23.964219702754626
+  },
+  {
+   "player": "p136",
+   "hero": "vellgrim",
+   "value": 14.42587908622669
+  },
+  {
+   "player": "p004",
+   "hero": "marrek",
+   "value": 20.377512691730683
+  },
+  {
+   "player": "p081",
+   "hero": "wyncote",
+   "value": 0.5397779111059453
+  },
+  {
+   "player": "p009",
+   "hero": "pellam",
+   "value": 15.037600899436422
+  },
+  {
+   "player": "p128",
+   "hero": "jorreck",
+   "value": 5.929783285038603
+  },
+  {
+   "player": "p013",
+   "hero": "alderwyn",
+   "value": 24.358650364865106
+  },
+  {
+   "player": "p138",
+   "hero": "barrowick",
+   "value": 2.2031222181393995
+  },
+  {
+   "player": "p049",
+   "hero": "tanglewick",
+   "value": 52.219504815015945
+  },
+  {
+   "player": "p033",
+   "hero": "wyncote",
+   "value": 14.68249179828408
+  },
+  {
+   "player": "p138",
+   "hero": "corvane",
+   "value": 18.774877724851866
+  },
+  {
+   "player": "p098",
+   "hero": "vellgrim",
+   "value": 8.156679184308931
+  },
+  {
+   "player": "p115",
+   "hero": "ketterick",
+   "value": 8.355891119045397
+  }
+ ],
+ "meta": {
+  "seed": "S1-P2",
+  "values": {
+   "brannoch": 0.9708618508291679,
+   "dunmarrow": 0.9981998035839156,
+   "skarrow": 0.9946024242295083,
+   "hegwin": 1.023858607396199,
+   "ottomere": 1.0255432363431183,
+   "orrick": 1.004455099243494,
+   "vellgrim": 0.9856071323081663,
+   "barrowick": 1.0241311454348787,
+   "tuskal": 1.0141914664515972,
+   "gravenstone": 1.01505398564471,
+   "nimbrel": 0.9764745493645733,
+   "marrek": 0.9906655177219994,
+   "quillith": 1.0250474909201164,
+   "wyldrim": 1.0138791059588803,
+   "sootwing": 1.0243920021532573,
+   "veshra": 1.0157019658587694,
+   "ellowen": 1.0259800300051178,
+   "cindrel": 0.9875633183648699,
+   "dusken": 0.9768086567107924,
+   "maurelle": 1.0101161198649877,
+   "orisande": 0.983277689659178,
+   "tessarine": 1.0210923908346665,
+   "lanthorn": 0.9735449020572201,
+   "embrel": 0.9786979104873708,
+   "harkin": 0.9850887749766004,
+   "pellam": 1.0126122121935723,
+   "tamsel": 0.987541679077135,
+   "jorreck": 1.0136814689490008,
+   "brixley": 0.9757487703474844,
+   "dovrin": 1.0122632514390182,
+   "ketterick": 1.0249197371088379,
+   "sparrowe": 0.9808019618278339,
+   "sunnivah": 0.9827302345655614,
+   "bastrel": 0.9974894355691025,
+   "tanglewick": 1.0264427292935494,
+   "alderwyn": 1.0150993723469421,
+   "corvane": 1.0201447584574421,
+   "wyncote": 1.0209423801436148,
+   "oriel": 0.9827755572577117,
+   "fennimore": 1.0128992833091077
+  }
+ },
+ "lineups": {
+  "ironquill_wolves": {
+   "slots": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   },
+   "team_rating": 40.260000000000005
+  },
+  "duskwater_foxes": {
+   "slots": {
+    "top": "p011",
+    "jg": "p013",
+    "mid": "p015",
+    "bot": "p017",
+    "sup": "p019"
+   },
+   "team_rating": 40.910000000000004
+  },
+  "gildmoor_raiders": {
+   "slots": {
+    "top": "p021",
+    "jg": "p023",
+    "mid": "p025",
+    "bot": "p028",
+    "sup": "p030"
+   },
+   "team_rating": 46.01
+  },
+  "pinehollow_owls": {
+   "slots": {
+    "top": "p032",
+    "jg": "p033",
+    "mid": "p036",
+    "bot": "p037",
+    "sup": "p039"
+   },
+   "team_rating": 46.61
+  },
+  "mossgate_wardens": {
+   "slots": {
+    "top": "p042",
+    "jg": "p044",
+    "mid": "p046",
+    "bot": "p047",
+    "sup": "p049"
+   },
+   "team_rating": 51.46
+  },
+  "northreach_corsairs": {
+   "slots": {
+    "top": "p052",
+    "jg": "p054",
+    "mid": "p056",
+    "bot": "p058",
+    "sup": "p059"
+   },
+   "team_rating": 53.45
+  },
+  "emberfen_hounds": {
+   "slots": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   },
+   "team_rating": 60.3
+  },
+  "stormvale_herons": {
+   "slots": {
+    "top": "p072",
+    "jg": "p074",
+    "mid": "p075",
+    "bot": "p077",
+    "sup": "p080"
+   },
+   "team_rating": 58.57000000000001
+  },
+  "thornwick_stags": {
+   "slots": {
+    "top": "p082",
+    "jg": "p083",
+    "mid": "p086",
+    "bot": "p088",
+    "sup": "p090"
+   },
+   "team_rating": 64.78999999999999
+  },
+  "saltmarrow_gulls": {
+   "slots": {
+    "top": "p092",
+    "jg": "p093",
+    "mid": "p096",
+    "bot": "p097",
+    "sup": "p100"
+   },
+   "team_rating": 69.47999999999999
+  }
+ },
+ "comp": [
+  {
+   "heroes": [
+    "marrek",
+    "harkin",
+    "brixley",
+    "pellam",
+    "cindrel"
+   ],
+   "mod": 0.03,
+   "style": "siege",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 0,
+    "siege": 5,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "wyldrim",
+    "ottomere",
+    "hegwin",
+    "tessarine",
+    "gravenstone"
+   ],
+   "mod": 0.06,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 3,
+    "siege": 1,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "dusken",
+    "oriel",
+    "nimbrel",
+    "sunnivah",
+    "ellowen"
+   ],
+   "mod": 0.03,
+   "style": "skirmish",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 2,
+    "siege": 3,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "jorreck",
+    "tanglewick",
+    "gravenstone",
+    "maurelle",
+    "alderwyn"
+   ],
+   "mod": 0.12,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 2,
+    "siege": 3,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "vellgrim",
+    "barrowick",
+    "wyncote",
+    "orrick",
+    "ellowen"
+   ],
+   "mod": 0.08,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 3,
+    "siege": 2,
+    "protect": 1
+   }
+  },
+  {
+   "heroes": [
+    "marrek",
+    "hegwin",
+    "tanglewick",
+    "quillith",
+    "dovrin"
+   ],
+   "mod": 0.04,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 3,
+    "siege": 3,
+    "protect": 1
+   }
+  },
+  {
+   "heroes": [
+    "pellam",
+    "orrick",
+    "ottomere",
+    "tamsel",
+    "harkin"
+   ],
+   "mod": 0.08,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 1,
+    "siege": 2,
+    "protect": 7
+   }
+  },
+  {
+   "heroes": [
+    "orisande",
+    "lanthorn",
+    "jorreck",
+    "oriel",
+    "ellowen"
+   ],
+   "mod": 0.03,
+   "style": "protect",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 2,
+    "siege": 3,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "brixley",
+    "nimbrel",
+    "oriel",
+    "quillith",
+    "sparrowe"
+   ],
+   "mod": 0.03,
+   "style": "siege",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 2,
+    "siege": 4,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "hegwin",
+    "corvane",
+    "ketterick",
+    "dunmarrow",
+    "ottomere"
+   ],
+   "mod": -0.03,
+   "style": "dive",
+   "needs": -0.05,
+   "balance": -0.06,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 6,
+    "siege": 0,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "bastrel",
+    "orrick",
+    "maurelle",
+    "wyncote",
+    "lanthorn"
+   ],
+   "mod": 0.12,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 4,
+    "siege": 1,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "alderwyn",
+    "embrel",
+    "harkin",
+    "gravenstone",
+    "sparrowe"
+   ],
+   "mod": 0.08,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 1,
+    "siege": 7,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "jorreck",
+    "marrek",
+    "pellam",
+    "maurelle",
+    "brixley"
+   ],
+   "mod": -0.010000000000000002,
+   "style": "protect",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 0,
+    "siege": 2,
+    "protect": 6
+   }
+  },
+  {
+   "heroes": [
+    "sootwing",
+    "vellgrim",
+    "ketterick",
+    "dusken",
+    "harkin"
+   ],
+   "mod": -0.019999999999999997,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 4,
+    "siege": 2,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "hegwin",
+    "corvane",
+    "quillith",
+    "fennimore",
+    "brannoch"
+   ],
+   "mod": 0.08,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 5,
+    "siege": 3,
+    "protect": 0
+   }
+  },
+  {
+   "heroes": [
+    "brixley",
+    "sootwing",
+    "barrowick",
+    "cindrel",
+    "dovrin"
+   ],
+   "mod": 0.0,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.0,
+   "scores": {
+    "dive": 2,
+    "siege": 2,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "sootwing",
+    "corvane",
+    "wyldrim",
+    "tessarine",
+    "wyncote"
+   ],
+   "mod": 0.12,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 4,
+    "siege": 1,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "lanthorn",
+    "brixley",
+    "cindrel",
+    "tessarine",
+    "ellowen"
+   ],
+   "mod": -0.010000000000000002,
+   "style": "siege",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 1,
+    "siege": 5,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "ellowen",
+    "cindrel",
+    "fennimore",
+    "orrick",
+    "bastrel"
+   ],
+   "mod": 0.12,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 3,
+    "siege": 5,
+    "protect": 1
+   }
+  },
+  {
+   "heroes": [
+    "tessarine",
+    "orisande",
+    "cindrel",
+    "tuskal",
+    "ellowen"
+   ],
+   "mod": 0.04,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 1,
+    "siege": 5,
+    "protect": 1
+   }
+  },
+  {
+   "heroes": [
+    "veshra",
+    "tuskal",
+    "sparrowe",
+    "brannoch",
+    "tanglewick"
+   ],
+   "mod": -0.019999999999999997,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 2,
+    "siege": 5,
+    "protect": 1
+   }
+  },
+  {
+   "heroes": [
+    "sootwing",
+    "maurelle",
+    "embrel",
+    "ottomere",
+    "sunnivah"
+   ],
+   "mod": 0.12,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 2,
+    "siege": 3,
+    "protect": 5
+   }
+  },
+  {
+   "heroes": [
+    "tamsel",
+    "orrick",
+    "nimbrel",
+    "veshra",
+    "bastrel"
+   ],
+   "mod": 0.12,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 4,
+    "siege": 1,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "corvane",
+    "harkin",
+    "orisande",
+    "sootwing",
+    "hegwin"
+   ],
+   "mod": 0.08,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 5,
+    "siege": 2,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "tanglewick",
+    "wyldrim",
+    "gravenstone",
+    "sunnivah",
+    "cindrel"
+   ],
+   "mod": 0.15,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.16,
+   "scores": {
+    "dive": 2,
+    "siege": 3,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "bastrel",
+    "brannoch",
+    "barrowick",
+    "sunnivah",
+    "wyldrim"
+   ],
+   "mod": 0.12,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 3,
+    "siege": 1,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "pellam",
+    "ottomere",
+    "oriel",
+    "quillith",
+    "fennimore"
+   ],
+   "mod": 0.08,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 3,
+    "siege": 3,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "brixley",
+    "corvane",
+    "tanglewick",
+    "wyldrim",
+    "fennimore"
+   ],
+   "mod": 0.15,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.16,
+   "scores": {
+    "dive": 4,
+    "siege": 2,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "embrel",
+    "orrick",
+    "jorreck",
+    "orisande",
+    "wyncote"
+   ],
+   "mod": 0.04,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 2,
+    "siege": 2,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "brixley",
+    "lanthorn",
+    "dunmarrow",
+    "jorreck",
+    "alderwyn"
+   ],
+   "mod": 0.08,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 2,
+    "siege": 1,
+    "protect": 5
+   }
+  },
+  {
+   "heroes": [
+    "ketterick",
+    "sootwing",
+    "ellowen",
+    "jorreck",
+    "vellgrim"
+   ],
+   "mod": 0.020000000000000004,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 3,
+    "siege": 2,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "bastrel",
+    "oriel",
+    "sootwing",
+    "ketterick",
+    "harkin"
+   ],
+   "mod": 0.12,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 4,
+    "siege": 3,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "skarrow",
+    "embrel",
+    "gravenstone",
+    "fennimore",
+    "ellowen"
+   ],
+   "mod": 0.12,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 2,
+    "siege": 5,
+    "protect": 0
+   }
+  },
+  {
+   "heroes": [
+    "gravenstone",
+    "sootwing",
+    "dunmarrow",
+    "ellowen",
+    "brixley"
+   ],
+   "mod": 0.08,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 3,
+    "siege": 2,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "wyncote",
+    "ketterick",
+    "hegwin",
+    "harkin",
+    "ellowen"
+   ],
+   "mod": 0.04,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 3,
+    "siege": 4,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "tamsel",
+    "tanglewick",
+    "vellgrim",
+    "barrowick",
+    "wyldrim"
+   ],
+   "mod": 0.009999999999999995,
+   "style": "skirmish",
+   "needs": -0.05,
+   "balance": -0.06,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 3,
+    "siege": 1,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "oriel",
+    "sootwing",
+    "skarrow",
+    "ottomere",
+    "orrick"
+   ],
+   "mod": 0.06,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 2,
+    "siege": 1,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "tuskal",
+    "quillith",
+    "barrowick",
+    "tanglewick",
+    "hegwin"
+   ],
+   "mod": 0.04,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 4,
+    "siege": 2,
+    "protect": 0
+   }
+  },
+  {
+   "heroes": [
+    "oriel",
+    "wyncote",
+    "ottomere",
+    "sparrowe",
+    "maurelle"
+   ],
+   "mod": 0.06,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 2,
+    "siege": 4,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "tamsel",
+    "veshra",
+    "dunmarrow",
+    "sunnivah",
+    "harkin"
+   ],
+   "mod": 0.06,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 2,
+    "siege": 3,
+    "protect": 5
+   }
+  },
+  {
+   "heroes": [
+    "ottomere",
+    "quillith",
+    "veshra",
+    "bastrel",
+    "tessarine"
+   ],
+   "mod": 0.08,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 5,
+    "siege": 3,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "orrick",
+    "fennimore",
+    "ketterick",
+    "tuskal",
+    "alderwyn"
+   ],
+   "mod": 0.04,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 2,
+    "siege": 2,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "sparrowe",
+    "brannoch",
+    "lanthorn",
+    "vellgrim",
+    "barrowick"
+   ],
+   "mod": 0.12,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 3,
+    "siege": 3,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "alderwyn",
+    "wyldrim",
+    "ellowen",
+    "fennimore",
+    "barrowick"
+   ],
+   "mod": 0.04,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 2,
+    "siege": 4,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "dovrin",
+    "tuskal",
+    "corvane",
+    "lanthorn",
+    "gravenstone"
+   ],
+   "mod": 0.03,
+   "style": "dive",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 4,
+    "siege": 0,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "vellgrim",
+    "cindrel",
+    "pellam",
+    "harkin",
+    "wyncote"
+   ],
+   "mod": 0.12,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 2,
+    "siege": 4,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "ketterick",
+    "sootwing",
+    "ottomere",
+    "brannoch",
+    "corvane"
+   ],
+   "mod": 0.08,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 5,
+    "siege": 1,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "sunnivah",
+    "sootwing",
+    "dovrin",
+    "jorreck",
+    "orrick"
+   ],
+   "mod": -0.010000000000000002,
+   "style": "protect",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 1,
+    "siege": 0,
+    "protect": 7
+   }
+  },
+  {
+   "heroes": [
+    "wyldrim",
+    "skarrow",
+    "vellgrim",
+    "fennimore",
+    "brixley"
+   ],
+   "mod": 0.12,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 2,
+    "siege": 1,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "jorreck",
+    "nimbrel",
+    "brannoch",
+    "bastrel",
+    "tuskal"
+   ],
+   "mod": 0.08,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 3,
+    "siege": 1,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "bastrel",
+    "oriel",
+    "quillith",
+    "cindrel",
+    "veshra"
+   ],
+   "mod": 0.08,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 4,
+    "siege": 5,
+    "protect": 1
+   }
+  },
+  {
+   "heroes": [
+    "quillith",
+    "fennimore",
+    "veshra",
+    "jorreck",
+    "wyldrim"
+   ],
+   "mod": 0.04,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 3,
+    "siege": 3,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "alderwyn",
+    "fennimore",
+    "dusken",
+    "orrick",
+    "dunmarrow"
+   ],
+   "mod": 0.12,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 3,
+    "siege": 2,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "maurelle",
+    "quillith",
+    "tessarine",
+    "ellowen",
+    "skarrow"
+   ],
+   "mod": 0.08,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 1,
+    "siege": 5,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "alderwyn",
+    "skarrow",
+    "fennimore",
+    "ketterick",
+    "dusken"
+   ],
+   "mod": 0.04,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 3,
+    "siege": 2,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "quillith",
+    "alderwyn",
+    "pellam",
+    "veshra",
+    "harkin"
+   ],
+   "mod": 0.03,
+   "style": "siege",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 2,
+    "siege": 5,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "nimbrel",
+    "ketterick",
+    "maurelle",
+    "tamsel",
+    "bastrel"
+   ],
+   "mod": 0.020000000000000004,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 4,
+    "siege": 1,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "harkin",
+    "skarrow",
+    "tessarine",
+    "orrick",
+    "wyncote"
+   ],
+   "mod": 0.04,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 1,
+    "siege": 3,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "alderwyn",
+    "veshra",
+    "quillith",
+    "sunnivah",
+    "ketterick"
+   ],
+   "mod": -0.010000000000000002,
+   "style": "protect",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 3,
+    "siege": 3,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "veshra",
+    "gravenstone",
+    "tuskal",
+    "vellgrim",
+    "sparrowe"
+   ],
+   "mod": 0.06,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 3,
+    "siege": 3,
+    "protect": 1
+   }
+  },
+  {
+   "heroes": [
+    "tuskal",
+    "dunmarrow",
+    "maurelle",
+    "fennimore",
+    "cindrel"
+   ],
+   "mod": 0.12,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 2,
+    "siege": 4,
+    "protect": 1
+   }
+  },
+  {
+   "heroes": [
+    "sparrowe",
+    "vellgrim",
+    "hegwin",
+    "nimbrel",
+    "sootwing"
+   ],
+   "mod": 0.08,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 4,
+    "siege": 2,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "harkin",
+    "bastrel",
+    "embrel",
+    "marrek",
+    "lanthorn"
+   ],
+   "mod": 0.12,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 3,
+    "siege": 5,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "ellowen",
+    "wyncote",
+    "marrek",
+    "dunmarrow",
+    "corvane"
+   ],
+   "mod": 0.06,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 4,
+    "siege": 3,
+    "protect": 0
+   }
+  },
+  {
+   "heroes": [
+    "tamsel",
+    "skarrow",
+    "wyldrim",
+    "dovrin",
+    "hegwin"
+   ],
+   "mod": -0.07,
+   "style": "protect",
+   "needs": -0.05,
+   "balance": -0.06,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 1,
+    "siege": 0,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "dovrin",
+    "marrek",
+    "fennimore",
+    "vellgrim",
+    "harkin"
+   ],
+   "mod": 0.06,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 2,
+    "siege": 4,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "hegwin",
+    "sunnivah",
+    "embrel",
+    "tessarine",
+    "corvane"
+   ],
+   "mod": 0.1,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.16,
+   "scores": {
+    "dive": 3,
+    "siege": 3,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "tuskal",
+    "brixley",
+    "ottomere",
+    "alderwyn",
+    "tessarine"
+   ],
+   "mod": 0.020000000000000004,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 1,
+    "siege": 2,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "dunmarrow",
+    "embrel",
+    "sunnivah",
+    "maurelle",
+    "dovrin"
+   ],
+   "mod": 0.020000000000000004,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 1,
+    "siege": 3,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "jorreck",
+    "maurelle",
+    "tessarine",
+    "tamsel",
+    "sunnivah"
+   ],
+   "mod": -0.060000000000000005,
+   "style": "protect",
+   "needs": -0.1,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 0,
+    "siege": 2,
+    "protect": 8
+   }
+  },
+  {
+   "heroes": [
+    "maurelle",
+    "alderwyn",
+    "quillith",
+    "sootwing",
+    "marrek"
+   ],
+   "mod": 0.04,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 2,
+    "siege": 4,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "ottomere",
+    "veshra",
+    "brannoch",
+    "lanthorn",
+    "nimbrel"
+   ],
+   "mod": 0.08,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 4,
+    "siege": 2,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "cindrel",
+    "dovrin",
+    "embrel",
+    "orrick",
+    "wyldrim"
+   ],
+   "mod": 0.03,
+   "style": "siege",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 0,
+    "siege": 4,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "quillith",
+    "embrel",
+    "barrowick",
+    "maurelle",
+    "dunmarrow"
+   ],
+   "mod": 0.06,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.12,
+   "scores": {
+    "dive": 3,
+    "siege": 4,
+    "protect": 1
+   }
+  },
+  {
+   "heroes": [
+    "quillith",
+    "lanthorn",
+    "oriel",
+    "harkin",
+    "hegwin"
+   ],
+   "mod": 0.08,
+   "style": "siege",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 3,
+    "siege": 4,
+    "protect": 3
+   }
+  },
+  {
+   "heroes": [
+    "dusken",
+    "sparrowe",
+    "lanthorn",
+    "skarrow",
+    "pellam"
+   ],
+   "mod": 0.04,
+   "style": "protect",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.04,
+   "scores": {
+    "dive": 2,
+    "siege": 2,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "tamsel",
+    "skarrow",
+    "pellam",
+    "vellgrim",
+    "sunnivah"
+   ],
+   "mod": -0.03,
+   "style": "protect",
+   "needs": -0.05,
+   "balance": -0.06,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 1,
+    "siege": 0,
+    "protect": 6
+   }
+  },
+  {
+   "heroes": [
+    "cindrel",
+    "ketterick",
+    "ellowen",
+    "tessarine",
+    "jorreck"
+   ],
+   "mod": 0.03,
+   "style": "siege",
+   "needs": -0.05,
+   "balance": 0.0,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 1,
+    "siege": 5,
+    "protect": 4
+   }
+  },
+  {
+   "heroes": [
+    "hegwin",
+    "harkin",
+    "vellgrim",
+    "barrowick",
+    "oriel"
+   ],
+   "mod": 0.15,
+   "style": "skirmish",
+   "needs": 0.0,
+   "balance": 0.0,
+   "synergy": 0.16,
+   "scores": {
+    "dive": 3,
+    "siege": 3,
+    "protect": 2
+   }
+  },
+  {
+   "heroes": [
+    "nimbrel",
+    "corvane",
+    "ketterick",
+    "vellgrim",
+    "marrek"
+   ],
+   "mod": 0.020000000000000004,
+   "style": "dive",
+   "needs": 0.0,
+   "balance": -0.06,
+   "synergy": 0.08,
+   "scores": {
+    "dive": 5,
+    "siege": 1,
+    "protect": 1
+   }
+  }
+ ],
+ "progress": [
+  {
+   "heroes": [
+    "brannoch",
+    "tamsel",
+    "bastrel",
+    "tessarine",
+    "skarrow"
+   ],
+   "value": 0.23000000000000004
+  },
+  {
+   "heroes": [
+    "tanglewick",
+    "corvane",
+    "brixley",
+    "ellowen",
+    "fennimore"
+   ],
+   "value": 0.23000000000000004
+  },
+  {
+   "heroes": [
+    "quillith",
+    "tamsel",
+    "corvane"
+   ],
+   "value": 0.19000000000000003
+  },
+  {
+   "heroes": [
+    "skarrow",
+    "brixley",
+    "tessarine",
+    "dunmarrow",
+    "nimbrel"
+   ],
+   "value": 0.23000000000000004
+  },
+  {
+   "heroes": [
+    "wyldrim",
+    "ketterick",
+    "marrek"
+   ],
+   "value": 0.19000000000000003
+  },
+  {
+   "heroes": [
+    "barrowick",
+    "wyncote"
+   ],
+   "value": 0.1
+  },
+  {
+   "heroes": [
+    "alderwyn",
+    "tanglewick",
+    "skarrow"
+   ],
+   "value": 0.19000000000000003
+  },
+  {
+   "heroes": [
+    "dunmarrow",
+    "marrek",
+    "dusken"
+   ],
+   "value": 0.23000000000000004
+  },
+  {
+   "heroes": [
+    "nimbrel",
+    "tessarine",
+    "quillith"
+   ],
+   "value": 0.1
+  },
+  {
+   "heroes": [
+    "bastrel",
+    "tanglewick"
+   ],
+   "value": 0.14
+  },
+  {
+   "heroes": [
+    "pellam",
+    "harkin",
+    "oriel",
+    "skarrow",
+    "ketterick"
+   ],
+   "value": 0.23000000000000004
+  },
+  {
+   "heroes": [
+    "marrek",
+    "orisande",
+    "oriel"
+   ],
+   "value": 0.15000000000000002
+  },
+  {
+   "heroes": [
+    "tuskal",
+    "sootwing",
+    "orrick"
+   ],
+   "value": 0.1
+  },
+  {
+   "heroes": [
+    "lanthorn"
+   ],
+   "value": 0.05
+  },
+  {
+   "heroes": [
+    "tanglewick",
+    "jorreck",
+    "embrel",
+    "oriel"
+   ],
+   "value": 0.18000000000000002
+  },
+  {
+   "heroes": [
+    "quillith",
+    "veshra",
+    "orisande",
+    "ellowen"
+   ],
+   "value": 0.14
+  },
+  {
+   "heroes": [
+    "fennimore"
+   ],
+   "value": 0.1
+  },
+  {
+   "heroes": [
+    "brixley",
+    "dusken",
+    "marrek",
+    "ottomere",
+    "pellam"
+   ],
+   "value": 0.27
+  },
+  {
+   "heroes": [
+    "dusken",
+    "harkin"
+   ],
+   "value": 0.1
+  },
+  {
+   "heroes": [
+    "hegwin"
+   ],
+   "value": 0.1
+  },
+  {
+   "heroes": [
+    "sootwing",
+    "brannoch"
+   ],
+   "value": 0.15000000000000002
+  },
+  {
+   "heroes": [
+    "tuskal",
+    "ellowen",
+    "orisande"
+   ],
+   "value": 0.15000000000000002
+  },
+  {
+   "heroes": [
+    "sparrowe",
+    "oriel",
+    "tessarine"
+   ],
+   "value": 0.13
+  },
+  {
+   "heroes": [
+    "bastrel",
+    "wyldrim",
+    "cindrel",
+    "dunmarrow"
+   ],
+   "value": 0.23000000000000004
+  },
+  {
+   "heroes": [
+    "hegwin",
+    "dunmarrow"
+   ],
+   "value": 0.18000000000000002
+  },
+  {
+   "heroes": [
+    "wyncote",
+    "orrick",
+    "tanglewick"
+   ],
+   "value": 0.1
+  },
+  {
+   "heroes": [
+    "orisande",
+    "ellowen"
+   ],
+   "value": 0.1
+  },
+  {
+   "heroes": [
+    "pellam",
+    "tamsel"
+   ],
+   "value": 0.04
+  },
+  {
+   "heroes": [
+    "brixley",
+    "lanthorn",
+    "quillith",
+    "embrel",
+    "marrek"
+   ],
+   "value": 0.19000000000000003
+  },
+  {
+   "heroes": [
+    "pellam"
+   ],
+   "value": 0.0
+  },
+  {
+   "heroes": [
+    "vellgrim",
+    "ellowen",
+    "wyncote",
+    "nimbrel"
+   ],
+   "value": 0.19000000000000003
+  },
+  {
+   "heroes": [
+    "oriel",
+    "alderwyn",
+    "dunmarrow"
+   ],
+   "value": 0.15000000000000002
+  },
+  {
+   "heroes": [
+    "embrel",
+    "ketterick",
+    "sootwing"
+   ],
+   "value": 0.1
+  },
+  {
+   "heroes": [
+    "sparrowe",
+    "fennimore",
+    "tamsel"
+   ],
+   "value": 0.18000000000000002
+  },
+  {
+   "heroes": [
+    "oriel",
+    "corvane",
+    "sootwing",
+    "lanthorn",
+    "dunmarrow"
+   ],
+   "value": 0.21000000000000002
+  },
+  {
+   "heroes": [
+    "dovrin",
+    "ellowen",
+    "oriel",
+    "harkin",
+    "corvane"
+   ],
+   "value": 0.17000000000000004
+  },
+  {
+   "heroes": [
+    "vellgrim",
+    "ottomere",
+    "tuskal",
+    "wyncote",
+    "sootwing"
+   ],
+   "value": 0.18000000000000002
+  },
+  {
+   "heroes": [
+    "oriel",
+    "brixley",
+    "orrick",
+    "cindrel",
+    "sunnivah"
+   ],
+   "value": 0.18000000000000002
+  },
+  {
+   "heroes": [
+    "brannoch",
+    "dovrin",
+    "cindrel",
+    "ottomere",
+    "dunmarrow"
+   ],
+   "value": 0.23000000000000004
+  },
+  {
+   "heroes": [
+    "barrowick",
+    "wyncote",
+    "tuskal",
+    "ottomere",
+    "cindrel"
+   ],
+   "value": 0.17000000000000004
+  }
+ ],
+ "drafts": [
+  {
+   "blue": "thornwick_stags",
+   "red": "northreach_corsairs",
+   "save_seed": 228385504,
+   "match_id": "G-0-thor-nort",
+   "full": false,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ellowen"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "jorreck"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "corvane"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "barrowick"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "sootwing"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "pellam"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "bastrel"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "fennimore"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "maurelle"
+    }
+   ],
+   "final": 0.17319034106340855,
+   "a_won": true,
+   "comp_b": 0.15,
+   "comp_r": 0.12,
+   "style_b": "dive",
+   "style_r": "dive",
+   "lane_b": {
+    "top": 0.1
+   },
+   "lane_r": {
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 66.46742982788528,
+    "jg": 65.19009475978608,
+    "mid": 62.09248290531191,
+    "bot": 60.137432661553795,
+    "sup": 62.18844976026809
+   },
+   "late_r": {
+    "top": 53.77193474917278,
+    "jg": 50.73933220398969,
+    "mid": 49.344834121278275,
+    "bot": 56.68187904102139,
+    "sup": 46.416503288488784
+   },
+   "con_b": 71.4,
+   "lineup_b": {
+    "top": "p082",
+    "jg": "p083",
+    "mid": "p086",
+    "bot": "p088",
+    "sup": "p090"
+   },
+   "lineup_r": {
+    "top": "p052",
+    "jg": "p054",
+    "mid": "p056",
+    "bot": "p058",
+    "sup": "p059"
+   }
+  },
+  {
+   "blue": "ironquill_wolves",
+   "red": "saltmarrow_gulls",
+   "save_seed": 701560359,
+   "match_id": "G-1-iron-salt",
+   "full": false,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dovrin"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "bastrel"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "tuskal"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "harkin"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    }
+   ],
+   "final": -0.6172765394414037,
+   "a_won": false,
+   "comp_b": 0.12,
+   "comp_r": 0.12,
+   "style_b": "skirmish",
+   "style_r": "dive",
+   "lane_b": {},
+   "lane_r": {
+    "top": 0.1,
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 45.469674002428405,
+    "jg": 43.19661797555085,
+    "mid": 34.33574695593588,
+    "bot": 38.20730608918835,
+    "sup": 37.61176361441657
+   },
+   "late_r": {
+    "top": 64.04463546182498,
+    "jg": 64.4644057589224,
+    "mid": 70.18725257299235,
+    "bot": 72.1691219944619,
+    "sup": 69.58508517070379
+   },
+   "con_b": 33.8,
+   "lineup_b": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   },
+   "lineup_r": {
+    "top": "p092",
+    "jg": "p093",
+    "mid": "p096",
+    "bot": "p097",
+    "sup": "p100"
+   }
+  },
+  {
+   "blue": "duskwater_foxes",
+   "red": "gildmoor_raiders",
+   "save_seed": 350850893,
+   "match_id": "G-2-dusk-gild",
+   "full": false,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "embrel"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "quillith"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "corvane"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "alderwyn"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "skarrow"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "maurelle"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    }
+   ],
+   "final": 0.29335586406751046,
+   "a_won": true,
+   "comp_b": 0.12,
+   "comp_r": 0.12,
+   "style_b": "protect",
+   "style_r": "skirmish",
+   "lane_b": {
+    "top": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "mid": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 46.01325184319903,
+    "jg": 40.65715468708239,
+    "mid": 40.517066037796965,
+    "bot": 36.34501164877918,
+    "sup": 44.72501603193789
+   },
+   "late_r": {
+    "top": 48.43127995011581,
+    "jg": 37.73413293945924,
+    "mid": 42.857682901397986,
+    "bot": 46.34396962857529,
+    "sup": 44.412420762755026
+   },
+   "con_b": 38.4,
+   "lineup_b": {
+    "top": "p011",
+    "jg": "p013",
+    "mid": "p015",
+    "bot": "p017",
+    "sup": "p019"
+   },
+   "lineup_r": {
+    "top": "p021",
+    "jg": "p023",
+    "mid": "p025",
+    "bot": "p028",
+    "sup": "p030"
+   }
+  },
+  {
+   "blue": "gildmoor_raiders",
+   "red": "stormvale_herons",
+   "save_seed": 725010140,
+   "match_id": "G-3-gild-stor",
+   "full": false,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "embrel"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "dunmarrow"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "oriel"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "skarrow"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "wyncote"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "barrowick"
+    }
+   ],
+   "final": -0.08116585492390133,
+   "a_won": false,
+   "comp_b": 0.020000000000000004,
+   "comp_r": 0.020000000000000004,
+   "style_b": "protect",
+   "style_r": "dive",
+   "lane_b": {
+    "mid": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "top": 0.1,
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 47.60357340022831,
+    "jg": 43.173908090963906,
+    "mid": 37.508483575741366,
+    "bot": 50.081839366202594,
+    "sup": 42.84539808436351
+   },
+   "late_r": {
+    "top": 56.955290795466915,
+    "jg": 48.09191463637377,
+    "mid": 56.327741206687044,
+    "bot": 64.32631595213317,
+    "sup": 58.265735290325175
+   },
+   "con_b": 39.6,
+   "lineup_b": {
+    "top": "p021",
+    "jg": "p023",
+    "mid": "p025",
+    "bot": "p028",
+    "sup": "p030"
+   },
+   "lineup_r": {
+    "top": "p072",
+    "jg": "p074",
+    "mid": "p075",
+    "bot": "p077",
+    "sup": "p080"
+   }
+  },
+  {
+   "blue": "ironquill_wolves",
+   "red": "saltmarrow_gulls",
+   "save_seed": 485234700,
+   "match_id": "G-4-iron-salt",
+   "full": false,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dovrin"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "quillith"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "hegwin"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "harkin"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "brannoch"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "bastrel"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "embrel"
+    }
+   ],
+   "final": -0.5542072018770492,
+   "a_won": false,
+   "comp_b": 0.12,
+   "comp_r": 0.12,
+   "style_b": "skirmish",
+   "style_r": "skirmish",
+   "lane_b": {
+    "mid": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 45.56367962784853,
+    "jg": 45.524146580246764,
+    "mid": 28.560306555409515,
+    "bot": 38.20730608918835,
+    "sup": 38.020002331419526
+   },
+   "late_r": {
+    "top": 59.0737440067174,
+    "jg": 66.17906576130294,
+    "mid": 67.30476732978121,
+    "bot": 72.1691219944619,
+    "sup": 71.95586684691845
+   },
+   "con_b": 33.8,
+   "lineup_b": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   },
+   "lineup_r": {
+    "top": "p092",
+    "jg": "p093",
+    "mid": "p096",
+    "bot": "p097",
+    "sup": "p100"
+   }
+  },
+  {
+   "blue": "ironquill_wolves",
+   "red": "stormvale_herons",
+   "save_seed": 536917124,
+   "match_id": "G-5-iron-stor",
+   "full": false,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ketterick"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dovrin"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "pellam"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "tuskal"
+    }
+   ],
+   "final": 0.25176160505942374,
+   "a_won": true,
+   "comp_b": 0.12,
+   "comp_r": 0.12,
+   "style_b": "skirmish",
+   "style_r": "dive",
+   "lane_b": {
+    "top": 0.1
+   },
+   "lane_r": {
+    "jg": 0.1
+   },
+   "early_b": {
+    "top": 44.96702112187455,
+    "jg": 43.19661797555085,
+    "mid": 34.33574695593588,
+    "bot": 38.20730608918835,
+    "sup": 37.61176361441657
+   },
+   "late_r": {
+    "top": 60.75156844486361,
+    "jg": 56.38292166906414,
+    "mid": 56.327741206687044,
+    "bot": 63.84696242100101,
+    "sup": 59.640542333599676
+   },
+   "con_b": 33.8,
+   "lineup_b": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   },
+   "lineup_r": {
+    "top": "p072",
+    "jg": "p074",
+    "mid": "p075",
+    "bot": "p077",
+    "sup": "p080"
+   }
+  },
+  {
+   "blue": "stormvale_herons",
+   "red": "ironquill_wolves",
+   "save_seed": 857490338,
+   "match_id": "G-6-stor-iron",
+   "full": false,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dovrin"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ketterick"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "pellam"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "tuskal"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    }
+   ],
+   "final": -0.4279364626558339,
+   "a_won": false,
+   "comp_b": 0.12,
+   "comp_r": 0.12,
+   "style_b": "dive",
+   "style_r": "skirmish",
+   "lane_b": {
+    "jg": 0.1
+   },
+   "lane_r": {
+    "top": 0.1
+   },
+   "early_b": {
+    "top": 58.61648331155415,
+    "jg": 63.12695890359226,
+    "mid": 60.336704088639934,
+    "bot": 57.03023538739207,
+    "sup": 61.349600994730395
+   },
+   "late_r": {
+    "top": 41.23305320617909,
+    "jg": 38.10203266528481,
+    "mid": 35.656062689857,
+    "bot": 40.076469406544746,
+    "sup": 37.32610465025645
+   },
+   "con_b": 53.4,
+   "lineup_b": {
+    "top": "p072",
+    "jg": "p074",
+    "mid": "p075",
+    "bot": "p077",
+    "sup": "p080"
+   },
+   "lineup_r": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   }
+  },
+  {
+   "blue": "northreach_corsairs",
+   "red": "emberfen_hounds",
+   "save_seed": 724255742,
+   "match_id": "G-7-nort-embe",
+   "full": false,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "corvane"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ellowen"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "barrowick"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "veshra"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "sootwing"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "wyncote"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "maurelle"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "dusken"
+    }
+   ],
+   "final": -0.2989291164220644,
+   "a_won": false,
+   "comp_b": 0.08,
+   "comp_r": 0.0,
+   "style_b": "skirmish",
+   "style_r": "dive",
+   "lane_b": {
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "mid": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 61.86612881645624,
+    "jg": 47.13210153148345,
+    "mid": 50.32920925164575,
+    "bot": 57.32282946145369,
+    "sup": 50.07689412457019
+   },
+   "late_r": {
+    "top": 54.954686723543446,
+    "jg": 59.9711360876714,
+    "mid": 59.08127041038003,
+    "bot": 67.02259362128379,
+    "sup": 56.906096751368594
+   },
+   "con_b": 48.2,
+   "lineup_b": {
+    "top": "p052",
+    "jg": "p054",
+    "mid": "p056",
+    "bot": "p058",
+    "sup": "p059"
+   },
+   "lineup_r": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   }
+  },
+  {
+   "blue": "thornwick_stags",
+   "red": "mossgate_wardens",
+   "save_seed": 240606860,
+   "match_id": "G-8-thor-moss",
+   "full": false,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "veshra"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "jorreck"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "bastrel"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "tessarine"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "sparrowe"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "tuskal"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "wyldrim"
+    }
+   ],
+   "final": -0.22694288593821602,
+   "a_won": false,
+   "comp_b": 0.08,
+   "comp_r": 0.15,
+   "style_b": "dive",
+   "style_r": "protect",
+   "lane_b": {
+    "top": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "mid": 0.1,
+    "jg": 0.1
+   },
+   "early_b": {
+    "top": 66.90793314170067,
+    "jg": 68.2295654003359,
+    "mid": 68.65340432949044,
+    "bot": 59.05401663537523,
+    "sup": 65.36915152728383
+   },
+   "late_r": {
+    "top": 47.60521426709349,
+    "jg": 51.18838151863778,
+    "mid": 46.97468903663485,
+    "bot": 45.91132778705768,
+    "sup": 53.792322046766046
+   },
+   "con_b": 71.4,
+   "lineup_b": {
+    "top": "p082",
+    "jg": "p083",
+    "mid": "p086",
+    "bot": "p088",
+    "sup": "p090"
+   },
+   "lineup_r": {
+    "top": "p042",
+    "jg": "p044",
+    "mid": "p046",
+    "bot": "p047",
+    "sup": "p049"
+   }
+  },
+  {
+   "blue": "saltmarrow_gulls",
+   "red": "duskwater_foxes",
+   "save_seed": 385861670,
+   "match_id": "G-9-salt-dusk",
+   "full": false,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ellowen"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "corvane"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "alderwyn"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "pellam"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "bastrel"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "sootwing"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "maurelle"
+    }
+   ],
+   "final": 0.40360486776772253,
+   "a_won": true,
+   "comp_b": 0.12,
+   "comp_r": 0.12,
+   "style_b": "dive",
+   "style_r": "protect",
+   "lane_b": {
+    "top": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {},
+   "early_b": {
+    "top": 58.212621431748914,
+    "jg": 74.68475539909535,
+    "mid": 67.79442208038327,
+    "bot": 68.09468931409462,
+    "sup": 72.23028246329393
+   },
+   "late_r": {
+    "top": 40.98465577502932,
+    "jg": 37.6659357904849,
+    "mid": 39.99884681324912,
+    "bot": 38.30100666762189,
+    "sup": 41.135372662780185
+   },
+   "con_b": 66.0,
+   "lineup_b": {
+    "top": "p092",
+    "jg": "p093",
+    "mid": "p096",
+    "bot": "p097",
+    "sup": "p100"
+   },
+   "lineup_r": {
+    "top": "p011",
+    "jg": "p013",
+    "mid": "p015",
+    "bot": "p017",
+    "sup": "p019"
+   }
+  },
+  {
+   "blue": "emberfen_hounds",
+   "red": "mossgate_wardens",
+   "save_seed": 146772778,
+   "match_id": "G-0-embe-moss",
+   "full": true,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "corvane"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "veshra"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ellowen"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "wyncote"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "dovrin"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "pellam"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "quillith"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "sootwing"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "lanthorn"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "marrek"
+    }
+   ],
+   "final": 0.09852657972270035,
+   "a_won": true,
+   "comp_b": -0.05,
+   "comp_r": 0.08,
+   "style_b": "dive",
+   "style_r": "protect",
+   "lane_b": {
+    "top": 0.1
+   },
+   "lane_r": {
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 58.41647693172071,
+    "jg": 63.75700361243405,
+    "mid": 56.61429758448591,
+    "bot": 63.649448955714455,
+    "sup": 57.74371289648418
+   },
+   "late_r": {
+    "top": 47.60521426709349,
+    "jg": 54.403748045361134,
+    "mid": 44.40567243886259,
+    "bot": 48.92057655631158,
+    "sup": 51.104690016610974
+   },
+   "con_b": 52.0,
+   "lineup_b": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   },
+   "lineup_r": {
+    "top": "p042",
+    "jg": "p044",
+    "mid": "p046",
+    "bot": "p047",
+    "sup": "p049"
+   }
+  },
+  {
+   "blue": "thornwick_stags",
+   "red": "ironquill_wolves",
+   "save_seed": 66944643,
+   "match_id": "G-1-thor-iron",
+   "full": true,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dovrin"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "jorreck"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "orisande"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "quillith"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "embrel"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "marrek"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tuskal"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "fennimore"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "pellam"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "bastrel"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    }
+   ],
+   "final": 0.5576087283124918,
+   "a_won": true,
+   "comp_b": 0.15,
+   "comp_r": 0.06,
+   "style_b": "skirmish",
+   "style_r": "dive",
+   "lane_b": {
+    "jg": 0.1
+   },
+   "lane_r": {
+    "top": 0.1,
+    "mid": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 66.46742982788528,
+    "jg": 62.051672128170566,
+    "mid": 68.65340432949044,
+    "bot": 60.137432661553795,
+    "sup": 65.36915152728383
+   },
+   "late_r": {
+    "top": 41.23305320617909,
+    "jg": 39.96012638370692,
+    "mid": 34.66268981676194,
+    "bot": 39.28922522778362,
+    "sup": 34.33455320629957
+   },
+   "con_b": 71.4,
+   "lineup_b": {
+    "top": "p082",
+    "jg": "p083",
+    "mid": "p086",
+    "bot": "p088",
+    "sup": "p090"
+   },
+   "lineup_r": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   }
+  },
+  {
+   "blue": "stormvale_herons",
+   "red": "thornwick_stags",
+   "save_seed": 69243946,
+   "match_id": "G-2-stor-thor",
+   "full": true,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "jorreck"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ketterick"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "orisande"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "pellam"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "corvane"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "alderwyn"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "sunnivah"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tuskal"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "fennimore"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "harkin"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "wyncote"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "tanglewick"
+    }
+   ],
+   "final": -0.057149652514279004,
+   "a_won": false,
+   "comp_b": 0.12,
+   "comp_r": 0.12,
+   "style_b": "siege",
+   "style_r": "dive",
+   "lane_b": {
+    "jg": 0.1
+   },
+   "lane_r": {
+    "top": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 58.61648331155415,
+    "jg": 52.16200521381537,
+    "mid": 60.336704088639934,
+    "bot": 55.00059410872858,
+    "sup": 59.33997833734456
+   },
+   "late_r": {
+    "top": 64.75209640065624,
+    "jg": 57.68140892186643,
+    "mid": 62.7766639695098,
+    "bot": 51.31880376262285,
+    "sup": 68.49099676916005
+   },
+   "con_b": 53.4,
+   "lineup_b": {
+    "top": "p072",
+    "jg": "p074",
+    "mid": "p075",
+    "bot": "p077",
+    "sup": "p080"
+   },
+   "lineup_r": {
+    "top": "p082",
+    "jg": "p083",
+    "mid": "p086",
+    "bot": "p088",
+    "sup": "p090"
+   }
+  },
+  {
+   "blue": "pinehollow_owls",
+   "red": "emberfen_hounds",
+   "save_seed": 752117149,
+   "match_id": "G-3-pine-embe",
+   "full": true,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "corvane"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "sunnivah"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "pellam"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "jorreck"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "veshra"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "sootwing"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "oriel"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "wyncote"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "brannoch"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "lanthorn"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "skarrow"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    }
+   ],
+   "final": -0.4859523434487728,
+   "a_won": false,
+   "comp_b": 0.08,
+   "comp_r": 0.04,
+   "style_b": "skirmish",
+   "style_r": "dive",
+   "lane_b": {
+    "top": 0.1,
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 44.406035963869215,
+    "jg": 45.99046582791127,
+    "mid": 43.94104206470542,
+    "bot": 35.52719994979402,
+    "sup": 49.22201178681316
+   },
+   "late_r": {
+    "top": 54.954686723543446,
+    "jg": 59.9711360876714,
+    "mid": 58.0973939586214,
+    "bot": 67.02259362128379,
+    "sup": 56.906096751368594
+   },
+   "con_b": 40.2,
+   "lineup_b": {
+    "top": "p032",
+    "jg": "p033",
+    "mid": "p036",
+    "bot": "p037",
+    "sup": "p039"
+   },
+   "lineup_r": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   }
+  },
+  {
+   "blue": "emberfen_hounds",
+   "red": "gildmoor_raiders",
+   "save_seed": 253365153,
+   "match_id": "G-4-embe-gild",
+   "full": true,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "embrel"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "corvane"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "skarrow"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "oriel"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "wyncote"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "tuskal"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "pellam"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "veshra"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "tessarine"
+    }
+   ],
+   "final": 0.2807743265641486,
+   "a_won": true,
+   "comp_b": 0.04,
+   "comp_r": 0.020000000000000004,
+   "style_b": "dive",
+   "style_r": "protect",
+   "lane_b": {
+    "top": 0.1,
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "mid": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 58.41647693172071,
+    "jg": 70.15982339322905,
+    "mid": 63.21508081471881,
+    "bot": 63.649448955714455,
+    "sup": 57.74371289648418
+   },
+   "late_r": {
+    "top": 48.43127995011581,
+    "jg": 39.57323277053949,
+    "mid": 45.48338920675042,
+    "bot": 44.34430825434638,
+    "sup": 44.03687189093646
+   },
+   "con_b": 52.0,
+   "lineup_b": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   },
+   "lineup_r": {
+    "top": "p021",
+    "jg": "p023",
+    "mid": "p025",
+    "bot": "p028",
+    "sup": "p030"
+   }
+  },
+  {
+   "blue": "gildmoor_raiders",
+   "red": "northreach_corsairs",
+   "save_seed": 899147680,
+   "match_id": "G-5-gild-nort",
+   "full": true,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ellowen"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ottomere"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "quillith"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "barrowick"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "skarrow"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "sootwing"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "embrel"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "brannoch"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "maurelle"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "wyncote"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "sunnivah"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    }
+   ],
+   "final": -0.8047934364013831,
+   "a_won": false,
+   "comp_b": 0.009999999999999995,
+   "comp_r": 0.06,
+   "style_b": "skirmish",
+   "style_r": "dive",
+   "lane_b": {
+    "top": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 47.32026938157911,
+    "jg": 43.173908090963906,
+    "mid": 40.997778940856875,
+    "bot": 48.371301550154584,
+    "sup": 43.949515061763584
+   },
+   "late_r": {
+    "top": 53.77193474917278,
+    "jg": 50.73933220398969,
+    "mid": 49.344834121278275,
+    "bot": 56.68187904102139,
+    "sup": 45.77734640471635
+   },
+   "con_b": 39.6,
+   "lineup_b": {
+    "top": "p021",
+    "jg": "p023",
+    "mid": "p025",
+    "bot": "p028",
+    "sup": "p030"
+   },
+   "lineup_r": {
+    "top": "p052",
+    "jg": "p054",
+    "mid": "p056",
+    "bot": "p058",
+    "sup": "p059"
+   }
+  },
+  {
+   "blue": "ironquill_wolves",
+   "red": "mossgate_wardens",
+   "save_seed": 220738700,
+   "match_id": "G-6-iron-moss",
+   "full": true,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "veshra"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dovrin"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "quillith"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "alderwyn"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "fennimore"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "sparrowe"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "ellowen"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "bastrel"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "embrel"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "orisande"
+    }
+   ],
+   "final": 0.30189742569261535,
+   "a_won": true,
+   "comp_b": 0.12,
+   "comp_r": 0.15,
+   "style_b": "dive",
+   "style_r": "dive",
+   "lane_b": {
+    "top": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "mid": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 44.96702112187455,
+    "jg": 45.524146580246764,
+    "mid": 33.390128995468416,
+    "bot": 38.20730608918835,
+    "sup": 38.020002331419526
+   },
+   "late_r": {
+    "top": 47.60521426709349,
+    "jg": 44.33455181563891,
+    "mid": 45.370764393051815,
+    "bot": 40.33026139793378,
+    "sup": 53.792322046766046
+   },
+   "con_b": 33.8,
+   "lineup_b": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   },
+   "lineup_r": {
+    "top": "p042",
+    "jg": "p044",
+    "mid": "p046",
+    "bot": "p047",
+    "sup": "p049"
+   }
+  },
+  {
+   "blue": "northreach_corsairs",
+   "red": "gildmoor_raiders",
+   "save_seed": 85874241,
+   "match_id": "G-7-nort-gild",
+   "full": true,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "embrel"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "skarrow"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ellowen"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "barrowick"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "sootwing"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "brannoch"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "wyncote"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "maurelle"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    }
+   ],
+   "final": 0.5880753997227088,
+   "a_won": true,
+   "comp_b": 0.06,
+   "comp_r": 0.12,
+   "style_b": "dive",
+   "style_r": "dive",
+   "lane_b": {
+    "bot": 0.1
+   },
+   "lane_r": {
+    "top": 0.1,
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 61.86612881645624,
+    "jg": 47.13210153148345,
+    "mid": 50.32920925164575,
+    "bot": 57.32282946145369,
+    "sup": 52.66650645586848
+   },
+   "late_r": {
+    "top": 48.43127995011581,
+    "jg": 38.88776618499295,
+    "mid": 43.24905903134536,
+    "bot": 46.34396962857529,
+    "sup": 42.75961221113298
+   },
+   "con_b": 48.2,
+   "lineup_b": {
+    "top": "p052",
+    "jg": "p054",
+    "mid": "p056",
+    "bot": "p058",
+    "sup": "p059"
+   },
+   "lineup_r": {
+    "top": "p021",
+    "jg": "p023",
+    "mid": "p025",
+    "bot": "p028",
+    "sup": "p030"
+   }
+  },
+  {
+   "blue": "ironquill_wolves",
+   "red": "pinehollow_owls",
+   "save_seed": 37506065,
+   "match_id": "G-8-iron-pine",
+   "full": true,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "sunnivah"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dovrin"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "jorreck"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "quillith"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "marrek"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "dunmarrow"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "fennimore"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ellowen"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "cindrel"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "alderwyn"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "tessarine"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "tamsel"
+    }
+   ],
+   "final": -0.01607184917982718,
+   "a_won": false,
+   "comp_b": 0.08,
+   "comp_r": 0.06,
+   "style_b": "siege",
+   "style_r": "skirmish",
+   "lane_b": {
+    "top": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 45.469674002428405,
+    "jg": 45.524146580246764,
+    "mid": 31.957444989198937,
+    "bot": 31.20752643498904,
+    "sup": 36.37383830046922
+   },
+   "late_r": {
+    "top": 46.41540627763094,
+    "jg": 49.44150810716944,
+    "mid": 46.18062020958827,
+    "bot": 44.140752406311705,
+    "sup": 45.72548359174914
+   },
+   "con_b": 33.8,
+   "lineup_b": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   },
+   "lineup_r": {
+    "top": "p032",
+    "jg": "p033",
+    "mid": "p036",
+    "bot": "p037",
+    "sup": "p039"
+   }
+  },
+  {
+   "blue": "mossgate_wardens",
+   "red": "emberfen_hounds",
+   "save_seed": 879218680,
+   "match_id": "G-9-moss-embe",
+   "full": true,
+   "human": {},
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "corvane"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ellowen"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "veshra"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "dovrin"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "wyncote"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "quillith"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "pellam"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "sootwing"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "marrek"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "lanthorn"
+    }
+   ],
+   "final": 0.5280442413554801,
+   "a_won": true,
+   "comp_b": 0.08,
+   "comp_r": -0.05,
+   "style_b": "protect",
+   "style_r": "dive",
+   "lane_b": {
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "top": 0.1
+   },
+   "early_b": {
+    "top": 44.346023360998295,
+    "jg": 53.22214114489073,
+    "mid": 48.56636413343982,
+    "bot": 47.647643186734065,
+    "sup": 54.0672807422116
+   },
+   "late_r": {
+    "top": 54.954686723543446,
+    "jg": 62.921366632392456,
+    "mid": 60.16363882695899,
+    "bot": 67.02259362128379,
+    "sup": 56.906096751368594
+   },
+   "con_b": 46.6,
+   "lineup_b": {
+    "top": "p042",
+    "jg": "p044",
+    "mid": "p046",
+    "bot": "p047",
+    "sup": "p049"
+   },
+   "lineup_r": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   }
+  },
+  {
+   "blue": "emberfen_hounds",
+   "red": "mossgate_wardens",
+   "save_seed": 891282755,
+   "match_id": "H-B-0-embe-moss",
+   "full": false,
+   "human": {
+    "0": "dovrin",
+    "2": [
+     "mid",
+     "brannoch"
+    ],
+    "5": [
+     "bot",
+     "vellgrim"
+    ],
+    "6": [
+     "sup",
+     "alderwyn"
+    ],
+    "9": [
+     "jg",
+     "tessarine"
+    ],
+    "10": [
+     "top",
+     "pellam"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dovrin"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "corvane"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "brannoch"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "veshra"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "alderwyn"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "barrowick"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "tessarine"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "pellam"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "hegwin"
+    }
+   ],
+   "final": 0.3904209964369575,
+   "a_won": true,
+   "comp_b": 0.08,
+   "comp_r": 0.12,
+   "style_b": "protect",
+   "style_r": "dive",
+   "lane_b": {},
+   "lane_r": {
+    "mid": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 46.15525272467439,
+    "jg": 53.80568846836945,
+    "mid": 49.58989757675316,
+    "bot": 52.25305166364603,
+    "sup": 54.571959615537025
+   },
+   "late_r": {
+    "top": 47.60521426709349,
+    "jg": 53.808986729532045,
+    "mid": 38.12615538107018,
+    "bot": 39.85877487562897,
+    "sup": 54.20977375225683
+   },
+   "con_b": 52.0,
+   "lineup_b": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   },
+   "lineup_r": {
+    "top": "p042",
+    "jg": "p044",
+    "mid": "p046",
+    "bot": "p047",
+    "sup": "p049"
+   }
+  },
+  {
+   "blue": "emberfen_hounds",
+   "red": "ironquill_wolves",
+   "save_seed": 726979199,
+   "match_id": "H-B-1-embe-iron",
+   "full": false,
+   "human": {
+    "0": "sparrowe",
+    "2": [
+     "mid",
+     "barrowick"
+    ],
+    "5": [
+     "jg",
+     "veshra"
+    ],
+    "6": [
+     "sup",
+     "cindrel"
+    ],
+    "9": [
+     "top",
+     "orrick"
+    ],
+    "10": [
+     "bot",
+     "nimbrel"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "sparrowe"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "barrowick"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "quillith"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "veshra"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "cindrel"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "fennimore"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "orrick"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "nimbrel"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ottomere"
+    }
+   ],
+   "final": 0.8387583792746994,
+   "a_won": true,
+   "comp_b": 0.04,
+   "comp_r": 0.12,
+   "style_b": "skirmish",
+   "style_r": "skirmish",
+   "lane_b": {},
+   "lane_r": {
+    "mid": 0.1,
+    "jg": 0.1
+   },
+   "early_b": {
+    "top": 56.517434301285235,
+    "jg": 70.15982339322905,
+    "mid": 52.63159762240961,
+    "bot": 52.97007277289139,
+    "sup": 44.00442187872648
+   },
+   "late_r": {
+    "top": 39.156291244223745,
+    "jg": 39.96012638370692,
+    "mid": 32.23907553064843,
+    "bot": 39.891094746623054,
+    "sup": 39.09012690077841
+   },
+   "con_b": 52.0,
+   "lineup_b": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   },
+   "lineup_r": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   }
+  },
+  {
+   "blue": "stormvale_herons",
+   "red": "saltmarrow_gulls",
+   "save_seed": 565544176,
+   "match_id": "H-B-2-stor-salt",
+   "full": false,
+   "human": {
+    "0": "corvane",
+    "2": [
+     "mid",
+     "orisande"
+    ],
+    "5": [
+     "bot",
+     "oriel"
+    ],
+    "6": [
+     "sup",
+     "cindrel"
+    ],
+    "9": [
+     "jg",
+     "veshra"
+    ],
+    "10": [
+     "top",
+     "lanthorn"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "corvane"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ketterick"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "orisande"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "oriel"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "cindrel"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "ellowen"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "veshra"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "lanthorn"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "maurelle"
+    }
+   ],
+   "final": 0.16318881667877022,
+   "a_won": true,
+   "comp_b": 0.03,
+   "comp_r": 0.08,
+   "style_b": "siege",
+   "style_r": "siege",
+   "lane_b": {},
+   "lane_r": {
+    "top": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 46.16179602051279,
+    "jg": 63.11833932771104,
+    "mid": 59.302676927798,
+    "bot": 46.84593924871203,
+    "sup": 45.53475628256308
+   },
+   "late_r": {
+    "top": 54.326315087026906,
+    "jg": 66.04900337292743,
+    "mid": 70.18725257299235,
+    "bot": 71.25854494353597,
+    "sup": 59.46932247049266
+   },
+   "con_b": 53.4,
+   "lineup_b": {
+    "top": "p072",
+    "jg": "p074",
+    "mid": "p075",
+    "bot": "p077",
+    "sup": "p080"
+   },
+   "lineup_r": {
+    "top": "p092",
+    "jg": "p093",
+    "mid": "p096",
+    "bot": "p097",
+    "sup": "p100"
+   }
+  },
+  {
+   "blue": "saltmarrow_gulls",
+   "red": "emberfen_hounds",
+   "save_seed": 18934263,
+   "match_id": "H-R-0-salt-embe",
+   "full": false,
+   "human": {
+    "1": "brixley",
+    "3": [
+     "top",
+     "oriel"
+    ],
+    "4": [
+     "mid",
+     "wyncote"
+    ],
+    "7": [
+     "jg",
+     "dunmarrow"
+    ],
+    "8": [
+     "sup",
+     "hegwin"
+    ],
+    "11": [
+     "bot",
+     "tanglewick"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "corvane"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "brixley"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "oriel"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "wyncote"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "dunmarrow"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "hegwin"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "alderwyn"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "bastrel"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "tanglewick"
+    }
+   ],
+   "final": 0.5837205716431634,
+   "a_won": true,
+   "comp_b": 0.12,
+   "comp_r": 0.12,
+   "style_b": "skirmish",
+   "style_r": "dive",
+   "lane_b": {
+    "top": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {},
+   "early_b": {
+    "top": 60.984643220582676,
+    "jg": 74.68475539909535,
+    "mid": 67.79442208038327,
+    "bot": 68.09468931409462,
+    "sup": 72.23028246329393
+   },
+   "late_r": {
+    "top": 43.74122163454316,
+    "jg": 49.354598674275614,
+    "mid": 48.11719509863277,
+    "bot": 51.43989082626572,
+    "sup": 47.67700726270302
+   },
+   "con_b": 66.0,
+   "lineup_b": {
+    "top": "p092",
+    "jg": "p093",
+    "mid": "p096",
+    "bot": "p097",
+    "sup": "p100"
+   },
+   "lineup_r": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   }
+  },
+  {
+   "blue": "northreach_corsairs",
+   "red": "saltmarrow_gulls",
+   "save_seed": 760493460,
+   "match_id": "H-R-1-nort-salt",
+   "full": false,
+   "human": {
+    "1": "quillith",
+    "3": [
+     "top",
+     "orisande"
+    ],
+    "4": [
+     "bot",
+     "ketterick"
+    ],
+    "7": [
+     "sup",
+     "vellgrim"
+    ],
+    "8": [
+     "mid",
+     "marrek"
+    ],
+    "11": [
+     "jg",
+     "dunmarrow"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "quillith"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "orisande"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "barrowick"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "marrek"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "sootwing"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "bastrel"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "dunmarrow"
+    }
+   ],
+   "final": -0.2611914966218606,
+   "a_won": false,
+   "comp_b": 0.08,
+   "comp_r": 0.020000000000000004,
+   "style_b": "dive",
+   "style_r": "dive",
+   "lane_b": {
+    "bot": 0.1
+   },
+   "lane_r": {},
+   "early_b": {
+    "top": 61.86612881645624,
+    "jg": 47.13210153148345,
+    "mid": 54.25904460533754,
+    "bot": 57.32282946145369,
+    "sup": 53.419228723489
+   },
+   "late_r": {
+    "top": 54.656947880444534,
+    "jg": 54.4024113245659,
+    "mid": 59.665533848610664,
+    "bot": 74.04062281873003,
+    "sup": 65.32954530336393
+   },
+   "con_b": 48.2,
+   "lineup_b": {
+    "top": "p052",
+    "jg": "p054",
+    "mid": "p056",
+    "bot": "p058",
+    "sup": "p059"
+   },
+   "lineup_r": {
+    "top": "p092",
+    "jg": "p093",
+    "mid": "p096",
+    "bot": "p097",
+    "sup": "p100"
+   }
+  },
+  {
+   "blue": "ironquill_wolves",
+   "red": "duskwater_foxes",
+   "save_seed": 407836575,
+   "match_id": "H-R-2-iron-dusk",
+   "full": false,
+   "human": {
+    "1": "harkin",
+    "3": [
+     "jg",
+     "gravenstone"
+    ],
+    "4": [
+     "sup",
+     "dovrin"
+    ],
+    "7": [
+     "mid",
+     "barrowick"
+    ],
+    "8": [
+     "top",
+     "skarrow"
+    ],
+    "11": [
+     "bot",
+     "vellgrim"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "quillith"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "harkin"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 4,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "dovrin"
+    },
+    {
+     "n": 5,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "sootwing"
+    },
+    {
+     "n": 6,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "jorreck"
+    },
+    {
+     "n": 7,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "barrowick"
+    },
+    {
+     "n": 8,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "skarrow"
+    },
+    {
+     "n": 9,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 10,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ottomere"
+    },
+    {
+     "n": 11,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "vellgrim"
+    }
+   ],
+   "final": 0.016727978508041086,
+   "a_won": true,
+   "comp_b": 0.06999999999999999,
+   "comp_r": 0.03,
+   "style_b": "protect",
+   "style_r": "skirmish",
+   "lane_b": {
+    "mid": 0.1,
+    "jg": 0.1
+   },
+   "lane_r": {},
+   "early_b": {
+    "top": 45.56367962784853,
+    "jg": 41.38019364024083,
+    "mid": 26.848725650210174,
+    "bot": 38.20730608918835,
+    "sup": 37.61176361441657
+   },
+   "late_r": {
+    "top": 39.67667300384607,
+    "jg": 39.48217260990389,
+    "mid": 33.21684302617149,
+    "bot": 28.5933749862913,
+    "sup": 34.37689601119524
+   },
+   "con_b": 33.8,
+   "lineup_b": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   },
+   "lineup_r": {
+    "top": "p011",
+    "jg": "p013",
+    "mid": "p015",
+    "bot": "p017",
+    "sup": "p019"
+   }
+  },
+  {
+   "blue": "ironquill_wolves",
+   "red": "emberfen_hounds",
+   "save_seed": 38469945,
+   "match_id": "H-B-0-iron-embe",
+   "full": true,
+   "human": {
+    "0": "bastrel",
+    "2": "wyldrim",
+    "4": [
+     "mid",
+     "ketterick"
+    ],
+    "7": [
+     "bot",
+     "embrel"
+    ],
+    "8": [
+     "top",
+     "tuskal"
+    ],
+    "11": "dunmarrow",
+    "13": [
+     "jg",
+     "lanthorn"
+    ],
+    "14": [
+     "sup",
+     "sootwing"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "bastrel"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dovrin"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "jorreck"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ketterick"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "veshra"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "embrel"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "tuskal"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dunmarrow"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "pellam"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "lanthorn"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "sootwing"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    }
+   ],
+   "final": 0.3914340620010702,
+   "a_won": true,
+   "comp_b": 0.0,
+   "comp_r": 0.12,
+   "style_b": "skirmish",
+   "style_r": "dive",
+   "lane_b": {},
+   "lane_r": {},
+   "early_b": {
+    "top": 44.06086840987742,
+    "jg": 33.439006080529076,
+    "mid": 26.48131860786534,
+    "bot": 30.544957603395066,
+    "sup": 29.864071350506688
+   },
+   "late_r": {
+    "top": 54.954686723543446,
+    "jg": 59.9711360876714,
+    "mid": 58.0973939586214,
+    "bot": 65.34989121189386,
+    "sup": 57.64193500430106
+   },
+   "con_b": 33.8,
+   "lineup_b": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   },
+   "lineup_r": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   }
+  },
+  {
+   "blue": "northreach_corsairs",
+   "red": "saltmarrow_gulls",
+   "save_seed": 756459980,
+   "match_id": "H-B-1-nort-salt",
+   "full": true,
+   "human": {
+    "0": "tanglewick",
+    "2": "corvane",
+    "4": [
+     "mid",
+     "vellgrim"
+    ],
+    "7": [
+     "top",
+     "orisande"
+    ],
+    "8": [
+     "jg",
+     "cindrel"
+    ],
+    "11": "tessarine",
+    "13": [
+     "sup",
+     "veshra"
+    ],
+    "14": [
+     "bot",
+     "dunmarrow"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ellowen"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "corvane"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "brannoch"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "vellgrim"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "hegwin"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "orisande"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "cindrel"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "barrowick"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tessarine"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "maurelle"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "veshra"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dunmarrow"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "sootwing"
+    }
+   ],
+   "final": -0.7553368040100631,
+   "a_won": false,
+   "comp_b": 0.06,
+   "comp_r": 0.04,
+   "style_b": "dive",
+   "style_r": "protect",
+   "lane_b": {},
+   "lane_r": {
+    "top": 0.1,
+    "mid": 0.1,
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 47.84651029448304,
+    "jg": 38.11213056251242,
+    "mid": 41.11951713919323,
+    "bot": 46.31033958043643,
+    "sup": 44.086862297233374
+   },
+   "late_r": {
+    "top": 54.326315087026906,
+    "jg": 66.04900337292743,
+    "mid": 67.30476732978121,
+    "bot": 71.25854494353597,
+    "sup": 63.49782555916828
+   },
+   "con_b": 48.2,
+   "lineup_b": {
+    "top": "p052",
+    "jg": "p054",
+    "mid": "p056",
+    "bot": "p058",
+    "sup": "p059"
+   },
+   "lineup_r": {
+    "top": "p092",
+    "jg": "p093",
+    "mid": "p096",
+    "bot": "p097",
+    "sup": "p100"
+   }
+  },
+  {
+   "blue": "emberfen_hounds",
+   "red": "ironquill_wolves",
+   "save_seed": 458038270,
+   "match_id": "H-B-2-embe-iron",
+   "full": true,
+   "human": {
+    "0": "oriel",
+    "2": "fennimore",
+    "4": [
+     "bot",
+     "dunmarrow"
+    ],
+    "7": [
+     "top",
+     "tuskal"
+    ],
+    "8": [
+     "mid",
+     "gravenstone"
+    ],
+    "11": "marrek",
+    "13": [
+     "jg",
+     "skarrow"
+    ],
+    "14": [
+     "sup",
+     "veshra"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "oriel"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "corvane"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "fennimore"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "pellam"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dunmarrow"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "quillith"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "tuskal"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ellowen"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "marrek"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "skarrow"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "veshra"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "sootwing"
+    }
+   ],
+   "final": -0.4409407347782653,
+   "a_won": false,
+   "comp_b": 0.08,
+   "comp_r": 0.08,
+   "style_b": "skirmish",
+   "style_r": "skirmish",
+   "lane_b": {},
+   "lane_r": {
+    "top": 0.1,
+    "mid": 0.1
+   },
+   "early_b": {
+    "top": 55.31620849472108,
+    "jg": 62.620044066949255,
+    "mid": 49.23436548496104,
+    "bot": 52.479224232663626,
+    "sup": 48.226785375654124
+   },
+   "late_r": {
+    "top": 39.156291244223745,
+    "jg": 39.96012638370692,
+    "mid": 31.93438104093963,
+    "bot": 39.891094746623054,
+    "sup": 37.32610465025645
+   },
+   "con_b": 52.0,
+   "lineup_b": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   },
+   "lineup_r": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   }
+  },
+  {
+   "blue": "emberfen_hounds",
+   "red": "ironquill_wolves",
+   "save_seed": 535175652,
+   "match_id": "H-R-0-embe-iron",
+   "full": true,
+   "human": {
+    "1": "brixley",
+    "3": "dunmarrow",
+    "5": [
+     "jg",
+     "veshra"
+    ],
+    "6": [
+     "mid",
+     "tuskal"
+    ],
+    "9": [
+     "bot",
+     "fennimore"
+    ],
+    "10": "tessarine",
+    "12": [
+     "sup",
+     "oriel"
+    ],
+    "15": [
+     "top",
+     "vellgrim"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "brixley"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dovrin"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "dunmarrow"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "veshra"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "tuskal"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "sootwing"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "ketterick"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "fennimore"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tessarine"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "jorreck"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "oriel"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "hegwin"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "ellowen"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "vellgrim"
+    }
+   ],
+   "final": 0.1900078364367661,
+   "a_won": true,
+   "comp_b": 0.020000000000000004,
+   "comp_r": 0.08,
+   "style_b": "dive",
+   "style_r": "skirmish",
+   "lane_b": {
+    "top": 0.1,
+    "jg": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {
+    "bot": 0.1
+   },
+   "early_b": {
+    "top": 58.41647693172071,
+    "jg": 63.75700361243405,
+    "mid": 63.21508081471881,
+    "bot": 63.649448955714455,
+    "sup": 59.07727643650991
+   },
+   "late_r": {
+    "top": 41.69396683690287,
+    "jg": 36.563990394523145,
+    "mid": 29.710251974580302,
+    "bot": 33.93400631902732,
+    "sup": 36.481080595093914
+   },
+   "con_b": 52.0,
+   "lineup_b": {
+    "top": "p061",
+    "jg": "p064",
+    "mid": "p065",
+    "bot": "p067",
+    "sup": "p069"
+   },
+   "lineup_r": {
+    "top": "p001",
+    "jg": "p004",
+    "mid": "p002",
+    "bot": "p007",
+    "sup": "p009"
+   }
+  },
+  {
+   "blue": "saltmarrow_gulls",
+   "red": "pinehollow_owls",
+   "save_seed": 269232591,
+   "match_id": "H-R-1-salt-pine",
+   "full": true,
+   "human": {
+    "1": "sootwing",
+    "3": "ottomere",
+    "5": [
+     "sup",
+     "harkin"
+    ],
+    "6": [
+     "top",
+     "brannoch"
+    ],
+    "9": [
+     "mid",
+     "fennimore"
+    ],
+    "10": "embrel",
+    "12": [
+     "jg",
+     "skarrow"
+    ],
+    "15": [
+     "bot",
+     "dunmarrow"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "sunnivah"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "sootwing"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "jorreck"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "ottomere"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "quillith"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "harkin"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "brannoch"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dovrin"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "wyldrim"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "fennimore"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "embrel"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "skarrow"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "barrowick"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "dunmarrow"
+    }
+   ],
+   "final": 0.08805878792826102,
+   "a_won": true,
+   "comp_b": 0.06,
+   "comp_r": 0.12,
+   "style_b": "dive",
+   "style_r": "siege",
+   "lane_b": {
+    "top": 0.1,
+    "bot": 0.1
+   },
+   "lane_r": {},
+   "early_b": {
+    "top": 73.64768322931424,
+    "jg": 74.68475539909535,
+    "mid": 67.79442208038327,
+    "bot": 68.09468931409462,
+    "sup": 74.66689018631698
+   },
+   "late_r": {
+    "top": 44.3765554937613,
+    "jg": 42.97669716022267,
+    "mid": 39.41048685203286,
+    "bot": 35.89715666685619,
+    "sup": 40.74819434923929
+   },
+   "con_b": 66.0,
+   "lineup_b": {
+    "top": "p092",
+    "jg": "p093",
+    "mid": "p096",
+    "bot": "p097",
+    "sup": "p100"
+   },
+   "lineup_r": {
+    "top": "p032",
+    "jg": "p033",
+    "mid": "p036",
+    "bot": "p037",
+    "sup": "p039"
+   }
+  },
+  {
+   "blue": "mossgate_wardens",
+   "red": "gildmoor_raiders",
+   "save_seed": 760060217,
+   "match_id": "H-R-2-moss-gild",
+   "full": true,
+   "human": {
+    "1": "orisande",
+    "3": "gravenstone",
+    "5": [
+     "jg",
+     "oriel"
+    ],
+    "6": [
+     "top",
+     "tuskal"
+    ],
+    "9": [
+     "bot",
+     "harkin"
+    ],
+    "10": "barrowick",
+    "12": [
+     "sup",
+     "lanthorn"
+    ],
+    "15": [
+     "mid",
+     "alderwyn"
+    ]
+   },
+   "log": [
+    {
+     "n": 0,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "embrel"
+    },
+    {
+     "n": 1,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "orisande"
+    },
+    {
+     "n": 2,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "tanglewick"
+    },
+    {
+     "n": 3,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "gravenstone"
+    },
+    {
+     "n": 4,
+     "team": "B",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "ottomere"
+    },
+    {
+     "n": 5,
+     "team": "R",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "oriel"
+    },
+    {
+     "n": 6,
+     "team": "R",
+     "kind": "pick",
+     "slot": "top",
+     "hero": "tuskal"
+    },
+    {
+     "n": 7,
+     "team": "B",
+     "kind": "pick",
+     "slot": "jg",
+     "hero": "veshra"
+    },
+    {
+     "n": 8,
+     "team": "B",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "corvane"
+    },
+    {
+     "n": 9,
+     "team": "R",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "harkin"
+    },
+    {
+     "n": 10,
+     "team": "R",
+     "kind": "ban",
+     "slot": "",
+     "hero": "barrowick"
+    },
+    {
+     "n": 11,
+     "team": "B",
+     "kind": "ban",
+     "slot": "",
+     "hero": "skarrow"
+    },
+    {
+     "n": 12,
+     "team": "R",
+     "kind": "pick",
+     "slot": "sup",
+     "hero": "lanthorn"
+    },
+    {
+     "n": 13,
+     "team": "B",
+     "kind": "pick",
+     "slot": "bot",
+     "hero": "sparrowe"
+    },
+    {
+     "n": 14,
+     "team": "B",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "dovrin"
+    },
+    {
+     "n": 15,
+     "team": "R",
+     "kind": "pick",
+     "slot": "mid",
+     "hero": "alderwyn"
+    }
+   ],
+   "final": 0.04721739456964358,
+   "a_won": true,
+   "comp_b": 0.12,
+   "comp_r": 0.08,
+   "style_b": "dive",
+   "style_r": "skirmish",
+   "lane_b": {
+    "bot": 0.1
+   },
+   "lane_r": {},
+   "early_b": {
+    "top": 44.346023360998295,
+    "jg": 60.82413317155991,
+    "mid": 48.56636413343982,
+    "bot": 47.71317594760433,
+    "sup": 60.72432231052454
+   },
+   "late_r": {
+    "top": 40.731963709469234,
+    "jg": 32.948055004380706,
+    "mid": 37.30340481121366,
+    "bot": 44.53408937818982,
+    "sup": 42.4485708695464
+   },
+   "con_b": 46.6,
+   "lineup_b": {
+    "top": "p042",
+    "jg": "p044",
+    "mid": "p046",
+    "bot": "p047",
+    "sup": "p049"
+   },
+   "lineup_r": {
+    "top": "p021",
+    "jg": "p023",
+    "mid": "p025",
+    "bot": "p028",
+    "sup": "p030"
+   }
+  }
+ ]
+}

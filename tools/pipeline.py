@@ -22,10 +22,11 @@ HEROES = {h["id"]: h for h in json.loads((D / "heroes.json").read_text())}
 PLAYERS = {p["id"]: p for p in json.loads((D / "players.json").read_text())}
 CLUBS = {c["id"]: c for c in json.loads((D / "clubs.json").read_text())}
 
-DEFAULT_POLICY = {"fam": 0.35, "meta": 0.20, "comp": 0.20, "counter": 0.25, "noise": 0.04}
-TEAM_MOD_DEFAULT = 0.0096          # new-club Bond 30, COM 60 (GDD 7.7)
-CAL_MORALE = 60.0
-FAM_W = 0.06                        # weight of familiarity in HeroFactor (GDD 4.4: 0.90 + 0.10*Fam/100)
+DP = COMP._DP
+DEFAULT_POLICY = dict(DP["policy_default"])
+TEAM_MOD_DEFAULT = DP["team_mod_default"]          # new-club Bond 30, COM 60 (GDD 7.7)
+CAL_MORALE = DP["cal_morale"]
+FAM_W = DP["fam_w"]                        # weight of familiarity in HeroFactor (GDD 4.4: 0.90 + 0.10*Fam/100)
 
 
 def base_rating(p, slot):
@@ -71,7 +72,7 @@ def phase_rating(p, slot, hero, phase, fam, meta, morale=CAL_MORALE):
     return (pb + cond) * hf * fit * (1 + (hero["power_" + phase] - 50) / 200.0) * meta
 
 
-def make_meta(seed, spread=0.03):
+def make_meta(seed, spread=DP["meta_spread"]):
     return {hid: 1.0 + spread * (2 * _u("meta:%s:%s" % (seed, hid)) - 1) for hid in HEROES}
 
 
@@ -97,6 +98,11 @@ ORDER = [("B", "ban"), ("R", "ban"), ("B", "ban"), ("R", "ban"),
          ("B", "pick"), ("R", "pick"), ("R", "pick"), ("B", "pick"), ("B", "pick"), ("R", "pick"),
          ("R", "ban"), ("B", "ban"),
          ("R", "pick"), ("B", "pick"), ("B", "pick"), ("R", "pick")]
+
+
+ORDER_SHORT = [("B", "ban"), ("R", "ban"),
+               ("B", "pick"), ("R", "pick"), ("R", "pick"), ("B", "pick"), ("B", "pick"), ("R", "pick"),
+               ("R", "pick"), ("B", "pick"), ("B", "pick"), ("R", "pick")]
 
 
 def _progress(heroes):
@@ -125,17 +131,31 @@ def _counter_score(h, slot, enemy_picks):
     return (max(-1, min(1, v)) + 1) / 2
 
 
-def draft(lineups, meta, mseed, match_id, policies=None):
+def draft(lineups, meta, mseed, match_id, policies=None, order=None, human=None, log=None):
     """lineups {'B': {slot: player}, 'R': {...}}; policies {'B': dict, 'R': dict}. Returns {'B': {slot: hero}, 'R': ...}."""
     policies = policies or {}
+    order = order or ORDER
+    human = human or {}          # {step index: hero id (ban) or (slot, hero id) (pick)}: steps decided by a person
     pol = {t: dict(DEFAULT_POLICY, **policies.get(t, {})) for t in "BR"}
     avail = sorted(HEROES)
     picks = {"B": {}, "R": {}}
-    for n, (team, kind) in enumerate(ORDER):
+    for n, (team, kind) in enumerate(order):
         stream = contest_stream(mseed, "draft:%s:%d" % (match_id, n))
         other = "R" if team == "B" else "B"
+        if n in human:
+            if kind == "ban":
+                best = human[n]
+            else:
+                slot, hid = human[n]
+                picks[team][slot] = HEROES[hid]
+                avail.remove(hid)
+                if log is not None: log.append((n, team, kind, slot, hid))
+                continue
+            avail.remove(best)
+            if log is not None: log.append((n, team, kind, None, best))
+            continue
         if kind == "ban":
-            by_meta_only = stream.next_float() < 0.25
+            by_meta_only = stream.next_float() < DP["ban_meta_only_p"]
             best, best_v = None, None
             for s, p in lineups[other].items():
                 for hid in avail:
@@ -144,6 +164,7 @@ def draft(lineups, meta, mseed, match_id, policies=None):
                     if best_v is None or v > best_v + 1e-12 or (abs(v - best_v) <= 1e-12 and hid < best):
                         best, best_v = hid, v
             avail.remove(best)
+            if log is not None: log.append((n, team, kind, None, best))
         else:
             w = pol[team]
             cur = [HEROES[h["id"]] for h in picks[team].values()]
@@ -171,11 +192,12 @@ def draft(lineups, meta, mseed, match_id, policies=None):
             slot, hid = best
             picks[team][slot] = HEROES[hid]
             avail.remove(hid)
+            if log is not None: log.append((n, team, kind, slot, hid))
     return picks
 
 
 # ---------------- team building and match
-LANE_MOD = 0.10
+LANE_MOD = DP["lane_mod"]
 
 
 def lane_mods(mine, theirs):
@@ -199,11 +221,11 @@ def build_team(lineup, picks_mine, picks_theirs, meta, team_mod=TEAM_MOD_DEFAULT
             "style": "skirmish" if neutral_draft else style}
 
 
-def play(club_blue, club_red, save_seed, match_id, meta, policies=None, lineups=None, con=None, neutral_draft=False):
+def play(club_blue, club_red, save_seed, match_id, meta, policies=None, lineups=None, con=None, neutral_draft=False, order=None):
     """Returns dict with a_won (Blue won), final, comp mods, neutral winner if requested."""
     lineups = lineups or {"B": best_lineup(club_blue), "R": best_lineup(club_red)}
     ms = match_seed(save_seed, match_id)
-    picks = draft(lineups, meta, ms, match_id, policies)
+    picks = draft(lineups, meta, ms, match_id, policies, order=order)
     con = con or {}
     a = build_team(lineups["B"], picks["B"], picks["R"], meta, con_override=con.get("B"))
     b = build_team(lineups["R"], picks["R"], picks["B"], meta, con_override=con.get("R"))
