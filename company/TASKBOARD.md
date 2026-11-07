@@ -27,3 +27,7 @@ Last updated: 2026-11-07 by Producer
 ## Later phases
 
 Scouting and training, seasons and league structure, finances, backend and online leagues, visual and audio pass, store release.
+
+## Phase 1 plan (Single Player edition, Android first, English text only)
+
+Order of work: P-001 project skeleton and string tables, P-002 headless simulator with golden tests, P-003 batch harness and the section 9.1 full-pipeline calibration, D-005/D-008 content data (40 heroes, player generation), then P-004 screens. Subscriptions, online play and the animated map are later phases.

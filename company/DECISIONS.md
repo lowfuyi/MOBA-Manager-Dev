@@ -8,13 +8,25 @@
 | 2026-11-07 | Copy genre logic (roles, lanes, jungle, objectives, draft); invent all names, art, heroes, items | Founder |
 | 2026-11-07 | Visual design for characters and items is postponed to the pre-launch phase | Founder |
 | 2026-11-07 | Engine: Godot (provisional, revisit at P-001) | Producer, pending Founder |
+| 2026-11-07 | Single player (offline, local device) is the first release; online comes in later updates | Founder |
+| 2026-11-07 | Match presentation: text and event feed first; animated map is the end goal | Founder |
+| 2026-11-07 | Setting: fantasy-lite; may change and develop later | Founder |
+| 2026-11-07 | Monetization: tiered monthly or annual subscriptions (Basic, Pro+, Esports, our own version), modelled loosely on the reference game's tier structure. Postponed until the final game release; nothing is built in Phase 1 | Founder |
+| 2026-11-07 | Release path and naming: the game's edition name changes with the update phase (see below) | Founder |
+| 2026-11-07 | Platform: Android first; iOS only when demand grows | Founder |
+| 2026-11-07 | Language: English for testing; more languages added at the live release (all text must be kept in translatable string tables from day one) | Founder |
 
-## Open questions for the Founder (blocking Phase 1 unless marked)
+## Release path (Founder, 2026-11-07)
 
-1. **Single-player first, or online from the start?** Recommendation: single-player offline for the prototype, online leagues later.
-2. **Match presentation.** Options: (a) text and event feed with a results summary, (b) simple 2D minimap with dots, (c) full animation later. Recommendation: (a) for prototype, (b) before launch.
-3. **Setting and tone.** Fantasy, sci-fi, or a neutral "esports league" frame with abstract heroes? Recommendation: fantasy-lite, since it is easiest to make original.
-4. **Monetization stance.** Premium currency for cosmetics and speed-ups only, or also for player/scouting advantages? Recommendation: cosmetics and convenience only, no pay-to-win. (Not blocking Phase 1.)
-5. **Game name.** Working title is "MOBA Manager". Also needs a trademark check before launch. (Not blocking.)
-6. **Primary platforms.** Android first, iOS later, or both? Recommendation: Android first. (Not blocking Phase 1.)
-7. **Languages.** English only at launch, or include Malay and Chinese? (Not blocking.)
+| Phase | Edition | What it adds |
+|---|---|---|
+| Single Player | MOBA Esports: Single Player | Offline play on the local device |
+| Multiplayer | MOBA Esports: Multiplayer | Internet multiplayer hosting and matching, friends, sale and transfer of players |
+| Global | MOBA Esports: Global | Game seasons, regional tournaments, mid-season invitationals, a World Cup |
+
+"MOBA Esports" is the working title only. A distinctive final name still needs a trademark and store search (see IP-RISK-LOG).
+
+## Still open
+
+1. **Final game name.** Working title: "MOBA Esports" with the edition suffixes above. Needs a name search before launch.
+2. **Reference images.** The three monetization reference images did not arrive with the message. Not blocking, because monetization is postponed. Please re-attach them when convenient.
