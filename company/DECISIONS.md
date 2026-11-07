@@ -29,4 +29,4 @@
 ## Still open
 
 1. **Final game name.** Working title: "MOBA Esports" with the edition suffixes above. Needs a name search before launch.
-2. **Reference images.** The three monetization reference images did not arrive with the message. Not blocking, because monetization is postponed. Please re-attach them when convenient.
+2. **Monetization details.** Reference images received; concept drafted in `docs/design/MONETIZATION-DRAFT.md`. Postponed until the final release.
