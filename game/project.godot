@@ -8,6 +8,7 @@ config/features=PackedStringArray("4.3", "GL Compatibility")
 
 [autoload]
 Strings="*res://src/core/strings.gd"
+App="*res://src/core/app.gd"
 
 [display]
 window/size/viewport_width=720

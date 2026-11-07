@@ -14,6 +14,7 @@ func _initialize() -> void:
 	_test_strings()
 	_test_data()
 	PipelineTests.new().run(_check)
+	GameTests.new().run(_check)
 	print("checks: %d, failures: %d" % [_checks, _failures])
 	quit(1 if _failures > 0 else 0)
 

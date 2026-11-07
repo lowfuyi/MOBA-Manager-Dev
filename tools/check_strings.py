@@ -28,9 +28,23 @@ def check(root=ROOT):
     for f in list((root / "game/src").rglob("*.gd")) + list((root / "game/tests").rglob("*.gd")):
         for m in USE.finditer(f.read_text()):
             key = m.group(1) or m.group(2)
+            if key.endswith(".") or "%s" in key:       # dynamic family: Strings.t("role." + slot)
+                prefix = key.split("%s")[0]
+                fam = [k for k in en if k.startswith(prefix)]
+                if not fam: errs.append(f"{f.relative_to(root)}: no keys in family {key}")
+                used.update(fam)
+                continue
             used.add(key)
             if key not in en and "no.such.key" not in key:
                 errs.append(f"{f.relative_to(root)}: unknown string key {key}")
+    # families that are built from game data must cover every value in the data
+    data = root / "game/data"
+    heroes = json.loads((data / "heroes.json").read_text())
+    for h in heroes:
+        for fam, val in [("arch.", h["archetype"]), ("dmg.", h["damage_type"])] + [("tag.", t) for t in h["tags"]]:
+            if fam + val not in en: errs.append(f"missing {fam}{val} (hero {h['id']})")
+    for pl in json.loads((data / "players.json").read_text()):
+        if "personality." + pl["personality"] not in en: errs.append(f"missing personality.{pl['personality']}")
     for other in sorted(i18n.glob("*.json")):
         if other.name == "en.json": continue
         t = load_unique(other)

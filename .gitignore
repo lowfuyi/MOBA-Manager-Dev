@@ -3,3 +3,4 @@ __pycache__/
 .godot/
 *.import
 .pytest_cache/
+build/

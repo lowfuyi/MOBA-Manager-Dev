@@ -33,7 +33,8 @@ Last updated: 2026-11-07 by Producer
 | P-002 | Match simulator as a headless module with unit tests (Python reference `tools/sim_core.py` on PCG32, Godot port `game/src/sim/match_sim.gd`, 25 golden cases, frozen input interface incl. Game Plan hooks, calibration re-run) | Engineering Lead | QA | Done; QA review of GDD v1.3 raised no defect in the simulator code itself. 33 Python tests, 588 Godot checks pass |
 | P-003 | Batch harness: full-pipeline run (9.1) DONE 2026-11-07 (draft constants re-tuned, `docs/design/CALIBRATION-9.1.md`, `tools/pipeline*.py`). Remaining: paired common-random-number lever tests with the v1.4 bands, calibration at Phase 1 rating scale (about 45), joint Game Plan coordinate-ascent test (9.2.1), 10,000-match report | QA & Balance Lead | Systems Lead | In progress (9.1 part done) |
 | D-018 | Pacing and formats (GDD 8.7): re-run 9.1 with the Short draft profile; add draft timers and auto-pick to the draft spec; game clock L in match report; playback speed and Skip in the match screen spec | Systems Lead | QA & Balance Lead | Backlog |
-| P-004 | Roster screen, draft screen, match result screen (placeholder visuals) | Engineering + UI/UX | Game Design Lead | Backlog |
+| P-004 | Roster screen, draft screen, match result screen (placeholder visuals) | Engineering + UI/UX | Game Design Lead | Done in Alpha 0.1 (A-004) |
+| A-004 | Alpha 0.1: installable Android build of the Single Player loop (club pick, lineup, 10 s draft, feed, report, season with standings and playoffs). Game state and report logic tested headless (1,514 checks), UI smoke test through a whole season, screenshot QA at 720x1280, APK exported and signature verified. Not yet run on a physical phone. Notes: `docs/ALPHA-0.1-NOTES.md` | Engineering Lead + UI/UX | QA (independent review pending) | Delivered for Founder game test |
 
 ## Later phases
 

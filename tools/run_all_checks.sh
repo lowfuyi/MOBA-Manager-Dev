@@ -10,7 +10,11 @@ python3 -m pytest -q tools || fail=1
 python3 -I tools/calibrate.py 40000 --check || fail=1
 G="${1:-${GODOT:-}}"
 if [ -n "$G" ] && [ -x "$G" ]; then
-  (cd game && "$G" --headless --import >/dev/null 2>&1; "$G" --headless --script res://tests/run_tests.gd) || fail=1
+  (cd game && "$G" --headless --import >/dev/null 2>&1; timeout 600 "$G" --headless --script res://tests/run_tests.gd) || fail=1
+  # UI smoke: the real Main scene driven through a whole season; engine/script errors in the log count as failures
+  out=$(cd game && timeout 600 "$G" --headless res://tests/ui_smoke.tscn 2>&1); echo "$out" | tail -3
+  if echo "$out" | grep -E "SCRIPT ERROR|Parse Error|ERROR:|FAIL:" | grep -v "leaked\|still in use" ; then fail=1; fi
+  echo "$out" | grep -q " 0 failures" || fail=1
 else
   echo "SKIPPED: GDScript tests (no Godot binary given)"
 fi
