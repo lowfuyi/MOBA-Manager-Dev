@@ -150,6 +150,41 @@ Seen as a paid feature. Our Quick mode auto-draft stays free (Pillar 5). A paid 
 - Anti-abuse: a fee band tied to the player's valuation (no gifting or price laundering between accounts), cooldowns on re-selling, a transfer history log, and a report function.
 - Needs a backend and moderation, so it waits for the Multiplayer edition.
 
+## 9. Player profile, attributes, mastery, tasks and career log (fourth set of screenshots)
+
+**Seen:**
+- **Squad list.** Each player card shows an avatar with a level ring, name, flag, age, morale % and condition %, contract days left, which genre the player is assigned to, the current task, and the top three role ratings plus a "+N more" chip.
+- **Player profile.** Personality label, morale, condition, a role-rating strip, and a grid of **16 attributes** (Accuracy, Anticipation, Bravery, Communication, Composure, Concentration, Decisions, Dexterity, Determination, Flair, Leadership, Memory, Stamina, Quickness, Vision, Teamwork) with bars. A drop-down switches the grid between **Ability** (current) and **Potential** (the ceiling for each attribute, shown per attribute). Colour tells low from high at a glance. Buttons lead to Dynamics (bonds), Mastery, Talents, Analytics, Contract, Tasks and Cash Prize.
+- **Help sheets.** Tapping Morale, Condition or Personality opens a short explanation ("performance might drop if morale or condition is too low; assign a Rest task"). Tapping an attribute opens a sheet with Current and Potential and two explanations: what it does **outside matches** and what it does **in a match** for each game genre, in plain words.
+- **Mastery.** An XP level for the player, per role and per hero, with KDA and win-loss next to each.
+- **Player analytics.** Date-range filter; games, win rate, KDA, farm per minute, damage per minute, vision per game; per-hero rows and a matchups table.
+- **Contract page.** Club, type, job, duration with days left, wage, prize split; buttons Renew contract, Sell player, Release player. A paid-tier banner offers expiry reminders. A **career log** lists births, birthdays, signings and departures with a link back to each contract.
+- **Tasks.** A per-player list of past and current tasks (Rest, a ladder practice session of 4 hours, replay analysis, scouting), each marked Reviewed once finished.
+- **Cash Prize.** Total prize money earned and medal counts (gold, silver, bronze).
+
+**What we learn:**
+- Showing **Potential per attribute** is a better idea than one Potential number per player. It answers an open review item (S8: single Potential, undefined growth targets) and it makes scouting and training decisions concrete.
+- The "outside matches / in a match" help text turns a stat list into something a newcomer can learn. It also forces every stat to have a job.
+- Mastery per hero is our Familiarity (GDD 4.4); the idea of a visible XP level and a W-L record per hero is easy and motivating.
+- Per-player match statistics are fun, but they must not become a second hidden model.
+- One banner is a warning sign for our own monetization: a reminder before a contract expires is a basic safety net, and a new player who loses a star to an unnoticed expiry will feel cheated if it is paywalled.
+
+**Our adaptation (recommended, proceeding unless the Founder objects):**
+1. **Keep our 6 core stats** (MEC, SEN, LAN, TFT, MAC, CON) for Phase 1. They are what the calibrated match model uses. Sixteen attributes would multiply the calibration work and the screens, with no benefit before the core loop works.
+2. **Change Potential to per stat.** Each of the 6 stats has its own ceiling. The training formula in GDD 7.3 is already per stat (`1 - stat/Potential`), so this is a data change, not a formula change. Generation (D-008): `Potential_stat = stat + a draw`, larger for younger players, capped at 99. Scouting shows each stat's ceiling as a range that narrows with reports. The profile gets an Ability / Potential toggle.
+3. **A later "Deep attributes" view (optional, after the core loop works):** about a dozen small attributes that roll up into the 6 stats and also drive systems outside matches (Communication, Leadership and Teamwork feed Team Bonds; Stamina feeds condition; Determination and Concentration feed training gain; Memory feeds how fast Familiarity grows). Names are generic English words and are fine, but this view is not in Phase 1.
+4. **Help sheets for every stat, plus Morale, Condition and Personality.** Two lines each: "outside matches" and "in a match". Stored as translatable strings. One-time help cards (see section 8) cover the first view.
+5. **Hero and role mastery (Phase 1):** show Familiarity as a level with a W-L record per hero and per role. Data comes from our match log.
+6. **Per-player match statistics (Phase 1, kept simple):** kills, deaths and assists per player in the match report, **derived from the simulated fights** (team totals consistent, shares weighted by the player's slot and rating). They are display only and never feed back into the model. Damage, farm and vision per minute are a later polish item. The QA test: totals add up, and no statistic contradicts the result (for example the winner never has fewer kills AND fewer objectives with no comeback story).
+7. **Career log:** a timeline of signings, departures, birthdays, awards and notable matches. Cheap and nice.
+8. **Per-player weekly plan:** one training focus per week, as in GDD 7.3. The reference's hourly tasks are a real-time system, so we skip them. Practice session wording: use "Practice Session", not the reference's phrase.
+9. **Expiry reminders are free.** A club always gets a warning before a contract ends. Paid tiers add comfort and cosmetics, never safety nets (add to the monetization principles).
+
+**IP notes:**
+- The screenshots show the reference game's own hero names. We must not use these names, or close variants, in our 40 heroes. They are recorded in the IP risk log as names to avoid.
+- Hero portraits, avatars and the talent icons are the reference game's art. We copy none of it. Avatars for players come in the visual phase.
+- The reference player names mix unrelated origins and look machine-generated. Ours come from our own name tables (section 8, rule 6).
+
 ## Decisions (Founder, 2026-11-07)
 1. **Game Plan in Phase 1: YES**, the small version (about 8 sliders, a default plan, triggers "ahead" and "behind"), built after the core draft calibration.
 2. **Team Bonds in Phase 1: YES**, with English-only data and the pair grid and maths in place.
@@ -159,3 +194,5 @@ Seen as a paid feature. Our Quick mode auto-draft stays free (Pillar 5). A paid 
 6. **Sponsors, Phase 1 (recommended):** sponsor "lite" (one contract, objectives per split) plus one-time tutorial goals. Daily missions are not in Single Player.
 7. **Manager level and talents (recommended):** deferred until the core loop is balanced. If built, no talent adds match strength directly.
 8. **Finances screens (Overview, Analytics, History):** included in Phase 1 (task D-007).
+9. **Player profile (recommended):** keep our 6 stats for Phase 1, change Potential to per stat, add stat help sheets, hero and role mastery levels, simple derived KDA and a career log (section 9). A deeper attribute view is a later option.
+10. **Expiry reminders stay in the free tier** (a safety net, not a perk).

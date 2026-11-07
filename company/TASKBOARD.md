@@ -21,6 +21,7 @@ Last updated: 2026-11-07 by Producer
 | D-013 | Recruitment and contracts spec: free-agent database and saved searches, scouting reports (New, Shortlisted, Rejected), up-to-3-round negotiation, contract terms (wage, splits, prize share), personality mapping, release and expiry, club history log | Systems Lead + Game Design Lead | QA + IP Checker | Backlog (proposed) |
 | D-014 | Manager level, XP and talents (one MOBA tree, about 30 nodes, no direct match strength) | Systems Lead | QA & Balance Lead | Parked until core loop is balanced |
 | D-015 | Multiplayer transfer market spec (provisional agreement, offers, fee bands, no real-money trading) | Systems Lead | QA + IP Checker | Parked (Multiplayer edition) |
+| D-016 | Player profile spec: per-stat Potential (changes D-008 generation and the scouting display), stat help sheets, hero and role mastery levels, derived match statistics (KDA) with consistency tests, career log | Systems Lead + Game Design Lead | QA & Balance Lead | Backlog (proposed) |
 
 ## Phase 1: Prototype (starts after D-003 is decided)
 

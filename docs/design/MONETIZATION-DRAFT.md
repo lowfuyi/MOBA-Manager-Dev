@@ -19,6 +19,8 @@ We do **not** reuse its tier names, wording, perk list or layout. Our tier names
 4. **Plain pricing.** Price, billing period and renewal shown clearly; trial terms stated; easy cancel (store rules require it).
 5. **Billing through the store.** Android subscriptions use Google Play Billing. Policy check before building.
 
+Added 2026-11-07: the reference game offers contract-expiry reminders in a paid tier. For us, safety nets such as expiry warnings stay free; paid tiers add comfort, cosmetics and convenience only.
+
 ## Draft tier sketch (to be revised near release)
 
 | Tier | Idea | Single Player edition perks (draft) | Added with Multiplayer / Global (draft) |

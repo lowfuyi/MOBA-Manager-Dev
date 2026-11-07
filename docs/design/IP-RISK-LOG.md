@@ -12,3 +12,7 @@ Maintained by the IP Checker. Screening only, not legal advice. A qualified IP l
 | 2026-11-07 | ESMO naming | Not yet screened against ESMO's store listing and in-app terms | Pending | IP Checker to read the store listing before launch |
 | 2026-11-07 | Working title collision | A Steam game called "MOBA GM" exists | Pending | Pick a distinctive final name |
 | 2026-11-07 | Numbers and tables (slot weights, hero power budget, tags) | Must be our own | Pass | All numbers are our own placeholders, tuned with our simulator. No tables from ESMO or any other game were used or consulted |
+| 2026-11-07 | Reference hero names seen in screenshots: Dredge, Gauntlet, Monolith, Oculus (and any others later) | These belong to the reference game. Our 40 heroes must not use them or close variants | Open rule | Content Lead checks every hero name against this list; IP Checker confirms |
+| 2026-11-07 | Reference art: hero portraits, avatars, talent icons, UI icons | Not to be copied or traced. Our art comes in the visual phase | Rule | Visual phase must use original or licensed assets only |
+| 2026-11-07 | Practice-session wording and other task names | Use our own words ("Practice Session"), keep genre-generic terms only | Rule | Naming glossary D-006 |
+
