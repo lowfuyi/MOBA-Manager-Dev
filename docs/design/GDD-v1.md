@@ -1,6 +1,6 @@
-# Game Design Document v1.2
+# Game Design Document v1.3
 
-Status: DRAFT, revised after two independent reviews (findings and fixes in section 16). Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
+Status: DRAFT v1.3 (v1.2 was revised after two independent reviews; v1.3 folds in the Founder-approved and recommended items from `REFERENCE-ESMO-ADAPTATION.md`; findings and fixes in section 16). **v1.3 has not had an independent review yet**: new sections 7.7 to 7.9, 9.2 and 10.1 are marked for QA and Systems Lead review. Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
 Next: Founder review. Engineering may start P-001 (project skeleton) now; P-002 (simulator) starts after the full-pipeline calibration in section 9.1 is scheduled.
 
 All numbers in this document are **v0 placeholders** unless marked otherwise. They exist so the rules can be tested. QA & Balance tunes them against the targets in section 9, using `tools/proto_sim.py` as the reference model.
@@ -24,6 +24,18 @@ A mobile esports **manager** game, MOBA only. The player is the club owner and h
 ### Non-goals for v1
 
 Direct hero control, real-time multiplayer matches, a 3D map, voice chat, esports betting, real-money trading of players.
+
+### Editions and roadmap (Founder decision)
+
+The game ships in stages, and the edition name changes with the stage. "MOBA Esports" is a working title.
+
+| Edition | Adds | In this document |
+|---|---|---|
+| **MOBA Esports: Single Player** (first release, Android first, English text) | Offline play on the local device | Everything except the items below |
+| MOBA Esports: Multiplayer | Internet hosting and matching, friends, sale and transfer of players, ranked ladder | Not specified yet (tasks D-012, D-015) |
+| MOBA Esports: Global | Seasons, regional tournaments (real-world regions), mid-season invitationals, a World Cup, multi-tier leagues | Not specified yet (task D-018) |
+
+All player-facing text lives in translatable string tables from day one; languages beyond English arrive at the live release.
 
 ---
 
@@ -87,12 +99,26 @@ Five **slots** per team: Top, Jungle, Mid, Bot Carry, Support. The five starters
 
 | Value | Range | Notes |
 |---|---|---|
-| Potential | 1 to 100 | Soft cap for each stat's growth; revealed only through scouting and time |
+| Potential | 1 to 100 **per stat** | Soft cap for each stat's growth; each of the 8 stats has its own ceiling. Revealed only through scouting and time |
 | Form | -10 to +10 | Moves with results (section 8.6); each day `Form = Form * 0.9` (mean-reverts to 0) |
 | Morale | 0 to 100 | Results and playing time (section 8.6); each day drifts 2 points toward 60; starters who sit 3+ matches lose 3 per match |
 | Fatigue | 0 to 100 | See section 7.3 |
 | Hero familiarity | 0 to 100 per hero | Starts 0 to 30 for new heroes; grows when played and trained; clamped to 0 to 100 |
 | Age | 16 to 35 | Affects growth rate and eventual decline |
+| Personality | one of 4 | Professional, Balanced, Casual, Temperamental. Visible on the player card; see the table below |
+| Languages | list of (language, fluency 0 to 100) | Feeds Understanding in section 7.7. Phase 1 data: everyone speaks English at 100 |
+| Country and region | text, from a fixed list | Display (flag) and later leaderboards. Never changes gameplay by itself |
+
+**Personality (v0 values, tuned in D-013).** No personality is strictly best; each trades one thing for another.
+
+| Personality | Training gain | Morale swing after results | Bond growth | Contract negotiation |
+|---|---|---|---|---|
+| Professional | x1.05 | x0.8 | x1.0 | Accepts a fair offer quickly |
+| Balanced | x1.00 | x1.0 | x1.0 | Standard |
+| Casual | x0.90 | x1.0 | x1.1 | Accepts slightly below asking |
+| Temperamental | x1.00 | x1.5 | x0.8 | Demands above asking and may walk away after round 2 |
+
+**Help text.** Every stat, plus Morale, Condition and Personality, has a short help sheet with two lines: what it does in a match and what it does outside matches (training, bonds, condition). Stored as translatable strings.
 
 ### 4.3 Slot weights
 
@@ -206,13 +232,19 @@ Each team ends with 3 bans and 5 picks; 16 heroes leave the pool of 40. The orde
 
 ### 7.1 Calendar
 
-Time advances in **days** when the player taps Continue. A **full season** has two splits (9 weeks each, 2 match days per week, 18 league matches per split) plus playoffs per split and a short off-season, so about 42 player matches. Phase 1 plays **one split plus playoffs** (18 league matches plus up to 6 playoff matches) as its "season". Promotion and relegation use split standings. Ranking: points (win 3, loss 0), then head-to-head, then game-time-adjusted score difference, then a seeded draw. Real-time timers are not used offline.
+Time advances in **days** when the player taps Continue. A **full season** has two splits (9 weeks each, 2 match days per week, 18 league matches per split) plus playoffs per split and a short off-season, so about 42 player matches. Phase 1 plays **one split plus playoffs** (18 league matches plus up to 6 playoff matches) as its "season". Promotion and relegation use split standings. Ranking: points (win 3, loss 0), then head-to-head, then game-time-adjusted score difference, then a seeded draw. Real-time timers are not used offline: a day passes only when the player presses Continue or plays a match, with no waiting, no daily-login missions and no wall-clock events. Contract length is counted in splits and wages are paid and shown per week.
 
 ### 7.2 Roster and contracts
 
 - 5 starters, up to 5 substitutes (max 10 players). Substitutes may be swapped in before any match.
 - Contracts have a length (in splits), a wage, and optional clauses (release fee, bonus).
-- Free agents and other clubs' players can be approached. The AI values an offer on wage versus the player's value, role need, club standing and playing time. Exact valuation is task D-007. **Phase 1 minimum rule:** no transfers between clubs; free agents can be signed at an asking wage of `2 * (BestSlotRating - 40)` per week, accepted if the club is under its wage cap.
+- Free agents and other clubs' players can be approached. The AI values an offer on wage versus the player's value, role need, club standing and playing time. Exact valuation is task D-007. **Phase 1 recruitment (free agents only; club-to-club transfers belong to the Multiplayer edition):**
+  - **Player database:** the free agents, with filters (role, age, rating range, languages, price) and saved searches.
+  - **Reports workflow:** each scouted player has a report that the manager marks Shortlisted or Rejected (New by default).
+  - **Negotiation:** up to 3 rounds. The manager proposes wage, length (1 to 4 splits) and prize share (50 to 90 percent to the player). The asking wage is `2 * (BestSlotRating - 40)` per week; the player accepts if the offer is at least his personality's threshold times the asking wage (see Personality table), adjusted slightly by length and prize share. The club must be under its wage cap and have the cash for the signing. Exact acceptance maths is task D-013.
+  - **Release and expiry:** releasing a player costs 50 percent of the remaining contract wages (v0). The club always gets a warning before a contract ends (a free safety net, never a paid perk).
+  - **Prize share:** when the club wins prize money, the player share goes to the players on the roster for that event in proportion to their contract percentage. A higher share raises willingness to sign and gives a small morale lift after prize wins.
+  - **Career log:** signings, departures, birthdays, awards and notable matches are recorded per player.
 
 ### 7.3 Training and fatigue
 
@@ -230,7 +262,7 @@ Familiarity: +3 per match played with the hero, +1.5 per week of focused trainin
 
 ### 7.4 Scouting
 
-Scouts are assigned to a region and role. Each report reveals stats as ranges with half-width `max(3, 16 - 2*ScoutLevel - 2*ReportsSoFar)` points, where `ReportsSoFar` counts reports on that player. The true value is always inside the range, but the range is centred at a random offset of up to half the width, so ranges mislead without being false. Potential is shown as a star range that narrows over time. Hidden gems and overrated players both exist.
+Scouts are assigned to a region and role. Each report reveals stats as ranges with half-width `max(3, 16 - 2*ScoutLevel - 2*ReportsSoFar)` points, where `ReportsSoFar` counts reports on that player. The true value is always inside the range, but the range is centred at a random offset of up to half the width, so ranges mislead without being false. Potential is shown as a star range that narrows over time. Hidden gems and overrated players both exist. Because Potential is per stat, a report shows each stat's current range and its ceiling range, so the manager can see where a young player can grow. A player's profile has an **Ability / Potential** toggle.
 
 ### 7.5 Staff and facilities
 
@@ -244,11 +276,57 @@ Facilities (levels 1 to 5): each level adds +5% training gain and +1 fatigue rec
 
 ### 7.6 Finance
 
-Income: sponsors (scale with league tier and results), prize money, transfers. Expenses: wages, staff, facilities, transfer fees. Each tier has a **wage cap**. Running out of money restricts signings. Numbers are task D-007.
+**Phase 1 income:** a sponsor contract (signing bonus plus objective rewards), prize money, and one-time tutorial goal rewards. **Expenses:** player wages, staff wages and facility upkeep. Transfer fees and transfer income arrive with the Multiplayer edition. There is no way to buy in-game money with real money.
 
-### 7.7 Chemistry
+- **Sponsor lite:** at the start of a season the manager picks 1 of 3 offers. Each pays a signing bonus and per-split objective rewards (for example reach the playoffs, win a set number of matches, start a rookie). Missing an objective loses that reward only. Daily missions are not part of Single Player.
+- **Tutorial goals:** one-time goals ("set a training plan", "make a Game Plan") with a small cash reward, to teach a new player the game.
+- **Ledger:** an Overview (balance and a week chart), Analytics (profit and loss over time, income and expense by source) and History (every payment as one line).
+- **Rules:** each tier has a wage cap. A balance below zero blocks new signings but does not end the game in Phase 1 (lose conditions come before launch, section 13). Money numbers are task D-007.
 
-Chemistry points (0 to 100, new club starts at 30): +4 per match together, +3 per scrim week, -25 whenever a starter is replaced (minimum 0). `ChemBonus = min(0.035, 0.03 * (Chem/100) * (0.5 + avgCOM/100))`. Team modifier `TeamMod = ChemBonus + StaffBonus`.
+### 7.7 Team Bonds (replaces the single Chemistry number)
+
+Chemistry is no longer one hidden number. Each pair of starters has a **Bond** and each direction has an **Understanding**.
+
+- **Bond** (0 to 100, symmetric, 10 pairs): +4 per match the two play together, +3 per team-scrim week, +2 per Exhibition game (section 7.9), all multiplied by the two players' Bond growth factors (Personality table, geometric mean). A new club's bonds start at 30. When a starter is replaced, the new player's bonds with the four others start at 20; the other six pairs keep their values. Minimum 0.
+- **Language factor** `Lang(i,j)`: 1.0 if the two share a language with fluency at least 50 for both, else 0.65 (v0).
+- **Understanding** (0 to 100, directional, 20 values): `U(i<-j) = Lang(i,j) * Bond(i,j) * (0.5 + COM_j/200)`. Read it as "how well player i takes in what player j says".
+- **Team chemistry** `Chem` = the mean of the 20 Understanding values.
+- `ChemBonus = 0.035 * Chem/100` (maximum 0.035). `TeamMod = ChemBonus + StaffBonus`, as before.
+
+**Change from v1.2:** COM now enters through Understanding only (the old formula multiplied by `0.5 + avgCOM/100` as well), and a replaced starter now costs the new pairs rather than a flat -25 for everyone. **The numbers are v0 and must be re-tuned so a typical roster (Bond 60, COM 60) gives a bonus of about 1.7 to 2.0 percent, close to the old curve, and the full-pipeline calibration in section 9.1 must be re-run with bonds in the loop.**
+
+**Screens:** a pentagon of the five starters (link thickness for Bond, colour for Understanding), a 5x5 Understanding grid, and a languages list per player. In Phase 1 every player speaks English at 100, so `Lang` is always 1.0 and the grid is a pure display of Bond and COM. The maths is tested with synthetic multi-language rosters in the unit tests, so switching real languages on later needs no rework. Language fluency is a gameplay trait only, never tied to nationality or ethnicity in text or art.
+
+### 7.8 Game Plan (the coach's second lever besides the draft)
+
+A **Game Plan** is a set of 10 sliders, each from -100 to +100 (default 0 = neutral), with an optional **trigger**. The engine uses the first plan whose trigger matches, otherwise the default plan. Phase 1 keeps at least one fully usable Game Plan for free; extra saved plans and triggers are convenience, never extra strength (section 11).
+
+| Slider (-100 / +100) | What it trades in the model (v0; max effect at +-100) |
+|---|---|
+| Spread out / Group up | Teamfight contest weight in mid and late phases x(1 + 0.15 g); lane and jungle weights x(1 - 0.15 g) |
+| Tempo / Scale | Early rating x(1 + 0.03 t) while late rating x(1 - 0.03 t) (t = -1 favours scaling) |
+| Early objective priority | `w_mid_obj` x(1 + 0.20 e); lane weights x(1 - 0.10 e); variance of that contest up |
+| Late objective priority | `w_late_obj` x(1 + 0.20 l); risk when behind rises |
+| Farm safely / Lane aggression | Lane contest differences amplified x(1 + 0.20 a) and contest noise x(1 + 0.25 a); safe side flattens both |
+| Jungle focus: Top / Mid / Bot | A fixed jungle bonus added to the chosen lane contest and subtracted from the others (total unchanged) |
+| Support stays / Support roams | Bot lane strength down and objective-contest strength up by the same amount |
+| Peel / Engage | Teamfight style interaction: moves the team's effective style towards Dive (engage) or Protect (peel) by 0.5 steps |
+| Play safe / Take risks | Noise of every contest x(1 + 0.20 r) |
+| Comeback focus | When behind after the early phase, late-phase variance up and late rating x(1 + 0.02 c) |
+
+Every slider has a cost, so no setting is free. **Triggers (v0):** `default`; `ahead after early` (`A_early > +0.15`); `behind after early` (`A_early < -0.15`); `against Dive`, `against Siege`, `against Protect` (the opponent's composition style). A trigger on a phase outcome re-applies the plan for the mid and late phases only.
+
+**AI clubs** get plans generated from their roster and composition. **Reports** state which plan setting mattered, using the same win-probability swing method as the draft edge (section 8.5).
+
+**QA requirements (section 9.2):** across the league average no setting beats neutral by more than 1.5 win-rate points, and the best setting differs by roster and opponent. Out of scope in v1: items, spells, per-hero micro positioning, vision.
+
+### 7.9 Exhibition and Quick Match
+
+Two offline modes for practice. They never change the league table, the Form Rating (section 10.1), Form or Morale.
+
+- **Exhibition:** pick any club in your league and play best of 1, 3 or 5. Each series uses up one calendar day (so it competes with training and rest). Fatigue +5 per game (instead of +15), Bond +2 per game for the starters (section 7.7). Intended for testing drafts and Game Plans.
+- **Quick Match:** an instant best-of-1 against a random club whose team rating is within 5 points of yours. Same rules; uses a calendar day.
+- Both can be played in Full or Quick mode.
 
 ---
 
@@ -319,7 +397,7 @@ A_mid = 0.35*objectives + 0.65*teamfights
 
 ### 8.6 After the match
 
-Form moves toward the result (+/-2), morale +/-5 to 10 based on result and playing time, fatigue +15 for players who played, familiarity of picked heroes +3, chemistry +4 (clamped to the ranges in section 4.2).
+Form moves toward the result (+/-2), morale +/-5 to 10 based on result and playing time, fatigue +15 for players who played, familiarity of picked heroes +3, Bond +4 for each pair of starters who played together (section 7.7), and the Form Rating updates for league and playoff matches (section 10.1); Exhibition and Quick Match change none of these except fatigue and Bond (section 7.9). All values are clamped to the ranges in section 4.2.
 
 ---
 
@@ -352,6 +430,18 @@ The tests above change one lever at a time. Before locking Pillar 1, QA runs a f
 
 Additional targets for the full game: no hero outside agreed pick/win bands at equal skill; no comp style beats the others by more than about 5 points in the league average; no training or fatigue schedule is strictly dominant.
 
+
+### 9.2 Additional QA tests (v1.3)
+
+1. **No dominant Game Plan:** for each slider, sweep it with other sliders neutral across the league average; no setting beats neutral by more than 1.5 points, and the best setting differs by roster and opponent (section 7.8).
+2. **Bond farming:** the fastest way to raise Bond (scrims, Exhibition, playing together) must not beat normal play by more than a small margin; Exhibition fatigue and the calendar-day cost must make spamming it a bad plan.
+3. **Chemistry curve:** a typical roster (Bond 60, COM 60) lands at about 1.7 to 2.0 percent ChemBonus; replacing one starter costs less than the old flat -25 on average; a roster with no shared language gets the 0.65 factor.
+4. **Economy:** simulate 10 seasons for a default club under default play. It must not go bankrupt and must not snowball; sponsor choices must each be viable.
+5. **Form Rating:** after one split the rating ranks clubs close to their true strength; an upset moves it more than an expected win; exhibitions never move it.
+6. **Derived statistics:** per-player kills, deaths and assists add up to the team totals and never contradict the result (display only, never fed back).
+7. **Personality:** no personality is strictly best in the 10-season simulation.
+8. **Per-stat Potential:** generated players satisfy `stat <= Potential_stat` for all 8 stats; scouting ranges always contain the true values.
+
 ---
 
 ## 10. League structure
@@ -363,25 +453,41 @@ Additional targets for the full game: no hero outside agreed pick/win bands at e
 | Regular season | Double round robin per split (18 matches) |
 | Playoffs | Top 4, best of 3 |
 | Promotion and relegation | Bottom 2 relegated, top 2 of the tier below promoted |
-| Later | Cups, international events, regional leagues |
+| Phase 1 uses | One tier of 10 teams, one split and playoffs |
+| Later (Global edition) | Multiple tiers with promotion and relegation, cups, invitationals, qualifier chains, regional leagues on real-world regions (task D-018) |
+
+### 10.1 Form Rating and trophy cabinet
+
+Each club has a **Form Rating** that shows how it has played lately. It is shown in the league table and on the club page.
+
+```
+Form = sum over matches in the last 28 game days of K * Importance * (Result - Expected) * Fade
+Fade = max(0, 1 - age_days / 28)
+```
+
+`Result` is 1 for a win and 0 for a loss. `Expected` is the simulator's own win probability for the two teams' ratings (so it matches the calibration table). `Importance`: league match 1.0, playoff round 1.25, final 1.5, times a series multiplier of 1.0 (best of 1), 1.2 (best of 3) or 1.4 (best of 5). Exhibition and Quick Match have importance 0. New clubs start at 0 and can go below 0. `K` is set so a normal league season spreads ratings from about -100 to +100 (v0). Quick Match opponents are chosen by team rating, not by Form.
+
+The **trophy cabinet** on the club page records prize money earned, titles and medals.
 
 ---
 
 ## 11. Monetization (deferred, Founder decision)
 
-Not built in v1. Principles to protect: no paid advantage in match outcomes, no random-paid-item mechanics (store policies and local law), clear price display. Details in a separate document after the Founder decision.
+Not built in v1. Principles to protect: no paid advantage in match outcomes, no random-paid-item mechanics (store policies and local law), clear price display. Safety nets (for example a warning before a contract ends) are never paywalled. Subscriptions sell convenience, customization and support. Details in a separate document after the Founder decision.
 
 ---
 
 ## 12. Scope of the first prototype (Phase 1)
 
 - Single player, offline.
-- One league of 10 teams, 5 slots, **40 original heroes**, about 140 generated players (10 per club plus 40 free agents). **Generation (v0):** each stat is drawn from a normal distribution with mean 50 + 4 * (club strength offset, -4 to +4) and standard deviation 8, clamped to 25 to 90; `Potential = max(stat) + a draw of 0 to 25 (younger players get larger draws)`, at most 99; age 17 to 32; every player has a primary role and 40% have a secondary role.
+- One league of 10 teams, 5 slots, **40 original heroes**, about 140 generated players (10 per club plus 40 free agents). **Generation (v0):** each stat is drawn from a normal distribution with mean 50 + 4 * (club strength offset, -4 to +4) and standard deviation 8, clamped to 25 to 90; `Potential_stat = stat + a draw of 0 to 25 per stat (younger players get larger draws)`, at most 99; personality drawn evenly from the four; languages English at 100; age 17 to 32; every player has a primary role and 40% have a secondary role.
 - Draft, match simulation with text match report, roster screen, simple training.
+- **Added in v1.3:** Game Plan (7.8), Team Bonds with pair grid (7.7), Exhibition and Quick Match (7.9), recruitment and negotiation for free agents (7.2), sponsor lite and the finance ledger (7.6), Form Rating and trophy cabinet (10.1), per-stat Potential and help sheets (4.2), simple per-player kills, deaths and assists in match reports, and a player career log. **Not in Phase 1:** manager level and talents (D-014), transfers between clubs (D-015), multi-tier leagues and cups (D-018), daily missions, subscriptions, the animated map.
+- **Build order inside Phase 1:** skeleton and string tables, headless simulator with golden tests, full-pipeline calibration (9.1), content data, core screens (roster, draft, match), then Team Bonds, Game Plan, recruitment, finance and the extra modes.
 - **Play modes:** Full (player drafts every match) and Quick (auto-draft, skim result for non-key matches).
 - Plain placeholder visuals.
 
-**Exit criteria:** the Phase 1 "season" (one split plus playoffs, about 24 player matches) can be played in about 15 minutes in Quick mode, where "key matches" (playoffs and matches against the top 3) still show the draft; the 40,000-match batch tests meet the targets in section 9; a non-developer can understand why they lost a match from the report.
+**Exit criteria:** the Phase 1 "season" (one split plus playoffs, about 24 player matches) can be played in about 15 minutes in Quick mode, where "key matches" (playoffs and matches against the top 3) still show the draft; the 40,000-match batch tests meet the targets in section 9; a non-developer can understand why they lost a match from the report; the extra QA tests in section 9.2 pass.
 
 ---
 
@@ -406,7 +512,7 @@ Lose conditions (bankruptcy, being fired), onboarding and tutorial, save format 
 
 ## 15. Open questions and parameters still to define
 
-Founder questions are in `company/DECISIONS.md`. Parameters still to define are tracked on the task board: economy and wage caps and contract valuation (D-007), hero data schema samples and 40-hero set (D-005, D-008), player generation rules (D-008), the PCG32 and golden-vector spec (P-002).
+Founder questions are in `company/DECISIONS.md`. Parameters still to define are tracked on the task board: economy and wage caps and contract valuation (D-007), recruitment and contract maths (D-013), the Game Plan v0 mapping and Team Bonds re-tuning (D-009, D-010), Form Rating constants (D-017), per-stat Potential generation and name block list (D-008, D-016), hero data schema samples and 40-hero set (D-005, D-008), player generation rules (D-008), the PCG32 and golden-vector spec (P-002).
 
 ---
 
@@ -417,3 +523,4 @@ Founder questions are in `company/DECISIONS.md`. Parameters still to define are 
 | 2026-11-07 | v1 draft | Game Design Lead, Systems Lead |
 | 2026-11-07 | v1.1 after independent review: model rebuilt so early and mid phases count (final score across all phases); objectives and teamfights use different slot weights; draft levers (CompMod up to 10%, style, lane counters) now simulated; slot assignment and hero fit defined; counterfactual draft attribution; determinism spec; constants re-tuned (D 25, sigma 2.0, gamma 0.8); pool raised to 40 with role floors; draft AI reweighted; missing parameters added; exit criteria use Quick mode; IP-sensitive names replaced (Heartstone, Ashen Vale, Ancient Colossus, Champions, mastery) | Game Design Lead, Systems Lead |
 | 2026-11-07 | v1.2 after second independent review: style edge defined as +4% winner / -4% loser (matches prototype); CompMod rescaled (synergy +2.5% per pair type, cap +10%, clamp -10% to +10%) with realistic-range numbers; role-floor rule rewritten to prevent dead ends; draft order changed to our own (2+1 bans each); Phase 1 season defined as one split plus playoffs; training, fatigue (threshold 25, +15 per match), form/morale/chemistry rules, AI lineup rule, Phase 1 signing rule and player generation added; early-phase stat per slot; HeroFactor floor 0.90; power budget tied to difficulty; scouting formula fixed; luck line and win-probability draft edge in reports; full-pipeline calibration (9.1) required | Game Design Lead, Systems Lead |
+| 2026-11-07 | v1.3 (not yet independently reviewed): Founder-approved Game Plan (7.8) and Team Bonds (7.7, replaces the single Chemistry number; COM now enters via Understanding; replacement cost per pair); Exhibition and Quick Match (7.9); free-agent recruitment, negotiation, prize share, release and expiry warning (7.2); sponsor lite and ledger (7.6); Potential per stat, personality, languages, country, help sheets (4.2, 7.4); Form Rating and trophy cabinet (10.1); editions and roadmap (section 1); extra QA tests (9.2); Phase 1 scope updated (12) | Game Design Lead, Systems Lead |

@@ -18,7 +18,8 @@
 | 2026-11-07 | Game Plan (small version: about 8 sliders, default plan, "ahead" and "behind" triggers) is in Phase 1 | Founder |
 | 2026-11-07 | Team Bonds (pairwise Bond and Understanding, languages data field) is in Phase 1 | Founder |
 | 2026-11-07 | Proposed by Producer, proceeding unless the Founder objects: turn-based calendar; free agents only in Phase 1; sponsor "lite" plus tutorial goals; finances screens; manager talents deferred (see REFERENCE-ESMO-ADAPTATION.md section 8 and decisions 4 to 8) | Producer (pending Founder) |
-| 2026-11-07 | Proposed by Producer, proceeding unless the Founder objects: keep the 6 core player stats; Potential becomes per stat; stat help sheets, mastery levels, derived KDA, career log; contract expiry reminders always free (see REFERENCE-ESMO-ADAPTATION.md section 9) | Producer (pending Founder) |
+| 2026-11-07 | Proposed by Producer, proceeding unless the Founder objects: keep the 8 player stats; Potential becomes per stat; stat help sheets, mastery levels, derived KDA, career log; contract expiry reminders always free (see REFERENCE-ESMO-ADAPTATION.md section 9) | Producer (pending Founder) |
+| 2026-11-07 | Global edition competition geography uses real regions; all clubs and players stay fictional | Founder |
 | 2026-11-07 | Proposed by Producer, proceeding unless the Founder objects: Form Rating (28-day fade, importance-weighted) and a trophy cabinet in Phase 1; multi-tier leagues, cups and region leaderboards wait for Global (see REFERENCE-ESMO-ADAPTATION.md section 10) | Producer (pending Founder) |
 
 ## Release path (Founder, 2026-11-07)
@@ -37,4 +38,3 @@
 2. **Monetization details.** Reference images received; concept drafted in `docs/design/MONETIZATION-DRAFT.md`. Postponed until the final release.
 3. **Transfers with AI clubs in Single Player.** The release path puts sale and transfer of players in the Multiplayer edition. Should a later Single Player update also allow transfers with AI-run clubs? Recommendation: not in Phase 1; decide after the core loop is balanced.
 4. **Ads in the Single Player edition.** Still open (see MONETIZATION-DRAFT.md).
-5. **Competition geography for the Global edition.** Real regions or fictional realms (fantasy-lite)? Not needed until the Global edition.
