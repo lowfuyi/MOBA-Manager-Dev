@@ -99,7 +99,63 @@ Seen as a paid feature. Our Quick mode auto-draft stays free (Pillar 5). A paid 
 - **Privacy:** matches public or private is a per-club setting; competitive matches are public.
 - **Moderation:** club names and tags need a filter and a report function before any online release.
 
+## 8. Manager talents, finances, sponsorship, recruitment and contracts (third set of screenshots)
+
+**Seen:**
+- **Talents.** The manager earns 1 talent point per manager level. There are four trees: a general *Negotiator* tree (20 points) and one specialist tree per game genre (75 to 77 points each). The MOBA tree is a branching grid of small nodes with icons (mood, energy, speed, focus, vision, shield, callout and similar), where each node is unlocked after its parent. A Reset button refunds points. Manager level comes from XP, and missions pay XP.
+- **Finances.** Three tabs. *Overview*: balance and a week bar chart of income and expense. *Analytics*: daily profit and loss, an income donut by source (sponsor signing bonus, cash prize, sponsor mission reward) and an expense donut (player wages). *History*: a day-by-day ledger, one line per payment.
+- **Sponsorship.** One active sponsor contract (an entry-level "Amateur Program" tier) and a list of missions tagged Daily, each with a progress bar (for example "assign 8 hours of Rest", 5 of 8) and a small cash plus XP reward.
+- **Recruitment hub.** Balance and total daily wage at the top, then: player database (free agents and the transfer list, with a New Search button), scouting reports (tabs New, Shortlisted, Rejected; sort by last scouted), negotiations (Ongoing, Accepted, Rejected), provisional agreements (Reached, Closed), transfer list (Buy and Sell tabs, with an Add Player flow), transfer offers (Received and Sent) and a history timeline.
+- **Player cards.** Name, age, country flag, the player's top three role ratings plus a "+N more" chip, a personality label (Casual, Balanced, Temperamental, Professional), morale %, energy %, current club and an asking price.
+- **Contract sheet.** Club, type (Full-Time), job (Player), duration (42 days), wage per day, and a **cash prize split** between club and player (for example club 20 percent, player 80 percent).
+- **Help cards.** One-time explanation cards with an "Understood" button. They explain that negotiations agree contract terms, that an agreement with a player who has a club creates a *provisional agreement*, that free agents sign directly, and that a provisional agreement is needed before a transfer offer to the player's club.
+
+**What we learn (design observations, not rules):**
+- The reference runs on real-time days with daily missions and tiny money numbers. That suits an online live-service game. Our Single Player edition is turn-based: a day passes when the manager presses Next Day or Play Match. There is no waiting and no daily-login pressure.
+- Splitting prize money between club and player is a clever contract term: it is one more thing to negotiate and it ties player happiness to results.
+- Talent trees give long-term progression, but a tree that adds match strength would let a high manager level beat good drafting. Our calibration (GDD section 9.1) is built around the draft and roster levers mattering.
+- The provisional agreement step (agree terms with the player first, then the fee with the selling club) is a good flow for club-to-club transfers.
+- Help cards, filter chips, empty-state text and a floating search button are good mobile patterns for a first-time player.
+
+**Edition mapping:**
+
+| Feature | Phase 1 (Single Player) | Later |
+|---|---|---|
+| Finances: Overview, Analytics, History | **Yes**, simple ledger and charts (see D-007) | Multiplayer adds trade income |
+| Income: sponsor signing bonus, sponsor objective rewards, prize money. Expense: player and staff wages, facility upkeep | Yes | Merch and match-day income later |
+| Sponsor contract | **Yes, "lite"**: choose 1 of 3 offers at the start of a season. Signing bonus plus per-split objectives (for example reach the playoffs, win a set number of matches, start a rookie). Missing an objective loses that reward only | Sponsor tiers tied to club reputation in Global |
+| Daily missions | **No** (real-time habit loop) | Possibly Multiplayer and Global, where live operations make sense |
+| One-time tutorial goals (for example "set a training plan", "make a Game Plan") with a small cash reward | **Yes**: gentle onboarding for new players | n/a |
+| Player database of free agents with filters and saved searches | **Yes** | n/a |
+| Scouting reports with New, Shortlisted, Rejected | **Yes** (uses the scouting formula in GDD) | n/a |
+| Negotiation and contracts for free agents: wage, length (in splits), prize split | **Yes**, a short negotiation of up to 3 rounds | Negotiator talent later |
+| Release or non-renewal of players, contract expiry | Yes | n/a |
+| Club history timeline (joins, leaves, contracts) | Yes (cheap) | n/a |
+| Manager level, XP and talents | **No**, deferred (D-014) | A later Single Player update, once the core loop is balanced |
+| Club-to-club transfers, provisional agreements, transfer list, transfer offers | **No** (the Founder placed sale and transfer of players in the Multiplayer edition) | Multiplayer edition (D-015) |
+
+**Adaptation rules (ours, for the Systems Lead):**
+1. **Time.** Contract length is counted in splits (1 to 4), not days. Wages are paid per week of game time and shown per week, not per day.
+2. **Economy balance.** All money figures are our own (task D-007). QA test: simulate 10 seasons for a default club under default play. It must not go bankrupt and must not snowball. There is no way to buy in-game money with real money (monetization principle: no paid advantage).
+3. **Prize split.** A contract term between 50 and 90 percent to the player. A higher player share raises the player's willingness to sign and lifts morale after wins.
+4. **Personality.** The four labels seen (Casual, Balanced, Temperamental, Professional) are common English words and fine to use. We map them to numbers: how steady training gains are, how fast Bond grows (Team Bonds), how swingy morale is, and how hard negotiation is. The Systems Lead sets the values.
+5. **Talents (later).** If built: about 30 nodes, one MOBA-only tree, small bonuses, effects only on support systems (training speed, scouting accuracy, negotiation, energy recovery, Bond growth). No node adds match strength directly. The tree layout, icons and names are our own.
+6. **Player names.** Generated from our own name tables per region. The generator must never produce the handle of a real pro player (right of publicity and IP). Names are data, not UI text.
+7. **Flags.** Real country flags are fine. The country links to the languages field used by Team Bonds.
+8. **Help cards.** One-time help cards with an "Understood" button, stored as translatable strings. The UI/UX Lead lists which screens get one.
+
+**Draft design for the Multiplayer transfer market (not for Phase 1):**
+- Flow: provisional agreement with the player (contract terms), then a transfer offer to the selling club (fee), then acceptance and signing. Offers expire.
+- **No real-money trading of players or clubs.** It would be a store-policy and legal risk and it breaks the no-paid-advantage rule. Fees are in-game cash only.
+- Anti-abuse: a fee band tied to the player's valuation (no gifting or price laundering between accounts), cooldowns on re-selling, a transfer history log, and a report function.
+- Needs a backend and moderation, so it waits for the Multiplayer edition.
+
 ## Decisions (Founder, 2026-11-07)
 1. **Game Plan in Phase 1: YES**, the small version (about 8 sliders, a default plan, triggers "ahead" and "behind"), built after the core draft calibration.
 2. **Team Bonds in Phase 1: YES**, with English-only data and the pair grid and maths in place.
 3. Exhibition and Quick Match in Phase 1: recommended, proceeding unless the Founder objects.
+4. **Time model, Phase 1 (recommended, proceeding unless the Founder objects):** turn-based calendar, no real-time waiting, no daily missions in Single Player.
+5. **Recruitment, Phase 1 (recommended):** free agents only, with scouting reports, negotiation and contracts. Club-to-club transfers wait for the Multiplayer edition, as the Founder's release path says. Open question for the Founder: allow transfers with AI clubs in a later Single Player update?
+6. **Sponsors, Phase 1 (recommended):** sponsor "lite" (one contract, objectives per split) plus one-time tutorial goals. Daily missions are not in Single Player.
+7. **Manager level and talents (recommended):** deferred until the core loop is balanced. If built, no talent adds match strength directly.
+8. **Finances screens (Overview, Analytics, History):** included in Phase 1 (task D-007).

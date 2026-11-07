@@ -10,15 +10,17 @@ Last updated: 2026-11-07 by Producer
 | D-002 | Game Design Document v1.2 (two independent reviews done) | Game Design Lead | Systems Lead + IP Checker | In review |
 | D-003 | Founder decisions on open questions (see DECISIONS.md) | Founder | n/a | Needs Founder |
 | D-004 | Prototype of the match formula (done as `tools/proto_sim.py` v0.2; calibrated to GDD section 9) | Systems Lead | QA & Balance Lead | Done (re-review passed with fixes) |
-| D-007 | Economy: wage caps, contract valuation, sponsor income | Systems Lead | QA & Balance Lead | Backlog |
+| D-007 | Economy: wages, contract valuation, sponsor lite (offers, objectives, tutorial goals), finance screens (Overview, Analytics, History), 10-season no-bankruptcy and no-snowball test | Systems Lead | QA & Balance Lead | Backlog |
 | D-008 | Player generation rules and the 40-hero set (data) | Content Lead | IP Checker + QA | Backlog |
 | D-009 | Game Plan spec: sliders, triggers, model mapping, no-dominant-plan test (see REFERENCE-ESMO-ADAPTATION.md) | Systems Lead | QA & Balance Lead + IP Checker | Backlog (Founder approved) |
 | D-010 | Team Bonds spec: pairwise Bond and Understanding, languages field, analytics screens | Systems Lead + UI/UX | QA + IP Checker | Backlog (Founder approved) |
 | D-005 | Original role/archetype set and 40 heroes (names + data only) | Content Lead | IP Checker + QA | Backlog |
 | D-006 | Original naming glossary (map, objectives, items, terms) | Content Lead | IP Checker | Backlog |
-
 | D-011 | Exhibition and Quick Match modes (single player, no league effect) | Game Design Lead | Systems Lead | Backlog |
 | D-012 | Multiplayer ladder, ranks, matchmaking and club search spec (Multiplayer edition, later) | Systems Lead | QA + IP Checker | Parked |
+| D-013 | Recruitment and contracts spec: free-agent database and saved searches, scouting reports (New, Shortlisted, Rejected), up-to-3-round negotiation, contract terms (wage, splits, prize share), personality mapping, release and expiry, club history log | Systems Lead + Game Design Lead | QA + IP Checker | Backlog (proposed) |
+| D-014 | Manager level, XP and talents (one MOBA tree, about 30 nodes, no direct match strength) | Systems Lead | QA & Balance Lead | Parked until core loop is balanced |
+| D-015 | Multiplayer transfer market spec (provisional agreement, offers, fee bands, no real-money trading) | Systems Lead | QA + IP Checker | Parked (Multiplayer edition) |
 
 ## Phase 1: Prototype (starts after D-003 is decided)
 
