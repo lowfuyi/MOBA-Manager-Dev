@@ -9,6 +9,9 @@ func go_back() -> void:
 
 func _ready() -> void:
 	var gs := App.gs
+	if gs.is_dismissed():
+		App.go.call_deferred(ScreenGameOver.new())
+		return
 	setup(Strings.t("hub.menu_title"), go_back)
 	var me := gs.club()
 	var row := {}
@@ -27,6 +30,9 @@ func _ready() -> void:
 			when = Strings.f("hub.when.done", {"season": gs.d["season"]})
 	head.add_child(UI.label(when, UI.S_SMALL, UI.DIM))
 	head.add_child(UI.label(Strings.f("hub.record", {"w": row.get("w", 0), "l": row.get("l", 0), "pts": row.get("pts", 0), "rank": row.get("rank", 0)}), UI.S_BODY, UI.ACCENT))
+	head.add_child(UI.label(Strings.f("hub.cash", {"cash": PlayerView.money(gs.cash()), "net": "%+d" % int(round(gs.weekly_net()))}), UI.S_SMALL, UI.GOOD if gs.cash() >= 0.0 else UI.BAD))
+	if gs.cash() < 0.0:
+		head.add_child(UI.label(Strings.f("hub.debt_warn", {"n": gs.debt_rounds_left()}), UI.S_SMALL, UI.BAD))
 	var g := gs.next_game()
 	if gs.d["phase"] == "done":
 		_done_card()
@@ -38,6 +44,8 @@ func _ready() -> void:
 		_next_card(g)
 	body.add_child(UI.button(Strings.t("hub.roster"), func(): App.go(ScreenRoster.new("hub"))))
 	body.add_child(UI.button(Strings.t("hub.training"), func(): App.go(ScreenTraining.new())))
+	body.add_child(UI.button(Strings.t("hub.free_agents"), func(): App.go(ScreenFreeAgents.new("hub"))))
+	body.add_child(UI.button(Strings.t("hub.finance"), func(): App.go(ScreenFinance.new())))
 	body.add_child(UI.button(Strings.t("hub.standings"), func(): App.go(ScreenStandings.new())))
 	body.add_child(UI.button(Strings.t("hub.settings"), func(): App.go(ScreenSettings.new())))
 

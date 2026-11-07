@@ -26,7 +26,12 @@ var fatigue: Dictionary = {}      # player id -> 0..100 (saved; missing = fresh)
 var progress: Dictionary = {}     # player id -> {stat: points gained or lost since the start} (saved)
 var season_offset := 0            # seasons played so far: everybody is this many years older
 
+var fa_ids: Array = []            # free agents right now (saved by the game; starts as the players without a club)
+
 var _orig_stats: Dictionary = {}  # player id -> the stats the data files gave him
+var _orig_ids: Dictionary = {}    # club id -> the roster the data files gave it
+var _orig_fa: Array = []
+var _roster_club := ""            # the one club whose roster the save may have changed
 
 var _fam_cache: Dictionary = {}
 var _sig_cache: Dictionary = {}
@@ -47,7 +52,40 @@ static func load_default() -> World:
 	for c in cs:
 		w.clubs[c["id"]] = c
 		w.club_ids.append(c["id"])
+		w._orig_ids[c["id"]] = (c["player_ids"] as Array).duplicate()
+	for p in ps:
+		if p["club"] == null:
+			w._orig_fa.append(p["id"])
+	w.fa_ids = w._orig_fa.duplicate()
 	return w
+
+
+# ---------------------------------------------------------------- roster overlay
+func orig_ids(club_id: String) -> Array:
+	return _orig_ids[club_id]
+
+
+func orig_free_agents() -> Array:
+	return _orig_fa.duplicate()
+
+
+## Point the world at one save's roster for the managed club and its free-agent pool. The other clubs keep
+## the rosters of the data files.
+func bind_roster(club_id: String, roster: Array, fa: Array) -> void:
+	if _roster_club != "" and _roster_club != club_id:
+		clubs[_roster_club]["player_ids"] = (_orig_ids[_roster_club] as Array).duplicate()
+		_lineup_cache.erase(_roster_club)
+	_roster_club = club_id
+	clubs[club_id]["player_ids"] = roster
+	fa_ids = fa
+	_lineup_cache.erase(club_id)
+
+
+func free_agent_players() -> Array:
+	var out: Array = []
+	for pid in fa_ids:
+		out.append(players[pid])
+	return out
 
 
 # ---------------------------------------------------------------- progress overlay

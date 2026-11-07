@@ -2,9 +2,10 @@ class_name GameState
 extends RefCounted
 ## One save: the managed club, the split calendar, standings, playoffs and familiarity growth.
 ## Everything in `d` is JSON-safe so the whole save is one file (user://save.json).
-## Alpha 0.2 scope: league (double round robin, one game per fixture) + playoffs (top 4,
-## best of 3 semis, best of 5 final), Game Plan, training, fatigue and ageing.
-## No recruitment, finance or Bonds yet.
+## Alpha 0.3 scope: league (double round robin, one game per fixture) + playoffs (top 4,
+## best of 3 semis, best of 5 final), Game Plan, training, fatigue and ageing, and now contracts,
+## the free-agent market, a cash balance with a sponsor, and dismissal when the club stays in debt.
+## No Bonds yet.
 
 const SAVE_PATH := "user://save.json"
 const VERSION := 1
@@ -29,9 +30,12 @@ static func new_game(w: World, club_id: String, save_seed: int, season: int = 1,
 		"seasons_done": carry.get("seasons_done", []), "plan": carry.get("plan", GamePlan.neutral_set()),
 		"stat_gain": carry.get("stat_gain", {}), "fatigue": carry.get("fatigue", {}), "train": carry.get("train", {}),
 		"train_last": [], "season_base": (carry.get("stat_gain", {}) as Dictionary).duplicate(true),
+		"roster": (carry["roster"] as Array) if carry.has("roster") else w.orig_ids(club_id).duplicate(),
+		"fa": (carry["fa"] as Array) if carry.has("fa") else w.orig_free_agents(),
 	}
 	w.fam_bonus = gs.d["fam_bonus"]
 	gs._bind()
+	gs._init_economy(carry)
 	gs.reset_lineup()
 	return gs
 
@@ -45,13 +49,19 @@ static func from_dict(w: World, data: Dictionary) -> GameState:
 			gs.d[k] = {}
 	if not gs.d.has("train_last"):
 		gs.d["train_last"] = []
+	if not gs.d.has("roster"):  # saves from before Alpha 0.3: the club as the data files have it
+		gs.d["roster"] = w.orig_ids(gs.d["club"]).duplicate()
+		gs.d["fa"] = w.orig_free_agents()
 	w.fam_bonus = gs.d["fam_bonus"]
 	gs._bind()
+	if not gs.d.has("cash"):
+		gs._init_economy({})
 	return gs
 
 
 ## Make the shared World show this save's player growth, fatigue and ages.
 func _bind() -> void:
+	world.bind_roster(club(), d["roster"], d["fa"])
 	world.bind_progress(d["stat_gain"], d["fatigue"], int(d["season"]) - 1)
 
 
@@ -308,12 +318,16 @@ func _tick_day() -> void:
 		if c == club():
 			mine = log
 	d["train_last"] = mine
+	Progression.tick_players(world, d, world.free_agent_players(), [], false)
 	world.fam_bonus = d["fam_bonus"]
+	d["clock"] = int(d["clock"]) + 1
+	_pay_round()
 
 
 ## Playoff games: only the managed club's roster ticks (the AI series are simulated without a calendar).
 func _tick_human_playoff_day() -> void:
 	d["train_last"] = Progression.tick_club(world, d, club(), (d["lineup"] as Dictionary).values(), true)
+	d["clock"] = int(d["clock"]) + 1
 
 
 func _finish_round_if_done() -> void:
@@ -408,6 +422,7 @@ func tired_starters(line: float = 40.0) -> Array:
 # ---------------------------------------------------------------- playoffs
 func _start_playoffs() -> void:
 	d["phase"] = "playoffs"
+	_settle_league()
 	var st := standings()
 	var seeds: Array = []
 	for i in 4:
@@ -486,6 +501,7 @@ func _archive_season() -> void:
 				series_result = "champion" if s["winner"] == club() else "runner_up"
 			elif s["winner"] == club() and s["id"] != "F":
 				series_result = "finalist"
+	_pay_playoff_prize(series_result)
 	(d["seasons_done"] as Array).append({"season": d["season"], "rank": mine.get("rank", 0), "w": mine.get("w", 0), "l": mine.get("l", 0),
 			"result": series_result, "champion": d["champion"]})
 
@@ -495,16 +511,423 @@ func playoff_label(s: Dictionary) -> String:
 
 
 func next_season() -> GameState:
+	var left_club := _expire_contracts()
 	Progression.age_everyone(world)
+	var fa: Array = (d["fa"] as Array).duplicate()
+	fa.append_array(left_club)
+	var roster: Array = []
+	for pid in d["roster"]:
+		if not left_club.has(pid):
+			roster.append(pid)
+	var contracts := {}
+	for pid in roster:
+		var c: Dictionary = (d["contracts"] as Dictionary)[pid]
+		contracts[pid] = {"wage": int(c["wage"]), "left": int(c["left"]) - 1 if not _kept_by_board(pid) else int(c["left"])}
 	var carry := {"fam_bonus": d["fam_bonus"], "history": d["history"], "settings": d["settings"], "seasons_done": d["seasons_done"], "plan": plan_set(),
-			"stat_gain": (d["stat_gain"] as Dictionary).duplicate(true), "fatigue": {}, "train": d["train"]}
+			"stat_gain": (d["stat_gain"] as Dictionary).duplicate(true), "fatigue": {}, "train": d["train"],
+			"roster": roster, "fa": fa, "contracts": contracts, "cash": d["cash"], "r0": d["r0"], "ledger": d["ledger"],
+			"clock": d["clock"], "lock": d["lock"]}
+	var lu: Dictionary = d["lineup"]
 	var gs := GameState.new_game(world, club(), int(d["save_seed"]) + 1000 * int(d["season"]), int(d["season"]) + 1, carry)
-	gs.d["lineup"] = d["lineup"]
+	gs.d["lineup"] = lu
+	gs._fix_lineup()
 	return gs
+
+
+# ---------------------------------------------------------------- economy
+func _init_economy(carry: Dictionary) -> void:
+	var e := Economy.data()
+	var season := int(d["season"])
+	if carry.has("contracts"):
+		d["contracts"] = carry["contracts"]
+	else:
+		d["contracts"] = {}
+		for pid in d["roster"]:
+			d["contracts"][pid] = Economy.initial_contract(world, world.players[pid])
+	if carry.has("r0"):
+		d["r0"] = float(carry["r0"]) * (1.0 + float(e["r0_inflation"]))
+	else:
+		d["r0"] = Economy.revenue_base(world, world.orig_ids(club()), season)
+	d["ledger"] = carry.get("ledger", [])
+	d["lock"] = carry.get("lock", {})
+	d["clock"] = int(carry.get("clock", 0))
+	d["neg"] = {}
+	d["neg_rounds"] = 0
+	d["dismissed"] = false
+	d["sponsor"] = "steady"
+	d["targets"] = _sponsor_targets()
+	if carry.has("cash"):
+		d["cash"] = float(carry["cash"])
+	else:
+		d["cash"] = float(e["start_balance_weeks"]) * wage_bill()
+	_earn("sponsor_bonus", float(sponsor_offer("steady")["bonus_weeks"]) * float(d["r0"]))
+
+
+func _earn(kind: String, amount: float) -> void:
+	if absf(amount) < 0.05:
+		return
+	d["cash"] = float(d["cash"]) + amount
+	var led: Array = d["ledger"]
+	led.append({"s": int(d["season"]), "r": int(d["round"]), "k": kind, "a": snappedf(amount, 0.1)})
+	while led.size() > 160:
+		led.pop_front()
+
+
+func cash() -> float:
+	return float(d["cash"])
+
+
+## Weekly wages of everybody under contract (the whole squad, starters or not).
+func wage_bill() -> float:
+	var total := 0.0
+	for pid in d["roster"]:
+		if (d["contracts"] as Dictionary).has(pid):
+			total += float(d["contracts"][pid]["wage"])
+		else:
+			total += float(Economy.initial_contract(world, world.players[pid])["wage"])
+	return total
+
+
+func revenue_base() -> float:
+	return float(d["r0"])
+
+
+func wage_cap() -> float:
+	return float(Economy.data()["wage_cap_r0"]) * revenue_base()
+
+
+func sponsor_offer(id: String) -> Dictionary:
+	for o in Economy.data()["sponsors"]:
+		if o["id"] == id:
+			return o
+	return Economy.data()["sponsors"][0]
+
+
+## 1 = strongest club by the rating of its best lineup right now (ties by club id).
+func strength_rank() -> int:
+	var mine := world.team_rating(world.best_lineup(club()))
+	var rank := 1
+	for c in world.club_ids:
+		if c == club():
+			continue
+		var r := world.team_rating(world.best_lineup(c))
+		if r > mine + 1.0e-9 or (absf(r - mine) <= 1.0e-9 and String(c) < String(club())):
+			rank += 1
+	return rank
+
+
+## Sponsor objectives are set for the club's strength at the start of the season, so a weak club is asked for
+## less than a strong one: wins = what a club of that strength is expected to win, plus one; rank = one place
+## better than its strength rank (never better than 2nd or worse than 6th).
+func _sponsor_targets() -> Dictionary:
+	var e := Economy.data()
+	var r := strength_rank()
+	var n := world.club_ids.size()
+	var p := float(e["target_win_rate_top"]) - (float(e["target_win_rate_top"]) - float(e["target_win_rate_bottom"])) * float(r - 1) / float(n - 1)
+	return {"wins": clampi(int(round(float(total_rounds()) * p)) + int(e["target_wins_extra"]), 4, total_rounds() - 2),
+			"rank": clampi(r - 1, int(e["target_rank_min"]), int(e["target_rank_max"]))}
+
+
+## The number the sponsor asks for this season (wins or league rank).
+func sponsor_target(offer: Dictionary) -> int:
+	if offer["objective"] == "wins":
+		return int(d["targets"]["wins"])
+	if offer["objective"] == "playoffs":
+		return int(d["targets"]["rank"])
+	return 0
+
+
+func sponsor_offers() -> Array:
+	return Economy.data()["sponsors"]
+
+
+## Weekly retainer the chosen sponsor pays.
+func weekly_income() -> float:
+	return float(sponsor_offer(d["sponsor"])["retainer"]) * revenue_base()
+
+
+func weekly_net() -> float:
+	return weekly_income() - wage_bill()
+
+
+## The sponsor can still be swapped until the first game of the season is played.
+func sponsor_changeable() -> bool:
+	if d["phase"] != "league":
+		return false
+	for f in d["fixtures"]:
+		if f["played"]:
+			return false
+	return true
+
+
+func set_sponsor(id: String) -> bool:
+	if not sponsor_changeable() or id == d["sponsor"]:
+		return false
+	var r0 := revenue_base()
+	_earn("sponsor_bonus", (float(sponsor_offer(id)["bonus_weeks"]) - float(sponsor_offer(d["sponsor"])["bonus_weeks"])) * r0)
+	d["sponsor"] = id
+	return true
+
+
+## Progress towards the sponsor's target: {"label_key", "have", "target", "reward", "met"}; empty without objective.
+func sponsor_objective() -> Dictionary:
+	var o := sponsor_offer(d["sponsor"])
+	if o["objective"] == "none":
+		return {}
+	var have := 0
+	if o["objective"] == "wins":
+		for r in standings():
+			if r["club"] == club():
+				have = int(r["w"])
+	else:
+		have = rank_of(club())
+	var target := sponsor_target(o)
+	var met: bool = (have >= target) if o["objective"] == "wins" else (have <= target and _fixtures_played().size() > 0)
+	return {"kind": o["objective"], "have": have, "target": target, "reward": float(o["reward_weeks"]) * revenue_base(), "met": met}
+
+
+func _pay_round() -> void:
+	var rpw := float(Economy.data()["rounds_per_week"])
+	_earn("wages", -wage_bill() / rpw)
+	_earn("retainer", weekly_income() / rpw)
+	if float(d["cash"]) < 0.0:
+		d["neg_rounds"] = int(d["neg_rounds"]) + 1
+		if int(d["neg_rounds"]) >= int(Economy.data()["dismiss_rounds"]):
+			d["dismissed"] = true
+	else:
+		d["neg_rounds"] = 0
+
+
+func _settle_league() -> void:
+	var e := Economy.data()
+	var r0 := revenue_base()
+	var rank := rank_of(club())
+	var prizes: Array = e["league_prize_weeks"]
+	if rank >= 1 and rank <= prizes.size():
+		_earn("prize_league", float(prizes[rank - 1]) * r0)
+	var ob := sponsor_objective()
+	if not ob.is_empty() and bool(ob["met"]):
+		_earn("sponsor_reward", float(ob["reward"]))
+
+
+func _pay_playoff_prize(result: String) -> void:
+	var e := Economy.data()
+	if result == "champion":
+		_earn("prize_playoff", float(e["champion_prize_weeks"]) * revenue_base())
+	elif result == "runner_up":
+		_earn("prize_playoff", float(e["runner_up_prize_weeks"]) * revenue_base())
+
+
+func is_dismissed() -> bool:
+	return bool(d.get("dismissed", false))
+
+
+## Negative balance for a long time ends the job: rounds left before that happens (0 when not in debt).
+func debt_rounds_left() -> int:
+	if float(d["cash"]) >= 0.0:
+		return 0
+	return maxi(0, int(Economy.data()["dismiss_rounds"]) - int(d["neg_rounds"]))
+
+
+# ---- contracts
+func contract_of(pid: String) -> Dictionary:
+	return (d["contracts"] as Dictionary).get(pid, {})
+
+
+func roster_players() -> Array:
+	return world.club_players(club())
+
+
+func fa_players() -> Array:
+	return world.free_agent_players()
+
+
+func _week_rounds_left() -> int:
+	return maxi(0, total_rounds() - int(d["round"])) if d["phase"] == "league" else 0
+
+
+## What letting him go costs: half the wages still owed on the contract (the current season counts from today).
+func release_cost(pid: String) -> float:
+	var c := contract_of(pid)
+	if c.is_empty():
+		return 0.0
+	var weeks := float(int(c["left"]) - 1) * float(total_rounds()) / float(Economy.data()["rounds_per_week"]) \
+			+ float(_week_rounds_left()) / float(Economy.data()["rounds_per_week"])
+	return float(Economy.data()["release_share"]) * float(c["wage"]) * weeks
+
+
+func can_release(pid: String) -> String:
+	if not (d["roster"] as Array).has(pid):
+		return "unknown"
+	if (d["roster"] as Array).size() <= int(Economy.data()["min_roster"]):
+		return "min"
+	if release_cost(pid) > cash():
+		return "cash"
+	return ""
+
+
+func release(pid: String) -> String:
+	var why := can_release(pid)
+	if why != "":
+		return why
+	_earn("release", -release_cost(pid))
+	(d["roster"] as Array).erase(pid)
+	(d["contracts"] as Dictionary).erase(pid)
+	(d["fa"] as Array).append(pid)
+	(d["lock"] as Dictionary)[pid] = int(d["clock"]) + int(Economy.data()["lockout_rounds"])
+	_after_roster_change()
+	return ""
+
+
+func _after_roster_change() -> void:
+	world.refresh_lineup(club())
+	_fix_lineup()
+
+
+## Any starting slot whose player has left is filled with the best rested player on the bench.
+func _fix_lineup() -> void:
+	var roster: Array = d["roster"]
+	for s in SLOTS:
+		if roster.has(d["lineup"][s]):
+			continue
+		var in_lineup := {}
+		for t in SLOTS:
+			in_lineup[d["lineup"][t]] = true
+		var best := ""
+		var best_score := -1.0e30
+		for pid in roster:
+			if in_lineup.has(pid):
+				continue
+			var sc := world.slot_score(world.players[pid], s)
+			if sc > best_score:
+				best_score = sc
+				best = pid
+		d["lineup"][s] = best
+
+
+## Contracts that end with this season.
+func expiring() -> Array:
+	var out: Array = []
+	for pid in d["roster"]:
+		if int(contract_of(pid).get("left", 9)) <= 1:
+			out.append(world.players[pid])
+	return out
+
+
+## Squad places taken: after the season is over the expiring players no longer count, so replacements can be signed.
+func roster_slots_used() -> int:
+	return (d["roster"] as Array).size() - (expiring().size() if d["phase"] == "done" else 0)
+
+
+## Seasons still to play on a contract as the player should read it (zero once it has run out).
+func seasons_left(pid: String) -> int:
+	var c := contract_of(pid)
+	if c.is_empty():
+		return 0
+	return int(c["left"]) - (1 if d["phase"] == "done" else 0)
+
+
+## Players who would be left after the expiring contracts run out and nobody renews.
+func roster_after_expiry() -> int:
+	return (d["roster"] as Array).size() - expiring().size()
+
+
+## Ids who leave at the season change; if that would leave too few players the board keeps the best ones.
+func _expire_contracts() -> Array:
+	var leaving: Array = []
+	for p in expiring():
+		leaving.append(p["id"])
+	var min_n := int(Economy.data()["min_roster"])
+	var need := min_n - ((d["roster"] as Array).size() - leaving.size())
+	if need > 0:
+		leaving.sort_custom(func(a, b): return Economy.best_slot_rating(world, world.players[a]) > Economy.best_slot_rating(world, world.players[b]))
+		_board_kept = leaving.slice(0, need)
+		leaving = leaving.slice(need)
+	else:
+		_board_kept = []
+	return leaving
+
+
+var _board_kept: Array = []
+
+
+func _kept_by_board(pid: String) -> bool:
+	return _board_kept.has(pid)
+
+
+# ---- negotiation
+## Why an offer cannot even be made: "" when it can.
+func offer_block(pid: String, wage: int, renewal: bool) -> String:
+	if int((d["lock"] as Dictionary).get(pid, -1)) > int(d["clock"]):
+		return "locked"
+	if not renewal:
+		if roster_slots_used() >= int(Economy.data()["max_roster"]):
+			return "full"
+		if cash() < 0.0 or cash() < signing_fee(wage):
+			return "cash"
+	var cur := float(contract_of(pid).get("wage", 0.0)) if renewal else 0.0
+	if wage_bill() - cur + float(wage) > wage_cap():
+		return "cap"
+	return ""
+
+
+func signing_fee(wage: int) -> float:
+	return float(wage) * float(Economy.data()["sign_fee_weeks"])
+
+
+func asking_wage(pid: String) -> int:
+	return Economy.asking_wage(world, world.players[pid])
+
+
+func negotiation_rounds_used(pid: String) -> int:
+	return int((d["neg"] as Dictionary).get(pid, 0))
+
+
+func lockout_left(pid: String) -> int:
+	return maxi(0, int((d["lock"] as Dictionary).get(pid, -1)) - int(d["clock"]))
+
+
+## One offer. Returns {"code": "accepted"|"close"|"below"|"far"|"walked"|"locked"|"full"|"cash"|"cap"|"bad", "rounds_left": int}.
+func offer(pid: String, wage: int, length: int, renewal: bool = false) -> Dictionary:
+	var e := Economy.data()
+	length = clampi(length, 1, int(e["max_length"]))
+	if not world.players.has(pid) or (renewal and not (d["roster"] as Array).has(pid)) or (not renewal and not (d["fa"] as Array).has(pid)):
+		return {"code": "bad", "rounds_left": 0}
+	if renewal and int(contract_of(pid).get("left", 9)) > 1:
+		return {"code": "bad", "rounds_left": 0}
+	var block := offer_block(pid, wage, renewal)
+	if block != "":
+		return {"code": block, "rounds_left": maxi(0, int(e["negotiation_rounds"]) - negotiation_rounds_used(pid))}
+	var p: Dictionary = world.players[pid]
+	var res := Economy.response(world, p, wage, length)
+	if res == "accept":
+		(d["neg"] as Dictionary).erase(pid)
+		if renewal:
+			var c: Dictionary = d["contracts"][pid]
+			c["wage"] = wage
+			c["left"] = int(c["left"]) + length
+			_after_roster_change()
+		else:
+			_earn("signing", -signing_fee(wage))
+			(d["fa"] as Array).erase(pid)
+			(d["roster"] as Array).append(pid)
+			(d["contracts"] as Dictionary)[pid] = {"wage": wage, "left": length + (1 if d["phase"] == "done" else 0)}
+			_after_roster_change()
+		return {"code": "accepted", "rounds_left": 0}
+	var used := negotiation_rounds_used(pid) + 1
+	(d["neg"] as Dictionary)[pid] = used
+	var walks: bool = used >= int(e["negotiation_rounds"]) or (p["personality"] == "temperamental" and used >= int(e["temperamental_walks_after"]))
+	if walks:
+		(d["neg"] as Dictionary).erase(pid)
+		(d["lock"] as Dictionary)[pid] = int(d["clock"]) + int(e["lockout_rounds"])
+		return {"code": "walked", "rounds_left": 0}
+	return {"code": res, "rounds_left": int(e["negotiation_rounds"]) - used}
 
 
 # ---------------------------------------------------------------- persistence
 func save() -> bool:
+	if is_dismissed():
+		return true  # the last autosave before the dismissal stays on disk
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f == null:
 		return false

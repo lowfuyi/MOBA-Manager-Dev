@@ -87,9 +87,14 @@ static func focus_of(d: Dictionary, p: Dictionary, human: bool) -> Dictionary:
 ## Roster of `club_id` ticks one match day. `played` are the ids that played. Returns the training log
 ## [[player_id, "stat:lan" or "hero:<id>", amount], ...] (only entries with a gain).
 static func tick_club(w: World, d: Dictionary, club_id: String, played: Array, human: bool) -> Array:
+	return tick_players(w, d, w.club_players(club_id), played, human)
+
+
+## The same for any list of players (the free agents train on their own, on the coach's plan, and rest).
+static func tick_players(w: World, d: Dictionary, plist: Array, played: Array, human: bool) -> Array:
 	var log: Array = []
 	var tpw := float(data()["ticks_per_week"])
-	for p in w.club_players(club_id):
+	for p in plist:
 		var pid: String = p["id"]
 		var fat := w.fatigue_of(pid)
 		var f := focus_of(d, p, human)

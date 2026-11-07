@@ -45,6 +45,22 @@ func _tour() -> void:
 	rs._toggle_slot("top")
 	rs._toggle_player(App.gs.d["lineup"]["mid"])
 	await shot("07_roster_detail")
+	rs._confirm_release = App.gs.d["lineup"]["mid"]
+	rs._rebuild()
+	await shot("07b_roster_release")
+	rs._confirm_release = ""
+	App.go(ScreenFinance.new())
+	await shot("07c_finance")
+	var fa_scr := ScreenFreeAgents.new("hub")
+	App.go(fa_scr)
+	await shot("07d_free_agents")
+	var cand: String = App.gs.d["fa"][0]
+	var neg := ScreenNegotiation.new(cand, false, "fa:hub")
+	App.go(neg)
+	await shot("07e_negotiation_full")
+	neg._wage = 1
+	neg._make_offer()
+	await shot("07f_negotiation_refused")
 	var g: Dictionary = App.gs.next_game()
 	for pid in (App.gs.d["lineup"] as Dictionary).values():
 		App.world.fatigue[pid] = 55.0

@@ -23,7 +23,10 @@ func _ready() -> void:
 	for s in done:
 		h.add_child(UI.label(Strings.f("season.history_row", {"season": s["season"], "rank": s["rank"], "w": s["w"], "l": s["l"], "result": Strings.t("season.result." + String(s["result"]))}), UI.S_SMALL, UI.TEXT))
 	_growth()
+	_contracts()
 	body.add_child(UI.button(Strings.t("season.next"), _next, "primary"))
+	body.add_child(UI.button(Strings.t("hub.free_agents"), func(): App.go(ScreenFreeAgents.new("season"))))
+	body.add_child(UI.button(Strings.t("hub.finance"), func(): App.go(ScreenFinance.new())))
 	body.add_child(UI.button(Strings.t("season.standings"), func(): App.go(ScreenStandings.new())))
 	body.add_child(UI.button(Strings.t("season.menu"), func(): App.autosave(); App.go(ScreenTitle.new())))
 
@@ -52,3 +55,21 @@ func _growth() -> void:
 			g.add_child(UI.label(Strings.f("season.growth_row", {"name": p["name"], "list": ", ".join(parts)}), UI.S_SMALL, UI.TEXT))
 	if not any:
 		g.add_child(UI.label(Strings.t("season.growth_none"), UI.S_SMALL, UI.DIM))
+
+
+## Final-year contracts: renew them now or the players leave when the new season starts.
+func _contracts() -> void:
+	var gs := App.gs
+	var c := UI.card(body)
+	c.add_child(UI.label(Strings.t("season.contracts_h"), UI.S_BODY, UI.ACCENT))
+	c.add_child(UI.label(Strings.f("season.cash_line", {"cash": PlayerView.money(gs.cash())}), UI.S_SMALL, UI.TEXT))
+	var exp := gs.expiring()
+	if exp.is_empty():
+		c.add_child(UI.label(Strings.t("season.contracts_none"), UI.S_SMALL, UI.DIM))
+		return
+	c.add_child(UI.label(Strings.t("season.contracts_hint"), UI.S_SMALL, UI.DIM))
+	for p in exp:
+		var line := Strings.f("season.contract_row", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "wage": gs.contract_of(p["id"])["wage"], "ask": gs.asking_wage(p["id"])})
+		c.add_child(UI.button(line, func(): App.go(ScreenNegotiation.new(p["id"], true, "season")), "normal", 84))
+	if gs.roster_after_expiry() < int(Economy.data()["min_roster"]):
+		c.add_child(UI.label(Strings.f("season.contracts_min", {"n": Economy.data()["min_roster"]}), UI.S_SMALL, UI.WARN))

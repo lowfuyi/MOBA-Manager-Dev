@@ -79,6 +79,55 @@ func _run() -> void:
 	ok(not (App.gs.d["train"] as Dictionary).has(tp["id"]), "coach picks everything again")
 	tr._toggle(tp["id"])
 	tr._toggle(tp["id"])
+	# money: finance screen, sponsor, free agents, release, signing through the negotiation screen
+	var fin := ScreenFinance.new()
+	App.go(fin)
+	await get_tree().process_frame
+	ok(cur() is ScreenFinance, "finance screen opens")
+	fin._choose("playoffs")
+	ok(App.gs.d["sponsor"] == "playoffs", "sponsor chosen from the screen")
+	fin._choose("steady")
+	fin._more = true
+	fin._rebuild()
+	var fa := ScreenFreeAgents.new("hub")
+	App.go(fa)
+	await get_tree().process_frame
+	ok(cur() is ScreenFreeAgents, "free agents screen opens")
+	for i in 6:
+		fa._next_role()
+	for i in 4:
+		fa._next_sort()
+	var rs2 := ScreenRoster.new("hub")
+	App.go(rs2)
+	await get_tree().process_frame
+	var cut: String = App.gs.d["roster"][9]
+	rs2._toggle_player(cut)
+	rs2._confirm_release = cut
+	rs2._rebuild()
+	rs2._release(cut)
+	ok((App.gs.d["roster"] as Array).size() == 9 and (App.gs.d["fa"] as Array).has(cut), "release from the roster screen")
+	var cand := ""
+	for fid in App.gs.d["fa"]:
+		if fid != cut:
+			cand = fid
+			break
+	var neg := ScreenNegotiation.new(cand, false, "fa:hub")
+	App.go(neg)
+	await get_tree().process_frame
+	ok(cur() is ScreenNegotiation, "negotiation screen opens")
+	neg._adj(5)
+	neg._adj(-5)
+	neg._set_len(3)
+	neg._wage = 1
+	neg._make_offer()
+	ok(neg._msg != "" and not neg._done, "a low offer is answered and the talks go on")
+	neg._wage = int(ceil(Economy.required_wage(App.world, App.world.players[cand], 3))) + 1
+	neg._make_offer()
+	ok(neg._done and (App.gs.d["roster"] as Array).has(cand), "a fair offer signs the player")
+	neg.go_back()
+	await get_tree().process_frame
+	ok(cur() is ScreenFreeAgents, "negotiation returns to the free agent list")
+	App.go(ScreenHub.new())
 	# full-UI games, then fast ones, through the whole season
 	var played := 0
 	var full_ui := 0
@@ -103,6 +152,26 @@ func _run() -> void:
 	App.go(ScreenSeasonEnd.new())
 	ok(cur() is ScreenSeasonEnd, "season end screen")
 	var club := App.gs.club()
+	var expiring: Array = App.gs.expiring()
+	ok(expiring.size() > 0, "some contracts end after the first season (%d)" % expiring.size())
+	if expiring.size() > 0:
+		var rid: String = expiring[0]["id"]
+		var rn := ScreenNegotiation.new(rid, true, "season")
+		App.go(rn)
+		await get_tree().process_frame
+		rn._wage = int(ceil(Economy.required_wage(App.world, App.world.players[rid], 2))) + 1
+		rn._set_len(2)
+		rn._make_offer()
+		ok(rn._done and App.gs.seasons_left(rid) >= 2, "renewal from the season end screen")
+		rn.go_back()
+		await get_tree().process_frame
+		ok(cur() is ScreenSeasonEnd, "renewal returns to the season end screen")
+	App.go(ScreenFreeAgents.new("season"))
+	await get_tree().process_frame
+	ok(cur() is ScreenFreeAgents, "free agents open from the season end")
+	cur().go_back()
+	await get_tree().process_frame
+	ok(cur() is ScreenSeasonEnd, "back from free agents returns to the season end")
 	cur()._next()
 	ok(cur() is ScreenHub and int(App.gs.d["season"]) == 2 and App.gs.club() == club, "next season starts")
 	# quick mode skips the live feed
@@ -110,6 +179,14 @@ func _run() -> void:
 	var g2: Dictionary = App.gs.next_game()
 	await _play_with_ui(g2, false)
 	ok(cur() is ScreenHub or cur() is ScreenReport, "quick-mode game returns to a normal screen")
+	# dismissal sends the manager to the game over screen
+	App.gs.d["dismissed"] = true
+	App.go(ScreenHub.new())
+	await get_tree().process_frame
+	await get_tree().process_frame
+	ok(cur() is ScreenGameOver, "a dismissed manager sees the game over screen")
+	App.gs.d["dismissed"] = false
+	App.go(ScreenHub.new())
 	# save / load round trip
 	App.autosave()
 	var loaded := GameState.load_save(App.world)

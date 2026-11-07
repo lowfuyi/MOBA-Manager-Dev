@@ -221,3 +221,34 @@ func _run() -> void:
 	get_tree().root.propagate_notification(NOTIFICATION_WM_GO_BACK_REQUEST)
 	await frames()
 	ok(cur() is ScreenHub, "back request in training returns to the hub")
+	# 5. free agents: a swipe that starts on a player row scrolls the market; a tap opens the talks; back returns
+	App.go(ScreenFreeAgents.new("hub"))
+	await frames(4)
+	var fs := scroller()
+	ok(fs.get_v_scroll_bar().max_value > fs.size.y, "free agent list is longer than the screen")
+	btns.clear()
+	find_buttons(cur(), btns)
+	var fa_btn: Button = null
+	for x in btns:
+		if "asks" in x.text:
+			fa_btn = x
+			break
+	await swipe(fa_btn.get_global_rect().get_center(), 300)
+	ok(fs.scroll_vertical > 100, "free agents: swipe over a player row scrolls (scroll=%d)" % fs.scroll_vertical)
+	ok(cur() is ScreenFreeAgents, "free agents: swipe did not open the player")
+	fs.scroll_vertical = 0
+	await frames()
+	btns.clear()
+	find_buttons(cur(), btns)
+	for x in btns:
+		if "asks" in x.text:
+			fa_btn = x
+			break
+	await tap(fa_btn.get_global_rect().get_center())
+	ok(cur() is ScreenNegotiation, "free agents: a tap on a player opens the negotiation")
+	get_tree().root.propagate_notification(NOTIFICATION_WM_GO_BACK_REQUEST)
+	await frames()
+	ok(cur() is ScreenFreeAgents, "back request in the negotiation returns to the free agents")
+	get_tree().root.propagate_notification(NOTIFICATION_WM_GO_BACK_REQUEST)
+	await frames()
+	ok(cur() is ScreenHub, "back request in the free agents returns to the hub")

@@ -58,3 +58,12 @@
 - **Training base rate raised from 0.5 to 1.5 points per week** and hero practice from 1.5 to 3.0 familiarity per week (GDD 7.3 formula otherwise unchanged). With the GDD's 0.5 the QA run showed "never train" beat the coach's training for every club in season 1 and most clubs in season 2, i.e. training was a trap. After the change training pays back from season 2 and resting is better inside season 1 (see CALIBRATION-9.1 addendum). Founder may overrule.
 - **Coach and Facility levels fixed at 2** for every club until staff and facilities (D-007) exist.
 - **Alpha 0.2 scope chosen by the Producer** (the Founder's game test gave no gameplay feedback): Game Plan, then training, fatigue and ageing; Alpha 0.3 is recruitment (free agents), contracts and a light finance layer.
+
+## Producer decision log: Alpha 0.3 (2026-11-08)
+
+- **Alpha 0.3 scope chosen by the Producer** (the Founder said "proceed"): free-agent recruitment, contracts and negotiation, and a light finance layer with sponsors (D-013 part, D-007 part). Saved searches, scouting reports, prize weight and the player prize pool, Analytics, tutorial goals and staff and facility costs are postponed.
+- **Money is a margin lever, not a shortcut.** Revenue is a multiple of the starting wage bill so every club has the same economy shape. Economy QA (CALIBRATION-9.1 addendum) found two problems in the first settings and both were fixed: sponsor targets are now scaled by club strength (a fixed 12-win target was a trap for weak clubs) and the wage cap was tightened from 1.15 to 1.05 times revenue. Founder may overrule any number in `game/data/economy_v0.json`.
+- **Dismissal rule kept as in the GDD** (8 rounds in debt = 4 weeks). The last autosave from before it stays loadable; saving is disabled once dismissed. Founder may prefer a softer rule (for example a warning season) if testers find it unfair.
+- **Computer-run clubs do not sign, release or pay anybody** in Phase 1; their squads stay as in the data. Free agents train and age like everybody else.
+- **Still open after Alpha 0.3:** 10-season economy run (5 to 6 seasons done), rich clubs have no cash sink, no youth intake, so the only new talent is the 40-player pool (it never refills except with released and expired players).
+
