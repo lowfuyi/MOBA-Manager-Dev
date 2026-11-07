@@ -1,0 +1,19 @@
+; Engine configuration file. Godot 4.3 (provisional engine choice, see company/DECISIONS.md).
+config_version=5
+
+[application]
+config/name="MOBA Esports (working title)"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+
+[autoload]
+Strings="*res://src/core/strings.gd"
+
+[display]
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/stretch/mode="canvas_items"
+window/handheld/orientation=1
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

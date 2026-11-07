@@ -1,0 +1,11 @@
+[
+  {"id": "sample_hero_a", "name": "Sample Hero A", "placeholder": true, "archetype": "bruiser", "role_primary": "top", "role_secondary": "jg",
+   "power_early": 48, "power_mid": 52, "power_late": 50, "damage_type": "physical", "range": "melee", "difficulty": 2,
+   "tags": ["frontline", "engage"], "strong_vs": ["sample_hero_b"]},
+  {"id": "sample_hero_b", "name": "Sample Hero B", "placeholder": true, "archetype": "gunner", "role_primary": "bot", "role_secondary": null,
+   "power_early": 41, "power_mid": 50, "power_late": 62, "damage_type": "physical", "range": "long", "difficulty": 3,
+   "tags": ["scaling", "poke"], "strong_vs": []},
+  {"id": "sample_hero_c", "name": "Sample Hero C", "placeholder": true, "archetype": "mender", "role_primary": "sup", "role_secondary": "mid",
+   "power_early": 50, "power_mid": 50, "power_late": 47, "damage_type": "magic", "range": "mid", "difficulty": 1,
+   "tags": ["protect", "waveclear"], "strong_vs": []}
+]

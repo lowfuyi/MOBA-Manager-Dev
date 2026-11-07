@@ -1,0 +1,10 @@
+[
+  {"id": "sample_player_a", "name": "Sample Player A", "placeholder": true, "age": 21, "country": "SG",
+   "languages": [{"lang": "en", "fluency": 100}], "personality": "professional", "role_primary": "mid", "role_secondary": null,
+   "stats": {"mec": 62, "sen": 55, "lan": 58, "tft": 50, "mac": 47, "com": 52, "con": 49, "clu": 51},
+   "potential": {"mec": 78, "sen": 70, "lan": 72, "tft": 64, "mac": 60, "com": 66, "con": 61, "clu": 63}},
+  {"id": "sample_player_b", "name": "Sample Player B", "placeholder": true, "age": 28, "country": "MY",
+   "languages": [{"lang": "en", "fluency": 100}], "personality": "temperamental", "role_primary": "jg", "role_secondary": "top",
+   "stats": {"mec": 55, "sen": 66, "lan": 40, "tft": 60, "mac": 68, "com": 45, "con": 58, "clu": 57},
+   "potential": {"mec": 56, "sen": 67, "lan": 41, "tft": 61, "mac": 69, "com": 46, "con": 59, "clu": 58}}
+]

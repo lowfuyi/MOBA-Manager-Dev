@@ -20,13 +20,14 @@ company/
 docs/
   design/
     GDD-v1.md        Game Design Document (source of truth for rules)
-data/                (later) heroes, items, players as CSV/JSON, no art
+game/data/           heroes, players etc. as JSON (schemas in game/data/schema), no art
+game/i18n/           translatable string tables (en.json first)
 src/                 (later) Godot project
 ```
 
 ## Principles
 
-1. Design before code. Rules live in `docs/design/`, numbers live in `data/`, code reads both.
+1. Design before code. Rules live in `docs/design/`, numbers live in `game/data/`, code reads both.
 2. Nobody approves their own work. Every deliverable has a different reviewer.
 3. Visuals come last. Placeholder names and plain icons until the pre-launch phase.
 4. Originality. Genre conventions are free to use; names, art, lore and exact hero kits are ours alone.

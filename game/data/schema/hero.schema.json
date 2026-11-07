@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Hero (GDD 5.2)",
+  "type": "object",
+  "required": ["id", "name", "archetype", "role_primary", "power_early", "power_mid", "power_late", "damage_type", "range", "difficulty", "tags", "strong_vs"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+    "name": {"type": "string", "minLength": 1},
+    "placeholder": {"type": "boolean", "description": "true until the Content Lead names the hero and the IP Checker clears it"},
+    "archetype": {"enum": ["bruiser", "bulwark", "spellcaster", "gunner", "shade", "mender", "binder"]},
+    "role_primary": {"enum": ["top", "jg", "mid", "bot", "sup"]},
+    "role_secondary": {"enum": ["top", "jg", "mid", "bot", "sup", null]},
+    "power_early": {"type": "integer", "minimum": 38, "maximum": 62},
+    "power_mid": {"type": "integer", "minimum": 38, "maximum": 62},
+    "power_late": {"type": "integer", "minimum": 38, "maximum": 62},
+    "damage_type": {"enum": ["physical", "magic", "mixed"]},
+    "range": {"enum": ["melee", "mid", "long"]},
+    "difficulty": {"type": "integer", "minimum": 1, "maximum": 5},
+    "tags": {"type": "array", "minItems": 2, "maxItems": 4, "uniqueItems": true,
+             "items": {"enum": ["engage", "poke", "protect", "pick", "splitpush", "frontline", "waveclear", "scaling"]}},
+    "strong_vs": {"type": "array", "maxItems": 3, "items": {"type": "string"}}
+  }
+}
