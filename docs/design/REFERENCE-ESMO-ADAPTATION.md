@@ -185,6 +185,47 @@ Seen as a paid feature. Our Quick mode auto-draft stays free (Pillar 5). A paid 
 - Hero portraits, avatars and the talent icons are the reference game's art. We copy none of it. Avatars for players come in the visual phase.
 - The reference player names mix unrelated origins and look machine-generated. Ours come from our own name tables (section 8, rule 6).
 
+## 10. Competitions, the competitive rating and regions (fifth set of screenshots)
+
+**Seen:**
+- **Competitions hub.** Tabs Schedule, Featured and History, a region filter, a career summary (prize earnings, medal counts) and a rating card. Events are listed by wall-clock time with a type badge: *Open* (anyone can register), *Invitational* (invite only), a top-tier badge for a qualifier-fed event, and a *Promotion Tournament* for moving up a league. Running events show a LIVE badge. A banner says how many more competitions the club can register for or qualify for in the next 24 hours.
+- **Competitive rating (a per-game ladder).** Moves with recent results, gives more credit for difficult or meaningful wins (upsets, bigger events, longer series), and lets older results fade over 28 days. New or inactive rosters sit at 0 and active ones can go below 0. There are two values: **Published** (a stable value from a nightly refresh, used for the official leaderboard and rank) and **Provisional** (recomputed live after every match, becoming the next published value). The leaderboard ranks positive ratings and can be filtered by state and by region.
+- **Region picker.** A tree with checkboxes: world, then big regions, then sub-regions, then countries. Parent boxes show a partial state when only some children are chosen.
+
+**What we learn:**
+- A rating that rewards upsets, important matches and long series, and that **fades with time**, tells a manager "how are we playing now", which is more useful than a lifetime total.
+- Splitting **published (nightly) from provisional (live)** is a sound online design. It stops leaderboard jitter, makes farming harder and reduces server load. It is irrelevant offline.
+- The reference's events run on real clock times with daily caps. That is a live-service model. Ours is calendar-based.
+- A region tree with partial-selection checkboxes is a good filter pattern, and it keeps region data-driven.
+
+**Edition mapping:**
+
+| Feature | Phase 1 (Single Player) | Later |
+|---|---|---|
+| **Form Rating** (our version of the rolling rating): one number per club, shown in the league table and club page | **Yes** (task D-017) | Multiplayer: published and provisional versions |
+| Trophy cabinet: prize money earned, titles and medals, on the club page | **Yes** (cheap) | n/a |
+| Single league plus playoffs | Yes (GDD 11) | n/a |
+| Multi-tier leagues, promotion and relegation, open cups, invitationals, qualifier chains | **No** | **Global edition** (D-018) |
+| Region filters and region leaderboards | Data fields only (`region`, `country` on clubs and players) | Multiplayer and Global |
+| LIVE events and wall-clock schedules | No | Multiplayer and Global, where live operations exist |
+
+**Draft design for the Form Rating (Phase 1, for the Systems Lead to refine):**
+- Per club, `Form = sum over matches in the last 28 game days of K * Importance * (Result - Expected) * Fade`, where `Result` is 1 for a win and 0 for a loss, `Expected` is the model's own win probability from the two teams' ratings (so it matches our calibration table), and `Fade = max(0, 1 - age_days / 28)`.
+- `Importance`: league match 1.0, playoff round 1.25, final 1.5; series length multiplier 1.0 for best of 1, 1.2 for best of 3, 1.4 for best of 5. Exhibition and Quick Match: 0 (they never move the rating, as decided in section 7).
+- `K` is set so a normal league season ends with ratings spread over a readable range (target: the best club around +100, the worst around -100). QA test: the rating ranks clubs close to their true strength after one split, and an upset moves it more than an expected win.
+- Quick Match opponents are chosen by team rating (GDD 4.4), not by the Form Rating.
+- The name "ECR" and its description are the reference game's. We use our own name and wording ("Form Rating").
+
+**Draft design for the Multiplayer and Global editions (not for Phase 1):**
+- Rating state: a stable value refreshed on a schedule for the official ladder, plus a live provisional value. The refresh interval can be nightly.
+- Anti-farming: diminishing returns against the same opponent, bot matches labelled and worth less, and no rating gain from private matches.
+- Competition formats need **our own names**. Placeholder families: Open Cup (anyone registers), Invitational (rating threshold), Qualifier Series feeding a Premier event, Promotion Series (moves a club up a tier). Avoid "Masters" and other tier names used by existing esports circuits, and do not copy the reference's event titles.
+- Regions: real countries are fine as player nationality (flags, languages for Team Bonds). The competition geography can be real regions or fictional realms to fit the fantasy-lite setting; that is a Founder decision for the Global edition. Keep the region tree in data.
+
+**IP notes:**
+- The leaderboard screenshot shows **real esports organizations** (for example well-known pro clubs, one with its real logo). We never use real organization names, logos, team names or pro-player handles in the game (trademark and right of publicity). All clubs are generated and fictional.
+- Event names in the reference mix real cities and generic words. City names alone are fine, but we avoid the reference's exact event titles and any tier word tied to a real circuit.
+
 ## Decisions (Founder, 2026-11-07)
 1. **Game Plan in Phase 1: YES**, the small version (about 8 sliders, a default plan, triggers "ahead" and "behind"), built after the core draft calibration.
 2. **Team Bonds in Phase 1: YES**, with English-only data and the pair grid and maths in place.
@@ -196,3 +237,4 @@ Seen as a paid feature. Our Quick mode auto-draft stays free (Pillar 5). A paid 
 8. **Finances screens (Overview, Analytics, History):** included in Phase 1 (task D-007).
 9. **Player profile (recommended):** keep our 6 stats for Phase 1, change Potential to per stat, add stat help sheets, hero and role mastery levels, simple derived KDA and a career log (section 9). A deeper attribute view is a later option.
 10. **Expiry reminders stay in the free tier** (a safety net, not a perk).
+11. **Form Rating in Phase 1 (recommended):** one rolling rating per club with a 28-day fade and an importance weighting, plus a trophy cabinet. Multi-tier leagues, cups and invitationals wait for the Global edition.

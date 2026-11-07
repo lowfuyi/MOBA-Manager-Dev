@@ -15,4 +15,7 @@ Maintained by the IP Checker. Screening only, not legal advice. A qualified IP l
 | 2026-11-07 | Reference hero names seen in screenshots: Dredge, Gauntlet, Monolith, Oculus (and any others later) | These belong to the reference game. Our 40 heroes must not use them or close variants | Open rule | Content Lead checks every hero name against this list; IP Checker confirms |
 | 2026-11-07 | Reference art: hero portraits, avatars, talent icons, UI icons | Not to be copied or traced. Our art comes in the visual phase | Rule | Visual phase must use original or licensed assets only |
 | 2026-11-07 | Practice-session wording and other task names | Use our own words ("Practice Session"), keep genre-generic terms only | Rule | Naming glossary D-006 |
+| 2026-11-07 | Real esports organization names and logos appear in the reference leaderboard | Trademark and publicity risk if we used any real club, team or pro-player name or logo | Rule | All clubs and players are generated and fictional; name generator checks against a block list (D-008) |
+| 2026-11-07 | Competition tier words and event titles (a "Masters"-style tier, the reference event names) | Tier words tied to real circuits and the reference titles are not ours | Rule | Original format names in D-018; IP Checker reviews |
+| 2026-11-07 | Rating name and help text ("ECR" and its description) | Reference wording | Rule | Ours is "Form Rating" with our own text |
 

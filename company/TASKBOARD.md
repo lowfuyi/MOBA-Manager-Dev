@@ -22,6 +22,8 @@ Last updated: 2026-11-07 by Producer
 | D-014 | Manager level, XP and talents (one MOBA tree, about 30 nodes, no direct match strength) | Systems Lead | QA & Balance Lead | Parked until core loop is balanced |
 | D-015 | Multiplayer transfer market spec (provisional agreement, offers, fee bands, no real-money trading) | Systems Lead | QA + IP Checker | Parked (Multiplayer edition) |
 | D-016 | Player profile spec: per-stat Potential (changes D-008 generation and the scouting display), stat help sheets, hero and role mastery levels, derived match statistics (KDA) with consistency tests, career log | Systems Lead + Game Design Lead | QA & Balance Lead | Backlog (proposed) |
+| D-017 | Form Rating spec (rolling rating with fade and importance), trophy cabinet, region and country data fields; QA test for ranking accuracy | Systems Lead | QA & Balance Lead | Backlog (proposed) |
+| D-018 | Global edition competitions spec: tiers, open cups, invitationals, qualifier chains, promotion series, regions, original format names | Game Design Lead | QA + IP Checker | Parked (Global edition) |
 
 ## Phase 1: Prototype (starts after D-003 is decided)
 
