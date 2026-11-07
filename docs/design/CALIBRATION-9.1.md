@@ -62,3 +62,20 @@ Logistic slope fitted to all matches: 0.0915 per rating point, so a +10 gap wins
 | weak CON 20, favourite CON 80 | 1200 | 82.8% |
 | weak CON 80, favourite CON 20 | 1200 | 82.8% |
 
+
+## Addendum (Alpha 0.2, 2026-11-08): Short draft re-test (D-018) and Game Plan QA (D-009)
+
+**Short draft (1 ban + 5 picks each, 10 s) versus Full draft.** Re-run of the draft-policy checks with `tools/pipeline_short.py`, 400 side-swapped matches per cell (standard error 2.5 points, so this is a sanity check, not a calibration). Table above. No cell moves outside about one standard error of the Full draft except composition-heavy versus familiarity-heavy (45.0% against 50.0%), which is two standard errors from 50 and one from the Full result. The default policy still beats familiarity-heavy, so drafting still matters with the Short profile. The Blue mirror reading of 47.5% is one standard error low; the earlier 3,600-match mirror run gave 50.1%. A properly powered Short-draft run (4,000+ matches per cell) belongs in the P-003 10,000-match report.
+
+**Game Plan (GDD 7.8, 9.2.1).** `tools/gp_qa.gd`: 6 matchups from 1 to 35 rating points apart, plans fitted on 800 training seeds and scored on 4,000 held-out seeds (standard error about 0.8 points per matchup). Gain is in win-rate points over the neutral plan.
+
+| Quantity | Result | Limit |
+|---|---|---|
+| Best single control, mean over matchups | Risk +0.87 | 1.0 |
+| All other controls, mean | Aggression +0.29, Tempo +0.16, Fight style +0.12, Mid objectives +0.03, rest about 0 | 1.0 |
+| Joint plan (all controls fitted together), mean | +1.56 | 3.0 |
+| Joint plan, largest single matchup | +4.35 (a 10%-win-rate underdog: Duskwater Foxes vs Thornwick Stags) | n/a |
+| Coach suggestion, mean | +1.02 | n/a |
+| Matchups whose best plan differs from the others | 15 of 15 pairs | at least 30% |
+
+Reading: no plan dominates, and the best plan depends on the matchup. Risk is the strongest single lever because variance helps the underdog; its largest effect (+2.90 points) is for the 10% underdog, which is the intended comeback valve and stays far below the effect of squad strength (a 20-point rating gap is worth about 32 points of win rate, 82.5% in the calibration table). The coach gets about two thirds of the joint gain with no player effort. Zero-sum (9.2.9) and neutral-equals-plain-sim are asserted in `game/tests/game_plan_tests.gd` (1,547 checks pass). No coefficient change needed. Re-run after Team Bonds ships.

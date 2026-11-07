@@ -25,7 +25,7 @@ static func new_game(w: World, club_id: String, save_seed: int, season: int = 1,
 		"fixtures": _schedule(w.club_ids, "S%d" % season),
 		"lineup": {}, "fam_bonus": carry.get("fam_bonus", {}), "history": carry.get("history", []),
 		"playoffs": {}, "champion": "", "settings": carry.get("settings", {"quick": false}),
-		"seasons_done": carry.get("seasons_done", []),
+		"seasons_done": carry.get("seasons_done", []), "plan": carry.get("plan", GamePlan.neutral_set()),
 	}
 	w.fam_bonus = gs.d["fam_bonus"]
 	gs.reset_lineup()
@@ -195,7 +195,7 @@ func rank_of(club_id: String) -> int:
 # ---------------------------------------------------------------- playing games
 func _sim_fixture(f: Dictionary) -> void:
 	var meta := meta_for(int(f["round"]))
-	var r := MatchRunner.auto(world, lineup_for(f["blue"]), lineup_for(f["red"]), meta, int(d["save_seed"]), f["id"], false)
+	var r := MatchRunner.auto(world, lineup_for(f["blue"]), lineup_for(f["red"]), meta, int(d["save_seed"]), f["id"], false, {"B": "ai", "R": "ai"})
 	f["played"] = true
 	f["final"] = float(r["final"])
 	f["winner"] = f["blue"] if r["blue_won"] else f["red"]
@@ -309,9 +309,24 @@ func autoplay(until_all: bool = false) -> void:
 		record_human_game(g, auto_game(g))
 
 
+## Plans for one of the managed club's games: the saved plan on the human side, the coach's suggestion for the AI.
+func plans_for(g: Dictionary) -> Dictionary:
+	var mine := "B" if g["blue"] == club() else "R"
+	var out := {"B": "ai", "R": "ai"}
+	out[mine] = plan_set()
+	return out
+
+
+## The managed club's plan set (older saves have none: neutral).
+func plan_set() -> Dictionary:
+	if not d.has("plan"):
+		d["plan"] = GamePlan.neutral_set()
+	return d["plan"]
+
+
 func auto_game(g: Dictionary) -> Dictionary:
 	var meta := meta_for(int(g["round"]))
-	return MatchRunner.auto(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta, int(d["save_seed"]), g["id"], bool(g["full"]))
+	return MatchRunner.auto(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta, int(d["save_seed"]), g["id"], bool(g["full"]), plans_for(g))
 
 
 # ---------------------------------------------------------------- playoffs
@@ -357,7 +372,7 @@ func advance_playoffs() -> void:
 			if s["done"] or s["a"] == club() or s["b"] == club():
 				continue
 			var g := _series_game(s)
-			var r := MatchRunner.auto(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta_for(0), int(d["save_seed"]), g["id"], bool(g["full"]))
+			var r := MatchRunner.auto(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta_for(0), int(d["save_seed"]), g["id"], bool(g["full"]), {"B": "ai", "R": "ai"})
 			_add_series_game(s, g, g["blue"] if r["blue_won"] else g["red"], float(r["final"]))
 			progressed = true
 		var all_done := true
@@ -404,7 +419,7 @@ func playoff_label(s: Dictionary) -> String:
 
 
 func next_season() -> GameState:
-	var carry := {"fam_bonus": d["fam_bonus"], "history": d["history"], "settings": d["settings"], "seasons_done": d["seasons_done"]}
+	var carry := {"fam_bonus": d["fam_bonus"], "history": d["history"], "settings": d["settings"], "seasons_done": d["seasons_done"], "plan": plan_set()}
 	var gs := GameState.new_game(world, club(), int(d["save_seed"]) + 1000 * int(d["season"]), int(d["season"]) + 1, carry)
 	gs.d["lineup"] = d["lineup"]
 	return gs

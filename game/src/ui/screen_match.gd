@@ -102,6 +102,9 @@ func _reveal(ev: Dictionary) -> void:
 		"jungle":
 			_lead = 0.30 * _phase_vals["early"]
 			_set_edge()
+			var used: String = String(res["sim"].get("plan_used", {}).get(my_side, "default"))
+			if used != "default":
+				_add_line(Strings.t("gp.switch." + used), UI.WARN)
 		"fight_mid":
 			_lead = 0.30 * _phase_vals["early"] + 0.30 * _phase_vals["mid"]
 			_set_edge()

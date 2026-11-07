@@ -1,6 +1,6 @@
 # Task board
 
-Last updated: 2026-11-07 by Producer
+Last updated: 2026-11-08 by Producer
 
 ## Phase 0: Design
 
@@ -12,7 +12,7 @@ Last updated: 2026-11-07 by Producer
 | D-004 | Prototype of the match formula (done as `tools/proto_sim.py` v0.2; calibrated to GDD section 9) | Systems Lead | QA & Balance Lead | Done (re-review passed with fixes) |
 | D-007 | Economy (also: CON is a reliability stat, so valuation must not treat it as plain strength; asking wage floor and Potential factor; 4-week-negative dismissal rule): wages, contract valuation, sponsor lite (offers, objectives, tutorial goals), finance screens (Overview, Analytics, History), 10-season no-bankruptcy and no-snowball test | Systems Lead | QA & Balance Lead | Backlog |
 | D-008 | Player generation rules and the 40-hero set (data): v0 done and tested (`tools/gen_heroes.py`, `tools/gen_players.py`, `tools/tune_tags.py`; 15 content tests; Godot loads and validates it). Open: IP name search, runtime generator port for new saves, pool of names for Global edition | Content Lead | IP Checker + QA | In review |
-| D-009 | Game Plan: v1.4 spec written (8 zero-sum controls on 3 simulator hooks, triggers at +-0.40). Remaining: `game/data/game_plan_v0.json`, engine two-pass trigger logic, no-dominant-plan tests (9.2.1) | Systems Lead | QA & Balance Lead + IP Checker | In progress (Founder approved) |
+| D-009 | Game Plan: 8 zero-sum controls, triggers at +-0.40, coach suggestion. Engine, data (`game_plan_v0.json`), editor screen, draft/match/report integration done in Alpha 0.2. QA 9.2.1 passed on held-out seeds (best single control +0.87 pt, joint +1.56 pt mean against limit 3.0, best plan differs in 15 of 15 matchups); 1,547 headless checks, UI smoke covers the screen. See CALIBRATION-9.1 addendum | Systems Lead + Engineering | QA & Balance Lead + IP Checker | Done (Alpha 0.2); re-run QA after Team Bonds |
 | D-010 | Team Bonds spec: pairwise Bond and Understanding, languages field, analytics screens | Systems Lead + UI/UX | QA + IP Checker | Backlog (Founder approved) |
 | D-005 | Original role/archetype set and 40 heroes (names + data only) | Content Lead | IP Checker + QA | Done for v0 with placeholder names (see D-008); IP name search pending |
 | D-006 | Original naming glossary (map, objectives, items, terms) | Content Lead | IP Checker | Backlog |
@@ -32,7 +32,7 @@ Last updated: 2026-11-07 by Producer
 | P-001 | Godot project skeleton, string tables, data loaders and schemas, PCG32 reference and golden vectors | Engineering Lead | QA | Done: 14 Python tests and 61 headless Godot checks pass (Godot 4.3 official build, checksum verified); negative test confirmed tests can fail |
 | P-002 | Match simulator as a headless module with unit tests (Python reference `tools/sim_core.py` on PCG32, Godot port `game/src/sim/match_sim.gd`, 25 golden cases, frozen input interface incl. Game Plan hooks, calibration re-run) | Engineering Lead | QA | Done; QA review of GDD v1.3 raised no defect in the simulator code itself. 33 Python tests, 588 Godot checks pass |
 | P-003 | Batch harness: full-pipeline run (9.1) DONE 2026-11-07 (draft constants re-tuned, `docs/design/CALIBRATION-9.1.md`, `tools/pipeline*.py`). Remaining: paired common-random-number lever tests with the v1.4 bands, calibration at Phase 1 rating scale (about 45), joint Game Plan coordinate-ascent test (9.2.1), 10,000-match report | QA & Balance Lead | Systems Lead | In progress (9.1 part done) |
-| D-018 | Pacing and formats (GDD 8.7): re-run 9.1 with the Short draft profile; add draft timers and auto-pick to the draft spec; game clock L in match report; playback speed and Skip in the match screen spec | Systems Lead | QA & Balance Lead | Backlog |
+| D-018 | Pacing and formats (GDD 8.7): Short draft re-test done (draft lever preserved, low-powered n=400; 4,000+ run goes into P-003); draft timers, auto-pick, Skip and playback speed are in the Alpha 0.1 screens | Systems Lead | QA & Balance Lead | Done (Alpha 0.2) |
 | P-004 | Roster screen, draft screen, match result screen (placeholder visuals) | Engineering + UI/UX | Game Design Lead | Done in Alpha 0.1 (A-004) |
 | A-004 | Alpha 0.1: installable Android build of the Single Player loop (club pick, lineup, 10 s draft, feed, report, season with standings and playoffs). Game state and report logic tested headless (1,514 checks), UI smoke test through a whole season, screenshot QA at 720x1280, APK exported and signature verified. Not yet run on a physical phone. Notes: `docs/ALPHA-0.1-NOTES.md` | Engineering Lead + UI/UX | QA (independent review pending) | Delivered for Founder game test |
 

@@ -14,9 +14,10 @@ var _sel_hero := ""
 var _timer_label: Label
 
 
-func _init(g: Dictionary = {}) -> void:
+func _init(g: Dictionary = {}, finished: Draft = null) -> void:
 	super._init()
 	game = g
+	draft = finished     # set when coming back from the Game Plan screen
 
 
 func go_back() -> void:
@@ -27,8 +28,9 @@ func go_back() -> void:
 func _ready() -> void:
 	var gs := App.gs
 	my_side = "B" if game["blue"] == gs.club() else "R"
-	draft = MatchRunner.prepare(App.world, gs.lineup_for(game["blue"]), gs.lineup_for(game["red"]),
-			gs.meta_for(int(game["round"])), int(gs.d["save_seed"]), game["id"], bool(game["full"]))
+	if draft == null:
+		draft = MatchRunner.prepare(App.world, gs.lineup_for(game["blue"]), gs.lineup_for(game["red"]),
+				gs.meta_for(int(game["round"])), int(gs.d["save_seed"]), game["id"], bool(game["full"]))
 	_limit = 15.0 if game["full"] else 10.0
 	setup("", Callable())
 	_begin_step()
@@ -261,11 +263,17 @@ func _show_done() -> void:
 			names.append("%s %s" % [Strings.t("role." + s), draft.picks[t][s]["name"]])
 		cc.add_child(UI.label("\n".join(names), UI.S_SMALL, UI.TEXT))
 		cc.add_child(UI.label(Strings.f("draft.comp_line", {"style": Strings.t("style." + ev["style"]), "mod": UI.pct(ev["mod"])}), UI.S_SMALL, UI.GOOD if ev["mod"] >= 0.0 else UI.WARN))
+	var plan_state := Strings.t("gp.state.neutral") if GamePlan.is_neutral(App.gs.plan_set()["default"]) and App.gs.plan_set()["triggers"].is_empty() else Strings.t("gp.state.set")
+	body.add_child(UI.button(Strings.f("draft.game_plan", {"state": plan_state}), func(): App.go(ScreenGamePlan.new(game, draft)), "normal", 84))
 	body.add_child(UI.button(Strings.t("draft.start_match"), _start_match, "primary"))
 
 
 func _start_match() -> void:
-	var res := MatchRunner.finish(App.world, draft)
-	App.last_game = game
+	ScreenDraft.launch(game, draft)
+
+
+static func launch(g: Dictionary, d: Draft) -> void:
+	var res := MatchRunner.finish(App.world, d, App.gs.plans_for(g))
+	App.last_game = g
 	App.last_result = res
-	App.go(ScreenMatch.new(game, res))
+	App.go(ScreenMatch.new(g, res))

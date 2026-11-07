@@ -75,15 +75,21 @@ static func attribution(result: Dictionary, my_side: String) -> Dictionary:
 	var ms := int(result["mseed"])
 	var actual := float(result["final"])
 	var sgn := 1.0 if my_side == "B" else -1.0
+	var plans: Dictionary = result.get("plans", {})
 	var factors: Array = []
 	for s in SLOTS:
 		var cf := _dup_team(ta)
 		for ph in PHASES:
 			cf["ratings"][ph][s] = tb["ratings"][ph][s]
-		var f: float = float(MatchSim.simulate(cf, tb, ms, p)["final"])
+		var f: float = float(GamePlan.simulate(cf, tb, ms, p, plans)["final"])
 		factors.append({"id": "slot." + s, "value": (actual - f) * sgn})
-	var draft_f := float(MatchSim.simulate(_neutral(ta), _neutral(tb), ms, p)["final"])
+	var draft_f := float(GamePlan.simulate(_neutral(ta), _neutral(tb), ms, p, plans)["final"])
 	factors.append({"id": "draft", "value": (actual - draft_f) * sgn})
+	if plans.has(my_side) and not (plans[my_side]["triggers"].is_empty() and GamePlan.is_neutral(plans[my_side]["default"])):
+		var without := plans.duplicate()
+		without.erase(my_side)
+		var plan_f := float(GamePlan.simulate(ta, tb, ms, p, without)["final"])
+		factors.append({"id": "plan", "value": (actual - plan_f) * sgn})
 	var eq_a := _neutral(tb)
 	eq_a["style"] = "skirmish"
 	var luck_f := float(MatchSim.simulate(eq_a, _neutral(tb), ms, p)["final"])

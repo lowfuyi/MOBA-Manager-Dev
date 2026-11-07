@@ -56,7 +56,9 @@ static func _contest(name: String, a: float, b: float, carry: float, mseed: int,
 	var s_a: float = base_a * float(ta.get("contest_var", {}).get(name, 1.0))
 	var s_b: float = base_b * float(tb.get("contest_var", {}).get(name, 1.0))
 	var sigma_eff := sqrt((s_a * s_a + s_b * s_b) / 2.0)
-	var z := Pcg32.contest_stream(mseed, name).next_normal() * sigma_eff
+	var z := 0.0
+	if sigma_eff > 0.0:    # sigma 0 is the noise-free evaluation used by the Game Plan coach
+		z = Pcg32.contest_stream(mseed, name).next_normal() * sigma_eff
 	noise[name] = z
 	return tanh((a - b) / float(p["D"]) + float(p["gamma"]) * carry + z)
 

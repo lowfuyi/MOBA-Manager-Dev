@@ -120,6 +120,8 @@ func _play_with_ui(g: Dictionary, manual: bool) -> void:
 			d._process(20.0)
 	ok(d.draft.is_done(), "draft finishes (timeouts and manual picks)")
 	ok(d.draft.order.size() == (16 if g["full"] else 12), "draft profile matches game kind")
+	if manual:
+		d = await _exercise_game_plan(g, d)
 	d._start_match()
 	await get_tree().process_frame
 	if App.gs.is_quick():
@@ -140,3 +142,45 @@ func _play_with_ui(g: Dictionary, manual: bool) -> void:
 	await get_tree().process_frame
 	ok(cur() is ScreenReport, "report after the match")
 	cur()._leave()
+
+
+## Open the Game Plan screen from the finished draft and tap through everything on it.
+func _exercise_game_plan(g: Dictionary, d: ScreenDraft) -> ScreenDraft:
+	var gp := ScreenGamePlan.new(g, d.draft)
+	App.go(gp)
+	await get_tree().process_frame
+	ok(cur() is ScreenGamePlan, "game plan screen opens")
+	var ps: Dictionary = App.gs.plan_set()
+	ps["triggers"].clear()  # plans persist from game to game; start this check from a clean set
+	gp._set_value("r", 100)
+	gp._set_value("g", -50)
+	gp._set_jf("top")
+	ok(ps["default"]["r"] == 100 and ps["default"]["g"] == -50 and ps["default"]["jf"] == "top", "plan values are stored in the save")
+	gp._set_tab("behind_early")
+	gp._toggle_trigger()
+	ok(ps["triggers"].size() == 1 and ps["triggers"][0]["when"] == "behind_early", "behind plan switched on")
+	gp._set_value("r", 100)
+	gp._set_value("a", 100)
+	gp._set_tab("ahead_early")
+	gp._toggle_trigger()
+	gp._coach()
+	gp._set_tab("default")
+	gp._coach()
+	var tot := 0
+	for k in GamePlan.SLIDERS:
+		tot += int(ps["default"][k])
+	ok(absi(tot) <= 600, "coach suggestion is a valid plan")
+	gp._reset()
+	ok(GamePlan.is_neutral(ps["default"]), "reset makes the plan neutral")
+	gp._set_value("t", -50)
+	gp._set_tab("ahead_early")
+	gp._toggle_trigger()
+	ok(ps["triggers"].size() == 1, "ahead plan switched off again")
+	# the plan survives a save and the back button returns to the finished draft
+	App.autosave()
+	var loaded := GameState.load_save(App.world)
+	ok(loaded != null and loaded.plan_set()["default"]["t"] == -50, "plan survives save/load")
+	gp.go_back()
+	await get_tree().process_frame
+	ok(cur() is ScreenDraft and cur().draft.is_done(), "back from game plan returns to the finished draft")
+	return cur()

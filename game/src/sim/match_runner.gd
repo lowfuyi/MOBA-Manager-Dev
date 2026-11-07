@@ -21,13 +21,27 @@ static func prepare(world: World, blue_lineup: Dictionary, red_lineup: Dictionar
 
 
 ## Build both teams from a finished draft and simulate. Returns everything the report needs.
-static func finish(world: World, d: Draft, extra_a: Dictionary = {}, extra_b: Dictionary = {}) -> Dictionary:
+static func build_teams(world: World, d: Draft) -> Array:
 	assert(d.is_done())
-	var ta := world.build_team(d.lineups["B"], d.picks["B"], d.picks["R"], d.meta)
-	var tb := world.build_team(d.lineups["R"], d.picks["R"], d.picks["B"], d.meta)
-	ta.merge(extra_a, true)
-	tb.merge(extra_b, true)
-	var r := MatchSim.simulate(ta, tb, d.mseed, sim_params())
+	return [world.build_team(d.lineups["B"], d.picks["B"], d.picks["R"], d.meta),
+			world.build_team(d.lineups["R"], d.picks["R"], d.picks["B"], d.meta)]
+
+
+## plans: {"B": plan_set | "ai", "R": plan_set | "ai"}; a missing side plays neutral, "ai" is the coach's
+## suggestion for that team. An empty dictionary reproduces the plain simulator exactly (golden vectors).
+static func finish(world: World, d: Draft, plans: Dictionary = {}) -> Dictionary:
+	var teams := build_teams(world, d)
+	var ta: Dictionary = teams[0]
+	var tb: Dictionary = teams[1]
+	var sets := {}
+	for side in ["B", "R"]:
+		if not plans.has(side):
+			continue
+		if plans[side] is String:
+			sets[side] = GamePlan.suggest_set(ta, tb, sim_params(), side)
+		else:
+			sets[side] = plans[side]
+	var r := GamePlan.simulate(ta, tb, d.mseed, sim_params(), sets)
 	var pick_ids := {"B": {}, "R": {}}
 	for t in ["B", "R"]:
 		for s in SLOTS:
@@ -48,7 +62,7 @@ static func _ids(lineup: Dictionary) -> Dictionary:
 
 ## Whole game decided by the AI on both sides.
 static func auto(world: World, blue_lineup: Dictionary, red_lineup: Dictionary, meta: Dictionary,
-		save_seed: int, match_id: String, full_draft: bool) -> Dictionary:
+		save_seed: int, match_id: String, full_draft: bool, plans: Dictionary = {}) -> Dictionary:
 	var d := prepare(world, blue_lineup, red_lineup, meta, save_seed, match_id, full_draft)
 	d.finish_with_ai()
-	return finish(world, d)
+	return finish(world, d, plans)

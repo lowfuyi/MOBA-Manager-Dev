@@ -1,0 +1,16 @@
+{
+  "version": "v0",
+  "note": "Game Plan controls (GDD 7.8). Each entry gives the effect at +100 (the mirror applies at -100). mod = fraction added to the team's rating entering the contest; var = fraction added to the multiplier on the team's noise in the contest. Every control's final-weighted mod sum is zero (tests/game_plan_tests.gd).",
+  "trigger_threshold": 0.40,
+  "controls": {
+    "g": {"mod": {"fight_mid": 0.020, "fight_late": 0.020, "top": -0.033, "mid_lane": -0.033, "bot": -0.033, "jungle": -0.033}},
+    "t": {"mod": {"top": -0.030, "mid_lane": -0.030, "bot": -0.030, "jungle": -0.030, "obj_late": 0.0225, "fight_late": 0.0225}},
+    "m": {"mod": {"obj_mid": 0.030, "fight_mid": -0.0161}},
+    "l": {"mod": {"obj_late": 0.030, "fight_late": -0.0100}},
+    "a": {"var": {"top": 0.25, "mid_lane": 0.25, "bot": 0.25}},
+    "s": {"mod": {"bot": -0.020, "obj_mid": 0.0082, "obj_late": 0.0082}},
+    "r": {"var": {"top": 0.20, "mid_lane": 0.20, "bot": 0.20, "jungle": 0.20, "obj_mid": 0.20, "fight_mid": 0.20, "obj_late": 0.20, "fight_late": 0.20}}
+  },
+  "jungle_focus": {"jungle": -0.020, "chosen": 0.0114},
+  "final_weights": {"top": 0.084, "mid_lane": 0.084, "bot": 0.084, "jungle": 0.048, "obj_mid": 0.105, "fight_mid": 0.195, "obj_late": 0.100, "fight_late": 0.300}
+}
