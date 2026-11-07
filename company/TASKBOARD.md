@@ -11,10 +11,10 @@ Last updated: 2026-11-07 by Producer
 | D-003 | Founder decisions on open questions (see DECISIONS.md) | Founder | n/a | Needs Founder |
 | D-004 | Prototype of the match formula (done as `tools/proto_sim.py` v0.2; calibrated to GDD section 9) | Systems Lead | QA & Balance Lead | Done (re-review passed with fixes) |
 | D-007 | Economy (also: CON is a reliability stat, so valuation must not treat it as plain strength; asking wage floor and Potential factor; 4-week-negative dismissal rule): wages, contract valuation, sponsor lite (offers, objectives, tutorial goals), finance screens (Overview, Analytics, History), 10-season no-bankruptcy and no-snowball test | Systems Lead | QA & Balance Lead | Backlog |
-| D-008 | Player generation rules and the 40-hero set (data) | Content Lead | IP Checker + QA | Backlog |
+| D-008 | Player generation rules and the 40-hero set (data): v0 done and tested (`tools/gen_heroes.py`, `tools/gen_players.py`, `tools/tune_tags.py`; 15 content tests; Godot loads and validates it). Open: IP name search, runtime generator port for new saves, pool of names for Global edition | Content Lead | IP Checker + QA | In review |
 | D-009 | Game Plan: v1.4 spec written (8 zero-sum controls on 3 simulator hooks, triggers at +-0.40). Remaining: `game/data/game_plan_v0.json`, engine two-pass trigger logic, no-dominant-plan tests (9.2.1) | Systems Lead | QA & Balance Lead + IP Checker | In progress (Founder approved) |
 | D-010 | Team Bonds spec: pairwise Bond and Understanding, languages field, analytics screens | Systems Lead + UI/UX | QA + IP Checker | Backlog (Founder approved) |
-| D-005 | Original role/archetype set and 40 heroes (names + data only) | Content Lead | IP Checker + QA | Backlog |
+| D-005 | Original role/archetype set and 40 heroes (names + data only) | Content Lead | IP Checker + QA | Done for v0 with placeholder names (see D-008); IP name search pending |
 | D-006 | Original naming glossary (map, objectives, items, terms) | Content Lead | IP Checker | Backlog |
 | D-011 | Exhibition and Quick Match modes (single player, no league effect) | Game Design Lead | Systems Lead | Backlog |
 | D-012 | Multiplayer ladder, ranks, matchmaking and club search spec (Multiplayer edition, later) | Systems Lead | QA + IP Checker | Parked |

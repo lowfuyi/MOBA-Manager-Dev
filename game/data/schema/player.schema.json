@@ -2,30 +2,161 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Player (GDD 4.1, 4.2)",
   "type": "object",
-  "required": ["id", "name", "age", "country", "languages", "personality", "role_primary", "stats", "potential"],
+  "required": [
+    "id",
+    "name",
+    "age",
+    "country",
+    "languages",
+    "personality",
+    "role_primary",
+    "stats",
+    "potential",
+    "club"
+  ],
   "additionalProperties": false,
   "properties": {
-    "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
-    "name": {"type": "string", "minLength": 1},
-    "placeholder": {"type": "boolean"},
-    "age": {"type": "integer", "minimum": 16, "maximum": 35},
-    "country": {"type": "string", "pattern": "^[A-Z]{2}$", "description": "ISO 3166-1 alpha-2, display only"},
-    "languages": {"type": "array", "minItems": 1,
-      "items": {"type": "object", "required": ["lang", "fluency"], "additionalProperties": false,
-        "properties": {"lang": {"type": "string", "pattern": "^[a-z]{2}$"}, "fluency": {"type": "integer", "minimum": 0, "maximum": 100}}}},
-    "personality": {"enum": ["professional", "balanced", "casual", "temperamental"]},
-    "role_primary": {"enum": ["top", "jg", "mid", "bot", "sup"]},
-    "role_secondary": {"enum": ["top", "jg", "mid", "bot", "sup", null]},
-    "stats": {"$ref": "#/$defs/eight"},
-    "potential": {"$ref": "#/$defs/eight"}
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "placeholder": {
+      "type": "boolean"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 16,
+      "maximum": 35
+    },
+    "country": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "description": "ISO 3166-1 alpha-2, display only"
+    },
+    "languages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "lang",
+          "fluency"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "lang": {
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          },
+          "fluency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        }
+      }
+    },
+    "personality": {
+      "enum": [
+        "professional",
+        "balanced",
+        "casual",
+        "temperamental"
+      ]
+    },
+    "role_primary": {
+      "enum": [
+        "top",
+        "jg",
+        "mid",
+        "bot",
+        "sup"
+      ]
+    },
+    "role_secondary": {
+      "enum": [
+        "top",
+        "jg",
+        "mid",
+        "bot",
+        "sup",
+        null
+      ]
+    },
+    "stats": {
+      "$ref": "#/$defs/eight"
+    },
+    "potential": {
+      "$ref": "#/$defs/eight"
+    },
+    "club": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "club id, or null for a free agent"
+    }
   },
   "$defs": {
-    "eight": {"type": "object", "additionalProperties": false,
-      "required": ["mec", "sen", "lan", "tft", "mac", "com", "con", "clu"],
+    "eight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mec",
+        "sen",
+        "lan",
+        "tft",
+        "mac",
+        "com",
+        "con",
+        "clu"
+      ],
       "properties": {
-        "mec": {"type": "integer", "minimum": 1, "maximum": 100}, "sen": {"type": "integer", "minimum": 1, "maximum": 100},
-        "lan": {"type": "integer", "minimum": 1, "maximum": 100}, "tft": {"type": "integer", "minimum": 1, "maximum": 100},
-        "mac": {"type": "integer", "minimum": 1, "maximum": 100}, "com": {"type": "integer", "minimum": 1, "maximum": 100},
-        "con": {"type": "integer", "minimum": 1, "maximum": 100}, "clu": {"type": "integer", "minimum": 1, "maximum": 100}}}
+        "mec": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "sen": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "lan": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "tft": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "mac": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "com": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "con": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "clu": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      }
+    }
   }
 }

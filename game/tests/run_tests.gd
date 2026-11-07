@@ -105,3 +105,26 @@ func _test_data() -> void:
 	_check(players is Array and players.size() > 0, "sample players load")
 	for p in players:
 		_check(DataLoader.player_errors(p).is_empty(), "player valid: " + str(p.get("id")))
+
+	# the real generated league (tools/gen_heroes.py, tools/gen_players.py)
+	var all_heroes = DataLoader.load_json("res://data/heroes.json")
+	_check(all_heroes is Array and all_heroes.size() == 40, "40 heroes load")
+	var by_id := {}
+	for h in all_heroes:
+		by_id[h["id"]] = h
+		_check(DataLoader.hero_errors(h).is_empty(), "hero valid: " + str(h.get("id")))
+	for h in all_heroes:
+		for t in h["strong_vs"]:
+			_check(by_id.has(t), "counter target exists: " + str(t))
+	var all_players = DataLoader.load_json("res://data/players.json")
+	_check(all_players is Array and all_players.size() == 140, "140 players load")
+	var pid := {}
+	for p in all_players:
+		pid[p["id"]] = p
+		_check(DataLoader.player_errors(p).is_empty(), "player valid: " + str(p.get("id")))
+	var clubs = DataLoader.load_json("res://data/clubs.json")
+	_check(clubs is Array and clubs.size() == 10, "10 clubs load")
+	for c in clubs:
+		_check(c["player_ids"].size() == 10, "club roster size: " + str(c["id"]))
+		for i in c["player_ids"]:
+			_check(pid.has(i) and pid[i]["club"] == c["id"], "roster link: " + str(i))

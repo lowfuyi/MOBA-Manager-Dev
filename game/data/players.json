@@ -1,0 +1,5182 @@
+[
+ {
+  "id": "p001",
+  "name": "Ashjin",
+  "placeholder": true,
+  "age": 19,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "top",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 46,
+   "sen": 25,
+   "lan": 52,
+   "tft": 49,
+   "mac": 27,
+   "com": 25,
+   "con": 42,
+   "clu": 37
+  },
+  "potential": {
+   "mec": 60,
+   "sen": 46,
+   "lan": 72,
+   "tft": 65,
+   "mac": 48,
+   "com": 26,
+   "con": 67,
+   "clu": 54
+  },
+  "club": "ironquill_wolves"
+ },
+ {
+  "id": "p002",
+  "name": "Ormkai",
+  "placeholder": true,
+  "age": 21,
+  "country": "BR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "top",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 57,
+   "sen": 36,
+   "lan": 25,
+   "tft": 34,
+   "mac": 49,
+   "com": 45,
+   "con": 34,
+   "clu": 37
+  },
+  "potential": {
+   "mec": 79,
+   "sen": 57,
+   "lan": 42,
+   "tft": 54,
+   "mac": 53,
+   "com": 56,
+   "con": 48,
+   "clu": 44
+  },
+  "club": "ironquill_wolves"
+ },
+ {
+  "id": "p003",
+  "name": "Eskjin",
+  "placeholder": true,
+  "age": 26,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "jg",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 25,
+   "sen": 26,
+   "lan": 27,
+   "tft": 25,
+   "mac": 32,
+   "com": 47,
+   "con": 40,
+   "clu": 38
+  },
+  "potential": {
+   "mec": 35,
+   "sen": 26,
+   "lan": 33,
+   "tft": 29,
+   "mac": 36,
+   "com": 50,
+   "con": 41,
+   "clu": 39
+  },
+  "club": "ironquill_wolves"
+ },
+ {
+  "id": "p004",
+  "name": "Paxlo",
+  "placeholder": true,
+  "age": 20,
+  "country": "US",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "jg",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 42,
+   "sen": 35,
+   "lan": 35,
+   "tft": 41,
+   "mac": 48,
+   "com": 26,
+   "con": 31,
+   "clu": 25
+  },
+  "potential": {
+   "mec": 44,
+   "sen": 55,
+   "lan": 45,
+   "tft": 42,
+   "mac": 55,
+   "com": 40,
+   "con": 46,
+   "clu": 35
+  },
+  "club": "ironquill_wolves"
+ },
+ {
+  "id": "p005",
+  "name": "Corxo",
+  "placeholder": true,
+  "age": 20,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 28,
+   "sen": 33,
+   "lan": 25,
+   "tft": 27,
+   "mac": 39,
+   "com": 29,
+   "con": 37,
+   "clu": 44
+  },
+  "potential": {
+   "mec": 33,
+   "sen": 33,
+   "lan": 44,
+   "tft": 42,
+   "mac": 59,
+   "com": 34,
+   "con": 56,
+   "clu": 47
+  },
+  "club": "ironquill_wolves"
+ },
+ {
+  "id": "p006",
+  "name": "Falhex",
+  "placeholder": true,
+  "age": 22,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "mid",
+  "role_secondary": "bot",
+  "stats": {
+   "mec": 25,
+   "sen": 47,
+   "lan": 25,
+   "tft": 29,
+   "mac": 25,
+   "com": 44,
+   "con": 28,
+   "clu": 38
+  },
+  "potential": {
+   "mec": 43,
+   "sen": 67,
+   "lan": 47,
+   "tft": 38,
+   "mac": 35,
+   "com": 59,
+   "con": 31,
+   "clu": 45
+  },
+  "club": "ironquill_wolves"
+ },
+ {
+  "id": "p007",
+  "name": "Brammont",
+  "placeholder": true,
+  "age": 18,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 47,
+   "sen": 25,
+   "lan": 37,
+   "tft": 32,
+   "mac": 28,
+   "com": 36,
+   "con": 33,
+   "clu": 46
+  },
+  "potential": {
+   "mec": 67,
+   "sen": 47,
+   "lan": 59,
+   "tft": 39,
+   "mac": 30,
+   "com": 51,
+   "con": 58,
+   "clu": 67
+  },
+  "club": "ironquill_wolves"
+ },
+ {
+  "id": "p008",
+  "name": "Yorlo",
+  "placeholder": true,
+  "age": 25,
+  "country": "VN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "bot",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 33,
+   "sen": 33,
+   "lan": 35,
+   "tft": 33,
+   "mac": 25,
+   "com": 28,
+   "con": 25,
+   "clu": 37
+  },
+  "potential": {
+   "mec": 37,
+   "sen": 38,
+   "lan": 45,
+   "tft": 34,
+   "mac": 25,
+   "com": 28,
+   "con": 27,
+   "clu": 40
+  },
+  "club": "ironquill_wolves"
+ },
+ {
+  "id": "p009",
+  "name": "Holbane",
+  "placeholder": true,
+  "age": 24,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "sup",
+  "role_secondary": "bot",
+  "stats": {
+   "mec": 25,
+   "sen": 41,
+   "lan": 41,
+   "tft": 28,
+   "mac": 45,
+   "com": 26,
+   "con": 29,
+   "clu": 41
+  },
+  "potential": {
+   "mec": 29,
+   "sen": 47,
+   "lan": 48,
+   "tft": 43,
+   "mac": 62,
+   "com": 41,
+   "con": 42,
+   "clu": 48
+  },
+  "club": "ironquill_wolves"
+ },
+ {
+  "id": "p010",
+  "name": "Vexsel",
+  "placeholder": true,
+  "age": 26,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "sup",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 29,
+   "sen": 30,
+   "lan": 34,
+   "tft": 38,
+   "mac": 44,
+   "com": 35,
+   "con": 25,
+   "clu": 34
+  },
+  "potential": {
+   "mec": 39,
+   "sen": 36,
+   "lan": 39,
+   "tft": 40,
+   "mac": 53,
+   "com": 37,
+   "con": 34,
+   "clu": 46
+  },
+  "club": "ironquill_wolves"
+ },
+ {
+  "id": "p011",
+  "name": "Eldgus",
+  "placeholder": true,
+  "age": 18,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "top",
+  "role_secondary": "jg",
+  "stats": {
+   "mec": 35,
+   "sen": 45,
+   "lan": 57,
+   "tft": 37,
+   "mac": 43,
+   "com": 32,
+   "con": 42,
+   "clu": 41
+  },
+  "potential": {
+   "mec": 50,
+   "sen": 50,
+   "lan": 68,
+   "tft": 38,
+   "mac": 64,
+   "com": 54,
+   "con": 43,
+   "clu": 55
+  },
+  "club": "duskwater_foxes"
+ },
+ {
+  "id": "p012",
+  "name": "Yorhex",
+  "placeholder": true,
+  "age": 25,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "top",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 48,
+   "sen": 31,
+   "lan": 47,
+   "tft": 39,
+   "mac": 39,
+   "com": 35,
+   "con": 40,
+   "clu": 44
+  },
+  "potential": {
+   "mec": 56,
+   "sen": 40,
+   "lan": 49,
+   "tft": 45,
+   "mac": 43,
+   "com": 37,
+   "con": 42,
+   "clu": 50
+  },
+  "club": "duskwater_foxes"
+ },
+ {
+  "id": "p013",
+  "name": "Morjin",
+  "placeholder": true,
+  "age": 28,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 33,
+   "sen": 41,
+   "lan": 36,
+   "tft": 37,
+   "mac": 45,
+   "com": 38,
+   "con": 35,
+   "clu": 45
+  },
+  "potential": {
+   "mec": 40,
+   "sen": 42,
+   "lan": 37,
+   "tft": 37,
+   "mac": 51,
+   "com": 43,
+   "con": 36,
+   "clu": 48
+  },
+  "club": "duskwater_foxes"
+ },
+ {
+  "id": "p014",
+  "name": "Paxjin",
+  "placeholder": true,
+  "age": 28,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 28,
+   "sen": 46,
+   "lan": 31,
+   "tft": 31,
+   "mac": 46,
+   "com": 43,
+   "con": 41,
+   "clu": 35
+  },
+  "potential": {
+   "mec": 29,
+   "sen": 46,
+   "lan": 32,
+   "tft": 32,
+   "mac": 50,
+   "com": 50,
+   "con": 43,
+   "clu": 38
+  },
+  "club": "duskwater_foxes"
+ },
+ {
+  "id": "p015",
+  "name": "Xanmir",
+  "placeholder": true,
+  "age": 21,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 37,
+   "sen": 38,
+   "lan": 44,
+   "tft": 44,
+   "mac": 43,
+   "com": 41,
+   "con": 26,
+   "clu": 43
+  },
+  "potential": {
+   "mec": 37,
+   "sen": 54,
+   "lan": 57,
+   "tft": 49,
+   "mac": 57,
+   "com": 57,
+   "con": 33,
+   "clu": 46
+  },
+  "club": "duskwater_foxes"
+ },
+ {
+  "id": "p016",
+  "name": "Nyxmont",
+  "placeholder": true,
+  "age": 21,
+  "country": "TH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "mid",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 25,
+   "sen": 45,
+   "lan": 40,
+   "tft": 25,
+   "mac": 30,
+   "com": 48,
+   "con": 43,
+   "clu": 25
+  },
+  "potential": {
+   "mec": 27,
+   "sen": 63,
+   "lan": 52,
+   "tft": 44,
+   "mac": 37,
+   "com": 67,
+   "con": 63,
+   "clu": 46
+  },
+  "club": "duskwater_foxes"
+ },
+ {
+  "id": "p017",
+  "name": "Grimir",
+  "placeholder": true,
+  "age": 27,
+  "country": "DE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 28,
+   "sen": 35,
+   "lan": 42,
+   "tft": 39,
+   "mac": 39,
+   "com": 39,
+   "con": 41,
+   "clu": 42
+  },
+  "potential": {
+   "mec": 35,
+   "sen": 40,
+   "lan": 47,
+   "tft": 43,
+   "mac": 41,
+   "com": 42,
+   "con": 46,
+   "clu": 46
+  },
+  "club": "duskwater_foxes"
+ },
+ {
+  "id": "p018",
+  "name": "Dunmont",
+  "placeholder": true,
+  "age": 23,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "bot",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 34,
+   "sen": 30,
+   "lan": 43,
+   "tft": 31,
+   "mac": 29,
+   "com": 52,
+   "con": 45,
+   "clu": 30
+  },
+  "potential": {
+   "mec": 47,
+   "sen": 41,
+   "lan": 60,
+   "tft": 36,
+   "mac": 45,
+   "com": 52,
+   "con": 62,
+   "clu": 34
+  },
+  "club": "duskwater_foxes"
+ },
+ {
+  "id": "p019",
+  "name": "Talsen",
+  "placeholder": true,
+  "age": 29,
+  "country": "TH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 27,
+   "sen": 49,
+   "lan": 56,
+   "tft": 42,
+   "mac": 42,
+   "com": 48,
+   "con": 48,
+   "clu": 33
+  },
+  "potential": {
+   "mec": 31,
+   "sen": 54,
+   "lan": 58,
+   "tft": 47,
+   "mac": 48,
+   "com": 52,
+   "con": 49,
+   "clu": 39
+  },
+  "club": "duskwater_foxes"
+ },
+ {
+  "id": "p020",
+  "name": "Eskwyn",
+  "placeholder": true,
+  "age": 31,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 25,
+   "sen": 37,
+   "lan": 34,
+   "tft": 25,
+   "mac": 40,
+   "com": 36,
+   "con": 33,
+   "clu": 33
+  },
+  "potential": {
+   "mec": 25,
+   "sen": 41,
+   "lan": 39,
+   "tft": 26,
+   "mac": 42,
+   "com": 39,
+   "con": 36,
+   "clu": 36
+  },
+  "club": "duskwater_foxes"
+ },
+ {
+  "id": "p021",
+  "name": "Quohex",
+  "placeholder": true,
+  "age": 21,
+  "country": "SE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "top",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 39,
+   "sen": 52,
+   "lan": 53,
+   "tft": 45,
+   "mac": 45,
+   "com": 58,
+   "con": 42,
+   "clu": 41
+  },
+  "potential": {
+   "mec": 51,
+   "sen": 57,
+   "lan": 66,
+   "tft": 62,
+   "mac": 53,
+   "com": 72,
+   "con": 44,
+   "clu": 46
+  },
+  "club": "gildmoor_raiders"
+ },
+ {
+  "id": "p022",
+  "name": "Lumpyre",
+  "placeholder": true,
+  "age": 28,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 33,
+   "sen": 29,
+   "lan": 39,
+   "tft": 34,
+   "mac": 29,
+   "com": 30,
+   "con": 50,
+   "clu": 33
+  },
+  "potential": {
+   "mec": 41,
+   "sen": 37,
+   "lan": 40,
+   "tft": 41,
+   "mac": 35,
+   "com": 33,
+   "con": 58,
+   "clu": 40
+  },
+  "club": "gildmoor_raiders"
+ },
+ {
+  "id": "p023",
+  "name": "Bramsel",
+  "placeholder": true,
+  "age": 20,
+  "country": "TH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 58,
+   "sen": 43,
+   "lan": 26,
+   "tft": 39,
+   "mac": 44,
+   "com": 50,
+   "con": 50,
+   "clu": 29
+  },
+  "potential": {
+   "mec": 61,
+   "sen": 56,
+   "lan": 34,
+   "tft": 46,
+   "mac": 62,
+   "com": 60,
+   "con": 65,
+   "clu": 31
+  },
+  "club": "gildmoor_raiders"
+ },
+ {
+  "id": "p024",
+  "name": "Korjin",
+  "placeholder": true,
+  "age": 20,
+  "country": "BR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 37,
+   "sen": 25,
+   "lan": 38,
+   "tft": 36,
+   "mac": 37,
+   "com": 35,
+   "con": 47,
+   "clu": 46
+  },
+  "potential": {
+   "mec": 55,
+   "sen": 31,
+   "lan": 38,
+   "tft": 36,
+   "mac": 39,
+   "com": 56,
+   "con": 58,
+   "clu": 64
+  },
+  "club": "gildmoor_raiders"
+ },
+ {
+  "id": "p025",
+  "name": "Junsen",
+  "placeholder": true,
+  "age": 20,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 50,
+   "sen": 40,
+   "lan": 50,
+   "tft": 37,
+   "mac": 36,
+   "com": 37,
+   "con": 34,
+   "clu": 46
+  },
+  "potential": {
+   "mec": 67,
+   "sen": 44,
+   "lan": 72,
+   "tft": 53,
+   "mac": 43,
+   "com": 45,
+   "con": 51,
+   "clu": 49
+  },
+  "club": "gildmoor_raiders"
+ },
+ {
+  "id": "p026",
+  "name": "Rivzen",
+  "placeholder": true,
+  "age": 29,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 35,
+   "sen": 36,
+   "lan": 50,
+   "tft": 35,
+   "mac": 33,
+   "com": 40,
+   "con": 39,
+   "clu": 25
+  },
+  "potential": {
+   "mec": 37,
+   "sen": 37,
+   "lan": 52,
+   "tft": 41,
+   "mac": 41,
+   "com": 40,
+   "con": 41,
+   "clu": 26
+  },
+  "club": "gildmoor_raiders"
+ },
+ {
+  "id": "p027",
+  "name": "Eldhex",
+  "placeholder": true,
+  "age": 23,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 38,
+   "sen": 39,
+   "lan": 48,
+   "tft": 40,
+   "mac": 25,
+   "com": 45,
+   "con": 40,
+   "clu": 42
+  },
+  "potential": {
+   "mec": 42,
+   "sen": 49,
+   "lan": 62,
+   "tft": 55,
+   "mac": 40,
+   "com": 53,
+   "con": 50,
+   "clu": 60
+  },
+  "club": "gildmoor_raiders"
+ },
+ {
+  "id": "p028",
+  "name": "Caelvik",
+  "placeholder": true,
+  "age": 23,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "bot",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 50,
+   "sen": 29,
+   "lan": 60,
+   "tft": 39,
+   "mac": 37,
+   "com": 46,
+   "con": 25,
+   "clu": 37
+  },
+  "potential": {
+   "mec": 54,
+   "sen": 32,
+   "lan": 65,
+   "tft": 42,
+   "mac": 48,
+   "com": 53,
+   "con": 39,
+   "clu": 37
+  },
+  "club": "gildmoor_raiders"
+ },
+ {
+  "id": "p029",
+  "name": "Eskkai",
+  "placeholder": true,
+  "age": 26,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 40,
+   "sen": 40,
+   "lan": 44,
+   "tft": 46,
+   "mac": 38,
+   "com": 34,
+   "con": 43,
+   "clu": 54
+  },
+  "potential": {
+   "mec": 42,
+   "sen": 48,
+   "lan": 55,
+   "tft": 51,
+   "mac": 45,
+   "com": 40,
+   "con": 44,
+   "clu": 57
+  },
+  "club": "gildmoor_raiders"
+ },
+ {
+  "id": "p030",
+  "name": "Grifin",
+  "placeholder": true,
+  "age": 27,
+  "country": "JP",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "sup",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 48,
+   "sen": 37,
+   "lan": 40,
+   "tft": 45,
+   "mac": 62,
+   "com": 40,
+   "con": 47,
+   "clu": 38
+  },
+  "potential": {
+   "mec": 51,
+   "sen": 39,
+   "lan": 44,
+   "tft": 45,
+   "mac": 67,
+   "com": 47,
+   "con": 47,
+   "clu": 41
+  },
+  "club": "gildmoor_raiders"
+ },
+ {
+  "id": "p031",
+  "name": "Wrenmir",
+  "placeholder": true,
+  "age": 20,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "top",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 52,
+   "sen": 46,
+   "lan": 43,
+   "tft": 47,
+   "mac": 36,
+   "com": 39,
+   "con": 39,
+   "clu": 32
+  },
+  "potential": {
+   "mec": 65,
+   "sen": 50,
+   "lan": 63,
+   "tft": 53,
+   "mac": 51,
+   "com": 52,
+   "con": 50,
+   "clu": 50
+  },
+  "club": "pinehollow_owls"
+ },
+ {
+  "id": "p032",
+  "name": "Kornox",
+  "placeholder": true,
+  "age": 22,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 55,
+   "sen": 44,
+   "lan": 39,
+   "tft": 58,
+   "mac": 32,
+   "com": 51,
+   "con": 50,
+   "clu": 50
+  },
+  "potential": {
+   "mec": 68,
+   "sen": 55,
+   "lan": 60,
+   "tft": 76,
+   "mac": 54,
+   "com": 72,
+   "con": 67,
+   "clu": 62
+  },
+  "club": "pinehollow_owls"
+ },
+ {
+  "id": "p033",
+  "name": "Umbzen",
+  "placeholder": true,
+  "age": 26,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 56,
+   "sen": 43,
+   "lan": 47,
+   "tft": 53,
+   "mac": 47,
+   "com": 45,
+   "con": 49,
+   "clu": 48
+  },
+  "potential": {
+   "mec": 65,
+   "sen": 53,
+   "lan": 50,
+   "tft": 53,
+   "mac": 49,
+   "com": 57,
+   "con": 51,
+   "clu": 52
+  },
+  "club": "pinehollow_owls"
+ },
+ {
+  "id": "p034",
+  "name": "Solmont",
+  "placeholder": true,
+  "age": 20,
+  "country": "TW",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 45,
+   "sen": 33,
+   "lan": 49,
+   "tft": 35,
+   "mac": 44,
+   "com": 40,
+   "con": 38,
+   "clu": 32
+  },
+  "potential": {
+   "mec": 48,
+   "sen": 47,
+   "lan": 58,
+   "tft": 36,
+   "mac": 65,
+   "com": 52,
+   "con": 39,
+   "clu": 48
+  },
+  "club": "pinehollow_owls"
+ },
+ {
+  "id": "p035",
+  "name": "Iresen",
+  "placeholder": true,
+  "age": 20,
+  "country": "TH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 38,
+   "sen": 34,
+   "lan": 51,
+   "tft": 56,
+   "mac": 37,
+   "com": 50,
+   "con": 34,
+   "clu": 40
+  },
+  "potential": {
+   "mec": 50,
+   "sen": 51,
+   "lan": 70,
+   "tft": 71,
+   "mac": 46,
+   "com": 71,
+   "con": 55,
+   "clu": 62
+  },
+  "club": "pinehollow_owls"
+ },
+ {
+  "id": "p036",
+  "name": "Irezen",
+  "placeholder": true,
+  "age": 25,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 46,
+   "sen": 62,
+   "lan": 41,
+   "tft": 36,
+   "mac": 40,
+   "com": 33,
+   "con": 33,
+   "clu": 43
+  },
+  "potential": {
+   "mec": 54,
+   "sen": 69,
+   "lan": 47,
+   "tft": 43,
+   "mac": 44,
+   "com": 38,
+   "con": 44,
+   "clu": 51
+  },
+  "club": "pinehollow_owls"
+ },
+ {
+  "id": "p037",
+  "name": "Morric",
+  "placeholder": true,
+  "age": 20,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 41,
+   "sen": 35,
+   "lan": 46,
+   "tft": 42,
+   "mac": 45,
+   "com": 59,
+   "con": 28,
+   "clu": 52
+  },
+  "potential": {
+   "mec": 46,
+   "sen": 48,
+   "lan": 60,
+   "tft": 43,
+   "mac": 45,
+   "com": 81,
+   "con": 45,
+   "clu": 63
+  },
+  "club": "pinehollow_owls"
+ },
+ {
+  "id": "p038",
+  "name": "Ormxo",
+  "placeholder": true,
+  "age": 27,
+  "country": "DE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "bot",
+  "role_secondary": "jg",
+  "stats": {
+   "mec": 40,
+   "sen": 48,
+   "lan": 37,
+   "tft": 39,
+   "mac": 45,
+   "com": 40,
+   "con": 52,
+   "clu": 40
+  },
+  "potential": {
+   "mec": 42,
+   "sen": 52,
+   "lan": 45,
+   "tft": 40,
+   "mac": 48,
+   "com": 41,
+   "con": 52,
+   "clu": 41
+  },
+  "club": "pinehollow_owls"
+ },
+ {
+  "id": "p039",
+  "name": "Wrenhex",
+  "placeholder": true,
+  "age": 23,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 39,
+   "sen": 54,
+   "lan": 38,
+   "tft": 48,
+   "mac": 54,
+   "com": 49,
+   "con": 41,
+   "clu": 43
+  },
+  "potential": {
+   "mec": 44,
+   "sen": 67,
+   "lan": 46,
+   "tft": 66,
+   "mac": 64,
+   "com": 62,
+   "con": 41,
+   "clu": 54
+  },
+  "club": "pinehollow_owls"
+ },
+ {
+  "id": "p040",
+  "name": "Rivrix",
+  "placeholder": true,
+  "age": 24,
+  "country": "AU",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 45,
+   "sen": 56,
+   "lan": 57,
+   "tft": 44,
+   "mac": 46,
+   "com": 42,
+   "con": 57,
+   "clu": 55
+  },
+  "potential": {
+   "mec": 47,
+   "sen": 69,
+   "lan": 67,
+   "tft": 51,
+   "mac": 64,
+   "com": 60,
+   "con": 60,
+   "clu": 59
+  },
+  "club": "pinehollow_owls"
+ },
+ {
+  "id": "p041",
+  "name": "Junnox",
+  "placeholder": true,
+  "age": 22,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 38,
+   "sen": 40,
+   "lan": 54,
+   "tft": 54,
+   "mac": 33,
+   "com": 47,
+   "con": 32,
+   "clu": 58
+  },
+  "potential": {
+   "mec": 40,
+   "sen": 50,
+   "lan": 66,
+   "tft": 70,
+   "mac": 53,
+   "com": 54,
+   "con": 32,
+   "clu": 70
+  },
+  "club": "mossgate_wardens"
+ },
+ {
+  "id": "p042",
+  "name": "Eskxo",
+  "placeholder": true,
+  "age": 25,
+  "country": "AU",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 56,
+   "sen": 45,
+   "lan": 41,
+   "tft": 50,
+   "mac": 38,
+   "com": 50,
+   "con": 59,
+   "clu": 36
+  },
+  "potential": {
+   "mec": 61,
+   "sen": 48,
+   "lan": 42,
+   "tft": 61,
+   "mac": 48,
+   "com": 56,
+   "con": 63,
+   "clu": 41
+  },
+  "club": "mossgate_wardens"
+ },
+ {
+  "id": "p043",
+  "name": "Solxo",
+  "placeholder": true,
+  "age": 21,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "jg",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 41,
+   "sen": 61,
+   "lan": 47,
+   "tft": 49,
+   "mac": 61,
+   "com": 52,
+   "con": 37,
+   "clu": 40
+  },
+  "potential": {
+   "mec": 51,
+   "sen": 68,
+   "lan": 56,
+   "tft": 52,
+   "mac": 72,
+   "com": 65,
+   "con": 45,
+   "clu": 40
+  },
+  "club": "mossgate_wardens"
+ },
+ {
+  "id": "p044",
+  "name": "Vexfin",
+  "placeholder": true,
+  "age": 28,
+  "country": "US",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "jg",
+  "role_secondary": "bot",
+  "stats": {
+   "mec": 44,
+   "sen": 54,
+   "lan": 45,
+   "tft": 69,
+   "mac": 60,
+   "com": 45,
+   "con": 41,
+   "clu": 45
+  },
+  "potential": {
+   "mec": 48,
+   "sen": 62,
+   "lan": 45,
+   "tft": 72,
+   "mac": 68,
+   "com": 46,
+   "con": 49,
+   "clu": 48
+  },
+  "club": "mossgate_wardens"
+ },
+ {
+  "id": "p045",
+  "name": "Caelwyn",
+  "placeholder": true,
+  "age": 23,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 47,
+   "sen": 49,
+   "lan": 35,
+   "tft": 53,
+   "mac": 51,
+   "com": 49,
+   "con": 46,
+   "clu": 41
+  },
+  "potential": {
+   "mec": 49,
+   "sen": 60,
+   "lan": 40,
+   "tft": 67,
+   "mac": 66,
+   "com": 64,
+   "con": 47,
+   "clu": 59
+  },
+  "club": "mossgate_wardens"
+ },
+ {
+  "id": "p046",
+  "name": "Yormir",
+  "placeholder": true,
+  "age": 30,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "mid",
+  "role_secondary": "jg",
+  "stats": {
+   "mec": 42,
+   "sen": 53,
+   "lan": 60,
+   "tft": 37,
+   "mac": 38,
+   "com": 47,
+   "con": 36,
+   "clu": 44
+  },
+  "potential": {
+   "mec": 45,
+   "sen": 57,
+   "lan": 63,
+   "tft": 41,
+   "mac": 38,
+   "com": 47,
+   "con": 36,
+   "clu": 49
+  },
+  "club": "mossgate_wardens"
+ },
+ {
+  "id": "p047",
+  "name": "Rivley",
+  "placeholder": true,
+  "age": 31,
+  "country": "BR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 62,
+   "sen": 35,
+   "lan": 41,
+   "tft": 48,
+   "mac": 46,
+   "com": 51,
+   "con": 55,
+   "clu": 43
+  },
+  "potential": {
+   "mec": 66,
+   "sen": 38,
+   "lan": 43,
+   "tft": 53,
+   "mac": 47,
+   "com": 56,
+   "con": 56,
+   "clu": 44
+  },
+  "club": "mossgate_wardens"
+ },
+ {
+  "id": "p048",
+  "name": "Griric",
+  "placeholder": true,
+  "age": 26,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "bot",
+  "role_secondary": "jg",
+  "stats": {
+   "mec": 59,
+   "sen": 46,
+   "lan": 43,
+   "tft": 34,
+   "mac": 50,
+   "com": 47,
+   "con": 27,
+   "clu": 47
+  },
+  "potential": {
+   "mec": 64,
+   "sen": 46,
+   "lan": 46,
+   "tft": 44,
+   "mac": 56,
+   "com": 58,
+   "con": 33,
+   "clu": 47
+  },
+  "club": "mossgate_wardens"
+ },
+ {
+  "id": "p049",
+  "name": "Yorbane",
+  "placeholder": true,
+  "age": 23,
+  "country": "TH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 46,
+   "sen": 62,
+   "lan": 54,
+   "tft": 50,
+   "mac": 58,
+   "com": 43,
+   "con": 42,
+   "clu": 49
+  },
+  "potential": {
+   "mec": 51,
+   "sen": 70,
+   "lan": 72,
+   "tft": 64,
+   "mac": 63,
+   "com": 50,
+   "con": 56,
+   "clu": 65
+  },
+  "club": "mossgate_wardens"
+ },
+ {
+  "id": "p050",
+  "name": "Wrennox",
+  "placeholder": true,
+  "age": 25,
+  "country": "TH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "sup",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 33,
+   "sen": 38,
+   "lan": 51,
+   "tft": 40,
+   "mac": 60,
+   "com": 45,
+   "con": 53,
+   "clu": 63
+  },
+  "potential": {
+   "mec": 43,
+   "sen": 40,
+   "lan": 53,
+   "tft": 44,
+   "mac": 60,
+   "com": 54,
+   "con": 61,
+   "clu": 63
+  },
+  "club": "mossgate_wardens"
+ },
+ {
+  "id": "p051",
+  "name": "Brikai",
+  "placeholder": true,
+  "age": 19,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 42,
+   "sen": 47,
+   "lan": 50,
+   "tft": 55,
+   "mac": 44,
+   "com": 55,
+   "con": 57,
+   "clu": 48
+  },
+  "potential": {
+   "mec": 52,
+   "sen": 64,
+   "lan": 68,
+   "tft": 76,
+   "mac": 56,
+   "com": 76,
+   "con": 72,
+   "clu": 50
+  },
+  "club": "northreach_corsairs"
+ },
+ {
+  "id": "p052",
+  "name": "Soldor",
+  "placeholder": true,
+  "age": 27,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 50,
+   "sen": 58,
+   "lan": 67,
+   "tft": 49,
+   "mac": 47,
+   "com": 53,
+   "con": 32,
+   "clu": 51
+  },
+  "potential": {
+   "mec": 51,
+   "sen": 65,
+   "lan": 67,
+   "tft": 52,
+   "mac": 53,
+   "com": 59,
+   "con": 40,
+   "clu": 54
+  },
+  "club": "northreach_corsairs"
+ },
+ {
+  "id": "p053",
+  "name": "Bridor",
+  "placeholder": true,
+  "age": 27,
+  "country": "SE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 56,
+   "sen": 46,
+   "lan": 47,
+   "tft": 46,
+   "mac": 50,
+   "com": 51,
+   "con": 56,
+   "clu": 57
+  },
+  "potential": {
+   "mec": 61,
+   "sen": 48,
+   "lan": 54,
+   "tft": 54,
+   "mac": 56,
+   "com": 53,
+   "con": 63,
+   "clu": 59
+  },
+  "club": "northreach_corsairs"
+ },
+ {
+  "id": "p054",
+  "name": "Yorric",
+  "placeholder": true,
+  "age": 24,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "jg",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 50,
+   "sen": 56,
+   "lan": 26,
+   "tft": 56,
+   "mac": 47,
+   "com": 35,
+   "con": 45,
+   "clu": 44
+  },
+  "potential": {
+   "mec": 68,
+   "sen": 62,
+   "lan": 31,
+   "tft": 59,
+   "mac": 48,
+   "com": 46,
+   "con": 58,
+   "clu": 49
+  },
+  "club": "northreach_corsairs"
+ },
+ {
+  "id": "p055",
+  "name": "Dovnox",
+  "placeholder": true,
+  "age": 24,
+  "country": "TH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 33,
+   "sen": 48,
+   "lan": 62,
+   "tft": 52,
+   "mac": 52,
+   "com": 53,
+   "con": 57,
+   "clu": 60
+  },
+  "potential": {
+   "mec": 35,
+   "sen": 64,
+   "lan": 70,
+   "tft": 59,
+   "mac": 66,
+   "com": 63,
+   "con": 60,
+   "clu": 78
+  },
+  "club": "northreach_corsairs"
+ },
+ {
+  "id": "p056",
+  "name": "Caeldor",
+  "placeholder": true,
+  "age": 23,
+  "country": "VN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 49,
+   "sen": 56,
+   "lan": 50,
+   "tft": 59,
+   "mac": 46,
+   "com": 57,
+   "con": 49,
+   "clu": 44
+  },
+  "potential": {
+   "mec": 62,
+   "sen": 74,
+   "lan": 58,
+   "tft": 70,
+   "mac": 50,
+   "com": 67,
+   "con": 58,
+   "clu": 56
+  },
+  "club": "northreach_corsairs"
+ },
+ {
+  "id": "p057",
+  "name": "Nyxwyn",
+  "placeholder": true,
+  "age": 23,
+  "country": "BR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 59,
+   "sen": 42,
+   "lan": 53,
+   "tft": 53,
+   "mac": 66,
+   "com": 64,
+   "con": 42,
+   "clu": 47
+  },
+  "potential": {
+   "mec": 62,
+   "sen": 55,
+   "lan": 63,
+   "tft": 69,
+   "mac": 73,
+   "com": 76,
+   "con": 54,
+   "clu": 47
+  },
+  "club": "northreach_corsairs"
+ },
+ {
+  "id": "p058",
+  "name": "Talfin",
+  "placeholder": true,
+  "age": 22,
+  "country": "BR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "bot",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 62,
+   "sen": 48,
+   "lan": 56,
+   "tft": 60,
+   "mac": 41,
+   "com": 62,
+   "con": 61,
+   "clu": 52
+  },
+  "potential": {
+   "mec": 69,
+   "sen": 69,
+   "lan": 61,
+   "tft": 78,
+   "mac": 54,
+   "com": 84,
+   "con": 61,
+   "clu": 57
+  },
+  "club": "northreach_corsairs"
+ },
+ {
+  "id": "p059",
+  "name": "Lummir",
+  "placeholder": true,
+  "age": 30,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "sup",
+  "role_secondary": "jg",
+  "stats": {
+   "mec": 39,
+   "sen": 54,
+   "lan": 53,
+   "tft": 59,
+   "mac": 48,
+   "com": 43,
+   "con": 54,
+   "clu": 36
+  },
+  "potential": {
+   "mec": 39,
+   "sen": 55,
+   "lan": 56,
+   "tft": 60,
+   "mac": 51,
+   "com": 48,
+   "con": 55,
+   "clu": 38
+  },
+  "club": "northreach_corsairs"
+ },
+ {
+  "id": "p060",
+  "name": "Xansel",
+  "placeholder": true,
+  "age": 20,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 55,
+   "sen": 42,
+   "lan": 58,
+   "tft": 44,
+   "mac": 51,
+   "com": 59,
+   "con": 61,
+   "clu": 58
+  },
+  "potential": {
+   "mec": 75,
+   "sen": 42,
+   "lan": 62,
+   "tft": 66,
+   "mac": 53,
+   "com": 64,
+   "con": 68,
+   "clu": 61
+  },
+  "club": "northreach_corsairs"
+ },
+ {
+  "id": "p061",
+  "name": "Nyxhex",
+  "placeholder": true,
+  "age": 23,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 67,
+   "sen": 49,
+   "lan": 58,
+   "tft": 63,
+   "mac": 48,
+   "com": 50,
+   "con": 50,
+   "clu": 40
+  },
+  "potential": {
+   "mec": 71,
+   "sen": 62,
+   "lan": 66,
+   "tft": 69,
+   "mac": 55,
+   "com": 61,
+   "con": 58,
+   "clu": 51
+  },
+  "club": "emberfen_hounds"
+ },
+ {
+  "id": "p062",
+  "name": "Umbtor",
+  "placeholder": true,
+  "age": 30,
+  "country": "TW",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "top",
+  "role_secondary": "bot",
+  "stats": {
+   "mec": 50,
+   "sen": 51,
+   "lan": 65,
+   "tft": 51,
+   "mac": 30,
+   "com": 56,
+   "con": 49,
+   "clu": 53
+  },
+  "potential": {
+   "mec": 54,
+   "sen": 51,
+   "lan": 67,
+   "tft": 52,
+   "mac": 34,
+   "com": 61,
+   "con": 51,
+   "clu": 58
+  },
+  "club": "emberfen_hounds"
+ },
+ {
+  "id": "p063",
+  "name": "Dovxo",
+  "placeholder": true,
+  "age": 18,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "jg",
+  "role_secondary": "bot",
+  "stats": {
+   "mec": 37,
+   "sen": 58,
+   "lan": 62,
+   "tft": 62,
+   "mac": 67,
+   "com": 56,
+   "con": 62,
+   "clu": 58
+  },
+  "potential": {
+   "mec": 49,
+   "sen": 60,
+   "lan": 80,
+   "tft": 86,
+   "mac": 77,
+   "com": 56,
+   "con": 64,
+   "clu": 66
+  },
+  "club": "emberfen_hounds"
+ },
+ {
+  "id": "p064",
+  "name": "Solpyre",
+  "placeholder": true,
+  "age": 18,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 53,
+   "sen": 57,
+   "lan": 43,
+   "tft": 54,
+   "mac": 78,
+   "com": 57,
+   "con": 57,
+   "clu": 56
+  },
+  "potential": {
+   "mec": 63,
+   "sen": 77,
+   "lan": 63,
+   "tft": 66,
+   "mac": 99,
+   "com": 63,
+   "con": 71,
+   "clu": 60
+  },
+  "club": "emberfen_hounds"
+ },
+ {
+  "id": "p065",
+  "name": "Brampyre",
+  "placeholder": true,
+  "age": 22,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "mid",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 74,
+   "sen": 47,
+   "lan": 62,
+   "tft": 64,
+   "mac": 36,
+   "com": 49,
+   "con": 45,
+   "clu": 57
+  },
+  "potential": {
+   "mec": 93,
+   "sen": 51,
+   "lan": 71,
+   "tft": 72,
+   "mac": 51,
+   "com": 51,
+   "con": 47,
+   "clu": 68
+  },
+  "club": "emberfen_hounds"
+ },
+ {
+  "id": "p066",
+  "name": "Paxhex",
+  "placeholder": true,
+  "age": 24,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "mid",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 54,
+   "sen": 62,
+   "lan": 59,
+   "tft": 43,
+   "mac": 44,
+   "com": 54,
+   "con": 54,
+   "clu": 46
+  },
+  "potential": {
+   "mec": 65,
+   "sen": 71,
+   "lan": 77,
+   "tft": 46,
+   "mac": 57,
+   "com": 60,
+   "con": 65,
+   "clu": 61
+  },
+  "club": "emberfen_hounds"
+ },
+ {
+  "id": "p067",
+  "name": "Ireley",
+  "placeholder": true,
+  "age": 17,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 71,
+   "sen": 56,
+   "lan": 64,
+   "tft": 58,
+   "mac": 72,
+   "com": 60,
+   "con": 57,
+   "clu": 55
+  },
+  "potential": {
+   "mec": 87,
+   "sen": 58,
+   "lan": 84,
+   "tft": 69,
+   "mac": 88,
+   "com": 68,
+   "con": 79,
+   "clu": 76
+  },
+  "club": "emberfen_hounds"
+ },
+ {
+  "id": "p068",
+  "name": "Paxmont",
+  "placeholder": true,
+  "age": 28,
+  "country": "JP",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 51,
+   "sen": 56,
+   "lan": 64,
+   "tft": 62,
+   "mac": 49,
+   "com": 47,
+   "con": 59,
+   "clu": 57
+  },
+  "potential": {
+   "mec": 54,
+   "sen": 56,
+   "lan": 71,
+   "tft": 63,
+   "mac": 55,
+   "com": 47,
+   "con": 65,
+   "clu": 62
+  },
+  "club": "emberfen_hounds"
+ },
+ {
+  "id": "p069",
+  "name": "Eskhex",
+  "placeholder": true,
+  "age": 30,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 50,
+   "sen": 58,
+   "lan": 49,
+   "tft": 50,
+   "mac": 60,
+   "com": 59,
+   "con": 51,
+   "clu": 71
+  },
+  "potential": {
+   "mec": 50,
+   "sen": 58,
+   "lan": 50,
+   "tft": 54,
+   "mac": 62,
+   "com": 60,
+   "con": 55,
+   "clu": 74
+  },
+  "club": "emberfen_hounds"
+ },
+ {
+  "id": "p070",
+  "name": "Caelsen",
+  "placeholder": true,
+  "age": 27,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "sup",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 57,
+   "sen": 62,
+   "lan": 64,
+   "tft": 56,
+   "mac": 41,
+   "com": 64,
+   "con": 62,
+   "clu": 57
+  },
+  "potential": {
+   "mec": 61,
+   "sen": 67,
+   "lan": 64,
+   "tft": 61,
+   "mac": 47,
+   "com": 72,
+   "con": 67,
+   "clu": 61
+  },
+  "club": "emberfen_hounds"
+ },
+ {
+  "id": "p071",
+  "name": "Zelley",
+  "placeholder": true,
+  "age": 21,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "top",
+  "role_secondary": "jg",
+  "stats": {
+   "mec": 58,
+   "sen": 61,
+   "lan": 53,
+   "tft": 53,
+   "mac": 65,
+   "com": 64,
+   "con": 75,
+   "clu": 45
+  },
+  "potential": {
+   "mec": 62,
+   "sen": 61,
+   "lan": 53,
+   "tft": 55,
+   "mac": 80,
+   "com": 65,
+   "con": 93,
+   "clu": 62
+  },
+  "club": "stormvale_herons"
+ },
+ {
+  "id": "p072",
+  "name": "Caeljin",
+  "placeholder": true,
+  "age": 26,
+  "country": "DE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 50,
+   "sen": 75,
+   "lan": 65,
+   "tft": 51,
+   "mac": 51,
+   "com": 65,
+   "con": 63,
+   "clu": 55
+  },
+  "potential": {
+   "mec": 59,
+   "sen": 76,
+   "lan": 71,
+   "tft": 53,
+   "mac": 54,
+   "com": 74,
+   "con": 75,
+   "clu": 60
+  },
+  "club": "stormvale_herons"
+ },
+ {
+  "id": "p073",
+  "name": "Paxsel",
+  "placeholder": true,
+  "age": 23,
+  "country": "DE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 56,
+   "sen": 53,
+   "lan": 51,
+   "tft": 55,
+   "mac": 63,
+   "com": 56,
+   "con": 50,
+   "clu": 65
+  },
+  "potential": {
+   "mec": 74,
+   "sen": 70,
+   "lan": 69,
+   "tft": 68,
+   "mac": 77,
+   "com": 66,
+   "con": 59,
+   "clu": 69
+  },
+  "club": "stormvale_herons"
+ },
+ {
+  "id": "p074",
+  "name": "Nyxjin",
+  "placeholder": true,
+  "age": 24,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "jg",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 63,
+   "sen": 59,
+   "lan": 45,
+   "tft": 51,
+   "mac": 68,
+   "com": 69,
+   "con": 62,
+   "clu": 57
+  },
+  "potential": {
+   "mec": 65,
+   "sen": 73,
+   "lan": 61,
+   "tft": 55,
+   "mac": 76,
+   "com": 75,
+   "con": 72,
+   "clu": 62
+  },
+  "club": "stormvale_herons"
+ },
+ {
+  "id": "p075",
+  "name": "Irehex",
+  "placeholder": true,
+  "age": 26,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "mid",
+  "role_secondary": "bot",
+  "stats": {
+   "mec": 65,
+   "sen": 40,
+   "lan": 65,
+   "tft": 61,
+   "mac": 61,
+   "com": 48,
+   "con": 46,
+   "clu": 49
+  },
+  "potential": {
+   "mec": 73,
+   "sen": 46,
+   "lan": 65,
+   "tft": 64,
+   "mac": 63,
+   "com": 52,
+   "con": 48,
+   "clu": 50
+  },
+  "club": "stormvale_herons"
+ },
+ {
+  "id": "p076",
+  "name": "Falkai",
+  "placeholder": true,
+  "age": 27,
+  "country": "FR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "mid",
+  "role_secondary": "bot",
+  "stats": {
+   "mec": 57,
+   "sen": 62,
+   "lan": 62,
+   "tft": 58,
+   "mac": 45,
+   "com": 68,
+   "con": 63,
+   "clu": 63
+  },
+  "potential": {
+   "mec": 62,
+   "sen": 66,
+   "lan": 65,
+   "tft": 61,
+   "mac": 45,
+   "com": 71,
+   "con": 66,
+   "clu": 67
+  },
+  "club": "stormvale_herons"
+ },
+ {
+  "id": "p077",
+  "name": "Junfin",
+  "placeholder": true,
+  "age": 21,
+  "country": "BR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 57,
+   "sen": 56,
+   "lan": 62,
+   "tft": 57,
+   "mac": 47,
+   "com": 55,
+   "con": 42,
+   "clu": 74
+  },
+  "potential": {
+   "mec": 66,
+   "sen": 65,
+   "lan": 84,
+   "tft": 72,
+   "mac": 49,
+   "com": 59,
+   "con": 62,
+   "clu": 83
+  },
+  "club": "stormvale_herons"
+ },
+ {
+  "id": "p078",
+  "name": "Talgus",
+  "placeholder": true,
+  "age": 22,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 56,
+   "sen": 57,
+   "lan": 52,
+   "tft": 60,
+   "mac": 57,
+   "com": 68,
+   "con": 47,
+   "clu": 80
+  },
+  "potential": {
+   "mec": 59,
+   "sen": 71,
+   "lan": 53,
+   "tft": 68,
+   "mac": 76,
+   "com": 81,
+   "con": 64,
+   "clu": 81
+  },
+  "club": "stormvale_herons"
+ },
+ {
+  "id": "p079",
+  "name": "Holjin",
+  "placeholder": true,
+  "age": 27,
+  "country": "VN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "sup",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 47,
+   "sen": 58,
+   "lan": 47,
+   "tft": 51,
+   "mac": 61,
+   "com": 67,
+   "con": 71,
+   "clu": 58
+  },
+  "potential": {
+   "mec": 49,
+   "sen": 63,
+   "lan": 52,
+   "tft": 55,
+   "mac": 68,
+   "com": 71,
+   "con": 71,
+   "clu": 61
+  },
+  "club": "stormvale_herons"
+ },
+ {
+  "id": "p080",
+  "name": "Eldkai",
+  "placeholder": true,
+  "age": 20,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 56,
+   "sen": 63,
+   "lan": 65,
+   "tft": 53,
+   "mac": 52,
+   "com": 53,
+   "con": 54,
+   "clu": 77
+  },
+  "potential": {
+   "mec": 74,
+   "sen": 77,
+   "lan": 65,
+   "tft": 59,
+   "mac": 70,
+   "com": 63,
+   "con": 69,
+   "clu": 82
+  },
+  "club": "stormvale_herons"
+ },
+ {
+  "id": "p081",
+  "name": "Zello",
+  "placeholder": true,
+  "age": 21,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "top",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 59,
+   "sen": 53,
+   "lan": 79,
+   "tft": 71,
+   "mac": 55,
+   "com": 61,
+   "con": 53,
+   "clu": 56
+  },
+  "potential": {
+   "mec": 62,
+   "sen": 65,
+   "lan": 99,
+   "tft": 81,
+   "mac": 67,
+   "com": 67,
+   "con": 70,
+   "clu": 71
+  },
+  "club": "thornwick_stags"
+ },
+ {
+  "id": "p082",
+  "name": "Talxo",
+  "placeholder": true,
+  "age": 21,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 63,
+   "sen": 67,
+   "lan": 72,
+   "tft": 70,
+   "mac": 62,
+   "com": 60,
+   "con": 78,
+   "clu": 63
+  },
+  "potential": {
+   "mec": 79,
+   "sen": 77,
+   "lan": 92,
+   "tft": 86,
+   "mac": 70,
+   "com": 78,
+   "con": 81,
+   "clu": 77
+  },
+  "club": "thornwick_stags"
+ },
+ {
+  "id": "p083",
+  "name": "Zelsen",
+  "placeholder": true,
+  "age": 23,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "jg",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 78,
+   "sen": 52,
+   "lan": 57,
+   "tft": 57,
+   "mac": 71,
+   "com": 57,
+   "con": 74,
+   "clu": 56
+  },
+  "potential": {
+   "mec": 89,
+   "sen": 68,
+   "lan": 69,
+   "tft": 74,
+   "mac": 78,
+   "com": 68,
+   "con": 79,
+   "clu": 61
+  },
+  "club": "thornwick_stags"
+ },
+ {
+  "id": "p084",
+  "name": "Nyxvik",
+  "placeholder": true,
+  "age": 25,
+  "country": "DE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "jg",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 54,
+   "sen": 58,
+   "lan": 59,
+   "tft": 60,
+   "mac": 60,
+   "com": 53,
+   "con": 63,
+   "clu": 72
+  },
+  "potential": {
+   "mec": 66,
+   "sen": 70,
+   "lan": 61,
+   "tft": 67,
+   "mac": 72,
+   "com": 54,
+   "con": 67,
+   "clu": 79
+  },
+  "club": "thornwick_stags"
+ },
+ {
+  "id": "p085",
+  "name": "Paxzen",
+  "placeholder": true,
+  "age": 29,
+  "country": "BR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "mid",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 82,
+   "sen": 56,
+   "lan": 47,
+   "tft": 66,
+   "mac": 59,
+   "com": 58,
+   "con": 62,
+   "clu": 56
+  },
+  "potential": {
+   "mec": 86,
+   "sen": 63,
+   "lan": 50,
+   "tft": 74,
+   "mac": 64,
+   "com": 59,
+   "con": 70,
+   "clu": 56
+  },
+  "club": "thornwick_stags"
+ },
+ {
+  "id": "p086",
+  "name": "Dovzen",
+  "placeholder": true,
+  "age": 27,
+  "country": "US",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "mid",
+  "role_secondary": "jg",
+  "stats": {
+   "mec": 69,
+   "sen": 64,
+   "lan": 70,
+   "tft": 53,
+   "mac": 51,
+   "com": 72,
+   "con": 65,
+   "clu": 65
+  },
+  "potential": {
+   "mec": 77,
+   "sen": 67,
+   "lan": 76,
+   "tft": 53,
+   "mac": 56,
+   "com": 77,
+   "con": 67,
+   "clu": 67
+  },
+  "club": "thornwick_stags"
+ },
+ {
+  "id": "p087",
+  "name": "Eskmont",
+  "placeholder": true,
+  "age": 22,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 73,
+   "sen": 61,
+   "lan": 44,
+   "tft": 51,
+   "mac": 60,
+   "com": 54,
+   "con": 53,
+   "clu": 54
+  },
+  "potential": {
+   "mec": 78,
+   "sen": 68,
+   "lan": 49,
+   "tft": 58,
+   "mac": 67,
+   "com": 76,
+   "con": 55,
+   "clu": 69
+  },
+  "club": "thornwick_stags"
+ },
+ {
+  "id": "p088",
+  "name": "Ormpyre",
+  "placeholder": true,
+  "age": 21,
+  "country": "AU",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 56,
+   "sen": 68,
+   "lan": 64,
+   "tft": 67,
+   "mac": 65,
+   "com": 63,
+   "con": 68,
+   "clu": 63
+  },
+  "potential": {
+   "mec": 78,
+   "sen": 81,
+   "lan": 65,
+   "tft": 78,
+   "mac": 76,
+   "com": 77,
+   "con": 75,
+   "clu": 82
+  },
+  "club": "thornwick_stags"
+ },
+ {
+  "id": "p089",
+  "name": "Britor",
+  "placeholder": true,
+  "age": 18,
+  "country": "FR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "sup",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 57,
+   "sen": 56,
+   "lan": 41,
+   "tft": 58,
+   "mac": 53,
+   "com": 70,
+   "con": 70,
+   "clu": 72
+  },
+  "potential": {
+   "mec": 71,
+   "sen": 61,
+   "lan": 43,
+   "tft": 63,
+   "mac": 70,
+   "com": 93,
+   "con": 88,
+   "clu": 86
+  },
+  "club": "thornwick_stags"
+ },
+ {
+  "id": "p090",
+  "name": "Caeltor",
+  "placeholder": true,
+  "age": 17,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 52,
+   "sen": 61,
+   "lan": 72,
+   "tft": 72,
+   "mac": 70,
+   "com": 62,
+   "con": 72,
+   "clu": 64
+  },
+  "potential": {
+   "mec": 68,
+   "sen": 65,
+   "lan": 91,
+   "tft": 73,
+   "mac": 83,
+   "com": 64,
+   "con": 80,
+   "clu": 69
+  },
+  "club": "thornwick_stags"
+ },
+ {
+  "id": "p091",
+  "name": "Corley",
+  "placeholder": true,
+  "age": 30,
+  "country": "US",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "top",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 61,
+   "sen": 59,
+   "lan": 56,
+   "tft": 55,
+   "mac": 58,
+   "com": 66,
+   "con": 71,
+   "clu": 69
+  },
+  "potential": {
+   "mec": 64,
+   "sen": 62,
+   "lan": 56,
+   "tft": 60,
+   "mac": 59,
+   "com": 66,
+   "con": 75,
+   "clu": 69
+  },
+  "club": "saltmarrow_gulls"
+ },
+ {
+  "id": "p092",
+  "name": "Ashdor",
+  "placeholder": true,
+  "age": 23,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 62,
+   "sen": 60,
+   "lan": 84,
+   "tft": 60,
+   "mac": 64,
+   "com": 75,
+   "con": 66,
+   "clu": 60
+  },
+  "potential": {
+   "mec": 65,
+   "sen": 70,
+   "lan": 93,
+   "tft": 71,
+   "mac": 77,
+   "com": 92,
+   "con": 69,
+   "clu": 66
+  },
+  "club": "saltmarrow_gulls"
+ },
+ {
+  "id": "p093",
+  "name": "Holfin",
+  "placeholder": true,
+  "age": 24,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 54,
+   "sen": 65,
+   "lan": 59,
+   "tft": 61,
+   "mac": 80,
+   "com": 63,
+   "con": 64,
+   "clu": 66
+  },
+  "potential": {
+   "mec": 70,
+   "sen": 82,
+   "lan": 64,
+   "tft": 70,
+   "mac": 81,
+   "com": 68,
+   "con": 65,
+   "clu": 74
+  },
+  "club": "saltmarrow_gulls"
+ },
+ {
+  "id": "p094",
+  "name": "Mormont",
+  "placeholder": true,
+  "age": 20,
+  "country": "FR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "jg",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 66,
+   "sen": 68,
+   "lan": 71,
+   "tft": 51,
+   "mac": 67,
+   "com": 71,
+   "con": 68,
+   "clu": 70
+  },
+  "potential": {
+   "mec": 67,
+   "sen": 78,
+   "lan": 78,
+   "tft": 72,
+   "mac": 78,
+   "com": 82,
+   "con": 69,
+   "clu": 92
+  },
+  "club": "saltmarrow_gulls"
+ },
+ {
+  "id": "p095",
+  "name": "Lumley",
+  "placeholder": true,
+  "age": 26,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 67,
+   "sen": 62,
+   "lan": 59,
+   "tft": 72,
+   "mac": 66,
+   "com": 62,
+   "con": 56,
+   "clu": 66
+  },
+  "potential": {
+   "mec": 78,
+   "sen": 62,
+   "lan": 67,
+   "tft": 72,
+   "mac": 75,
+   "com": 70,
+   "con": 62,
+   "clu": 66
+  },
+  "club": "saltmarrow_gulls"
+ },
+ {
+  "id": "p096",
+  "name": "Rivmir",
+  "placeholder": true,
+  "age": 23,
+  "country": "BR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 82,
+   "sen": 73,
+   "lan": 61,
+   "tft": 64,
+   "mac": 65,
+   "com": 69,
+   "con": 68,
+   "clu": 70
+  },
+  "potential": {
+   "mec": 86,
+   "sen": 88,
+   "lan": 78,
+   "tft": 72,
+   "mac": 79,
+   "com": 74,
+   "con": 75,
+   "clu": 80
+  },
+  "club": "saltmarrow_gulls"
+ },
+ {
+  "id": "p097",
+  "name": "Ormnox",
+  "placeholder": true,
+  "age": 23,
+  "country": "AU",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "bot",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 76,
+   "sen": 59,
+   "lan": 64,
+   "tft": 74,
+   "mac": 59,
+   "com": 76,
+   "con": 62,
+   "clu": 77
+  },
+  "potential": {
+   "mec": 90,
+   "sen": 60,
+   "lan": 69,
+   "tft": 92,
+   "mac": 60,
+   "com": 81,
+   "con": 68,
+   "clu": 81
+  },
+  "club": "saltmarrow_gulls"
+ },
+ {
+  "id": "p098",
+  "name": "Soltor",
+  "placeholder": true,
+  "age": 22,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "bot",
+  "role_secondary": "jg",
+  "stats": {
+   "mec": 66,
+   "sen": 67,
+   "lan": 64,
+   "tft": 66,
+   "mac": 71,
+   "com": 55,
+   "con": 65,
+   "clu": 60
+  },
+  "potential": {
+   "mec": 85,
+   "sen": 89,
+   "lan": 68,
+   "tft": 74,
+   "mac": 84,
+   "com": 60,
+   "con": 68,
+   "clu": 61
+  },
+  "club": "saltmarrow_gulls"
+ },
+ {
+  "id": "p099",
+  "name": "Ormgus",
+  "placeholder": true,
+  "age": 21,
+  "country": "TW",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "sup",
+  "role_secondary": "jg",
+  "stats": {
+   "mec": 71,
+   "sen": 57,
+   "lan": 53,
+   "tft": 66,
+   "mac": 69,
+   "com": 75,
+   "con": 69,
+   "clu": 77
+  },
+  "potential": {
+   "mec": 79,
+   "sen": 65,
+   "lan": 67,
+   "tft": 87,
+   "mac": 84,
+   "com": 75,
+   "con": 79,
+   "clu": 81
+  },
+  "club": "saltmarrow_gulls"
+ },
+ {
+  "id": "p100",
+  "name": "Vexnox",
+  "placeholder": true,
+  "age": 25,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "sup",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 59,
+   "sen": 71,
+   "lan": 64,
+   "tft": 85,
+   "mac": 69,
+   "com": 54,
+   "con": 70,
+   "clu": 81
+  },
+  "potential": {
+   "mec": 63,
+   "sen": 75,
+   "lan": 67,
+   "tft": 91,
+   "mac": 77,
+   "com": 56,
+   "con": 75,
+   "clu": 85
+  },
+  "club": "saltmarrow_gulls"
+ },
+ {
+  "id": "p101",
+  "name": "Caelric",
+  "placeholder": true,
+  "age": 27,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "top",
+  "role_secondary": "bot",
+  "stats": {
+   "mec": 49,
+   "sen": 28,
+   "lan": 50,
+   "tft": 35,
+   "mac": 47,
+   "com": 35,
+   "con": 54,
+   "clu": 41
+  },
+  "potential": {
+   "mec": 56,
+   "sen": 30,
+   "lan": 56,
+   "tft": 35,
+   "mac": 54,
+   "com": 40,
+   "con": 59,
+   "clu": 45
+  },
+  "club": null
+ },
+ {
+  "id": "p102",
+  "name": "Solbane",
+  "placeholder": true,
+  "age": 17,
+  "country": "SE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 51,
+   "sen": 42,
+   "lan": 58,
+   "tft": 57,
+   "mac": 46,
+   "com": 49,
+   "con": 44,
+   "clu": 38
+  },
+  "potential": {
+   "mec": 75,
+   "sen": 59,
+   "lan": 76,
+   "tft": 80,
+   "mac": 66,
+   "com": 58,
+   "con": 58,
+   "clu": 50
+  },
+  "club": null
+ },
+ {
+  "id": "p103",
+  "name": "Rivric",
+  "placeholder": true,
+  "age": 25,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 38,
+   "sen": 39,
+   "lan": 46,
+   "tft": 44,
+   "mac": 47,
+   "com": 51,
+   "con": 51,
+   "clu": 53
+  },
+  "potential": {
+   "mec": 40,
+   "sen": 45,
+   "lan": 51,
+   "tft": 53,
+   "mac": 57,
+   "com": 60,
+   "con": 59,
+   "clu": 61
+  },
+  "club": null
+ },
+ {
+  "id": "p104",
+  "name": "Bramjin",
+  "placeholder": true,
+  "age": 24,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 31,
+   "sen": 43,
+   "lan": 34,
+   "tft": 39,
+   "mac": 52,
+   "com": 40,
+   "con": 46,
+   "clu": 47
+  },
+  "potential": {
+   "mec": 46,
+   "sen": 54,
+   "lan": 36,
+   "tft": 45,
+   "mac": 54,
+   "com": 46,
+   "con": 58,
+   "clu": 53
+  },
+  "club": null
+ },
+ {
+  "id": "p105",
+  "name": "Grizen",
+  "placeholder": true,
+  "age": 20,
+  "country": "US",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "top",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 46,
+   "sen": 70,
+   "lan": 26,
+   "tft": 48,
+   "mac": 41,
+   "com": 34,
+   "con": 49,
+   "clu": 41
+  },
+  "potential": {
+   "mec": 67,
+   "sen": 77,
+   "lan": 47,
+   "tft": 54,
+   "mac": 41,
+   "com": 46,
+   "con": 67,
+   "clu": 61
+  },
+  "club": null
+ },
+ {
+  "id": "p106",
+  "name": "Umbmir",
+  "placeholder": true,
+  "age": 23,
+  "country": "FR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 50,
+   "sen": 33,
+   "lan": 54,
+   "tft": 50,
+   "mac": 43,
+   "com": 46,
+   "con": 51,
+   "clu": 44
+  },
+  "potential": {
+   "mec": 63,
+   "sen": 41,
+   "lan": 64,
+   "tft": 62,
+   "mac": 61,
+   "com": 64,
+   "con": 62,
+   "clu": 46
+  },
+  "club": null
+ },
+ {
+  "id": "p107",
+  "name": "Bramtor",
+  "placeholder": true,
+  "age": 23,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 57,
+   "sen": 41,
+   "lan": 36,
+   "tft": 46,
+   "mac": 56,
+   "com": 39,
+   "con": 27,
+   "clu": 38
+  },
+  "potential": {
+   "mec": 75,
+   "sen": 57,
+   "lan": 47,
+   "tft": 59,
+   "mac": 61,
+   "com": 56,
+   "con": 38,
+   "clu": 49
+  },
+  "club": null
+ },
+ {
+  "id": "p108",
+  "name": "Dunwyn",
+  "placeholder": true,
+  "age": 18,
+  "country": "JP",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "top",
+  "role_secondary": null,
+  "stats": {
+   "mec": 35,
+   "sen": 33,
+   "lan": 55,
+   "tft": 54,
+   "mac": 49,
+   "com": 40,
+   "con": 31,
+   "clu": 59
+  },
+  "potential": {
+   "mec": 53,
+   "sen": 52,
+   "lan": 63,
+   "tft": 64,
+   "mac": 67,
+   "com": 52,
+   "con": 55,
+   "clu": 61
+  },
+  "club": null
+ },
+ {
+  "id": "p109",
+  "name": "Solvik",
+  "placeholder": true,
+  "age": 19,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "jg",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 46,
+   "sen": 54,
+   "lan": 37,
+   "tft": 54,
+   "mac": 56,
+   "com": 33,
+   "con": 45,
+   "clu": 44
+  },
+  "potential": {
+   "mec": 51,
+   "sen": 77,
+   "lan": 48,
+   "tft": 59,
+   "mac": 65,
+   "com": 44,
+   "con": 46,
+   "clu": 58
+  },
+  "club": null
+ },
+ {
+  "id": "p110",
+  "name": "Wrenley",
+  "placeholder": true,
+  "age": 18,
+  "country": "TW",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 26,
+   "sen": 54,
+   "lan": 48,
+   "tft": 27,
+   "mac": 51,
+   "com": 45,
+   "con": 35,
+   "clu": 40
+  },
+  "potential": {
+   "mec": 28,
+   "sen": 79,
+   "lan": 57,
+   "tft": 39,
+   "mac": 71,
+   "com": 47,
+   "con": 56,
+   "clu": 63
+  },
+  "club": null
+ },
+ {
+  "id": "p111",
+  "name": "Yormont",
+  "placeholder": true,
+  "age": 24,
+  "country": "US",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "jg",
+  "role_secondary": "bot",
+  "stats": {
+   "mec": 58,
+   "sen": 44,
+   "lan": 34,
+   "tft": 47,
+   "mac": 44,
+   "com": 49,
+   "con": 42,
+   "clu": 52
+  },
+  "potential": {
+   "mec": 69,
+   "sen": 52,
+   "lan": 48,
+   "tft": 57,
+   "mac": 52,
+   "com": 49,
+   "con": 44,
+   "clu": 59
+  },
+  "club": null
+ },
+ {
+  "id": "p112",
+  "name": "Dunmir",
+  "placeholder": true,
+  "age": 23,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "jg",
+  "role_secondary": "bot",
+  "stats": {
+   "mec": 38,
+   "sen": 51,
+   "lan": 32,
+   "tft": 29,
+   "mac": 50,
+   "com": 42,
+   "con": 41,
+   "clu": 25
+  },
+  "potential": {
+   "mec": 56,
+   "sen": 67,
+   "lan": 34,
+   "tft": 42,
+   "mac": 50,
+   "com": 60,
+   "con": 53,
+   "clu": 39
+  },
+  "club": null
+ },
+ {
+  "id": "p113",
+  "name": "Dunpyre",
+  "placeholder": true,
+  "age": 18,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 35,
+   "sen": 51,
+   "lan": 48,
+   "tft": 34,
+   "mac": 38,
+   "com": 48,
+   "con": 46,
+   "clu": 53
+  },
+  "potential": {
+   "mec": 53,
+   "sen": 51,
+   "lan": 70,
+   "tft": 42,
+   "mac": 40,
+   "com": 71,
+   "con": 52,
+   "clu": 69
+  },
+  "club": null
+ },
+ {
+  "id": "p114",
+  "name": "Eldvik",
+  "placeholder": true,
+  "age": 23,
+  "country": "BR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 39,
+   "sen": 63,
+   "lan": 25,
+   "tft": 48,
+   "mac": 80,
+   "com": 46,
+   "con": 44,
+   "clu": 39
+  },
+  "potential": {
+   "mec": 44,
+   "sen": 66,
+   "lan": 40,
+   "tft": 53,
+   "mac": 93,
+   "com": 60,
+   "con": 58,
+   "clu": 39
+  },
+  "club": null
+ },
+ {
+  "id": "p115",
+  "name": "Vexrix",
+  "placeholder": true,
+  "age": 26,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "jg",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 40,
+   "sen": 38,
+   "lan": 42,
+   "tft": 38,
+   "mac": 39,
+   "com": 48,
+   "con": 41,
+   "clu": 56
+  },
+  "potential": {
+   "mec": 43,
+   "sen": 44,
+   "lan": 53,
+   "tft": 50,
+   "mac": 45,
+   "com": 53,
+   "con": 51,
+   "clu": 58
+  },
+  "club": null
+ },
+ {
+  "id": "p116",
+  "name": "Dunlo",
+  "placeholder": true,
+  "age": 28,
+  "country": "DE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "stats": {
+   "mec": 42,
+   "sen": 57,
+   "lan": 55,
+   "tft": 33,
+   "mac": 47,
+   "com": 61,
+   "con": 50,
+   "clu": 45
+  },
+  "potential": {
+   "mec": 42,
+   "sen": 61,
+   "lan": 56,
+   "tft": 37,
+   "mac": 54,
+   "com": 67,
+   "con": 58,
+   "clu": 48
+  },
+  "club": null
+ },
+ {
+  "id": "p117",
+  "name": "Solgus",
+  "placeholder": true,
+  "age": 23,
+  "country": "DE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 45,
+   "sen": 45,
+   "lan": 40,
+   "tft": 32,
+   "mac": 46,
+   "com": 42,
+   "con": 36,
+   "clu": 53
+  },
+  "potential": {
+   "mec": 59,
+   "sen": 46,
+   "lan": 53,
+   "tft": 49,
+   "mac": 50,
+   "com": 55,
+   "con": 44,
+   "clu": 60
+  },
+  "club": null
+ },
+ {
+  "id": "p118",
+  "name": "Umbjin",
+  "placeholder": true,
+  "age": 23,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "mid",
+  "role_secondary": "jg",
+  "stats": {
+   "mec": 62,
+   "sen": 40,
+   "lan": 45,
+   "tft": 44,
+   "mac": 45,
+   "com": 39,
+   "con": 35,
+   "clu": 51
+  },
+  "potential": {
+   "mec": 68,
+   "sen": 40,
+   "lan": 48,
+   "tft": 58,
+   "mac": 48,
+   "com": 57,
+   "con": 46,
+   "clu": 69
+  },
+  "club": null
+ },
+ {
+  "id": "p119",
+  "name": "Nyxley",
+  "placeholder": true,
+  "age": 21,
+  "country": "CN",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 44,
+   "sen": 43,
+   "lan": 57,
+   "tft": 56,
+   "mac": 60,
+   "com": 47,
+   "con": 62,
+   "clu": 55
+  },
+  "potential": {
+   "mec": 65,
+   "sen": 50,
+   "lan": 74,
+   "tft": 62,
+   "mac": 63,
+   "com": 68,
+   "con": 79,
+   "clu": 73
+  },
+  "club": null
+ },
+ {
+  "id": "p120",
+  "name": "Irelo",
+  "placeholder": true,
+  "age": 23,
+  "country": "SE",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 51,
+   "sen": 44,
+   "lan": 38,
+   "tft": 49,
+   "mac": 43,
+   "com": 49,
+   "con": 56,
+   "clu": 40
+  },
+  "potential": {
+   "mec": 52,
+   "sen": 47,
+   "lan": 46,
+   "tft": 53,
+   "mac": 60,
+   "com": 65,
+   "con": 64,
+   "clu": 42
+  },
+  "club": null
+ },
+ {
+  "id": "p121",
+  "name": "Umbbane",
+  "placeholder": true,
+  "age": 23,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 51,
+   "sen": 32,
+   "lan": 31,
+   "tft": 40,
+   "mac": 45,
+   "com": 52,
+   "con": 41,
+   "clu": 33
+  },
+  "potential": {
+   "mec": 56,
+   "sen": 37,
+   "lan": 47,
+   "tft": 45,
+   "mac": 61,
+   "com": 54,
+   "con": 46,
+   "clu": 50
+  },
+  "club": null
+ },
+ {
+  "id": "p122",
+  "name": "Rivdor",
+  "placeholder": true,
+  "age": 17,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 54,
+   "sen": 37,
+   "lan": 59,
+   "tft": 39,
+   "mac": 38,
+   "com": 50,
+   "con": 36,
+   "clu": 51
+  },
+  "potential": {
+   "mec": 79,
+   "sen": 55,
+   "lan": 75,
+   "tft": 59,
+   "mac": 48,
+   "com": 57,
+   "con": 61,
+   "clu": 62
+  },
+  "club": null
+ },
+ {
+  "id": "p123",
+  "name": "Solkai",
+  "placeholder": true,
+  "age": 22,
+  "country": "US",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "stats": {
+   "mec": 43,
+   "sen": 44,
+   "lan": 39,
+   "tft": 29,
+   "mac": 38,
+   "com": 39,
+   "con": 40,
+   "clu": 43
+  },
+  "potential": {
+   "mec": 46,
+   "sen": 53,
+   "lan": 55,
+   "tft": 36,
+   "mac": 39,
+   "com": 41,
+   "con": 52,
+   "clu": 53
+  },
+  "club": null
+ },
+ {
+  "id": "p124",
+  "name": "Vexlo",
+  "placeholder": true,
+  "age": 22,
+  "country": "TW",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "mid",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 53,
+   "sen": 42,
+   "lan": 52,
+   "tft": 59,
+   "mac": 42,
+   "com": 39,
+   "con": 40,
+   "clu": 34
+  },
+  "potential": {
+   "mec": 57,
+   "sen": 54,
+   "lan": 52,
+   "tft": 72,
+   "mac": 64,
+   "com": 59,
+   "con": 44,
+   "clu": 39
+  },
+  "club": null
+ },
+ {
+  "id": "p125",
+  "name": "Falxo",
+  "placeholder": true,
+  "age": 21,
+  "country": "MY",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 51,
+   "sen": 36,
+   "lan": 46,
+   "tft": 54,
+   "mac": 46,
+   "com": 49,
+   "con": 48,
+   "clu": 53
+  },
+  "potential": {
+   "mec": 71,
+   "sen": 49,
+   "lan": 64,
+   "tft": 56,
+   "mac": 59,
+   "com": 70,
+   "con": 54,
+   "clu": 57
+  },
+  "club": null
+ },
+ {
+  "id": "p126",
+  "name": "Corkai",
+  "placeholder": true,
+  "age": 23,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 50,
+   "sen": 36,
+   "lan": 41,
+   "tft": 38,
+   "mac": 44,
+   "com": 48,
+   "con": 51,
+   "clu": 60
+  },
+  "potential": {
+   "mec": 67,
+   "sen": 54,
+   "lan": 56,
+   "tft": 52,
+   "mac": 45,
+   "com": 62,
+   "con": 60,
+   "clu": 78
+  },
+  "club": null
+ },
+ {
+  "id": "p127",
+  "name": "Dovgus",
+  "placeholder": true,
+  "age": 22,
+  "country": "JP",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 38,
+   "sen": 27,
+   "lan": 34,
+   "tft": 33,
+   "mac": 46,
+   "com": 48,
+   "con": 32,
+   "clu": 54
+  },
+  "potential": {
+   "mec": 52,
+   "sen": 46,
+   "lan": 34,
+   "tft": 35,
+   "mac": 66,
+   "com": 65,
+   "con": 43,
+   "clu": 74
+  },
+  "club": null
+ },
+ {
+  "id": "p128",
+  "name": "Nyxzen",
+  "placeholder": true,
+  "age": 26,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 56,
+   "sen": 31,
+   "lan": 45,
+   "tft": 56,
+   "mac": 32,
+   "com": 41,
+   "con": 41,
+   "clu": 53
+  },
+  "potential": {
+   "mec": 66,
+   "sen": 36,
+   "lan": 55,
+   "tft": 68,
+   "mac": 37,
+   "com": 53,
+   "con": 44,
+   "clu": 64
+  },
+  "club": null
+ },
+ {
+  "id": "p129",
+  "name": "Iresel",
+  "placeholder": true,
+  "age": 28,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "bot",
+  "role_secondary": "sup",
+  "stats": {
+   "mec": 49,
+   "sen": 52,
+   "lan": 47,
+   "tft": 60,
+   "mac": 33,
+   "com": 35,
+   "con": 41,
+   "clu": 54
+  },
+  "potential": {
+   "mec": 49,
+   "sen": 55,
+   "lan": 53,
+   "tft": 64,
+   "mac": 41,
+   "com": 36,
+   "con": 41,
+   "clu": 58
+  },
+  "club": null
+ },
+ {
+  "id": "p130",
+  "name": "Xansen",
+  "placeholder": true,
+  "age": 22,
+  "country": "KR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 36,
+   "sen": 41,
+   "lan": 63,
+   "tft": 44,
+   "mac": 47,
+   "com": 50,
+   "con": 49,
+   "clu": 58
+  },
+  "potential": {
+   "mec": 53,
+   "sen": 57,
+   "lan": 76,
+   "tft": 59,
+   "mac": 60,
+   "com": 63,
+   "con": 67,
+   "clu": 79
+  },
+  "club": null
+ },
+ {
+  "id": "p131",
+  "name": "Ashxo",
+  "placeholder": true,
+  "age": 28,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 48,
+   "sen": 39,
+   "lan": 51,
+   "tft": 42,
+   "mac": 33,
+   "com": 45,
+   "con": 60,
+   "clu": 36
+  },
+  "potential": {
+   "mec": 53,
+   "sen": 40,
+   "lan": 51,
+   "tft": 47,
+   "mac": 38,
+   "com": 51,
+   "con": 64,
+   "clu": 38
+  },
+  "club": null
+ },
+ {
+  "id": "p132",
+  "name": "Bramgus",
+  "placeholder": true,
+  "age": 24,
+  "country": "TW",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "stats": {
+   "mec": 60,
+   "sen": 40,
+   "lan": 59,
+   "tft": 50,
+   "mac": 29,
+   "com": 56,
+   "con": 33,
+   "clu": 45
+  },
+  "potential": {
+   "mec": 72,
+   "sen": 51,
+   "lan": 66,
+   "tft": 50,
+   "mac": 29,
+   "com": 57,
+   "con": 45,
+   "clu": 59
+  },
+  "club": null
+ },
+ {
+  "id": "p133",
+  "name": "Solfin",
+  "placeholder": true,
+  "age": 27,
+  "country": "ID",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 38,
+   "sen": 43,
+   "lan": 50,
+   "tft": 37,
+   "mac": 54,
+   "com": 41,
+   "con": 53,
+   "clu": 51
+  },
+  "potential": {
+   "mec": 40,
+   "sen": 44,
+   "lan": 54,
+   "tft": 43,
+   "mac": 54,
+   "com": 47,
+   "con": 61,
+   "clu": 58
+  },
+  "club": null
+ },
+ {
+  "id": "p134",
+  "name": "Quosel",
+  "placeholder": true,
+  "age": 29,
+  "country": "TH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 55,
+   "sen": 51,
+   "lan": 49,
+   "tft": 37,
+   "mac": 49,
+   "com": 29,
+   "con": 47,
+   "clu": 44
+  },
+  "potential": {
+   "mec": 60,
+   "sen": 52,
+   "lan": 51,
+   "tft": 38,
+   "mac": 53,
+   "com": 35,
+   "con": 55,
+   "clu": 50
+  },
+  "club": null
+ },
+ {
+  "id": "p135",
+  "name": "Falsel",
+  "placeholder": true,
+  "age": 27,
+  "country": "TH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "balanced",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 45,
+   "sen": 49,
+   "lan": 54,
+   "tft": 41,
+   "mac": 43,
+   "com": 44,
+   "con": 42,
+   "clu": 54
+  },
+  "potential": {
+   "mec": 51,
+   "sen": 49,
+   "lan": 57,
+   "tft": 46,
+   "mac": 48,
+   "com": 48,
+   "con": 45,
+   "clu": 58
+  },
+  "club": null
+ },
+ {
+  "id": "p136",
+  "name": "Yorpyre",
+  "placeholder": true,
+  "age": 22,
+  "country": "FR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 40,
+   "sen": 58,
+   "lan": 38,
+   "tft": 54,
+   "mac": 49,
+   "com": 46,
+   "con": 39,
+   "clu": 59
+  },
+  "potential": {
+   "mec": 57,
+   "sen": 79,
+   "lan": 43,
+   "tft": 57,
+   "mac": 57,
+   "com": 46,
+   "con": 45,
+   "clu": 75
+  },
+  "club": null
+ },
+ {
+  "id": "p137",
+  "name": "Ormmir",
+  "placeholder": true,
+  "age": 17,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "sup",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 46,
+   "sen": 58,
+   "lan": 37,
+   "tft": 44,
+   "mac": 45,
+   "com": 46,
+   "con": 43,
+   "clu": 42
+  },
+  "potential": {
+   "mec": 52,
+   "sen": 82,
+   "lan": 57,
+   "tft": 53,
+   "mac": 46,
+   "com": 60,
+   "con": 68,
+   "clu": 65
+  },
+  "club": null
+ },
+ {
+  "id": "p138",
+  "name": "Morxo",
+  "placeholder": true,
+  "age": 21,
+  "country": "PH",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "temperamental",
+  "role_primary": "sup",
+  "role_secondary": "mid",
+  "stats": {
+   "mec": 43,
+   "sen": 50,
+   "lan": 56,
+   "tft": 42,
+   "mac": 46,
+   "com": 38,
+   "con": 59,
+   "clu": 43
+  },
+  "potential": {
+   "mec": 50,
+   "sen": 61,
+   "lan": 68,
+   "tft": 60,
+   "mac": 59,
+   "com": 44,
+   "con": 68,
+   "clu": 62
+  },
+  "club": null
+ },
+ {
+  "id": "p139",
+  "name": "Falfin",
+  "placeholder": true,
+  "age": 26,
+  "country": "FR",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "professional",
+  "role_primary": "sup",
+  "role_secondary": "top",
+  "stats": {
+   "mec": 47,
+   "sen": 48,
+   "lan": 37,
+   "tft": 56,
+   "mac": 43,
+   "com": 38,
+   "con": 39,
+   "clu": 43
+  },
+  "potential": {
+   "mec": 51,
+   "sen": 55,
+   "lan": 40,
+   "tft": 62,
+   "mac": 49,
+   "com": 38,
+   "con": 51,
+   "clu": 53
+  },
+  "club": null
+ },
+ {
+  "id": "p140",
+  "name": "Holpyre",
+  "placeholder": true,
+  "age": 26,
+  "country": "SG",
+  "languages": [
+   {
+    "lang": "en",
+    "fluency": 100
+   }
+  ],
+  "personality": "casual",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "stats": {
+   "mec": 43,
+   "sen": 35,
+   "lan": 34,
+   "tft": 37,
+   "mac": 42,
+   "com": 63,
+   "con": 30,
+   "clu": 46
+  },
+  "potential": {
+   "mec": 43,
+   "sen": 46,
+   "lan": 37,
+   "tft": 41,
+   "mac": 52,
+   "com": 71,
+   "con": 33,
+   "clu": 52
+  },
+  "club": null
+ }
+]

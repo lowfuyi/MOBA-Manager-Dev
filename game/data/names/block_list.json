@@ -1,0 +1,7 @@
+{
+  "note": "Best-effort block list for generated names (D-008). Entries are matched case-insensitively: equal to a generated name, or (for entries of 5+ letters) contained in it. Real players, handles and organizations must never appear. The IP Checker still reviews names before launch; this list is a safety net, not a clearance.",
+  "handles": ["Faker", "Uzi", "Doublelift", "Bjergsen", "Caps", "Perkz", "Rekkles", "Showmaker", "Chovy", "Keria", "Gumayusi", "Oner", "Zeus", "Deft", "TheShy", "Rookie", "JackeyLove", "Ruler", "Canyon", "Tarzan", "Meiko", "Peanut", "Clearlove", "Xpeke", "Froggen", "Sneaky", "Imaqtpie", "Dyrus", "Wildturtle", "Ambition", "Bengi", "Impact", "Pobelter", "Jensen", "Bwipo", "Hylissang", "Larssen", "Nuguri", "Khan", "Doran", "Miracle", "N0tail", "Topson", "Arteezy", "Dendi", "Puppey", "Yatoro", "Collapse", "Sumail", "Kuro", "Zven", "Mithy", "Selfmade", "Inspired", "Elyoya", "Humanoid", "Upset", "Carzzy", "Jankos", "Mikyx", "Trymbi"],
+  "orgs": ["Fnatic", "Cloud9", "Liquid", "Vitality", "Madlions", "Evil Geniuses", "Navi", "Alliance", "Evos", "Rrq", "Onic", "Bigetron", "Todak", "Falcons", "Tundra", "Geng", "Drx", "Blacklist", "Gamerlegion", "Heroic", "Astralis", "Faze", "Optic", "Sentinels", "Loud", "Pain", "Furia", "Talon", "Flash Wolves", "Hong Kong Attitude", "Counter Logic", "Immortals", "Dignitas", "Misfits", "Excel", "Rogue", "Schalke", "Origen", "Splyce", "Unicorns"],
+  "reference_hero_names": ["Dredge", "Gauntlet", "Monolith", "Oculus"],
+  "club_words_to_avoid": ["Cairn"]
+}

@@ -1,0 +1,239 @@
+{
+ "brannoch": {
+  "extra": [
+   "waveclear"
+  ],
+  "damage": "mixed"
+ },
+ "dunmarrow": {
+  "extra": [],
+  "damage": "magic"
+ },
+ "skarrow": {
+  "extra": [
+   "splitpush"
+  ],
+  "damage": "mixed"
+ },
+ "hegwin": {
+  "extra": [
+   "pick"
+  ],
+  "damage": "mixed"
+ },
+ "ottomere": {
+  "extra": [
+   "scaling"
+  ],
+  "damage": "physical"
+ },
+ "orrick": {
+  "extra": [
+   "scaling"
+  ],
+  "damage": "physical"
+ },
+ "vellgrim": {
+  "extra": [],
+  "damage": "magic"
+ },
+ "barrowick": {
+  "extra": [
+   "pick"
+  ],
+  "damage": "mixed"
+ },
+ "tuskal": {
+  "extra": [
+   "splitpush"
+  ],
+  "damage": "physical"
+ },
+ "gravenstone": {
+  "extra": [],
+  "damage": "physical"
+ },
+ "nimbrel": {
+  "extra": [
+   "splitpush"
+  ],
+  "damage": "mixed"
+ },
+ "marrek": {
+  "extra": [
+   "waveclear"
+  ],
+  "damage": "mixed"
+ },
+ "quillith": {
+  "extra": [
+   "waveclear"
+  ],
+  "damage": "mixed"
+ },
+ "wyldrim": {
+  "extra": [
+   "protect"
+  ],
+  "damage": "mixed"
+ },
+ "sootwing": {
+  "extra": [
+   "scaling"
+  ],
+  "damage": "mixed"
+ },
+ "veshra": {
+  "extra": [
+   "splitpush",
+   "waveclear"
+  ],
+  "damage": "mixed"
+ },
+ "ellowen": {
+  "extra": [
+   "poke"
+  ],
+  "damage": "mixed"
+ },
+ "cindrel": {
+  "extra": [
+   "poke"
+  ],
+  "damage": "mixed"
+ },
+ "dusken": {
+  "extra": [
+   "splitpush"
+  ],
+  "damage": "mixed"
+ },
+ "maurelle": {
+  "extra": [
+   "protect"
+  ],
+  "damage": "mixed"
+ },
+ "orisande": {
+  "extra": [
+   "splitpush"
+  ],
+  "damage": "mixed"
+ },
+ "tessarine": {
+  "extra": [
+   "scaling"
+  ],
+  "damage": "mixed"
+ },
+ "lanthorn": {
+  "extra": [
+   "scaling"
+  ],
+  "damage": "mixed"
+ },
+ "embrel": {
+  "extra": [
+   "poke"
+  ],
+  "damage": "magic"
+ },
+ "harkin": {
+  "extra": [
+   "waveclear",
+   "poke"
+  ],
+  "damage": "mixed"
+ },
+ "pellam": {
+  "extra": [
+   "protect"
+  ],
+  "damage": "mixed"
+ },
+ "tamsel": {
+  "extra": [
+   "protect"
+  ],
+  "damage": "magic"
+ },
+ "jorreck": {
+  "extra": [
+   "protect"
+  ],
+  "damage": "mixed"
+ },
+ "brixley": {
+  "extra": [
+   "splitpush"
+  ],
+  "damage": "mixed"
+ },
+ "dovrin": {
+  "extra": [
+   "splitpush"
+  ],
+  "damage": "magic"
+ },
+ "ketterick": {
+  "extra": [
+   "pick"
+  ],
+  "damage": "magic"
+ },
+ "sparrowe": {
+  "extra": [
+   "waveclear",
+   "poke"
+  ],
+  "damage": "physical"
+ },
+ "sunnivah": {
+  "extra": [
+   "scaling"
+  ],
+  "damage": "mixed"
+ },
+ "bastrel": {
+  "extra": [
+   "pick"
+  ],
+  "damage": "mixed"
+ },
+ "tanglewick": {
+  "extra": [
+   "poke"
+  ],
+  "damage": "mixed"
+ },
+ "alderwyn": {
+  "extra": [
+   "waveclear"
+  ],
+  "damage": "mixed"
+ },
+ "corvane": {
+  "extra": [
+   "pick"
+  ],
+  "damage": "magic"
+ },
+ "wyncote": {
+  "extra": [
+   "splitpush"
+  ],
+  "damage": "mixed"
+ },
+ "oriel": {
+  "extra": [
+   "waveclear"
+  ],
+  "damage": "mixed"
+ },
+ "fennimore": {
+  "extra": [
+   "waveclear"
+  ],
+  "damage": "mixed"
+ }
+}

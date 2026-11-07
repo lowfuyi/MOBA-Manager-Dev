@@ -1,0 +1,896 @@
+[
+ {
+  "id": "brannoch",
+  "name": "Brannoch",
+  "placeholder": true,
+  "archetype": "bruiser",
+  "role_primary": "top",
+  "role_secondary": "jg",
+  "power_early": 56,
+  "power_mid": 51,
+  "power_late": 43,
+  "damage_type": "mixed",
+  "range": "melee",
+  "difficulty": 2,
+  "tags": [
+   "frontline",
+   "waveclear"
+  ],
+  "strong_vs": [
+   "dunmarrow",
+   "hegwin"
+  ]
+ },
+ {
+  "id": "dunmarrow",
+  "name": "Dunmarrow",
+  "placeholder": true,
+  "archetype": "bulwark",
+  "role_primary": "top",
+  "role_secondary": null,
+  "power_early": 49,
+  "power_mid": 49,
+  "power_late": 49,
+  "damage_type": "magic",
+  "range": "melee",
+  "difficulty": 1,
+  "tags": [
+   "frontline",
+   "engage"
+  ],
+  "strong_vs": [
+   "skarrow",
+   "ottomere"
+  ]
+ },
+ {
+  "id": "skarrow",
+  "name": "Skarrow",
+  "placeholder": true,
+  "archetype": "bruiser",
+  "role_primary": "top",
+  "role_secondary": "jg",
+  "power_early": 57,
+  "power_mid": 52,
+  "power_late": 44,
+  "damage_type": "mixed",
+  "range": "melee",
+  "difficulty": 3,
+  "tags": [
+   "frontline",
+   "splitpush"
+  ],
+  "strong_vs": [
+   "hegwin",
+   "orrick"
+  ]
+ },
+ {
+  "id": "hegwin",
+  "name": "Hegwin",
+  "placeholder": true,
+  "archetype": "bruiser",
+  "role_primary": "top",
+  "role_secondary": "mid",
+  "power_early": 47,
+  "power_mid": 59,
+  "power_late": 47,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 3,
+  "tags": [
+   "frontline",
+   "pick"
+  ],
+  "strong_vs": [
+   "ottomere",
+   "vellgrim"
+  ]
+ },
+ {
+  "id": "ottomere",
+  "name": "Ottomere",
+  "placeholder": true,
+  "archetype": "bulwark",
+  "role_primary": "top",
+  "role_secondary": null,
+  "power_early": 42,
+  "power_mid": 50,
+  "power_late": 58,
+  "damage_type": "physical",
+  "range": "melee",
+  "difficulty": 2,
+  "tags": [
+   "frontline",
+   "engage",
+   "scaling"
+  ],
+  "strong_vs": [
+   "orrick",
+   "barrowick"
+  ]
+ },
+ {
+  "id": "orrick",
+  "name": "Orrick",
+  "placeholder": true,
+  "archetype": "bruiser",
+  "role_primary": "top",
+  "role_secondary": null,
+  "power_early": 44,
+  "power_mid": 52,
+  "power_late": 60,
+  "damage_type": "physical",
+  "range": "melee",
+  "difficulty": 4,
+  "tags": [
+   "frontline",
+   "scaling"
+  ],
+  "strong_vs": [
+   "vellgrim",
+   "brannoch"
+  ]
+ },
+ {
+  "id": "vellgrim",
+  "name": "Vellgrim",
+  "placeholder": true,
+  "archetype": "bulwark",
+  "role_primary": "top",
+  "role_secondary": "sup",
+  "power_early": 51,
+  "power_mid": 51,
+  "power_late": 51,
+  "damage_type": "magic",
+  "range": "melee",
+  "difficulty": 3,
+  "tags": [
+   "frontline",
+   "engage"
+  ],
+  "strong_vs": [
+   "barrowick",
+   "dunmarrow"
+  ]
+ },
+ {
+  "id": "barrowick",
+  "name": "Barrowick",
+  "placeholder": true,
+  "archetype": "bruiser",
+  "role_primary": "top",
+  "role_secondary": null,
+  "power_early": 56,
+  "power_mid": 51,
+  "power_late": 43,
+  "damage_type": "mixed",
+  "range": "melee",
+  "difficulty": 2,
+  "tags": [
+   "frontline",
+   "pick"
+  ],
+  "strong_vs": [
+   "brannoch",
+   "skarrow"
+  ]
+ },
+ {
+  "id": "tuskal",
+  "name": "Tuskal",
+  "placeholder": true,
+  "archetype": "bruiser",
+  "role_primary": "jg",
+  "role_secondary": "top",
+  "power_early": 56,
+  "power_mid": 51,
+  "power_late": 43,
+  "damage_type": "physical",
+  "range": "melee",
+  "difficulty": 2,
+  "tags": [
+   "frontline",
+   "splitpush"
+  ],
+  "strong_vs": [
+   "gravenstone",
+   "marrek"
+  ]
+ },
+ {
+  "id": "gravenstone",
+  "name": "Gravenstone",
+  "placeholder": true,
+  "archetype": "bulwark",
+  "role_primary": "jg",
+  "role_secondary": "top",
+  "power_early": 46,
+  "power_mid": 58,
+  "power_late": 46,
+  "damage_type": "physical",
+  "range": "melee",
+  "difficulty": 2,
+  "tags": [
+   "frontline",
+   "engage"
+  ],
+  "strong_vs": [
+   "nimbrel",
+   "quillith"
+  ]
+ },
+ {
+  "id": "nimbrel",
+  "name": "Nimbrel",
+  "placeholder": true,
+  "archetype": "shade",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "power_early": 57,
+  "power_mid": 43,
+  "power_late": 56,
+  "damage_type": "mixed",
+  "range": "melee",
+  "difficulty": 4,
+  "tags": [
+   "pick",
+   "splitpush"
+  ],
+  "strong_vs": [
+   "marrek",
+   "wyldrim"
+  ]
+ },
+ {
+  "id": "marrek",
+  "name": "Marrek",
+  "placeholder": true,
+  "archetype": "bruiser",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "power_early": 43,
+  "power_mid": 51,
+  "power_late": 59,
+  "damage_type": "mixed",
+  "range": "melee",
+  "difficulty": 3,
+  "tags": [
+   "frontline",
+   "waveclear"
+  ],
+  "strong_vs": [
+   "quillith",
+   "sootwing"
+  ]
+ },
+ {
+  "id": "quillith",
+  "name": "Quillith",
+  "placeholder": true,
+  "archetype": "shade",
+  "role_primary": "jg",
+  "role_secondary": "mid",
+  "power_early": 56,
+  "power_mid": 42,
+  "power_late": 55,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 3,
+  "tags": [
+   "pick",
+   "waveclear"
+  ],
+  "strong_vs": [
+   "wyldrim",
+   "veshra"
+  ]
+ },
+ {
+  "id": "wyldrim",
+  "name": "Wyldrim",
+  "placeholder": true,
+  "archetype": "bruiser",
+  "role_primary": "jg",
+  "role_secondary": "top",
+  "power_early": 57,
+  "power_mid": 52,
+  "power_late": 44,
+  "damage_type": "mixed",
+  "range": "melee",
+  "difficulty": 3,
+  "tags": [
+   "frontline",
+   "protect"
+  ],
+  "strong_vs": [
+   "sootwing",
+   "tuskal"
+  ]
+ },
+ {
+  "id": "sootwing",
+  "name": "Sootwing",
+  "placeholder": true,
+  "archetype": "shade",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "power_early": 45,
+  "power_mid": 53,
+  "power_late": 61,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 5,
+  "tags": [
+   "pick",
+   "scaling"
+  ],
+  "strong_vs": [
+   "veshra",
+   "gravenstone"
+  ]
+ },
+ {
+  "id": "veshra",
+  "name": "Veshra",
+  "placeholder": true,
+  "archetype": "shade",
+  "role_primary": "jg",
+  "role_secondary": null,
+  "power_early": 57,
+  "power_mid": 52,
+  "power_late": 44,
+  "damage_type": "mixed",
+  "range": "melee",
+  "difficulty": 3,
+  "tags": [
+   "pick",
+   "splitpush",
+   "waveclear"
+  ],
+  "strong_vs": [
+   "tuskal",
+   "nimbrel"
+  ]
+ },
+ {
+  "id": "ellowen",
+  "name": "Ellowen",
+  "placeholder": true,
+  "archetype": "spellcaster",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "power_early": 56,
+  "power_mid": 51,
+  "power_late": 43,
+  "damage_type": "mixed",
+  "range": "long",
+  "difficulty": 2,
+  "tags": [
+   "waveclear",
+   "poke"
+  ],
+  "strong_vs": [
+   "cindrel",
+   "maurelle"
+  ]
+ },
+ {
+  "id": "cindrel",
+  "name": "Cindrel",
+  "placeholder": true,
+  "archetype": "spellcaster",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "power_early": 43,
+  "power_mid": 51,
+  "power_late": 59,
+  "damage_type": "mixed",
+  "range": "long",
+  "difficulty": 3,
+  "tags": [
+   "waveclear",
+   "poke"
+  ],
+  "strong_vs": [
+   "dusken",
+   "orisande"
+  ]
+ },
+ {
+  "id": "dusken",
+  "name": "Dusken",
+  "placeholder": true,
+  "archetype": "shade",
+  "role_primary": "mid",
+  "role_secondary": "jg",
+  "power_early": 57,
+  "power_mid": 43,
+  "power_late": 56,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 4,
+  "tags": [
+   "pick",
+   "splitpush"
+  ],
+  "strong_vs": [
+   "maurelle",
+   "tessarine"
+  ]
+ },
+ {
+  "id": "maurelle",
+  "name": "Maurelle",
+  "placeholder": true,
+  "archetype": "spellcaster",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "power_early": 47,
+  "power_mid": 59,
+  "power_late": 47,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 3,
+  "tags": [
+   "waveclear",
+   "protect"
+  ],
+  "strong_vs": [
+   "orisande",
+   "lanthorn"
+  ]
+ },
+ {
+  "id": "orisande",
+  "name": "Orisande",
+  "placeholder": true,
+  "archetype": "binder",
+  "role_primary": "mid",
+  "role_secondary": "sup",
+  "power_early": 57,
+  "power_mid": 43,
+  "power_late": 56,
+  "damage_type": "mixed",
+  "range": "long",
+  "difficulty": 4,
+  "tags": [
+   "pick",
+   "splitpush"
+  ],
+  "strong_vs": [
+   "tessarine",
+   "embrel"
+  ]
+ },
+ {
+  "id": "tessarine",
+  "name": "Tessarine",
+  "placeholder": true,
+  "archetype": "spellcaster",
+  "role_primary": "mid",
+  "role_secondary": null,
+  "power_early": 44,
+  "power_mid": 52,
+  "power_late": 60,
+  "damage_type": "mixed",
+  "range": "long",
+  "difficulty": 4,
+  "tags": [
+   "waveclear",
+   "scaling"
+  ],
+  "strong_vs": [
+   "lanthorn",
+   "ellowen"
+  ]
+ },
+ {
+  "id": "lanthorn",
+  "name": "Lanthorn",
+  "placeholder": true,
+  "archetype": "binder",
+  "role_primary": "mid",
+  "role_secondary": "sup",
+  "power_early": 42,
+  "power_mid": 50,
+  "power_late": 58,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 2,
+  "tags": [
+   "pick",
+   "scaling"
+  ],
+  "strong_vs": [
+   "embrel",
+   "cindrel"
+  ]
+ },
+ {
+  "id": "embrel",
+  "name": "Embrel",
+  "placeholder": true,
+  "archetype": "spellcaster",
+  "role_primary": "mid",
+  "role_secondary": "top",
+  "power_early": 55,
+  "power_mid": 50,
+  "power_late": 42,
+  "damage_type": "magic",
+  "range": "mid",
+  "difficulty": 1,
+  "tags": [
+   "waveclear",
+   "poke"
+  ],
+  "strong_vs": [
+   "ellowen",
+   "dusken"
+  ]
+ },
+ {
+  "id": "harkin",
+  "name": "Harkin",
+  "placeholder": true,
+  "archetype": "gunner",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "power_early": 42,
+  "power_mid": 50,
+  "power_late": 58,
+  "damage_type": "mixed",
+  "range": "long",
+  "difficulty": 2,
+  "tags": [
+   "scaling",
+   "waveclear",
+   "poke"
+  ],
+  "strong_vs": [
+   "pellam",
+   "jorreck"
+  ]
+ },
+ {
+  "id": "pellam",
+  "name": "Pellam",
+  "placeholder": true,
+  "archetype": "gunner",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "power_early": 41,
+  "power_mid": 49,
+  "power_late": 57,
+  "damage_type": "mixed",
+  "range": "long",
+  "difficulty": 1,
+  "tags": [
+   "scaling",
+   "protect"
+  ],
+  "strong_vs": [
+   "tamsel",
+   "brixley"
+  ]
+ },
+ {
+  "id": "tamsel",
+  "name": "Tamsel",
+  "placeholder": true,
+  "archetype": "gunner",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "power_early": 44,
+  "power_mid": 52,
+  "power_late": 60,
+  "damage_type": "magic",
+  "range": "long",
+  "difficulty": 4,
+  "tags": [
+   "scaling",
+   "protect"
+  ],
+  "strong_vs": [
+   "jorreck",
+   "dovrin"
+  ]
+ },
+ {
+  "id": "jorreck",
+  "name": "Jorreck",
+  "placeholder": true,
+  "archetype": "gunner",
+  "role_primary": "bot",
+  "role_secondary": "mid",
+  "power_early": 51,
+  "power_mid": 51,
+  "power_late": 51,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 3,
+  "tags": [
+   "scaling",
+   "protect"
+  ],
+  "strong_vs": [
+   "brixley",
+   "ketterick"
+  ]
+ },
+ {
+  "id": "brixley",
+  "name": "Brixley",
+  "placeholder": true,
+  "archetype": "gunner",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "power_early": 43,
+  "power_mid": 51,
+  "power_late": 59,
+  "damage_type": "mixed",
+  "range": "long",
+  "difficulty": 3,
+  "tags": [
+   "scaling",
+   "splitpush"
+  ],
+  "strong_vs": [
+   "dovrin",
+   "sparrowe"
+  ]
+ },
+ {
+  "id": "dovrin",
+  "name": "Dovrin",
+  "placeholder": true,
+  "archetype": "gunner",
+  "role_primary": "bot",
+  "role_secondary": "mid",
+  "power_early": 50,
+  "power_mid": 50,
+  "power_late": 50,
+  "damage_type": "magic",
+  "range": "long",
+  "difficulty": 2,
+  "tags": [
+   "scaling",
+   "splitpush"
+  ],
+  "strong_vs": [
+   "ketterick",
+   "harkin"
+  ]
+ },
+ {
+  "id": "ketterick",
+  "name": "Ketterick",
+  "placeholder": true,
+  "archetype": "gunner",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "power_early": 45,
+  "power_mid": 53,
+  "power_late": 61,
+  "damage_type": "magic",
+  "range": "long",
+  "difficulty": 5,
+  "tags": [
+   "scaling",
+   "pick"
+  ],
+  "strong_vs": [
+   "sparrowe",
+   "pellam"
+  ]
+ },
+ {
+  "id": "sparrowe",
+  "name": "Sparrowe",
+  "placeholder": true,
+  "archetype": "gunner",
+  "role_primary": "bot",
+  "role_secondary": null,
+  "power_early": 57,
+  "power_mid": 52,
+  "power_late": 44,
+  "damage_type": "physical",
+  "range": "long",
+  "difficulty": 3,
+  "tags": [
+   "scaling",
+   "waveclear",
+   "poke"
+  ],
+  "strong_vs": [
+   "harkin",
+   "tamsel"
+  ]
+ },
+ {
+  "id": "sunnivah",
+  "name": "Sunnivah",
+  "placeholder": true,
+  "archetype": "mender",
+  "role_primary": "sup",
+  "role_secondary": "mid",
+  "power_early": 42,
+  "power_mid": 50,
+  "power_late": 58,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 2,
+  "tags": [
+   "protect",
+   "scaling"
+  ],
+  "strong_vs": [
+   "bastrel",
+   "alderwyn",
+   "harkin"
+  ]
+ },
+ {
+  "id": "bastrel",
+  "name": "Bastrel",
+  "placeholder": true,
+  "archetype": "bulwark",
+  "role_primary": "sup",
+  "role_secondary": "top",
+  "power_early": 56,
+  "power_mid": 51,
+  "power_late": 43,
+  "damage_type": "mixed",
+  "range": "melee",
+  "difficulty": 2,
+  "tags": [
+   "frontline",
+   "engage",
+   "pick"
+  ],
+  "strong_vs": [
+   "tanglewick",
+   "corvane",
+   "pellam"
+  ]
+ },
+ {
+  "id": "tanglewick",
+  "name": "Tanglewick",
+  "placeholder": true,
+  "archetype": "binder",
+  "role_primary": "sup",
+  "role_secondary": "mid",
+  "power_early": 47,
+  "power_mid": 59,
+  "power_late": 47,
+  "damage_type": "mixed",
+  "range": "long",
+  "difficulty": 3,
+  "tags": [
+   "pick",
+   "poke"
+  ],
+  "strong_vs": [
+   "alderwyn",
+   "wyncote",
+   "tamsel"
+  ]
+ },
+ {
+  "id": "alderwyn",
+  "name": "Alderwyn",
+  "placeholder": true,
+  "archetype": "mender",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "power_early": 51,
+  "power_mid": 51,
+  "power_late": 51,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 3,
+  "tags": [
+   "protect",
+   "waveclear"
+  ],
+  "strong_vs": [
+   "corvane",
+   "oriel",
+   "jorreck"
+  ]
+ },
+ {
+  "id": "corvane",
+  "name": "Corvane",
+  "placeholder": true,
+  "archetype": "bulwark",
+  "role_primary": "sup",
+  "role_secondary": "jg",
+  "power_early": 57,
+  "power_mid": 52,
+  "power_late": 44,
+  "damage_type": "magic",
+  "range": "melee",
+  "difficulty": 3,
+  "tags": [
+   "frontline",
+   "engage",
+   "pick"
+  ],
+  "strong_vs": [
+   "wyncote",
+   "fennimore",
+   "brixley"
+  ]
+ },
+ {
+  "id": "wyncote",
+  "name": "Wyncote",
+  "placeholder": true,
+  "archetype": "binder",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "power_early": 56,
+  "power_mid": 55,
+  "power_late": 45,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 4,
+  "tags": [
+   "pick",
+   "splitpush"
+  ],
+  "strong_vs": [
+   "oriel",
+   "sunnivah",
+   "dovrin"
+  ]
+ },
+ {
+  "id": "oriel",
+  "name": "Oriel",
+  "placeholder": true,
+  "archetype": "mender",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "power_early": 49,
+  "power_mid": 49,
+  "power_late": 49,
+  "damage_type": "mixed",
+  "range": "long",
+  "difficulty": 1,
+  "tags": [
+   "protect",
+   "waveclear"
+  ],
+  "strong_vs": [
+   "fennimore",
+   "bastrel",
+   "ketterick"
+  ]
+ },
+ {
+  "id": "fennimore",
+  "name": "Fennimore",
+  "placeholder": true,
+  "archetype": "binder",
+  "role_primary": "sup",
+  "role_secondary": null,
+  "power_early": 43,
+  "power_mid": 51,
+  "power_late": 59,
+  "damage_type": "mixed",
+  "range": "mid",
+  "difficulty": 3,
+  "tags": [
+   "pick",
+   "waveclear"
+  ],
+  "strong_vs": [
+   "sunnivah",
+   "tanglewick",
+   "sparrowe"
+  ]
+ }
+]
