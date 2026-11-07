@@ -15,6 +15,12 @@ if [ -n "$G" ] && [ -x "$G" ]; then
   out=$(cd game && timeout 600 "$G" --headless res://tests/ui_smoke.tscn 2>&1); echo "$out" | tail -3
   if echo "$out" | grep -E "SCRIPT ERROR|Parse Error|ERROR:|FAIL:" | grep -v "leaked\|still in use" ; then fail=1; fi
   echo "$out" | grep -q " 0 failures" || fail=1
+  # Touch behaviour: swipes must scroll (also from buttons), taps must tap, Android back must navigate.
+  # A scroll container only takes touch drags when a touchscreen exists, so the desktop run emulates one.
+  printf '[input_devices]\n\npointing/emulate_touch_from_mouse=true\n' > game/override.cfg
+  out=$(cd game && timeout 600 "$G" --headless res://tests/ui_touch.tscn 2>&1); rm -f game/override.cfg
+  echo "$out" | grep -E "FAIL|failures"
+  echo "$out" | grep -q " 0 failures" || fail=1
 else
   echo "SKIPPED: GDScript tests (no Godot binary given)"
 fi

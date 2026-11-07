@@ -1,7 +1,7 @@
 extends Node
 ## Autoload "App": shared game objects and screen navigation.
 
-const VERSION_LABEL := "0.1.0 alpha"
+const VERSION_LABEL := "0.1.1 alpha"
 
 var world: World
 var gs: GameState

@@ -21,6 +21,7 @@ func _rebuild() -> void:
 	cb.button_pressed = App.gs.is_quick()
 	cb.custom_minimum_size = Vector2(0, 80)
 	cb.focus_mode = Control.FOCUS_NONE
+	cb.mouse_filter = Control.MOUSE_FILTER_PASS
 	cb.toggled.connect(func(v): App.gs.set_quick(v); App.autosave())
 	c.add_child(cb)
 	c.add_child(UI.label(Strings.t("settings.quick_hint"), UI.S_SMALL, UI.DIM))

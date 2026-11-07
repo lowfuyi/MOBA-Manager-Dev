@@ -77,6 +77,7 @@ static func button(text: String, cb: Callable, kind: String = "normal", min_h: i
 	b.custom_minimum_size = Vector2(0, min_h)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.focus_mode = Control.FOCUS_NONE
+	b.mouse_filter = Control.MOUSE_FILTER_PASS    # lets a swipe that starts on a button scroll the page
 	match kind:
 		"primary":
 			b.add_theme_stylebox_override("normal", box(ACCENT.darkened(0.15), 16, 18))
@@ -114,6 +115,7 @@ static func card(parent: Control, color: Color = PANEL, pad: int = 20) -> VBoxCo
 	var pc := PanelContainer.new()
 	pc.add_theme_stylebox_override("panel", box(color, 18, pad))
 	pc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pc.mouse_filter = Control.MOUSE_FILTER_PASS   # PanelContainer defaults to STOP, which blocks swipe-scrolling
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pc.add_child(v)
@@ -130,6 +132,7 @@ static func bar(value: float, max_value: float, color: Color = ACCENT, height: i
 	b.custom_minimum_size = Vector2(0, height)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.add_theme_stylebox_override("fill", box(color, 8))
+	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return b
 
 

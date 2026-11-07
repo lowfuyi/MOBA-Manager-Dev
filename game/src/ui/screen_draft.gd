@@ -20,7 +20,8 @@ func _init(g: Dictionary = {}) -> void:
 
 
 func go_back() -> void:
-	pass    # no way out mid-draft: the clock is running
+	# Leaving abandons this draft; nothing is recorded, the game is still waiting on match day.
+	App.go(ScreenPreMatch.new(game))
 
 
 func _ready() -> void:
@@ -75,6 +76,10 @@ func _rebuild() -> void:
 	var side_name := Strings.t("hub.side.blue" if cur["team"] == "B" else "hub.side.red")
 	var what := Strings.t("draft.kind." + cur["kind"])
 	var row := UI.hbox()
+	var back := UI.button("<", go_back, "normal", 64)
+	back.custom_minimum_size = Vector2(80, 64)
+	back.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	row.add_child(back)
 	if mine:
 		row.add_child(UI.label(Strings.f("draft.your_turn", {"what": what}), UI.S_BIG, UI.GOOD))
 		_timer_label = UI.label(Strings.f("draft.time", {"s": ceili(_time_left)}), UI.S_BIG, UI.TEXT, HORIZONTAL_ALIGNMENT_RIGHT)

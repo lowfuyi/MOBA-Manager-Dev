@@ -9,7 +9,7 @@ func go_back() -> void:
 
 func _ready() -> void:
 	var gs := App.gs
-	setup("", Callable())
+	setup(Strings.t("hub.menu_title"), go_back)
 	var me := gs.club()
 	var row := {}
 	for r in gs.standings():

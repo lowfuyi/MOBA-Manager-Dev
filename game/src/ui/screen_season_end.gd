@@ -8,7 +8,7 @@ func go_back() -> void:
 
 func _ready() -> void:
 	var gs := App.gs
-	setup("", Callable())
+	setup(Strings.t("season.title"), go_back)
 	var done: Array = gs.d["seasons_done"]
 	var last: Dictionary = done[done.size() - 1] if not done.is_empty() else {}
 	var c := UI.card(body, UI.PANEL2)

@@ -224,5 +224,8 @@
   "season.next": "Start next season",
   "season.standings": "Final standings",
   "season.menu": "Back to menu",
-  "draft.bans_short": "Bans"
+  "draft.bans_short": "Bans",
+  "hub.menu_title": "Club office",
+  "report.title": "Match report",
+  "season.title": "Season summary"
 }

@@ -30,7 +30,7 @@ func _ready() -> void:
 	var my_side := "B" if game["blue"] == gs.club() else "R"
 	var opp_id: String = game["red"] if my_side == "B" else game["blue"]
 	var won: bool = res["blue_won"] == (my_side == "B")
-	setup("", Callable())
+	setup(Strings.t("report.title"), _leave)
 	# result banner
 	var c := UI.card(body, UI.PANEL2)
 	c.add_child(UI.label(Strings.t("report.victory" if won else "report.defeat"), UI.S_TITLE, UI.GOOD if won else UI.BAD, HORIZONTAL_ALIGNMENT_CENTER))

@@ -25,7 +25,10 @@ func _ready() -> void:
 
 func show_screen(screen: Control) -> void:
 	if _current != null:
-		_margin.remove_child(_current)
+		# Not remove_child(): a tap on a button swaps the screen from inside that button's own signal.
+		_current.set_process(false)
+		_current.hide()
+		_current.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_current.queue_free()
 	_current = screen
 	_margin.add_child(screen)
