@@ -52,3 +52,9 @@
 2. **Monetization details.** Reference images received; concept drafted in `docs/design/MONETIZATION-DRAFT.md`. Postponed until the final release.
 3. **Transfers with AI clubs in Single Player.** The release path puts sale and transfer of players in the Multiplayer edition. Should a later Single Player update also allow transfers with AI-run clubs? Recommendation: not in Phase 1; decide after the core loop is balanced.
 4. **Ads in the Single Player edition.** Still open (see MONETIZATION-DRAFT.md).
+
+## Producer decision log: Alpha 0.2 (2026-11-08)
+
+- **Training base rate raised from 0.5 to 1.5 points per week** and hero practice from 1.5 to 3.0 familiarity per week (GDD 7.3 formula otherwise unchanged). With the GDD's 0.5 the QA run showed "never train" beat the coach's training for every club in season 1 and most clubs in season 2, i.e. training was a trap. After the change training pays back from season 2 and resting is better inside season 1 (see CALIBRATION-9.1 addendum). Founder may overrule.
+- **Coach and Facility levels fixed at 2** for every club until staff and facilities (D-007) exist.
+- **Alpha 0.2 scope chosen by the Producer** (the Founder's game test gave no gameplay feedback): Game Plan, then training, fatigue and ageing; Alpha 0.3 is recruitment (free agents), contracts and a light finance layer.

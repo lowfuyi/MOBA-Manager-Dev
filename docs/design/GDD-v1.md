@@ -1,6 +1,6 @@
-# Game Design Document v1.6
+# Game Design Document v1.7
 
-Status: DRAFT v1.6. v1.6 adds the Founder's match formats and pacing rule (section 8.7). v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 to v1.6 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
+Status: DRAFT v1.7. v1.7 records how training, fatigue and ageing were implemented in Alpha 0.2 (section 7.3, Implementation notes) and the Game Plan QA result (CALIBRATION-9.1 addendum). v1.6 adds the Founder's match formats and pacing rule (section 8.7). v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 to v1.7 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
 Next: Founder review. Done: P-001 (skeleton), P-002 (simulator with golden tests), content data, P-003 first pass (9.1). Open: paired lever tests, Phase 1 rating-scale calibration, joint Game Plan test.
 
 All numbers in this document are **v0 placeholders** unless marked otherwise. They exist so the rules can be tested. QA & Balance tunes them against the targets in section 9, using `tools/proto_sim.py` as the reference model.
@@ -259,6 +259,17 @@ gain = max(0, base * (1 + 0.1*CoachLevel + 0.05*FacilityLevel) * (1 - stat/Poten
 Fatigue (clamped 0 to 100, reset to 0 at the off-season): +15 per match played, +5 per training week, -(5 + 0.5 x FacilityLevel) per rest day. A day with an Exhibition or Quick Match is not a rest day. A normal week for a starter (2 matches, 5 rest days) nets `+10 - 2.5 x FacilityLevel`: +7.5 at Facility 1 (the penalty line of 25 is crossed around week 4 and fatigue is near 68 by week 9), +2.5 at Facility 3, zero at Facility 4. So a low-facility club must rotate, and facility upgrades have a real payoff. QA checks that no schedule is strictly dominant and that rotation is sometimes right.
 
 Familiarity: +3 per match played with the hero, +1.5 x (1 + 0.1 x CoachLevel) per week of focused training, -0.5 per week if unused and above 50.
+
+
+**Implementation notes (Alpha 0.2, 2026-11-08; constants in `game/data/training_v0.json`).**
+- One calendar tick is one match day (half a week): weekly values are halved, so a starter who trains nets +2.5 fatigue per match day, +5 per week, as in the text above (Facility 2).
+- Coach and Facility are fixed at level 2 for every club until staff and facilities exist (D-007).
+- Training focus options in Alpha 0.2: one of the eight stats, one hero's familiarity, or **Rest** (no training, no training fatigue). Team scrim waits for Team Bonds. The default is the coach's pick: the stat with the largest (slot weight x room below Potential) for the player's main role. Every AI player always uses it.
+- Fatigue enters the match rating through `Cond` exactly as in 4.4 (`-0.15 x max(0, Fatigue - 25)`); Form and Morale terms are not built yet.
+- AI lineups rotate: start from the best lineup, then a bench player replaces a starter when his rating here minus his own fatigue penalty is higher. With no fatigue this is exactly the best lineup. AI clubs refresh their best lineup on patch days.
+- Ageing happens at the start of the next season: everybody is one year older, MEC -1 from age 29, TFT and SEN -0.5 from age 31 (ages as of the season just finished), fatigue resets to 0.
+- Playoffs: the managed club's playoff games tick fatigue and training like a match day; AI-versus-AI playoff games do not tick (they have no calendar in Phase 1).
+- Familiarity gains from match play and training are not capped per week; the decay of an unused hero (-0.5 per week above 50) is not built yet.
 
 ### 7.4 Scouting
 
@@ -575,3 +586,4 @@ Founder questions are in `company/DECISIONS.md`. Parameters still to define are 
 | 2026-11-07 | v1.4 after independent QA review of v1.3 (3 critical, 9 serious findings): Form Rating redefined as Elo (the old definition was noise); Game Plan rebuilt on three simulator hooks and zero-sum controls (8 controls, triggers moved to +-0.40, Peel/Engage and Comeback removed); Team Bonds numbers corrected (ChemBonus 1.92 percent at Bond 60 / COM 60, diminishing Bond gains, bonds stored for all roster pairs); fatigue and morale numbers fixed so they actually build; recruitment (asking wage floor and Potential factor, prize weights, coarse refusals and lockout, personality thresholds), bankruptcy dismissal rule, Exhibition exclusions; determinism spec completed (outcome seed, stream names, tolerance); report attribution by counterfactual; standings tiebreaks defined; lever tests paired with tighter bands; economy and personality 10-season tests deferred; build order puts content before 9.1; dead data and minor items fixed | Game Design Lead, Systems Lead |
 | 2026-11-07 | v1.5 after the full-pipeline calibration (P-003): draft constants re-tuned so familiarity no longer dominates (HeroFactor familiarity weight 0.06; synergy +4%; needs -5%; damage balance -6%; CompMod cap 15%; lane counter +10%); 9.1 results recorded; hero set re-checked against the new constants | Systems Lead, QA & Balance |
 | 2026-11-07 | v1.6 Founder pacing decision: one game at most about 5 minutes including the draft; sudden-death single games for casual, quick, league and public play; best of 3 (finals best of 5) for tournaments; Short and Full draft profiles with timers; cosmetic game clock shortened to 9 to 16 minutes; new section 8.7 | Founder, Game Design Lead |
+| 2026-11-08 | v1.7 implementation notes for 7.3 (tick = match day, Coach and Facility fixed at 2, Rest focus, AI rotation rule, ageing timing, playoff ticking); Game Plan QA 9.2.1 passed (see CALIBRATION-9.1 addendum) | Systems Lead, Engineering Lead |

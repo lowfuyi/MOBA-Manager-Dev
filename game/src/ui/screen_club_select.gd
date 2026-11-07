@@ -9,6 +9,7 @@ func go_back() -> void:
 func _ready() -> void:
 	setup(Strings.t("club.pick.title"), go_back)
 	body.add_child(UI.label(Strings.t("club.pick.hint"), UI.S_SMALL, UI.DIM))
+	App.world.bind_progress({}, {}, 0)  # a new game starts from the data files, whatever save was open before
 	var rows: Array = []
 	for cid in App.world.club_ids:
 		rows.append([cid, App.world.team_rating(App.world.best_lineup(cid))])

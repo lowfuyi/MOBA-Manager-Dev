@@ -37,6 +37,7 @@ func _ready() -> void:
 	else:
 		_next_card(g)
 	body.add_child(UI.button(Strings.t("hub.roster"), func(): App.go(ScreenRoster.new("hub"))))
+	body.add_child(UI.button(Strings.t("hub.training"), func(): App.go(ScreenTraining.new())))
 	body.add_child(UI.button(Strings.t("hub.standings"), func(): App.go(ScreenStandings.new())))
 	body.add_child(UI.button(Strings.t("hub.settings"), func(): App.go(ScreenSettings.new())))
 
@@ -57,11 +58,14 @@ func _next_card(g: Dictionary) -> void:
 	c.add_child(UI.label(Strings.t(title_key), UI.S_SMALL, UI.DIM))
 	c.add_child(UI.label(gs.club_name(opp), UI.S_BIG, UI.TEXT))
 	var mine := App.world.team_rating(gs.lineup())
-	var theirs := App.world.team_rating(App.world.best_lineup(opp))
+	var theirs := App.world.team_rating(gs.lineup_for(opp))
 	c.add_child(UI.label(Strings.f("hub.ratings", {"mine": "%.1f" % mine, "theirs": "%.1f" % theirs}), UI.S_BODY, UI.GOOD if mine >= theirs else UI.WARN))
 	c.add_child(UI.label(Strings.f("hub.side_line", {"side": side, "draft": Strings.t("hub.draft.full" if g["full"] else "hub.draft.short")}), UI.S_SMALL, UI.DIM))
 	if extra != "":
 		c.add_child(UI.label(extra, UI.S_SMALL, UI.ACCENT))
+	var tired := gs.tired_starters().size()
+	if tired > 0:
+		c.add_child(UI.label(Strings.f("hub.tired_warn", {"n": tired}), UI.S_SMALL, UI.WARN))
 	c.add_child(UI.button(Strings.t("hub.play"), func(): App.go(ScreenPreMatch.new(g)), "primary"))
 	c.add_child(UI.button(Strings.t("hub.quick"), func(): _quick(g), "normal", 76))
 

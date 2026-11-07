@@ -150,3 +150,17 @@ static func clear(node: Node) -> void:
 
 static func pct(x: float, digits: int = 1) -> String:
 	return ("%+." + str(digits) + "f%%") % (x * 100.0)
+
+
+## Fatigue as words, for roster rows: "" when fresh, else "  -  tired -3" (the number is the rating lost).
+static func fatigue_tag(fat: float) -> String:
+	if fat < 25.0:
+		return ""
+	var level := "worn" if fat < 50.0 else ("tired" if fat < 75.0 else "exhausted")
+	var pen := Progression.fatigue_penalty(fat)
+	var txt := Strings.t("fatigue." + level)
+	return "  -  " + (txt + " -%.0f" % pen if pen >= 0.5 else txt)
+
+
+static func fatigue_color(fat: float) -> Color:
+	return GOOD if fat < 25.0 else (WARN if fat < 50.0 else BAD)

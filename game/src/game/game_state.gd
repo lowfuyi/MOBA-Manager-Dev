@@ -2,8 +2,9 @@ class_name GameState
 extends RefCounted
 ## One save: the managed club, the split calendar, standings, playoffs and familiarity growth.
 ## Everything in `d` is JSON-safe so the whole save is one file (user://save.json).
-## Alpha 0.1 scope: league (double round robin, one game per fixture) + playoffs (top 4,
-## best of 3 semis, best of 5 final). No training, recruitment, finance, Bonds or Game Plan yet.
+## Alpha 0.2 scope: league (double round robin, one game per fixture) + playoffs (top 4,
+## best of 3 semis, best of 5 final), Game Plan, training, fatigue and ageing.
+## No recruitment, finance or Bonds yet.
 
 const SAVE_PATH := "user://save.json"
 const VERSION := 1
@@ -26,8 +27,11 @@ static func new_game(w: World, club_id: String, save_seed: int, season: int = 1,
 		"lineup": {}, "fam_bonus": carry.get("fam_bonus", {}), "history": carry.get("history", []),
 		"playoffs": {}, "champion": "", "settings": carry.get("settings", {"quick": false}),
 		"seasons_done": carry.get("seasons_done", []), "plan": carry.get("plan", GamePlan.neutral_set()),
+		"stat_gain": carry.get("stat_gain", {}), "fatigue": carry.get("fatigue", {}), "train": carry.get("train", {}),
+		"train_last": [], "season_base": (carry.get("stat_gain", {}) as Dictionary).duplicate(true),
 	}
 	w.fam_bonus = gs.d["fam_bonus"]
+	gs._bind()
 	gs.reset_lineup()
 	return gs
 
@@ -36,8 +40,19 @@ static func from_dict(w: World, data: Dictionary) -> GameState:
 	var gs := GameState.new()
 	gs.world = w
 	gs.d = data
+	for k in ["stat_gain", "fatigue", "train", "season_base"]:  # saves from before Alpha 0.2
+		if not gs.d.has(k):
+			gs.d[k] = {}
+	if not gs.d.has("train_last"):
+		gs.d["train_last"] = []
 	w.fam_bonus = gs.d["fam_bonus"]
+	gs._bind()
 	return gs
+
+
+## Make the shared World show this save's player growth, fatigue and ages.
+func _bind() -> void:
+	world.bind_progress(d["stat_gain"], d["fatigue"], int(d["season"]) - 1)
 
 
 static func _schedule(club_ids: Array, season_tag: String) -> Array:
@@ -105,7 +120,8 @@ func set_quick(v: bool) -> void:
 
 # ---------------------------------------------------------------- lineup
 func reset_lineup() -> void:
-	var lu := world.best_lineup(club())
+	world.refresh_lineup(club())
+	var lu := world.rotated_lineup(club())
 	var m := {}
 	for s in SLOTS:
 		m[s] = lu[s]["id"]
@@ -132,7 +148,7 @@ func assign(slot: String, player_id: String) -> bool:
 
 
 func lineup_for(club_id: String) -> Dictionary:
-	return lineup() if club_id == club() else world.best_lineup(club_id)
+	return lineup() if club_id == club() else world.rotated_lineup(club_id)
 
 
 # ---------------------------------------------------------------- standings
@@ -276,6 +292,30 @@ func _grow_familiarity(game: Dictionary, result: Dictionary) -> void:
 	world.fam_bonus = d["fam_bonus"]
 
 
+## One match day passes for every club: fatigue moves and each player trains.
+## The log of the managed club's training is kept for the screen that reports it.
+func _tick_day() -> void:
+	var mine: Array = []
+	for c in world.club_ids:
+		var ids: Array = []
+		if c == club():
+			ids = (d["lineup"] as Dictionary).values()
+		else:
+			var lu := world.rotated_lineup(c)
+			for s in SLOTS:
+				ids.append(lu[s]["id"])
+		var log := Progression.tick_club(world, d, c, ids, c == club())
+		if c == club():
+			mine = log
+	d["train_last"] = mine
+	world.fam_bonus = d["fam_bonus"]
+
+
+## Playoff games: only the managed club's roster ticks (the AI series are simulated without a calendar).
+func _tick_human_playoff_day() -> void:
+	d["train_last"] = Progression.tick_club(world, d, club(), (d["lineup"] as Dictionary).values(), true)
+
+
 func _finish_round_if_done() -> void:
 	var r := int(d["round"])
 	for f in _round_fixtures(r):
@@ -286,7 +326,10 @@ func _finish_round_if_done() -> void:
 	for f in _round_fixtures(r):
 		all_done = all_done and f["played"]
 	if all_done:
+		_tick_day()
 		d["round"] = r + 1
+		if int(d["round"]) % ROUNDS_PER_PATCH == 0:
+			world.refresh_lineups()  # patch day: the AI managers re-pick their best lineups
 		if int(d["round"]) >= total_rounds():
 			_start_playoffs()
 
@@ -327,6 +370,39 @@ func plan_set() -> Dictionary:
 func auto_game(g: Dictionary) -> Dictionary:
 	var meta := meta_for(int(g["round"]))
 	return MatchRunner.auto(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta, int(d["save_seed"]), g["id"], bool(g["full"]), plans_for(g))
+
+
+# ---------------------------------------------------------------- training
+## The focus a player of the managed club follows: {"k": "stat"|"hero"|"rest", "v": stat or hero id}.
+func focus_of(p: Dictionary) -> Dictionary:
+	return Progression.focus_of(d, p, true)
+
+
+func set_focus(player_id: String, kind: String, value: String = "") -> void:
+	(d["train"] as Dictionary)[player_id] = {"k": kind, "v": value}
+
+
+## Back to the coach's pick for everybody on the roster.
+func coach_picks_all() -> void:
+	for p in world.club_players(club()):
+		(d["train"] as Dictionary).erase(p["id"])
+
+
+## Stat points a player has gained (or lost) since this season began.
+func season_gain(player_id: String, stat: String) -> float:
+	var now := float((d["stat_gain"] as Dictionary).get(player_id, {}).get(stat, 0.0))
+	var then := float((d["season_base"] as Dictionary).get(player_id, {}).get(stat, 0.0))
+	return now - then
+
+
+## Players of the managed club who start and are tired enough to cost rating.
+func tired_starters(line: float = 40.0) -> Array:
+	var out: Array = []
+	for s in SLOTS:
+		var p: Dictionary = world.players[d["lineup"][s]]
+		if world.fatigue_of(p["id"]) >= line:
+			out.append(p)
+	return out
 
 
 # ---------------------------------------------------------------- playoffs
@@ -419,7 +495,9 @@ func playoff_label(s: Dictionary) -> String:
 
 
 func next_season() -> GameState:
-	var carry := {"fam_bonus": d["fam_bonus"], "history": d["history"], "settings": d["settings"], "seasons_done": d["seasons_done"], "plan": plan_set()}
+	Progression.age_everyone(world)
+	var carry := {"fam_bonus": d["fam_bonus"], "history": d["history"], "settings": d["settings"], "seasons_done": d["seasons_done"], "plan": plan_set(),
+			"stat_gain": (d["stat_gain"] as Dictionary).duplicate(true), "fatigue": {}, "train": d["train"]}
 	var gs := GameState.new_game(world, club(), int(d["save_seed"]) + 1000 * int(d["season"]), int(d["season"]) + 1, carry)
 	gs.d["lineup"] = d["lineup"]
 	return gs

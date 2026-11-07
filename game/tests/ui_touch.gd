@@ -191,3 +191,33 @@ func _run() -> void:
 	get_tree().root.propagate_notification(NOTIFICATION_WM_GO_BACK_REQUEST)
 	await frames()
 	ok(cur() is ScreenPreMatch, "back request in the draft returns to match day")
+	# 4. training screen: a swipe that starts on a player row scrolls the list; the row still opens on a tap
+	App.go(ScreenHub.new())
+	await frames()
+	App.go(ScreenTraining.new())
+	await frames(4)
+	var ts := scroller()
+	ok(ts.get_v_scroll_bar().max_value > ts.size.y, "training list is longer than the screen")
+	btns.clear()
+	find_buttons(cur(), btns)
+	var row_btn: Button = null
+	for x in btns:
+		if "trains" in x.text or "practises" in x.text or "rests" in x.text:
+			row_btn = x
+			break
+	await swipe(row_btn.get_global_rect().get_center(), 300)
+	ok(ts.scroll_vertical > 100, "training: swipe over a player row scrolls (scroll=%d)" % ts.scroll_vertical)
+	ok(cur()._open == "", "training: swipe did not open the player")
+	ts.scroll_vertical = 0
+	await frames()
+	btns.clear()
+	find_buttons(cur(), btns)
+	for x in btns:
+		if "trains" in x.text or "practises" in x.text or "rests" in x.text:
+			row_btn = x
+			break
+	await tap(row_btn.get_global_rect().get_center())
+	ok(cur()._open != "", "training: a tap on a player row opens the focus picker")
+	get_tree().root.propagate_notification(NOTIFICATION_WM_GO_BACK_REQUEST)
+	await frames()
+	ok(cur() is ScreenHub, "back request in training returns to the hub")

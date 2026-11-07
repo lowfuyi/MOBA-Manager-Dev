@@ -46,8 +46,18 @@ func _tour() -> void:
 	rs._toggle_player(App.gs.d["lineup"]["mid"])
 	await shot("07_roster_detail")
 	var g: Dictionary = App.gs.next_game()
+	for pid in (App.gs.d["lineup"] as Dictionary).values():
+		App.world.fatigue[pid] = 55.0
 	App.go(ScreenPreMatch.new(g))
 	await shot("08_prematch")
+	App.world.fatigue.clear()
+	var trs := ScreenTraining.new()
+	App.go(trs)
+	await shot("08b_training")
+	trs._toggle(App.world.club_players(App.gs.club())[0]["id"])
+	await shot("08c_training_picker")
+	trs._toggle_heroes()
+	await shot("08d_training_heroes")
 	var d := ScreenDraft.new(g)
 	App.go(d)
 	await shot("09_draft_start")

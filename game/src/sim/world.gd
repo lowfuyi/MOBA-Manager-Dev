@@ -22,6 +22,11 @@ var players: Dictionary = {}      # id -> player dict
 var clubs: Dictionary = {}        # id -> club dict
 var club_ids: Array = []          # file order
 var fam_bonus: Dictionary = {}    # "player|hero" -> trained familiarity points (saved)
+var fatigue: Dictionary = {}      # player id -> 0..100 (saved; missing = fresh)
+var progress: Dictionary = {}     # player id -> {stat: points gained or lost since the start} (saved)
+var season_offset := 0            # seasons played so far: everybody is this many years older
+
+var _orig_stats: Dictionary = {}  # player id -> the stats the data files gave him
 
 var _fam_cache: Dictionary = {}
 var _sig_cache: Dictionary = {}
@@ -43,6 +48,95 @@ static func load_default() -> World:
 		w.clubs[c["id"]] = c
 		w.club_ids.append(c["id"])
 	return w
+
+
+# ---------------------------------------------------------------- progress overlay
+## Point the world at one save's growth state. Players' stat dictionaries are rewritten in place
+## (original value + saved change), so every rating function keeps reading p["stats"].
+func bind_progress(prog: Dictionary, fat: Dictionary, offset: int) -> void:
+	if _orig_stats.is_empty():
+		for pid in players:
+			_orig_stats[pid] = (players[pid]["stats"] as Dictionary).duplicate()
+	for pid in progress:
+		if not prog.has(pid):
+			_restore(pid)
+	progress = prog
+	fatigue = fat
+	season_offset = offset
+	for pid in progress:
+		_apply_one(pid)
+	_lineup_cache.clear()
+
+
+func _restore(pid: String) -> void:
+	var st: Dictionary = players[pid]["stats"]
+	for k in _orig_stats[pid]:
+		st[k] = _orig_stats[pid][k]
+
+
+func _apply_one(pid: String) -> void:
+	var st: Dictionary = players[pid]["stats"]
+	var ch: Dictionary = progress.get(pid, {})
+	for k in _orig_stats[pid]:
+		var v := float(_orig_stats[pid][k]) + float(ch.get(k, 0.0))
+		st[k] = clampf(v, 1.0, 99.0) if ch.has(k) else _orig_stats[pid][k]
+
+
+func add_progress(pid: String, stat: String, amount: float) -> void:
+	if not progress.has(pid):
+		progress[pid] = {}
+	progress[pid][stat] = float(progress[pid].get(stat, 0.0)) + amount
+	_apply_one(pid)
+
+
+## Forget the cached best lineups so the next call sees today's stats (the search is the expensive part of
+## a season, so growth does not trigger it by itself; the game calls this on patch days and after ageing).
+func refresh_lineups() -> void:
+	_lineup_cache.clear()
+
+
+## Same for one club (the manager asking for "best lineup" must not make nine AI clubs recompute).
+func refresh_lineup(club_id: String) -> void:
+	_lineup_cache.erase(club_id)
+
+
+func fatigue_of(pid: String) -> float:
+	return float(fatigue.get(pid, 0.0))
+
+
+func age_of(p: Dictionary) -> int:
+	return int(p["age"]) + season_offset
+
+
+## Rating a player brings to a slot right now: BaseRating x fit, less the fatigue penalty.
+func slot_score(p: Dictionary, slot: String) -> float:
+	return base_rating(p, slot) * player_fit(p, slot) - Progression.fatigue_penalty(fatigue_of(p["id"]))
+
+
+## The AI's lineup with rotation: the best rested lineup, then any bench player who is worth more than a
+## tired starter takes his slot. With nobody tired this is exactly best_lineup.
+func rotated_lineup(club_id: String) -> Dictionary:
+	var lu := best_lineup(club_id)
+	var ps := club_players(club_id)
+	for _pass in 2:
+		for s in SLOTS:
+			var in_lineup := {}
+			for t in SLOTS:
+				in_lineup[lu[t]["id"]] = true
+			var cur: Dictionary = lu[s]
+			var best_gain := 0.0
+			var pick: Dictionary = {}
+			var cur_score := slot_score(cur, s)
+			for p in ps:
+				if in_lineup.has(p["id"]):
+					continue
+				var gain := slot_score(p, s) - cur_score
+				if gain > best_gain + 1.0e-9:
+					best_gain = gain
+					pick = p
+			if not pick.is_empty():
+				lu[s] = pick
+	return lu
 
 
 # ---------------------------------------------------------------- ratings
@@ -110,7 +204,7 @@ func familiarity(p: Dictionary, hid: String) -> float:
 
 
 func phase_rating(p: Dictionary, slot: String, hero: Dictionary, phase: String, fam: float, meta: float,
-		morale: float = -1.0) -> float:
+		morale: float = -1.0, fat: float = 0.0) -> float:
 	if morale < 0.0:
 		morale = Params.f("cal_morale")
 	var fam_w := Params.f("fam_w")
@@ -123,7 +217,7 @@ func phase_rating(p: Dictionary, slot: String, hero: Dictionary, phase: String, 
 			pb = base
 		_:
 			pb = 0.8 * base + 0.2 * float(p["stats"]["clu"])
-	var cond := (morale - 50.0) * 0.06
+	var cond := (morale - 50.0) * 0.06 - Progression.fatigue_penalty(fat)
 	var hf := ((1.0 - fam_w) + fam_w * fam / 100.0) * (0.90 + 0.10 * minf(1.0, float(p["stats"]["mec"]) / (15.0 * float(hero["difficulty"]))))
 	var fit := player_fit(p, slot) * hero_fit(hero, slot)
 	return (pb + cond) * hf * fit * (1.0 + (float(hero["power_" + phase]) - 50.0) / 200.0) * meta
@@ -225,7 +319,7 @@ func build_team(lineup: Dictionary, picks_mine: Dictionary, picks_theirs: Dictio
 		var r := {}
 		for s in SLOTS:
 			var hero: Dictionary = picks_mine[s]
-			r[s] = phase_rating(lineup[s], s, hero, ph, familiarity(lineup[s], hero["id"]), float(meta[hero["id"]]))
+			r[s] = phase_rating(lineup[s], s, hero, ph, familiarity(lineup[s], hero["id"]), float(meta[hero["id"]]), -1.0, fatigue_of(lineup[s]["id"]))
 		ratings[ph] = r
 	var mine_list: Array = []
 	for s in SLOTS:

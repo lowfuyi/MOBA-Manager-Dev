@@ -35,6 +35,7 @@ Last updated: 2026-11-08 by Producer
 | D-018 | Pacing and formats (GDD 8.7): Short draft re-test done (draft lever preserved, low-powered n=400; 4,000+ run goes into P-003); draft timers, auto-pick, Skip and playback speed are in the Alpha 0.1 screens | Systems Lead | QA & Balance Lead | Done (Alpha 0.2) |
 | P-004 | Roster screen, draft screen, match result screen (placeholder visuals) | Engineering + UI/UX | Game Design Lead | Done in Alpha 0.1 (A-004) |
 | A-004 | Alpha 0.1: installable Android build of the Single Player loop (club pick, lineup, 10 s draft, feed, report, season with standings and playoffs). Game state and report logic tested headless (1,514 checks), UI smoke test through a whole season, screenshot QA at 720x1280, APK exported and signature verified. Not yet run on a physical phone. Notes: `docs/ALPHA-0.1-NOTES.md` | Engineering Lead + UI/UX | QA (independent review pending) | Delivered for Founder game test |
+| A-005 | Alpha 0.2: Game Plan screen and engine (D-009), training focus, fatigue with rotation, ageing and growth (GDD 7.3) for every club, growth summary. Constants in `game/data/training_v0.json` (Coach 2, Facility 2 fixed until D-007). 1,590 headless checks, UI smoke and touch tests cover the new screens, QA `tools/train_qa.gd` (no schedule dominant). Notes: `docs/ALPHA-0.2-NOTES.md` | Engineering Lead + Systems Lead | QA (independent review pending) | Delivered for Founder game test |
 
 ## Later phases
 

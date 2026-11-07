@@ -79,3 +79,27 @@ Logistic slope fitted to all matches: 0.0915 per rating point, so a +10 gap wins
 | Matchups whose best plan differs from the others | 15 of 15 pairs | at least 30% |
 
 Reading: no plan dominates, and the best plan depends on the matchup. Risk is the strongest single lever because variance helps the underdog; its largest effect (+2.90 points) is for the 10% underdog, which is the intended comeback valve and stays far below the effect of squad strength (a 20-point rating gap is worth about 32 points of win rate, 82.5% in the calibration table). The coach gets about two thirds of the joint gain with no player effort. Zero-sum (9.2.9) and neutral-equals-plain-sim are asserted in `game/tests/game_plan_tests.gd` (1,547 checks pass). No coefficient change needed. Re-run after Team Bonds ships.
+
+## Addendum (Alpha 0.2, 2026-11-08): training and fatigue schedules (GDD 7.3, 9.2 "no schedule is strictly dominant")
+
+`tools/train_qa.gd` plays each of the 10 clubs through two league seasons under six manager policies (the human club only; every AI club trains by the coach's pick and rotates). Results do not feed back into training yet (no Form or Morale), so one run per club and policy is exact. "eff" is the mean over match days of the five starters' mid-game rating with each one's best hero at neutral meta, fatigue included, so growth, familiarity and fatigue all count. "base" is the plain Team Rating at the end of the season. Mean over the 10 clubs.
+
+**First run, GDD base rate 0.5 points per training week.** Training lost: resting everybody beat the coach's training for 10 of 10 clubs in season 1 (eff 53.13 against 52.68) and for 9 of 10 in season 2, because a season of training added only +0.28 Team Rating but cost about 0.45 rating in fatigue. That is a dominant "never train" schedule, so the numbers were wrong. Fix (producer call, within the 7.3 formula): base rate 0.5 to 1.5 points per week and hero practice 1.5 to 3.0 familiarity per week. The formula, age factors, Coach and Facility terms and all fatigue numbers are unchanged.
+
+**Second run, base 1.5, hero practice 3.0.**
+
+| Policy | eff S1 | eff S2 | base S1 | base S2 | Wins S1 | Wins S2 |
+|---|---|---|---|---|---|---|
+| coach training, fixed lineup (the default) | 53.35 | 54.35 | 53.96 | 54.52 | 8.9 | 9.5 |
+| coach training, rotate every match day | 53.47 | 54.51 | 53.82 | 54.39 | 8.9 | 9.1 |
+| nobody trains | 53.53 | 53.84 | 53.18 | 53.16 | 9.0 | 9.2 |
+| everybody practises a hero | 53.05 | 53.28 | 53.18 | 53.16 | 9.1 | 8.8 |
+| starters rest, bench trains | 53.53 | 53.84 | 53.18 | 53.16 | 9.0 | 9.2 |
+| train 9 match days, then rest | 53.85 | 54.54 | 53.61 | 53.95 | 9.0 | 9.5 |
+
+Reading:
+- **Training is an investment.** Resting is better inside season 1 (9 of 10 clubs), training is better from season 2 (9 of 10) because fatigue resets in the off-season and the growth stays. Neither is dominant over a two-season horizon.
+- **Rotation is sometimes right:** the best-rested lineup beat the fixed lineup for 8 of 10 clubs (mean +0.12), not for the two clubs with a weak bench.
+- **Train early, rest late** is the best simple schedule (+0.5 eff over the default in season 1, better for 10 of 10 clubs). The edge is about half a rating point, roughly 0.3 wins a season, so it rewards attention without making the decision trivial. It is a skill reward, not an exploit.
+- **Hero practice loses to stat training on raw rating** in every club, as expected: familiarity is a weak lever by design (v1.5 re-tune) and the QA metric already gives each player his best hero. Its use is draft flexibility (learning a second hero), which this metric cannot see. It stays as a niche option; the Alpha test will tell whether it feels useless.
+- Wins barely move (about 9 of 18 for every policy): training is a slow lever. The league as a whole grows about +0.8 Team Rating in season 1 and +1.3 by the end of season 2 (AI clubs train too), until players reach their ceilings. There is no youth intake yet, so a very long save will drift towards an ageing league; recruitment (Alpha 0.3) is the fix.

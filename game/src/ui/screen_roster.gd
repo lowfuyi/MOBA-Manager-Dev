@@ -40,7 +40,7 @@ func _rebuild() -> void:
 		var p: Dictionary = lu[s]
 		var fit := w.player_fit(p, s)
 		var tag := "" if fit >= 1.0 else ("  (" + Strings.t("roster.offrole") + ")")
-		var txt := Strings.f("roster.slot_row", {"role": Strings.t("role." + s), "name": p["name"], "rating": "%.0f" % (w.base_rating(p, s) * fit)}) + tag
+		var txt := Strings.f("roster.slot_row", {"role": Strings.t("role." + s), "name": p["name"], "rating": "%.0f" % w.slot_score(p, s)}) + tag + UI.fatigue_tag(w.fatigue_of(p["id"]))
 		var b := UI.button(txt, _toggle_slot.bind(s), "primary" if _pick_slot == s else "normal", 76)
 		c.add_child(b)
 		if _pick_slot == s:
@@ -55,7 +55,7 @@ func _rebuild() -> void:
 		for s in GameState.SLOTS:
 			if lu[s]["id"] == p["id"]:
 				starting = true
-		var line := Strings.f("roster.player_row", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "age": p["age"], "rating": "%.0f" % _best(w, p)})
+		var line := Strings.f("roster.player_row", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "age": w.age_of(p), "rating": "%.0f" % _best(w, p)}) + UI.fatigue_tag(w.fatigue_of(p["id"]))
 		if starting:
 			line += "  *"
 		sq.add_child(UI.button(line, _toggle_player.bind(p["id"]), "flat" if _open_player != p["id"] else "normal", 70))
@@ -66,7 +66,7 @@ func _rebuild() -> void:
 func _best(w: World, p: Dictionary) -> float:
 	var best := 0.0
 	for s in GameState.SLOTS:
-		best = maxf(best, w.base_rating(p, s) * w.player_fit(p, s))
+		best = maxf(best, w.slot_score(p, s))
 	return best
 
 
@@ -86,10 +86,9 @@ func _picker(parent: VBoxContainer, slot: String) -> void:
 	var sub := UI.card(parent, UI.PANEL2, 12)
 	sub.add_child(UI.label(Strings.f("roster.choose_for", {"role": Strings.t("role." + slot)}), UI.S_SMALL, UI.DIM))
 	var ps := w.club_players(gs.club())
-	ps.sort_custom(func(a, b): return w.base_rating(a, slot) * w.player_fit(a, slot) > w.base_rating(b, slot) * w.player_fit(b, slot))
+	ps.sort_custom(func(a, b): return w.slot_score(a, slot) > w.slot_score(b, slot))
 	for p in ps:
-		var fit := w.player_fit(p, slot)
-		var txt := Strings.f("roster.pick_row", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "rating": "%.0f" % (w.base_rating(p, slot) * fit)})
+		var txt := Strings.f("roster.pick_row", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "rating": "%.0f" % w.slot_score(p, slot)}) + UI.fatigue_tag(w.fatigue_of(p["id"]))
 		sub.add_child(UI.button(txt, _assign.bind(slot, p["id"]), "normal", 66))
 
 
@@ -111,6 +110,8 @@ func _player_detail(parent: VBoxContainer, p: Dictionary) -> void:
 	var w := App.world
 	var d := UI.card(parent, UI.PANEL2, 14)
 	d.add_child(UI.label(Strings.f("roster.detail", {"personality": Strings.t("personality." + p["personality"]), "country": p["country"]}), UI.S_SMALL, UI.DIM))
+	var fat := w.fatigue_of(p["id"])
+	d.add_child(UI.label(Strings.f("roster.fatigue_line", {"fat": "%.0f" % fat}), UI.S_SMALL, UI.fatigue_color(fat)))
 	for st in World.STATS:
 		var row := UI.hbox()
 		var name_l := UI.label(Strings.t("stat." + st), UI.S_SMALL, UI.TEXT)
@@ -120,8 +121,10 @@ func _player_detail(parent: VBoxContainer, p: Dictionary) -> void:
 		var bar := UI.bar(float(p["stats"][st]), 100.0, UI.ACCENT, 20)
 		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(bar)
-		var val := UI.label("%d / %d" % [p["stats"][st], p["potential"][st]], UI.S_SMALL, UI.DIM, HORIZONTAL_ALIGNMENT_RIGHT)
-		val.custom_minimum_size = Vector2(120, 0)
+		var gain := App.gs.season_gain(p["id"], st) if (App.gs.world.clubs[App.gs.club()]["player_ids"] as Array).has(p["id"]) else 0.0
+		var gain_txt := "" if absf(gain) < 0.05 else " (%+.1f)" % gain
+		var val := UI.label("%d / %d%s" % [int(round(float(p["stats"][st]))), p["potential"][st], gain_txt], UI.S_SMALL, UI.GOOD if gain >= 0.05 else UI.DIM, HORIZONTAL_ALIGNMENT_RIGHT)
+		val.custom_minimum_size = Vector2(190, 0)
 		val.size_flags_horizontal = Control.SIZE_SHRINK_END
 		row.add_child(val)
 		d.add_child(row)

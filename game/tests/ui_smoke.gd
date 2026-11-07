@@ -59,6 +59,26 @@ func _run() -> void:
 	App.go(se)
 	se._confirm_reset = true
 	se._rebuild()
+	# training screen: open it, change a focus, hand everything back to the coach
+	var tr := ScreenTraining.new()
+	App.go(tr)
+	await get_tree().process_frame
+	ok(cur() is ScreenTraining, "training screen opens")
+	var tp: Dictionary = App.world.club_players(App.gs.club())[0]
+	tr._toggle(tp["id"])
+	tr._choose(tp["id"], "stat", "mec")
+	ok(App.gs.focus_of(tp)["k"] == "stat" and App.gs.focus_of(tp)["v"] == "mec", "training focus set from the screen")
+	tr._toggle_heroes()
+	var hero_id: String = App.world.hero_ids[0]
+	tr._choose(tp["id"], "hero", hero_id)
+	ok(App.gs.focus_of(tp)["k"] == "hero", "hero practice set from the screen")
+	tr._choose(tp["id"], "rest", "")
+	ok(App.gs.focus_of(tp)["k"] == "rest", "rest set from the screen")
+	tr._auto_one(tp["id"])
+	tr._coach_all()
+	ok(not (App.gs.d["train"] as Dictionary).has(tp["id"]), "coach picks everything again")
+	tr._toggle(tp["id"])
+	tr._toggle(tp["id"])
 	# full-UI games, then fast ones, through the whole season
 	var played := 0
 	var full_ui := 0
@@ -100,8 +120,17 @@ func _run() -> void:
 ## One game through PreMatch -> Draft -> Match -> Report -> back.
 func _play_with_ui(g: Dictionary, manual: bool) -> void:
 	App.go(ScreenHub.new())
+	if manual:
+		for pid in (App.gs.d["lineup"] as Dictionary).values():
+			App.world.fatigue[pid] = 80.0  # everyone tired: the match day shows the warning and the rotate button
 	App.go(ScreenPreMatch.new(g))
 	ok(cur() is ScreenPreMatch, "prematch")
+	if manual:
+		ok(App.gs.tired_starters().size() == 5, "tired starters are detected")
+		cur()._rotate()
+		await get_tree().process_frame
+		ok(cur() is ScreenPreMatch, "rotating returns to match day")
+		App.world.fatigue.clear()
 	App.go(ScreenDraft.new(g))
 	await get_tree().process_frame
 	var d: ScreenDraft = cur()
