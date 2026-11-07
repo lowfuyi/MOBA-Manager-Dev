@@ -436,7 +436,7 @@ Form moves toward the result (+/-2), morale +/-5 to 10 based on result and playi
 
 A best-of-3 series is therefore about 8 to 12 minutes and a best-of-5 final about 15 to 20 minutes, or seconds in Quick mode. Players can always choose to sim a series instead of watching.
 
-**Consequences to check.** (1) The short draft removes two bans, so 9.1 must be re-run with the short profile; the effect on the draft lever is expected to be small. (2) A 16-second feed per game minute is the playback target for the presentation phase. (3) Multiplayer edition (public matching): human timers apply to both drafters, and what happens when no opponent is found (a bot opponent after a short wait is the plan) is decided in that edition's design.
+**Consequences to check.** (1) The short draft removes two bans, so 9.1 must be re-run with the short profile; the effect on the draft lever is expected to be small. (2) The playback target for the presentation phase is about 7 to 8 seconds of feed per game minute (the 8x clock), so a 16-minute game plays in 2 minutes. (3) Multiplayer edition (public matching): human timers apply to both drafters, and what happens when no opponent is found (a bot opponent after a short wait is the plan) is decided in that edition's design.
 
 ---
 
