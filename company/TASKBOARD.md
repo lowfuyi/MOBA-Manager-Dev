@@ -29,7 +29,7 @@ Last updated: 2026-11-07 by Producer
 
 | ID | Task | Owner | Reviewer | Status |
 |---|---|---|---|---|
-| P-001 | Godot project skeleton, string tables, data loaders and schemas, PCG32 reference and golden vectors | Engineering Lead | QA | In progress: Python side done and tested (14 tests pass); GDScript files written but NOT yet run in Godot (running Godot needs Founder permission) |
+| P-001 | Godot project skeleton, string tables, data loaders and schemas, PCG32 reference and golden vectors | Engineering Lead | QA | Done: 14 Python tests and 61 headless Godot checks pass (Godot 4.3 official build, checksum verified); negative test confirmed tests can fail |
 | P-002 | Match simulator as a headless module with unit tests | Engineering Lead | QA | Backlog |
 | P-003 | Batch simulation harness (10,000 matches, win-rate report) | QA & Balance Lead | Systems Lead | Backlog |
 | P-004 | Roster screen, draft screen, match result screen (placeholder visuals) | Engineering + UI/UX | Game Design Lead | Backlog |
