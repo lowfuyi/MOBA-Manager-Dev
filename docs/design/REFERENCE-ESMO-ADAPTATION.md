@@ -78,6 +78,28 @@ Seen as a paid feature. Our Quick mode auto-draft stays free (Pillar 5). A paid 
 - Competitions list: grows into Global edition (seasons, regional tournaments, invitationals, World Cup).
 - Skins and club customization: visual phase and paid tiers.
 
-## Open questions for the Founder
-1. **Game Plan in Phase 1?** Recommendation: yes, the small version (about 8 sliders, a default plan and two triggers, "ahead" and "behind"), after the core draft calibration is done. It adds a real coach decision. Cost: more simulator tests.
-2. **Team Bonds grid in Phase 1?** Recommendation: yes, with English-only data and the maths in place for languages later.
+## 7. Matchmaking, ranks and leaderboards (second set of screenshots)
+
+**Seen:** a matchmaking hub with three modes: *Competitive* (a season with a countdown, a leaderboard, a ranks guide, placement matches before you get a rank), *Quick Match* (queue-time preference: balanced, faster, or higher quality; fairness setting: standard, strict, expanded), and *Friendly* (a quick match against a chosen club, best of 1, 3 or 5, with a club search). A settings sheet lets the player allow matches against bots to cut queue time and choose whether their matches are public. The leaderboard lists clubs with logo, flag, rank and points. The ranks guide shows nine ranks, each with five divisions for the lower ranks and none at the top; hidden skill rating decides points won or lost; 100 points promotes you; dropping below 0 demotes you unless a "points shield" protects you (earned from losses and on promotion); top ranks use thresholds that move with how many players are in each rank, and inactivity slowly lowers points. Each rank shows a season reward.
+
+**Edition mapping:**
+- **Multiplayer edition (online):** the full competitive ladder, Quick Match, Friendly, club search, privacy settings and leaderboards belong here. Draft below.
+- **Single Player edition (Phase 1):** only two of these make sense offline, and both are cheap:
+  - **Exhibition (the Friendly idea):** pick any club in your league, play best of 1, 3 or 5. No effect on the league table; reduced fatigue and no form or morale change. Useful for testing drafts and Game Plans, and it is where "scrim" for chemistry can live.
+  - **Quick Match:** an instant game against a random club of similar strength, same no-effect rule.
+  Recommendation: include both in Phase 1.
+- **Global edition:** seasons with countdown, season rewards and tournaments.
+
+**Draft design for the Multiplayer ladder (not for Phase 1):**
+- Hidden rating (Elo-style, with uncertainty) decides points gained or lost; placement matches set the starting point; ranks have divisions; a points shield softens demotion; top ranks use population-based thresholds; inactivity decay; a season reset. This is a standard ladder design and the maths is ours to choose.
+- **Our own rank names.** The reference's rank names are the same well-known ladder words used by the genre leader, so we do not use them. Placeholder names Tier 1 to Tier 10 until the Content Lead proposes original names (task D-006) and the IP Checker clears them.
+- **Honesty about bots:** if bots fill queues, label them in the match record. Store policies and fairness expectations favour clear disclosure.
+- **Fairness settings:** queue-time and fairness options are good ideas. Keep two simple controls and show expected wait.
+- **Rewards:** season rewards are in-game items and cosmetics only. No real-money prizes without legal review (prize games and gambling rules differ by country).
+- **Privacy:** matches public or private is a per-club setting; competitive matches are public.
+- **Moderation:** club names and tags need a filter and a report function before any online release.
+
+## Decisions (Founder, 2026-11-07)
+1. **Game Plan in Phase 1: YES**, the small version (about 8 sliders, a default plan, triggers "ahead" and "behind"), built after the core draft calibration.
+2. **Team Bonds in Phase 1: YES**, with English-only data and the pair grid and maths in place.
+3. Exhibition and Quick Match in Phase 1: recommended, proceeding unless the Founder objects.

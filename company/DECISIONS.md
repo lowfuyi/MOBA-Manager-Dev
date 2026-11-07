@@ -15,6 +15,8 @@
 | 2026-11-07 | Release path and naming: the game's edition name changes with the update phase (see below) | Founder |
 | 2026-11-07 | Platform: Android first; iOS only when demand grows | Founder |
 | 2026-11-07 | Language: English for testing; more languages added at the live release (all text must be kept in translatable string tables from day one) | Founder |
+| 2026-11-07 | Game Plan (small version: about 8 sliders, default plan, "ahead" and "behind" triggers) is in Phase 1 | Founder |
+| 2026-11-07 | Team Bonds (pairwise Bond and Understanding, languages data field) is in Phase 1 | Founder |
 
 ## Release path (Founder, 2026-11-07)
 

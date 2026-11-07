@@ -12,10 +12,13 @@ Last updated: 2026-11-07 by Producer
 | D-004 | Prototype of the match formula (done as `tools/proto_sim.py` v0.2; calibrated to GDD section 9) | Systems Lead | QA & Balance Lead | Done (re-review passed with fixes) |
 | D-007 | Economy: wage caps, contract valuation, sponsor income | Systems Lead | QA & Balance Lead | Backlog |
 | D-008 | Player generation rules and the 40-hero set (data) | Content Lead | IP Checker + QA | Backlog |
-| D-009 | Game Plan spec: sliders, triggers, model mapping, no-dominant-plan test (see REFERENCE-ESMO-ADAPTATION.md) | Systems Lead | QA & Balance Lead + IP Checker | Backlog, pending Founder |
-| D-010 | Team Bonds spec: pairwise Bond and Understanding, languages field, analytics screens | Systems Lead + UI/UX | QA + IP Checker | Backlog, pending Founder |
+| D-009 | Game Plan spec: sliders, triggers, model mapping, no-dominant-plan test (see REFERENCE-ESMO-ADAPTATION.md) | Systems Lead | QA & Balance Lead + IP Checker | Backlog (Founder approved) |
+| D-010 | Team Bonds spec: pairwise Bond and Understanding, languages field, analytics screens | Systems Lead + UI/UX | QA + IP Checker | Backlog (Founder approved) |
 | D-005 | Original role/archetype set and 40 heroes (names + data only) | Content Lead | IP Checker + QA | Backlog |
 | D-006 | Original naming glossary (map, objectives, items, terms) | Content Lead | IP Checker | Backlog |
+
+| D-011 | Exhibition and Quick Match modes (single player, no league effect) | Game Design Lead | Systems Lead | Backlog |
+| D-012 | Multiplayer ladder, ranks, matchmaking and club search spec (Multiplayer edition, later) | Systems Lead | QA + IP Checker | Parked |
 
 ## Phase 1: Prototype (starts after D-003 is decided)
 
