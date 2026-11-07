@@ -332,7 +332,7 @@ Two offline modes for practice. They never change the league table, the Form Rat
 
 ## 8. Match simulation (the core model)
 
-The simulator is **deterministic given a seed**, fast, and produces a readable report. It reasons in three phases made of named contests. The reference implementation for calibration is `tools/proto_sim.py`.
+The simulator is **deterministic given a seed**, fast, and produces a readable report. It reasons in three phases made of named contests. The reference implementation is `tools/sim_core.py` (PCG32); `tools/proto_sim.py` is the older prototype kept for history.
 
 ### 8.1 Inputs
 
@@ -381,7 +381,7 @@ A_mid = 0.35*objectives + 0.65*teamfights
 
 ### 8.4 Randomness and determinism
 
-- RNG: **PCG32** with Box-Muller for normal draws. (The prototype uses Python's own generator, so P-002 must re-run the section 9 calibration after the switch and store the numbers beside the golden vectors.) Match seed = hash(save seed, match id), fixed when the match is generated, before the draft.
+- RNG: **PCG32** with Box-Muller for normal draws. (Done in P-002: the reference simulator `tools/sim_core.py` uses PCG32 and the section 9 calibration was re-run, see the PCG32 table in section 9. Constants live in `game/data/sim_params.json`; golden vectors are `game/tests/golden/sim_vectors.json`, reproduced by the Godot module.) Match seed = hash(save seed, match id), fixed when the match is generated, before the draft.
 - Each contest draws from its own named substream (`seed + contest id`), so replaying a match with a changed input uses the same noise. This allows exact counterfactuals for reports.
 - Engineering produces golden test vectors (inputs, seed, outputs) from the reference implementation in task P-002; the Godot module must reproduce them.
 - Offline single player accepts save-reload redrafting as a known risk; competitive modes use a single autosave.
@@ -423,6 +423,8 @@ Measured on 40,000 simulated matches, equal CON of 50 unless stated. Tolerance i
 | Dive vs Siege (winner +4%, loser -4%), equal players | about +3 to +6 points | 54.6% |
 | Lane counter bonus +5% in all three lanes | about +2 points | 52.1% |
 | Comeback rate (team behind after early game, |A_early| of 0.2 or more, wins) | 25 to 40% | 27.8% |
+
+**PCG32 re-run (P-002, `tools/calibrate.py`, 40,000 matches per row, seeds fixed):** all rows are inside their bands, so no constant changed. Win rate: +0 50.4%, +5 59.7%, +10 **67.8%**, +20 82.5%, +30 92.1%. CON 20/50/80 at +10: 64.8 / 68.2 / 74.0%. Late-heavy vs early-heavy 49.8%. One-phase +10: early 57.1, mid 55.5, late 56.9%. CompMod +10% 57.2%, +5% 53.9%. Dive vs Siege 54.4%. Lane counter 52.0%. Comeback 28.1%. Bands are the numbers above plus a sampling tolerance of two standard errors (0.25 points at this sample size). **Watch item:** +10 sits 0.2 points under its 68% lower edge and passes only through that tolerance; the +20 and +30 rows are also on the low side. If the full-pipeline test (9.1) shows the favourite underperforming, nudge `D` down slightly (for example 24) rather than adding new terms.
 
 ### 9.1 Full-pipeline calibration (required before P-002 is closed)
 

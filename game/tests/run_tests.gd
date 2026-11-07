@@ -10,6 +10,7 @@ var _failures := 0
 
 func _initialize() -> void:
 	_test_rng_golden()
+	_test_sim_golden()
 	_test_strings()
 	_test_data()
 	print("checks: %d, failures: %d" % [_checks, _failures])
@@ -56,6 +57,34 @@ func _test_rng_golden() -> void:
 				var g := Pcg32.contest_stream(_join(c["match_seed"]), c["contest_id"])
 				for i in c["u32"].size():
 					_check(g.next_u32() == int(c["u32"][i]), name + " u32 #%d" % i)
+
+
+func _close(a: float, b: float, tol: float) -> bool:
+	return absf(a - b) <= tol
+
+
+func _test_sim_golden() -> void:
+	var golden = DataLoader.load_json("res://tests/golden/sim_vectors.json")
+	_check(golden is Dictionary, "sim golden loads")
+	if not (golden is Dictionary):
+		return
+	var p := MatchSim.load_params()
+	_check(not p.is_empty(), "sim params load")
+	var save_seed := _join(golden["save_seed"])
+	var tol := float(golden["tolerance"])
+	var i := 0
+	for c in golden["cases"]:
+		var label := "sim case %d (%s)" % [i, c["match_id"]]
+		i += 1
+		var r := MatchSim.simulate(c["team_a"], c["team_b"], Pcg32.match_seed(save_seed, c["match_id"]), p)
+		var e: Dictionary = c["expect"]
+		_check(r["a_won"] == e["a_won"], label + " winner")
+		for k in ["final", "early", "mid", "late"]:
+			_check(_close(r[k], float(e[k]), tol), label + " " + k)
+		for k in e["contests"]:
+			_check(_close(r["contests"][k], float(e["contests"][k]), tol), label + " contest " + k)
+		for k in e["noise"]:
+			_check(_close(r["noise"][k], float(e["noise"][k]), tol), label + " noise " + k)
 
 
 func _test_strings() -> void:

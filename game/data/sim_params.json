@@ -1,0 +1,20 @@
+{
+  "version": "v0",
+  "note": "Match model constants (GDD section 8). Single source for the Python reference and the Godot module. Tuned only through QA calibration (tools/calibrate.py).",
+  "D": 25.0,
+  "sigma": 2.0,
+  "gamma": 0.8,
+  "w_lane": 0.28,
+  "w_jungle": 0.16,
+  "w_mid_obj": 0.35,
+  "w_late_obj": 0.25,
+  "carry_early": 0.5,
+  "f_early": 0.30,
+  "f_mid": 0.30,
+  "f_late": 0.40,
+  "side_bonus": 0.02,
+  "style_edge": 0.04,
+  "obj_w": {"jg": 0.30, "sup": 0.25, "mid": 0.15, "top": 0.15, "bot": 0.15},
+  "fight_w": {"bot": 0.25, "mid": 0.25, "top": 0.20, "jg": 0.15, "sup": 0.15},
+  "style_beats": {"dive": "siege", "siege": "protect", "protect": "dive"}
+}
