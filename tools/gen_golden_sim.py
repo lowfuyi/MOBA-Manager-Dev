@@ -21,12 +21,23 @@ def rand_team(g):
             "style": STYLES[g.next_u32() % 4]}
 
 
+def add_plan(team, g):
+    team["contest_mod"] = {c: round(0.06 * (g.next_float() - 0.5), 4) for c in S.CONTESTS if g.next_u32() % 2}
+    team["variance_mult"] = round(0.8 + 0.5 * g.next_float(), 3)
+    team["contest_var"] = {c: round(0.8 + 0.5 * g.next_float(), 3) for c in S.CONTESTS if g.next_u32() % 3 == 0}
+    return team
+
+
 def main():
     g = Pcg32(20261107, 99)
     save_seed = 0xDEADBEEF12345678
     cases = []
     for i in range(24):
         a, b = rand_team(g), rand_team(g)
+        if i >= 12:  # second half of the cases carry Game Plan hooks on one or both teams
+            add_plan(a, g)
+            if i % 2:
+                add_plan(b, g)
         mid = "golden-%02d" % i
         r = S.simulate(a, b, match_seed(save_seed, mid))
         cases.append({"match_id": mid, "team_a": a, "team_b": b, "expect": r})

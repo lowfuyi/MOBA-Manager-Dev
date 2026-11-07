@@ -53,3 +53,29 @@ def test_calibration_bands_hold_at_reduced_sample():
     rows = C.run(10000)
     bad = [(n, v, lo, hi) for n, v, lo, hi in rows if not lo <= v <= hi]
     assert bad == []
+
+
+def test_plan_hooks_default_to_no_change():
+    a, b = S.make_team(63), S.make_team(60)
+    a2 = copy.deepcopy(a)
+    a2.update(contest_mod={}, variance_mult=1.0, contest_var={})
+    s = match_seed(5, "hooks")
+    assert S.simulate(a, b, s) == S.simulate(a2, b, s)
+
+
+def test_contest_mod_moves_only_that_contest_input():
+    a, b = S.make_team(60), S.make_team(60)
+    a2 = copy.deepcopy(a); a2["contest_mod"] = {"fight_late": 0.05}
+    s = match_seed(5, "hooks2")
+    r1, r2 = S.simulate(a, b, s), S.simulate(a2, b, s)
+    assert r1["noise"] == r2["noise"]
+    assert r1["contests"]["top"] == r2["contests"]["top"]
+    assert r2["contests"]["fight_late"] != r1["contests"]["fight_late"]
+
+
+def test_variance_mult_scales_noise_in_every_contest():
+    a, b = S.make_team(60), S.make_team(60)
+    a2 = copy.deepcopy(a); a2["variance_mult"] = 1.5
+    s = match_seed(5, "hooks3")
+    n1, n2 = S.simulate(a, b, s)["noise"], S.simulate(a2, b, s)["noise"]
+    assert all(abs(n2[k]) > abs(n1[k]) * 1.1 or n1[k] == 0 for k in n1)

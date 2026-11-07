@@ -10,9 +10,9 @@ Last updated: 2026-11-07 by Producer
 | D-002 | Game Design Document v1.2 (two independent reviews done) | Game Design Lead | Systems Lead + IP Checker | In review |
 | D-003 | Founder decisions on open questions (see DECISIONS.md) | Founder | n/a | Needs Founder |
 | D-004 | Prototype of the match formula (done as `tools/proto_sim.py` v0.2; calibrated to GDD section 9) | Systems Lead | QA & Balance Lead | Done (re-review passed with fixes) |
-| D-007 | Economy: wages, contract valuation, sponsor lite (offers, objectives, tutorial goals), finance screens (Overview, Analytics, History), 10-season no-bankruptcy and no-snowball test | Systems Lead | QA & Balance Lead | Backlog |
+| D-007 | Economy (also: CON is a reliability stat, so valuation must not treat it as plain strength; asking wage floor and Potential factor; 4-week-negative dismissal rule): wages, contract valuation, sponsor lite (offers, objectives, tutorial goals), finance screens (Overview, Analytics, History), 10-season no-bankruptcy and no-snowball test | Systems Lead | QA & Balance Lead | Backlog |
 | D-008 | Player generation rules and the 40-hero set (data) | Content Lead | IP Checker + QA | Backlog |
-| D-009 | Game Plan spec: sliders, triggers, model mapping, no-dominant-plan test (see REFERENCE-ESMO-ADAPTATION.md) | Systems Lead | QA & Balance Lead + IP Checker | Backlog (Founder approved) |
+| D-009 | Game Plan: v1.4 spec written (8 zero-sum controls on 3 simulator hooks, triggers at +-0.40). Remaining: `game/data/game_plan_v0.json`, engine two-pass trigger logic, no-dominant-plan tests (9.2.1) | Systems Lead | QA & Balance Lead + IP Checker | In progress (Founder approved) |
 | D-010 | Team Bonds spec: pairwise Bond and Understanding, languages field, analytics screens | Systems Lead + UI/UX | QA + IP Checker | Backlog (Founder approved) |
 | D-005 | Original role/archetype set and 40 heroes (names + data only) | Content Lead | IP Checker + QA | Backlog |
 | D-006 | Original naming glossary (map, objectives, items, terms) | Content Lead | IP Checker | Backlog |
@@ -22,7 +22,7 @@ Last updated: 2026-11-07 by Producer
 | D-014 | Manager level, XP and talents (one MOBA tree, about 30 nodes, no direct match strength) | Systems Lead | QA & Balance Lead | Parked until core loop is balanced |
 | D-015 | Multiplayer transfer market spec (provisional agreement, offers, fee bands, no real-money trading) | Systems Lead | QA + IP Checker | Parked (Multiplayer edition) |
 | D-016 | Player profile spec: per-stat Potential (changes D-008 generation and the scouting display), stat help sheets, hero and role mastery levels, derived match statistics (KDA) with consistency tests, career log | Systems Lead + Game Design Lead | QA & Balance Lead | Backlog (proposed) |
-| D-017 | Form Rating spec (rolling rating with fade and importance), trophy cabinet, region and country data fields; QA test for ranking accuracy | Systems Lead | QA & Balance Lead | Backlog (proposed) |
+| D-017 | Form Rating (Elo-style, K 24, v1.4), trophy cabinet, region and country data fields; QA test for ranking accuracy (9.2.5, number check already in `tools/test_gdd_numbers.py`) | Systems Lead | QA & Balance Lead | Backlog (proposed) |
 | D-018 | Global edition competitions spec: tiers, open cups, invitationals, qualifier chains, promotion series, regions, original format names | Game Design Lead | QA + IP Checker | Parked (Global edition) |
 
 ## Phase 1: Prototype (starts after D-003 is decided)
@@ -30,8 +30,8 @@ Last updated: 2026-11-07 by Producer
 | ID | Task | Owner | Reviewer | Status |
 |---|---|---|---|---|
 | P-001 | Godot project skeleton, string tables, data loaders and schemas, PCG32 reference and golden vectors | Engineering Lead | QA | Done: 14 Python tests and 61 headless Godot checks pass (Godot 4.3 official build, checksum verified); negative test confirmed tests can fail |
-| P-002 | Match simulator as a headless module with unit tests (Python reference `tools/sim_core.py` on PCG32, Godot port `game/src/sim/match_sim.gd`, 25 golden cases, calibration re-run) | Engineering Lead | QA | Done pending review: 21 Python tests, 588 Godot checks, calibration in band; Godot mutation test confirmed it can fail |
-| P-003 | Batch simulation harness (10,000 matches, win-rate report) | QA & Balance Lead | Systems Lead | Backlog |
+| P-002 | Match simulator as a headless module with unit tests (Python reference `tools/sim_core.py` on PCG32, Godot port `game/src/sim/match_sim.gd`, 25 golden cases, frozen input interface incl. Game Plan hooks, calibration re-run) | Engineering Lead | QA | Done; QA review of GDD v1.3 raised no defect in the simulator code itself. 33 Python tests, 588 Godot checks pass |
+| P-003 | Batch harness: paired common-random-number lever tests with the v1.4 bands, calibration at Phase 1 rating scale (about 45), full-pipeline run (9.1) once content exists, joint Game Plan coordinate-ascent test (9.2.1), 10,000-match report | QA & Balance Lead | Systems Lead | Backlog |
 | P-004 | Roster screen, draft screen, match result screen (placeholder visuals) | Engineering + UI/UX | Game Design Lead | Backlog |
 
 ## Later phases

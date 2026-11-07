@@ -13,6 +13,12 @@ Team A is Blue side. A team is a dict:
   comp_mod  CompMod fraction (draft composition)
   lane_mod  {"top","mid","bot","jg": fraction}
   style     "dive" | "siege" | "protect" | "skirmish"
+Optional Game Plan hooks (interface frozen in v1; defaults leave results unchanged):
+  contest_mod   {contest: fraction}  multiplies this team's rating entering that contest
+  variance_mult float                multiplies this team's sigma in every contest (default 1)
+  contest_var   {contest: float}     multiplies this team's sigma in one contest (default 1)
+Contest weights (w_lane, obj_w, ...) are never changed by a plan; plans act only
+through these three hooks.
 """
 import json
 import math
@@ -57,12 +63,16 @@ def weighted(ratings, weights):
 def simulate(team_a, team_b, mseed, p=PARAMS):
     """Returns a dict: a_won, final, early, mid, late, contests{name: result},
     noise{name: draw (sigma_eff already applied)}."""
-    s_a = p["sigma"] * noise_scale(team_a["con"])
-    s_b = p["sigma"] * noise_scale(team_b["con"])
-    sigma_eff = math.sqrt((s_a ** 2 + s_b ** 2) / 2.0)
+    base_a = p["sigma"] * noise_scale(team_a["con"]) * team_a.get("variance_mult", 1.0)
+    base_b = p["sigma"] * noise_scale(team_b["con"]) * team_b.get("variance_mult", 1.0)
     noise = {}
 
     def contest(name, a, b, carry):
+        a = a * (1.0 + team_a.get("contest_mod", {}).get(name, 0.0))
+        b = b * (1.0 + team_b.get("contest_mod", {}).get(name, 0.0))
+        s_a = base_a * team_a.get("contest_var", {}).get(name, 1.0)
+        s_b = base_b * team_b.get("contest_var", {}).get(name, 1.0)
+        sigma_eff = math.sqrt((s_a ** 2 + s_b ** 2) / 2.0)
         z = contest_stream(mseed, name).next_normal() * sigma_eff
         noise[name] = z
         return math.tanh((a - b) / p["D"] + p["gamma"] * carry + z)

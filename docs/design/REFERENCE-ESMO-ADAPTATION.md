@@ -141,7 +141,7 @@ Seen as a paid feature. Our Quick mode auto-draft stays free (Pillar 5). A paid 
 4. **Personality.** The four labels seen (Casual, Balanced, Temperamental, Professional) are common English words and fine to use. We map them to numbers: how steady training gains are, how fast Bond grows (Team Bonds), how swingy morale is, and how hard negotiation is. The Systems Lead sets the values.
 5. **Talents (later).** If built: about 30 nodes, one MOBA-only tree, small bonuses, effects only on support systems (training speed, scouting accuracy, negotiation, energy recovery, Bond growth). No node adds match strength directly. The tree layout, icons and names are our own.
 6. **Player names.** Generated from our own name tables per region. The generator must never produce the handle of a real pro player (right of publicity and IP). Names are data, not UI text.
-7. **Flags.** Real country flags are fine. The country links to the languages field used by Team Bonds.
+7. **Flags.** Real country flags are fine and are display only. Languages are a separate field used by Team Bonds and are never derived from country (decided in GDD v1.4, section 4.2).
 8. **Help cards.** One-time help cards with an "Understood" button, stored as translatable strings. The UI/UX Lead lists which screens get one.
 
 **Draft design for the Multiplayer transfer market (not for Phase 1):**

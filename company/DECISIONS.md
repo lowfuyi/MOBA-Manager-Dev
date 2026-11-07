@@ -20,9 +20,10 @@
 | 2026-11-07 | Proposed by Producer, proceeding unless the Founder objects: turn-based calendar; free agents only in Phase 1; sponsor "lite" plus tutorial goals; finances screens; manager talents deferred (see REFERENCE-ESMO-ADAPTATION.md section 8 and decisions 4 to 8) | Producer (pending Founder) |
 | 2026-11-07 | Proposed by Producer, proceeding unless the Founder objects: keep the 8 player stats; Potential becomes per stat; stat help sheets, mastery levels, derived KDA, career log; contract expiry reminders always free (see REFERENCE-ESMO-ADAPTATION.md section 9) | Producer (pending Founder) |
 | 2026-11-07 | Global edition competition geography uses real regions; all clubs and players stay fictional | Founder |
-| 2026-11-07 | Proposed by Producer, proceeding unless the Founder objects: Form Rating (28-day fade, importance-weighted) and a trophy cabinet in Phase 1; multi-tier leagues, cups and region leaderboards wait for Global (see REFERENCE-ESMO-ADAPTATION.md section 10) | Producer (pending Founder) |
+| 2026-11-07 | Proposed by Producer, proceeding unless the Founder objects: Form Rating (redefined in GDD v1.4 as an Elo-style rating, K 24, because the 28-day-fade version measured only luck) and a trophy cabinet in Phase 1; multi-tier leagues, cups and region leaderboards wait for Global (see REFERENCE-ESMO-ADAPTATION.md section 10) | Producer (pending Founder) |
 
 ## Release path (Founder, 2026-11-07)
+| 2026-11-07 | Producer decisions after the independent QA review (GDD v1.4), proceeding unless the Founder objects: Game Plan has 8 controls (within the approved 8 to 10), all zero-sum in rating, acting through three simulator hooks, with triggers at +-0.40; Peel/Engage and Comeback-focus sliders dropped; Team Bonds numbers corrected (Bond 60 / COM 60 gives 1.92 percent) and Bond gains shrink as a pair matures; a club that stays in the red for 4 weeks in a row gets the manager dismissed (game over, retry from autosave) in Phase 1 so the economy has a real failure case; Exhibition and Quick Match earn no objectives, goals or awards; prize money is 40 percent to a player pool by prize weights; 10-season economy and personality tests wait for the seasons phase | Producer (pending Founder) |
 
 | Phase | Edition | What it adds |
 |---|---|---|
