@@ -7,9 +7,9 @@ Last updated: 2026-11-07 by Producer
 | ID | Task | Owner | Reviewer | Status |
 |---|---|---|---|---|
 | D-001 | Repo structure, workflow, role charters | Producer | Founder | In review |
-| D-002 | Game Design Document v1.1 (revised after first review; second review in progress) | Game Design Lead | Systems Lead + IP Checker | In review |
+| D-002 | Game Design Document v1.2 (two independent reviews done) | Game Design Lead | Systems Lead + IP Checker | In review |
 | D-003 | Founder decisions on open questions (see DECISIONS.md) | Founder | n/a | Needs Founder |
-| D-004 | Prototype of the match formula (done as `tools/proto_sim.py` v0.2; calibrated to GDD section 9) | Systems Lead | QA & Balance Lead | Done, pending re-review |
+| D-004 | Prototype of the match formula (done as `tools/proto_sim.py` v0.2; calibrated to GDD section 9) | Systems Lead | QA & Balance Lead | Done (re-review passed with fixes) |
 | D-007 | Economy: wage caps, contract valuation, sponsor income | Systems Lead | QA & Balance Lead | Backlog |
 | D-008 | Player generation rules and the 40-hero set (data) | Content Lead | IP Checker + QA | Backlog |
 | D-005 | Original role/archetype set and 40 heroes (names + data only) | Content Lead | IP Checker + QA | Backlog |

@@ -1,7 +1,7 @@
-# Game Design Document v1.1
+# Game Design Document v1.2
 
-Status: DRAFT, revised after independent review. Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
-Reviewers: Systems Lead + IP Checker (first review done, findings addressed in section 16), then Founder.
+Status: DRAFT, revised after two independent reviews (findings and fixes in section 16). Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
+Next: Founder review. Engineering may start P-001 (project skeleton) now; P-002 (simulator) starts after the full-pipeline calibration in section 9.1 is scheduled.
 
 All numbers in this document are **v0 placeholders** unless marked otherwise. They exist so the rules can be tested. QA & Balance tunes them against the targets in section 9, using `tools/proto_sim.py` as the reference model.
 
@@ -56,6 +56,7 @@ Five **slots** per team: Top, Jungle, Mid, Bot Carry, Support. The five starters
 - **PlayerFit** (player vs slot): primary 1.00, secondary 0.93, unfamiliar 0.80.
 - **HeroFit** (hero vs slot): the hero's primary role 1.00, secondary role 0.95, other 0.85.
 - In the draft, every pick is made **for a slot**. The AI sets its lineup before the draft starts, and its picks respect HeroFit.
+- **AI lineup rule:** choose the assignment of five starters to five slots that maximizes the sum of `BaseRating(slot) * PlayerFit`; ties broken by the higher sum of primary-role matches. Exactly 5 starters, one per slot.
 
 | Slot | Lane | Job in the sim |
 |---|---|---|
@@ -87,10 +88,10 @@ Five **slots** per team: Top, Jungle, Mid, Bot Carry, Support. The five starters
 | Value | Range | Notes |
 |---|---|---|
 | Potential | 1 to 100 | Soft cap for each stat's growth; revealed only through scouting and time |
-| Form | -10 to +10 | Moves with recent results; mean-reverts to 0 |
-| Morale | 0 to 100 | Affected by results, playing time, contract, team atmosphere |
+| Form | -10 to +10 | Moves with results (section 8.6); each day `Form = Form * 0.9` (mean-reverts to 0) |
+| Morale | 0 to 100 | Results and playing time (section 8.6); each day drifts 2 points toward 60; starters who sit 3+ matches lose 3 per match |
 | Fatigue | 0 to 100 | See section 7.3 |
-| Hero familiarity | 0 to 100 per hero | Starts 0 to 30 for new heroes; grows when played and trained |
+| Hero familiarity | 0 to 100 per hero | Starts 0 to 30 for new heroes; grows when played and trained; clamped to 0 to 100 |
 | Age | 16 to 35 | Affects growth rate and eventual decline |
 
 ### 4.3 Slot weights
@@ -112,12 +113,13 @@ Each slot converts the five performance stats into a **base rating** (rows sum t
 For each match, each starter's **rating per phase** is:
 
 ```
-Cond        = Form*0.4 + (Morale-50)*0.06 - 0.15*max(0, Fatigue-40)        (points)
-HeroFactor  = (0.85 + 0.15*Familiarity/100) * (0.90 + 0.10*min(1, MEC/(15*Difficulty)))
+Cond        = Form*0.4 + (Morale-50)*0.06 - 0.15*max(0, Fatigue-25)        (points)
+HeroFactor  = (0.90 + 0.10*Familiarity/100) * (0.90 + 0.10*min(1, MEC/(15*Difficulty)))
 Fit         = PlayerFit * HeroFit
-PhaseBase   = Early: 0.6*BaseRating + 0.4*LAN
+PhaseBase   = Early: 0.7*BaseRating + 0.3*EarlyStat(slot)
               Mid:   BaseRating
               Late:  0.8*BaseRating + 0.2*CLU
+EarlyStat   = LAN for Top, Mid, Bot Carry; MAC for Jungle; SEN for Support
 Rating(phase) = (PhaseBase + Cond) * HeroFactor * Fit
                 * (1 + (HeroPower[phase] - 50)/200) * MetaMod
 ```
@@ -151,7 +153,7 @@ Each hero has 2 to 4 tags: the archetype defaults plus up to two more chosen by 
 | id, name | Unique; name screened by IP Checker |
 | archetype | One of the seven above |
 | role_primary, role_secondary | Slots |
-| power_early, power_mid, power_late | 38 to 62 each; the three sum to 150 plus or minus 6 (power budget) |
+| power_early, power_mid, power_late | 38 to 62 each; the three sum to `144 + 3*difficulty` (147 to 159), so harder heroes are stronger when played well |
 | damage_type | Physical, Magic, Mixed |
 | range | Melee, Mid, Long |
 | difficulty | 1 to 5 |
@@ -160,14 +162,16 @@ Each hero has 2 to 4 tags: the archetype defaults plus up to two more chosen by 
 
 ### 5.3 Composition scoring
 
-Each team's picks produce a **CompMod** (range -10% to +10%) and a **comp style**.
+Each team's picks produce a **CompMod** and a **comp style**. `CompMod = clamp(sum of the terms below, -10%, +10%)`.
 
 - **Needs:** at least one Frontline, at least one Engage or Pick, at least one Waveclear. Each missing need is -3%.
 - **Damage balance:** Physical counts 1 physical, Magic 1 magic, Mixed 0.5 of each. If either total is 3.5 or more, -4%.
-- **Synergy pairs** (each pair counts once when both tags are present, on different heroes): Engage with Pick, Protect with Scaling, Poke with Waveclear, Frontline with Engage. +1.5% each, capped at +6%.
-- **Comp style:** Dive score = number of Engage + Pick tags; Siege score = Poke + Waveclear; Protect score = Protect + Scaling. The style is the highest score if it is at least 4 and at least 1 above the second; otherwise Skirmish.
-- **Style triangle:** Dive beats Siege beats Protect beats Dive. The winner gets +4% on **teamfight** contests only. Skirmish is neutral.
-- **Lane matchups:** in each lane contest, a hero that is `strong_vs` its opposing hero gives that lane +5%. In the Bot lane, either of the two heroes counts, capped at +5%.
+- **Synergy pairs:** four pair types exist: Engage with Pick, Protect with Scaling, Poke with Waveclear, Frontline with Engage. Each pair type counts **once** if both tags are present on two different heroes. +2.5% each, so the maximum is +10%.
+- **Comp style:** Dive score = count of Engage + Pick tags; Siege score = Poke + Waveclear; Protect score = Protect + Scaling. The style is the highest score if it is at least 4 and at least 1 above the second; any tie or lower score gives Skirmish. (Waveclear is required by Needs, so a Siege score of 1 is normal and does not make a Siege comp.)
+- **Style triangle:** Dive beats Siege beats Protect beats Dive. The winning style gets **+4% and the losing style gets -4%** on **teamfight** contests only (an 8% relative swing; this is what the prototype tests). Skirmish is neutral. `StyleEdge` below means this signed +4% or -4%.
+- **Lane matchups:** in the Top, Mid and Jungle contests, a hero that is `strong_vs` its opposing hero gives that contest +5%. In the Bot lane, any `strong_vs` link between the two heroes on either side counts, capped at +5% for the lane.
+
+**Realistic draft range (from the prototype, equal players):** a +5% comp beats none 54.0%; +10% beats none 57.4%; +5% beats -5% 57.4%; the best realistic draft (+8% comp, three lane counters, a style win) beats a mildly poor one (-3%) 63.7%.
 
 ### 5.4 Patches and the meta
 
@@ -181,16 +185,16 @@ Both teams draft before every match. The hero pool is **40 heroes** (about 8 per
 
 **Sides:** Blue picks first. In a league match the higher-ranked team chooses the side; in the prototype Blue is assigned by a seeded coin flip.
 
-**Sequence (v1):**
+**Sequence (v1, our own order):**
 
-1. Ban phase 1: Blue, Red, Blue, Red, Blue, Red (3 bans each).
+1. Ban phase 1: Blue, Red, Blue, Red (2 bans each).
 2. Pick phase 1: Blue 1, Red 1, Red 2, Blue 2, Blue 3, Red 3.
-3. Ban phase 2: Red, Blue, Red, Blue (2 bans each).
+3. Ban phase 2: Red, Blue (1 ban each).
 4. Pick phase 2: Red 4, Blue 4, Blue 5, Red 5.
 
-Each team ends with 5 bans and 5 picks; 20 heroes leave the pool.
+Each team ends with 3 bans and 5 picks; 16 heroes leave the pool of 40. The order can change in later versions.
 
-**Rules:** a hero can be picked or banned once per match. **Role floor:** a ban or pick is blocked if it would leave fewer than 3 available heroes whose primary role is any slot that still needs a pick. Timer: 20 seconds per decision in Full mode (no timer in the prototype).
+**Rules:** a hero can be picked or banned once per match. Off-role picks are always allowed (at HeroFit 0.85). **Role floor:** after any pick, each slot must still have at least as many available heroes with that primary role as the number of teams that still need that slot; after any ban, at least that number plus 1. A move that would break this is blocked. QA must prove with an exhaustive AI-vs-AI draft test that no draft dead-ends. Timer: 20 seconds per decision in Full mode (no timer in the prototype).
 
 **Player experience:** the draft screen shows each starter's familiarity with every available hero, current MetaMod, and a live preview of CompMod, style, and lane matchups.
 
@@ -202,31 +206,31 @@ Each team ends with 5 bans and 5 picks; 20 heroes leave the pool.
 
 ### 7.1 Calendar
 
-Time advances in **days** when the player taps Continue. A season has two splits (9 weeks each, 2 match days per week, 18 matches) plus playoffs and a short off-season. Real-time timers are not used offline.
+Time advances in **days** when the player taps Continue. A **full season** has two splits (9 weeks each, 2 match days per week, 18 league matches per split) plus playoffs per split and a short off-season, so about 42 player matches. Phase 1 plays **one split plus playoffs** (18 league matches plus up to 6 playoff matches) as its "season". Promotion and relegation use split standings. Ranking: points (win 3, loss 0), then head-to-head, then game-time-adjusted score difference, then a seeded draw. Real-time timers are not used offline.
 
 ### 7.2 Roster and contracts
 
 - 5 starters, up to 5 substitutes (max 10 players). Substitutes may be swapped in before any match.
 - Contracts have a length (in splits), a wage, and optional clauses (release fee, bonus).
-- Free agents and other clubs' players can be approached. The AI values an offer on wage versus the player's value, role need, club standing and playing time. Exact valuation is task D-007.
+- Free agents and other clubs' players can be approached. The AI values an offer on wage versus the player's value, role need, club standing and playing time. Exact valuation is task D-007. **Phase 1 minimum rule:** no transfers between clubs; free agents can be signed at an asking wage of `2 * (BestSlotRating - 40)` per week, accepted if the club is under its wage cap.
 
 ### 7.3 Training and fatigue
 
 Each player has one **training focus** per week: a stat, a hero's familiarity, or a **team scrim** (builds chemistry).
 
 ```
-gain = base * (1 + 0.1*CoachLevel) * (1 - stat/Potential) * AgeFactor * (1 - Fatigue/200)
+gain = max(0, base * (1 + 0.1*CoachLevel + 0.05*FacilityLevel) * (1 - stat/Potential) * AgeFactor * (1 - Fatigue/200))
 ```
 
-`base` is 0.5 points per week. `CoachLevel` is 1 to 5. `AgeFactor`: 16 to 20 = 1.3, 21 to 23 = 1.1, 24 to 26 = 0.8, 27 to 29 = 0.5, 30 and over = 0.25. From age 29, MEC declines about 1 point per season.
+`base` is 0.5 points per week. `CoachLevel` and `FacilityLevel` are 1 to 5 and add together inside the bracket. Player generation guarantees `stat <= Potential`; if it ever isn't, `gain` is 0. `AgeFactor`: 16 to 20 = 1.3, 21 to 23 = 1.1, 24 to 26 = 0.8, 27 to 29 = 0.5, 30 and over = 0.25. From age 29, MEC declines about 1 point per season, and from age 31 TFT and SEN decline about 0.5 per season (v0).
 
-Fatigue: +12 per match played, +5 per training week, -8 per rest day. The penalty in section 4.4 starts at 40, so a light load is free and a heavy load hurts; QA checks that no training schedule dominates.
+Fatigue (clamped 0 to 100, reset to 0 at the off-season): +15 per match played, +5 per training week, -6 per rest day. A normal week (2 matches, 5 rest days) nets about +5, so fatigue builds slowly across a split; the penalty in section 4.4 starts at 25, so a heavy load or a dense playoff schedule hurts and rotating substitutes matters. QA checks that no schedule is strictly dominant and that rotation is sometimes right.
 
 Familiarity: +3 per match played with the hero, +1.5 per week of focused training (scaled by coach), -0.5 per week if unused and above 50.
 
 ### 7.4 Scouting
 
-Scouts are assigned to a region and role. Reports reveal stats as ranges with half-width `max(2, 14 - 3*ScoutLevel - 2*ReportsSoFar)` points. Potential is shown as a star range that narrows over time. Hidden gems and overrated players both exist.
+Scouts are assigned to a region and role. Each report reveals stats as ranges with half-width `max(3, 16 - 2*ScoutLevel - 2*ReportsSoFar)` points, where `ReportsSoFar` counts reports on that player. The true value is always inside the range, but the range is centred at a random offset of up to half the width, so ranges mislead without being false. Potential is shown as a star range that narrows over time. Hidden gems and overrated players both exist.
 
 ### 7.5 Staff and facilities
 
@@ -244,7 +248,7 @@ Income: sponsors (scale with league tier and results), prize money, transfers. E
 
 ### 7.7 Chemistry
 
-Chemistry points (0 to 100): +4 per match together, +3 per scrim week, -25 whenever a starter is replaced (minimum 0). `ChemBonus = min(0.035, 0.03 * (Chem/100) * (0.5 + avgCOM/100))`. Team modifier `TeamMod = ChemBonus + StaffBonus`.
+Chemistry points (0 to 100, new club starts at 30): +4 per match together, +3 per scrim week, -25 whenever a starter is replaced (minimum 0). `ChemBonus = min(0.035, 0.03 * (Chem/100) * (0.5 + avgCOM/100))`. Team modifier `TeamMod = ChemBonus + StaffBonus`.
 
 ---
 
@@ -270,28 +274,28 @@ The result is in (-1, +1); positive favors Team A (Blue). `carry` is the lead ca
 
 ### 8.3 Phases
 
-**Early game (about 0 to 14 min):** four contests.
+**Early game (first 35% of the match):** four contests.
 
 | Contest | Compares |
 |---|---|
 | Top lane | Top vs Top (with lane bonus) |
 | Mid lane | Mid vs Mid (with lane bonus) |
 | Bot lane | Average of Bot Carry and Support vs the opposing pair |
-| Jungle | Jungle vs Jungle |
+| Jungle | Jungle vs Jungle (with lane bonus) |
 
 `A_early = 0.28*(top + mid + bot) + 0.16*jungle`
 
-**Mid game (about 15 to 28 min):** two contests with different inputs, carrying `A_early` forward.
+**Mid game (35% to 70% of the match):** two contests with different inputs, carrying `A_early` forward.
 
 ```
 Objective rating = sum(OBJ_W[slot]  * rating) * (1 + CompMod)
-Teamfight rating = sum(FIGHT_W[slot]* rating) * (1 + CompMod + StyleEdge)
+Teamfight rating = sum(FIGHT_W[slot]* rating) * (1 + CompMod + StyleEdge)   (StyleEdge: +4% for the winning style, -4% for the losing style, section 5.3; teamfights only)
 OBJ_W   = Jungle 0.30, Support 0.25, Mid 0.15, Top 0.15, Bot 0.15
 FIGHT_W = Bot 0.25, Mid 0.25, Top 0.20, Jungle 0.15, Support 0.15
 A_mid = 0.35*objectives + 0.65*teamfights
 ```
 
-**Late game (29 min onward):** the same two contests with late ratings, carrying `0.5*A_early + 0.5*A_mid`.
+**Late game (last 30%):** the same two contests with late ratings, carrying `0.5*A_early + 0.5*A_mid`.
 
 `A_late = 0.25*objectives + 0.75*teamfights`
 
@@ -299,7 +303,7 @@ A_mid = 0.35*objectives + 0.65*teamfights
 
 ### 8.4 Randomness and determinism
 
-- RNG: **PCG32** with Box-Muller for normal draws. Match seed = hash(save seed, match id), fixed when the match is generated, before the draft.
+- RNG: **PCG32** with Box-Muller for normal draws. (The prototype uses Python's own generator, so P-002 must re-run the section 9 calibration after the switch and store the numbers beside the golden vectors.) Match seed = hash(save seed, match id), fixed when the match is generated, before the draft.
 - Each contest draws from its own named substream (`seed + contest id`), so replaying a match with a changed input uses the same noise. This allows exact counterfactuals for reports.
 - Engineering produces golden test vectors (inputs, seed, outputs) from the reference implementation in task P-002; the Godot module must reproduce them.
 - Offline single player accepts save-reload redrafting as a known risk; competitive modes use a single autosave.
@@ -307,20 +311,21 @@ A_mid = 0.35*objectives + 0.65*teamfights
 ### 8.5 Match report and attribution
 
 - **Contribution** of slot `s` to contest `c` = `phase weight * contest weight * slot weight * (rating_A,s - rating_B,s) / D` (signed). The report ranks the largest absolute contributions, and the MVP is the player with the highest total on the winning team.
-- **Draft edge** = `Final` minus `Final` recomputed with CompMod, StyleEdge and lane bonuses set to zero, using the same seed (counterfactual).
+- **Luck line:** every report also shows the noise term, so a win that came from luck is labelled as such. Contributions are shown as signed shares of the rating gap, and a "Luck" share is added so shares sum to the result.
+- **Draft edge** is reported as a win-probability swing: re-simulate the match about 200 times with and without the draft bonuses (same seeds) and show the difference, or a simple "the draft flipped this result" flag.
 - Example lines: "Red won Mid lane by a large margin", "Blue's Gunner scaled and won the Moonhulk fight", "Draft edge: Dive beat Siege".
 - Timeline times are fractions of the match length `L`: lane results 0.25L, first Stoneback 0.40L, mid fights 0.60L, Moonhulk 0.80L, base siege 1.0L.
 - Match length: `L = clamp(26 + 12*(1 - mean(|A_mid|, |A_late|)) + Normal(0, 2), 22, 48)` minutes.
 
 ### 8.6 After the match
 
-Form moves toward the result (+/-2), morale +/-5 to 10 based on result and playing time, fatigue +12 for players who played, familiarity of picked heroes rises, chemistry +4.
+Form moves toward the result (+/-2), morale +/-5 to 10 based on result and playing time, fatigue +15 for players who played, familiarity of picked heroes +3, chemistry +4 (clamped to the ranges in section 4.2).
 
 ---
 
 ## 9. Balance targets (QA acceptance criteria)
 
-Measured on 40,000 simulated matches, equal CON of 50 unless stated. Tolerance is **plus or minus 2.0 points** for win rates (standard error about 0.25).
+Measured on 40,000 simulated matches, equal CON of 50 unless stated. Tolerance is **plus or minus 2.0 points** for win rates (standard error about 0.25); the QA regression gate tightens to plus or minus 1.0 once the real engine exists. **Honest note:** the targets in the first table come from the design intent (a +10 team should win about 7 in 10); the "other check" ranges were set after seeing the prototype and are sanity bands, not independent evidence. The prototype takes finished ratings as input, so these numbers test the contest model, not HeroFactor, fit, chemistry or the draft pipeline.
 
 | Rating advantage (all five slots) | Target win rate | Prototype v0.2 |
 |---|---|---|
@@ -335,10 +340,15 @@ Measured on 40,000 simulated matches, equal CON of 50 unless stated. Tolerance i
 | +10 advantage with avg CON 20 / 50 / 80 | rises with CON; about 64 to 66 / 67 to 70 / 72 to 76% | 64.6 / 68.3 / 74.0% |
 | Late-heavy heroes (power 38/50/62) vs early-heavy (62/50/38), equal skill | 50% plus or minus 5 | 50.3% |
 | +10 rating advantage in one phase only | 55 to 58% each phase, none below 55% | early 57.0, mid 55.6, late 57.0% |
-| CompMod +10% vs none, equal players | about +6 to +9 points | 57.4% |
-| Dive vs Siege, equal players | about +3 to +6 points | 54.6% |
+| CompMod +10% (the cap) vs none, equal players | about +6 to +9 points | 57.4% |
+| CompMod +5% vs none | about +3 to +5 points | 54.0% |
+| Dive vs Siege (winner +4%, loser -4%), equal players | about +3 to +6 points | 54.6% |
 | Lane counter bonus +5% in all three lanes | about +2 points | 52.1% |
 | Comeback rate (team behind after early game, |A_early| of 0.2 or more, wins) | 25 to 40% | 27.8% |
+
+### 9.1 Full-pipeline calibration (required before P-002 is closed)
+
+The tests above change one lever at a time. Before locking Pillar 1, QA runs a full-pipeline test with the real 40 heroes, generated player pools, AI lineups and drafted teams, and reports: how often the draft changes the winner; win rate of a team that drafts best-for-composition versus best-for-familiarity; Blue versus Red win rate with the draft AI in the loop (Red picks last, so the side bonus may need to rise); and the effect of consistency (a weak team at CON 20 against a favourite at CON 80). If familiarity beats every draft lever, HeroFactor is reduced further or MetaMod and CompMod are widened.
 
 Additional targets for the full game: no hero outside agreed pick/win bands at equal skill; no comp style beats the others by more than about 5 points in the league average; no training or fatigue schedule is strictly dominant.
 
@@ -366,12 +376,12 @@ Not built in v1. Principles to protect: no paid advantage in match outcomes, no 
 ## 12. Scope of the first prototype (Phase 1)
 
 - Single player, offline.
-- One league of 10 teams, 5 slots, **40 original heroes**, about 140 generated players (10 per club plus 40 free agents).
+- One league of 10 teams, 5 slots, **40 original heroes**, about 140 generated players (10 per club plus 40 free agents). **Generation (v0):** each stat is drawn from a normal distribution with mean 50 + 4 * (club strength offset, -4 to +4) and standard deviation 8, clamped to 25 to 90; `Potential = max(stat) + a draw of 0 to 25 (younger players get larger draws)`, at most 99; age 17 to 32; every player has a primary role and 40% have a secondary role.
 - Draft, match simulation with text match report, roster screen, simple training.
 - **Play modes:** Full (player drafts every match) and Quick (auto-draft, skim result for non-key matches).
 - Plain placeholder visuals.
 
-**Exit criteria:** a full season (about 24 player matches) can be played in about 15 minutes in Quick mode; the 40,000-match batch tests meet the targets in section 9; a non-developer can understand why they lost a match from the report.
+**Exit criteria:** the Phase 1 "season" (one split plus playoffs, about 24 player matches) can be played in about 15 minutes in Quick mode, where "key matches" (playoffs and matches against the top 3) still show the draft; the 40,000-match batch tests meet the targets in section 9; a non-developer can understand why they lost a match from the report.
 
 ---
 
@@ -406,3 +416,4 @@ Founder questions are in `company/DECISIONS.md`. Parameters still to define are 
 |---|---|---|
 | 2026-11-07 | v1 draft | Game Design Lead, Systems Lead |
 | 2026-11-07 | v1.1 after independent review: model rebuilt so early and mid phases count (final score across all phases); objectives and teamfights use different slot weights; draft levers (CompMod up to 10%, style, lane counters) now simulated; slot assignment and hero fit defined; counterfactual draft attribution; determinism spec; constants re-tuned (D 25, sigma 2.0, gamma 0.8); pool raised to 40 with role floors; draft AI reweighted; missing parameters added; exit criteria use Quick mode; IP-sensitive names replaced (Heartstone, Ashen Vale, Ancient Colossus, Champions, mastery) | Game Design Lead, Systems Lead |
+| 2026-11-07 | v1.2 after second independent review: style edge defined as +4% winner / -4% loser (matches prototype); CompMod rescaled (synergy +2.5% per pair type, cap +10%, clamp -10% to +10%) with realistic-range numbers; role-floor rule rewritten to prevent dead ends; draft order changed to our own (2+1 bans each); Phase 1 season defined as one split plus playoffs; training, fatigue (threshold 25, +15 per match), form/morale/chemistry rules, AI lineup rule, Phase 1 signing rule and player generation added; early-phase stat per slot; HeroFactor floor 0.90; power budget tied to difficulty; scouting formula fixed; luck line and win-probability draft edge in reports; full-pipeline calibration (9.1) required | Game Design Lead, Systems Lead |
