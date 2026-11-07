@@ -1,6 +1,6 @@
-# Game Design Document v1.5
+# Game Design Document v1.6
 
-Status: DRAFT v1.5. v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 and v1.5 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
+Status: DRAFT v1.6. v1.6 adds the Founder's match formats and pacing rule (section 8.7). v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 to v1.6 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
 Next: Founder review. Done: P-001 (skeleton), P-002 (simulator with golden tests), content data, P-003 first pass (9.1). Open: paired lever tests, Phase 1 rating-scale calibration, joint Game Plan test.
 
 All numbers in this document are **v0 placeholders** unless marked otherwise. They exist so the rules can be tested. QA & Balance tunes them against the targets in section 9, using `tools/proto_sim.py` as the reference model.
@@ -19,7 +19,7 @@ A mobile esports **manager** game, MOBA only. The player is the club owner and h
 2. **Every player is a person.** Players have strengths, weaknesses, form, morale and growth. Losing a star hurts.
 3. **Results are readable.** After every match the player can see why they won or lost, and what to change.
 4. **Fair progression.** Skill and planning beat spending. (Monetization stance is a Founder decision; see `DECISIONS.md`.)
-5. **Short sessions.** In Full mode a match day takes about 3 to 5 minutes. In Quick mode (auto-draft, skim the result) it takes under a minute.
+5. **Short sessions.** In Full mode one game takes at most about 5 minutes from tapping Play to the result, draft included (budget in section 8.7, a Founder requirement). In Quick mode (auto-draft, skim the result) it takes under a minute.
 
 ### Non-goals for v1
 
@@ -220,7 +220,7 @@ Both teams draft before every match. The hero pool is **40 heroes** (about 8 per
 
 Each team ends with 3 bans and 5 picks; 16 heroes leave the pool of 40. The order can change in later versions.
 
-**Rules:** a hero can be picked or banned once per match. Off-role picks are always allowed (at HeroFit 0.85). **Role floor:** after any pick, each slot must still have at least as many available heroes with that primary role as the number of teams that still need that slot; after any ban, at least that number plus 1. A move that would break this is blocked. Because off-role picks are always allowed, the floor is a safety net that should almost never bind; QA proves no draft dead-ends with a property test of 100,000 random AI-vs-AI drafts plus an exhaustive search on a reduced pool (12 heroes, 4 per team sequence), and the floor is removed if it never triggers. (The full 40-hero tree has about 10^24 sequences, so it cannot be searched.) Timer: 20 seconds per decision in Full mode (no timer in the prototype).
+**Rules:** a hero can be picked or banned once per match. Off-role picks are always allowed (at HeroFit 0.85). **Role floor:** after any pick, each slot must still have at least as many available heroes with that primary role as the number of teams that still need that slot; after any ban, at least that number plus 1. A move that would break this is blocked. Because off-role picks are always allowed, the floor is a safety net that should almost never bind; QA proves no draft dead-ends with a property test of 100,000 random AI-vs-AI drafts plus an exhaustive search on a reduced pool (12 heroes, 4 per team sequence), and the floor is removed if it never triggers. (The full 40-hero tree has about 10^24 sequences, so it cannot be searched.) Timers and the short draft profile are in section 8.7 (the v1.5 figure of 20 seconds for all 16 decisions broke the 5-minute game budget).
 
 **Player experience:** the draft screen shows each starter's familiarity with every available hero, current MetaMod, and a live preview of CompMod, style, and lane matchups.
 
@@ -400,11 +400,43 @@ A_mid = 0.35*objectives + 0.65*teamfights
 - **Draft edge** is also reported as a win-probability swing: re-simulate about 200 times with and without the draft bonuses (streams `resim:...`) and show the difference, or a simple "the draft flipped this result" flag.
 - Example lines: "Red won Mid lane by a large margin", "Blue's Gunner scaled and won the late fight", "Draft edge: Dive beat Siege".
 - Timeline times are fractions of the match length `L`: four lane/jungle results 0.25L, early objective 0.45L, mid fight 0.60L, late objective 0.80L, late fight 0.95L, base siege 1.0L.
-- Match length: `L = clamp(24 + 16*(1 - mean(|A_mid|, |A_late|)) + Normal(0, 2) from stream length, 22, 42)` minutes. (Range of the formula before noise: 24 to 40.)
+- Match length (cosmetic game clock, never an input to the result): `L = clamp(11 + 6*(1 - mean(|A_mid|, |A_late|)) + Normal(0, 1) from stream length, 9, 16)` game minutes, the pace of a mobile MOBA. (v1.5 had 22 to 42; the Founder ruled that too long, section 8.7.) The feed plays the game clock at about 8x, so the playback is roughly 1 to 2 minutes.
 
 ### 8.6 After the match
 
 Form moves toward the result (+/-2), morale +/-5 to 10 based on result and playing time, fatigue +15 for players who played, familiarity of picked heroes +3, Bond +4 for each pair of starters who played together (section 7.7), and the Form Rating updates for league and playoff matches (section 10.1); Exhibition and Quick Match change none of these except fatigue and Bond (section 7.9). All values are clamped to the ranges in section 4.2.
+
+### 8.7 Match formats and pacing (Founder decision, 2026-11-07)
+
+**Rule:** one game must never take more than about 5 minutes of the player's time, draft included, or players will quit. Quick mode (auto-draft, instant result) is always available and takes under a minute.
+
+**Formats.**
+
+| Format | Where | Rule |
+|---|---|---|
+| **Sudden death** (single game) | Casual match, Quick Match, Exhibition best of 1, Single Player league matches, later public and bot matchmaking | One game, no draw: the first team to destroy the enemy base wins. The simulator already ends every game this way (the final siege decides the winner), so nothing in the simulator changes. |
+| **Series** | Tournaments, playoffs, finals, Exhibition best of 3 or 5 | Best of 3, with best of 5 for finals. Each game is its own sudden-death game with its own draft and seed (section 7.1). |
+
+**Draft profiles** (a timeout auto-picks the recommended hero; the AI side decides instantly):
+
+| Profile | Used for | Bans and picks per side | Timer per human decision | Longest human time |
+|---|---|---|---|---|
+| **Short** | Casual, Quick Match, Exhibition, league matches, games 2 and later of a series | 1 ban, 5 picks (order: Blue ban, Red ban, then the pick order of section 6 phases 1 and 2) | 10 s | 60 s |
+| **Full** | Game 1 of a tournament or playoff series | 3 bans, 5 picks (section 6) | 15 s | 120 s |
+
+**Time budget per game** (Full mode, worst case; most games are quicker):
+
+| Part | Casual and league | Tournament game |
+|---|---|---|
+| Draft | at most 60 s | at most 120 s |
+| Game Plan check (optional, section 7.8) | skippable | at most 20 s |
+| Event feed (game clock about 8x) | at most 120 s, with 2x speed and Skip | at most 120 s, same controls |
+| Result and report | skippable | skippable |
+| **Total** | **about 3 minutes** | **about 4.5 minutes** |
+
+A best-of-3 series is therefore about 8 to 12 minutes and a best-of-5 final about 15 to 20 minutes, or seconds in Quick mode. Players can always choose to sim a series instead of watching.
+
+**Consequences to check.** (1) The short draft removes two bans, so 9.1 must be re-run with the short profile; the effect on the draft lever is expected to be small. (2) A 16-second feed per game minute is the playback target for the presentation phase. (3) Multiplayer edition (public matching): human timers apply to both drafters, and what happens when no opponent is found (a bot opponent after a short wait is the plan) is decided in that edition's design.
 
 ---
 
@@ -542,3 +574,4 @@ Founder questions are in `company/DECISIONS.md`. Parameters still to define are 
 | 2026-11-07 | v1.3: Founder-approved Game Plan (7.8) and Team Bonds (7.7, replaces the single Chemistry number; COM now enters via Understanding; replacement cost per pair); Exhibition and Quick Match (7.9); free-agent recruitment, negotiation, prize share, release and expiry warning (7.2); sponsor lite and ledger (7.6); Potential per stat, personality, languages, country, help sheets (4.2, 7.4); Form Rating and trophy cabinet (10.1); editions and roadmap (section 1); extra QA tests (9.2); Phase 1 scope updated (12) | Game Design Lead, Systems Lead |
 | 2026-11-07 | v1.4 after independent QA review of v1.3 (3 critical, 9 serious findings): Form Rating redefined as Elo (the old definition was noise); Game Plan rebuilt on three simulator hooks and zero-sum controls (8 controls, triggers moved to +-0.40, Peel/Engage and Comeback removed); Team Bonds numbers corrected (ChemBonus 1.92 percent at Bond 60 / COM 60, diminishing Bond gains, bonds stored for all roster pairs); fatigue and morale numbers fixed so they actually build; recruitment (asking wage floor and Potential factor, prize weights, coarse refusals and lockout, personality thresholds), bankruptcy dismissal rule, Exhibition exclusions; determinism spec completed (outcome seed, stream names, tolerance); report attribution by counterfactual; standings tiebreaks defined; lever tests paired with tighter bands; economy and personality 10-season tests deferred; build order puts content before 9.1; dead data and minor items fixed | Game Design Lead, Systems Lead |
 | 2026-11-07 | v1.5 after the full-pipeline calibration (P-003): draft constants re-tuned so familiarity no longer dominates (HeroFactor familiarity weight 0.06; synergy +4%; needs -5%; damage balance -6%; CompMod cap 15%; lane counter +10%); 9.1 results recorded; hero set re-checked against the new constants | Systems Lead, QA & Balance |
+| 2026-11-07 | v1.6 Founder pacing decision: one game at most about 5 minutes including the draft; sudden-death single games for casual, quick, league and public play; best of 3 (finals best of 5) for tournaments; Short and Full draft profiles with timers; cosmetic game clock shortened to 9 to 16 minutes; new section 8.7 | Founder, Game Design Lead |

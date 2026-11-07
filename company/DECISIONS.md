@@ -33,6 +33,13 @@
 
 "MOBA Esports" is the working title only. A distinctive final name still needs a trademark and store search (see IP-RISK-LOG).
 
+## Founder decision: match formats and pacing (2026-11-07)
+
+- **One game must take at most about 5 minutes of the player's time, draft included.** Players get frustrated and quit if matches drag.
+- **Casual, quick, league and (later) public or bot matches are sudden death:** one game, first team to destroy the enemy base wins.
+- **Tournaments are a series:** best of 3, finals best of 5, each game under the same time budget.
+- Producer follow-through (GDD v1.6, section 8.7): Short draft (1 ban, 5 picks, 10 s timer) for casual play, Full draft (3 bans, 5 picks, 15 s timer) for game 1 of tournament series; game clock cosmetic 9 to 16 minutes; feed playback at most 2 minutes with Skip. Numbers are tunable; the 5-minute ceiling is not.
+
 ## Producer decision log: P-003 (2026-11-07)
 
 - **Draft constants re-tuned** (producer call within the GDD 9.1 rule, no Founder gate needed): HeroFactor familiarity weight 0.10 to 0.06, synergy +2.5% to +4%, missing need -3% to -5%, damage imbalance -4% to -6%, CompMod cap 10% to 15%, lane counter +5% to +10%. Reason: with the old numbers, picking comfort heroes beat smart drafting. Now they tie, and a careful drafter gains about 5 points. GDD v1.5.
