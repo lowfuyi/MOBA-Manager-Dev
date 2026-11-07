@@ -33,6 +33,12 @@
 
 "MOBA Esports" is the working title only. A distinctive final name still needs a trademark and store search (see IP-RISK-LOG).
 
+## Producer decision log: P-003 (2026-11-07)
+
+- **Draft constants re-tuned** (producer call within the GDD 9.1 rule, no Founder gate needed): HeroFactor familiarity weight 0.10 to 0.06, synergy +2.5% to +4%, missing need -3% to -5%, damage imbalance -4% to -6%, CompMod cap 10% to 15%, lane counter +5% to +10%. Reason: with the old numbers, picking comfort heroes beat smart drafting. Now they tie, and a careful drafter gains about 5 points. GDD v1.5.
+- **Draft is a margin lever** (about 3 win-rate points between sensible drafts; squad strength dominates). If playtests find it too small, widen MetaMod next. Founder may overrule.
+- **Side bonus stays 0.02.** The 48% Blue mirror readings were noise (4,000 matches: 50.8%).
+
 ## Still open
 
 1. **Final game name.** Working title: "MOBA Esports" with the edition suffixes above. Needs a name search before launch.

@@ -2,7 +2,7 @@
 import collections, itertools, json, pathlib, statistics, sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import validate_data as V
-from comp import comp_eval
+from comp import comp_eval, CAP
 import gen_players as GP
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -75,9 +75,10 @@ def test_composition_scoring_over_all_lineups_behaves():
         assert 0.15 <= styles[st] / n <= 0.27, (st, styles[st] / n)       # no style dominates or is unreachable
     assert 0.30 <= styles["skirmish"] / n <= 0.45
     assert 0.12 <= dmg / n <= 0.28 and 0.08 <= needs / n <= 0.20
-    assert sum(m >= 0.0999 for m in mods) / n <= 0.05                     # the +10 percent cap is rare
+    assert sum(m >= CAP - 1e-4 for m in mods) / n <= 0.05                 # the cap is rare
     assert min(mods) <= -0.05                                             # truly bad drafts exist
-    assert statistics.median(mods) <= 0.06
+    assert statistics.median(mods) <= 0.6 * CAP                            # a typical draft is well under the cap
+    assert statistics.pstdev(mods) >= 0.035                               # the draft has real spread to play with
 
 
 def test_every_tag_and_difficulty_is_used():

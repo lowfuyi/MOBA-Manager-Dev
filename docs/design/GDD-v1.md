@@ -1,7 +1,7 @@
-# Game Design Document v1.3
+# Game Design Document v1.5
 
-Status: DRAFT v1.3 (v1.2 was revised after two independent reviews; v1.3 folds in the Founder-approved and recommended items from `REFERENCE-ESMO-ADAPTATION.md`; findings and fixes in section 16). **v1.3 has not had an independent review yet**: new sections 7.7 to 7.9, 9.2 and 10.1 are marked for QA and Systems Lead review. Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
-Next: Founder review. Engineering may start P-001 (project skeleton) now; P-002 (simulator) starts after the full-pipeline calibration in section 9.1 is scheduled.
+Status: DRAFT v1.5. v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 and v1.5 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
+Next: Founder review. Done: P-001 (skeleton), P-002 (simulator with golden tests), content data, P-003 first pass (9.1). Open: paired lever tests, Phase 1 rating-scale calibration, joint Game Plan test.
 
 All numbers in this document are **v0 placeholders** unless marked otherwise. They exist so the rules can be tested. QA & Balance tunes them against the targets in section 9, using `tools/proto_sim.py` as the reference model.
 
@@ -140,7 +140,7 @@ For each match, each starter's **rating per phase** is:
 
 ```
 Cond        = Form*0.4 + (Morale-50)*0.06 - 0.15*max(0, Fatigue-25)        (points)
-HeroFactor  = (0.90 + 0.10*Familiarity/100) * (0.90 + 0.10*min(1, MEC/(15*Difficulty)))
+HeroFactor  = (0.94 + 0.06*Familiarity/100) * (0.90 + 0.10*min(1, MEC/(15*Difficulty)))
 Fit         = PlayerFit * HeroFit
 PhaseBase   = Early: 0.7*BaseRating + 0.3*EarlyStat(slot)
               Mid:   BaseRating
@@ -188,16 +188,16 @@ Each hero has 2 to 4 tags: the archetype defaults plus up to two more chosen by 
 
 ### 5.3 Composition scoring
 
-Each team's picks produce a **CompMod** and a **comp style**. `CompMod = clamp(sum of the terms below, -10%, +10%)`.
+Each team's picks produce a **CompMod** and a **comp style**. `CompMod = clamp(sum of the terms below, -15%, +15%)` (constants calibrated in P-003, section 9.1; v1.2 had 10%).
 
-- **Needs:** at least one Frontline, at least one Engage or Pick, at least one Waveclear. Each missing need is -3%.
-- **Damage balance:** Physical counts 1 physical, Magic 1 magic, Mixed 0.5 of each. If either total is 3.5 or more, -4%.
-- **Synergy pairs:** four pair types exist: Engage with Pick, Protect with Scaling, Poke with Waveclear, Frontline with Engage. Each pair type counts **once** if both tags are present on two different heroes. +2.5% each, so the maximum is +10%.
+- **Needs:** at least one Frontline, at least one Engage or Pick, at least one Waveclear. Each missing need is -5%.
+- **Damage balance:** Physical counts 1 physical, Magic 1 magic, Mixed 0.5 of each. If either total is 3.5 or more, -6%.
+- **Synergy pairs:** four pair types exist: Engage with Pick, Protect with Scaling, Poke with Waveclear, Frontline with Engage. Each pair type counts **once** if both tags are present on two different heroes. +4% each, so the raw maximum is +16% (the clamp holds it at +15%).
 - **Comp style:** Dive score = count of Engage + Pick tags; Siege score = Poke + Waveclear; Protect score = Protect + Scaling. The style is the highest score if it is at least 4 and at least 1 above the second; any tie or lower score gives Skirmish. (Waveclear is required by Needs, so a Siege score of 1 is normal and does not make a Siege comp.)
 - **Style triangle:** Dive beats Siege beats Protect beats Dive. The winning style gets **+4% and the losing style gets -4%** on **teamfight** contests only (an 8% relative swing; this is what the prototype tests). Skirmish is neutral. `StyleEdge` below means this signed +4% or -4%.
-- **Lane matchups:** in the Top, Mid and Jungle contests, a hero that is `strong_vs` its opposing hero gives that contest +5%. In the Bot lane, any `strong_vs` link between the two heroes on either side counts, capped at +5% for the lane.
+- **Lane matchups:** in the Top, Mid and Jungle contests, a hero that is `strong_vs` its opposing hero gives that contest +10%. In the Bot lane, any `strong_vs` link between the two heroes on either side counts, capped at +10% for the lane.
 
-**Realistic draft range (from the prototype, equal players):** a +5% comp beats none 54.0%; +10% beats none 57.4%; +5% beats -5% 57.4%; the best realistic draft (+8% comp, three lane counters, a style win) beats a mildly poor one (-3%) 63.7%.
+**Realistic draft range.** Simulator level (prototype, equal players, unchanged by P-003): a +5% comp beats none 54.0%; +10% beats none 57.4%; +5% beats -5% 57.4%. With the real 40 heroes, over all 32,768 one-hero-per-slot lineups, CompMod has a median of about +7%, a standard deviation of 4.4 points, and sits at the +15% cap in 3.3% of lineups; the worst lineups reach about -11%. In the full pipeline (section 9.1) two sensible drafts differ by about 3 win-rate points on average, and a careful drafter beats a comfort-pick drafter by about 5 points. The draft is a margin lever; squad strength still dominates.
 
 ### 5.4 Patches and the meta
 
@@ -293,7 +293,7 @@ Chemistry is no longer one hidden number. Each pair of starters has a **Bond** a
 - **Team chemistry** `Chem` = the mean of the 20 Understanding values.
 - `ChemBonus = 0.042 * Chem/100` (maximum 0.042). `TeamMod = ChemBonus + StaffBonus`, as before.
 
-**Worked numbers (v0, checked by the unit tests):** Bond 60 and COM 60 give `U = 60 * 0.76 = 45.6`, so ChemBonus = **1.92 percent** (target 1.7 to 2.0). A new club (Bond 30, COM 60) starts at 0.96 percent. At Bond 100 and COM 60 the bonus is 3.19 percent, and at Bond 100 and COM 100 it is 4.2 percent. Replacing one starter at Bond 60 means eight of the twenty values drop from 60 to 20, which costs about 0.5 percent; a shared-language mismatch multiplies the affected values by 0.65. Raising the whole roster's COM by 40 (from 60 to 100) adds about 0.6 percent at Bond 60 and 1.0 percent at Bond 100. The whole Bond range (30 to 100) is worth about 2.2 percent, roughly 3 win-rate points, so Bonds matter but never outweigh the draft (CompMod up to 10 percent).
+**Worked numbers (v0, checked by the unit tests):** Bond 60 and COM 60 give `U = 60 * 0.76 = 45.6`, so ChemBonus = **1.92 percent** (target 1.7 to 2.0). A new club (Bond 30, COM 60) starts at 0.96 percent. At Bond 100 and COM 60 the bonus is 3.19 percent, and at Bond 100 and COM 100 it is 4.2 percent. Replacing one starter at Bond 60 means eight of the twenty values drop from 60 to 20, which costs about 0.5 percent; a shared-language mismatch multiplies the affected values by 0.65. Raising the whole roster's COM by 40 (from 60 to 100) adds about 0.6 percent at Bond 60 and 1.0 percent at Bond 100. The whole Bond range (30 to 100) is worth about 2.2 percent, roughly 3 win-rate points, so Bonds matter but never outweigh the draft (CompMod up to 15 percent).
 
 **Change from v1.2:** COM enters through Understanding only (the old formula also multiplied by `0.5 + avgCOM/100`), and a replaced starter costs the new pairs rather than a flat -25 for everyone. The full-pipeline calibration in section 9.1 must be re-run with bonds in the loop.
 
@@ -437,6 +437,8 @@ Measured on 40,000 simulated matches, equal CON of 50 unless stated. Tolerance i
 
 The tests above change one lever at a time. Before locking Pillar 1, QA runs a full-pipeline test with the real 40 heroes, generated player pools, AI lineups and drafted teams, and reports: how often the draft changes the winner; win rate of a team that drafts best-for-composition versus best-for-familiarity; Blue versus Red win rate with the draft AI in the loop (Red picks last, so the side bonus may need to rise); and the effect of consistency (a weak team at CON 20 against a favourite at CON 80). If familiarity beats every draft lever, HeroFactor is reduced further or MetaMod and CompMod are widened. It is run once more after Team Bonds and Game Plan are implemented (they add TeamMod and plan hooks but not new simulator inputs, so the golden vectors stay valid).
 
+**9.1 results (P-003, 2026-11-07, full text in `docs/design/CALIBRATION-9.1.md`, reproduce with `tools/pipeline_report.py 1800`).** With the v0 constants familiarity dominated: familiarity-heavy drafting beat composition-heavy by 3 to 6 points, the default AI draft only tied it, and a value-maximising probe beat the default by 0.0. After the sweep the adopted constants are: HeroFactor familiarity weight 0.06 (was 0.10), synergy +4%, missing need -5%, damage imbalance -6%, CompMod cap 15%, lane counter +10%. Results now (3,600 side-swapped matches each): composition-heavy vs familiarity-heavy 49.5%, default vs familiarity-heavy 51.8%, default vs composition-heavy 52.1%; the expert probe beats familiarity-heavy by about 5 points. A +10 rating gap wins 71.4% (target 70), +20 wins 86.2% (target 84): HeroFactor, fit and noise cost the favourite almost nothing, so D stays at 25. Mirror matches: Blue 50.1% over 3,600 (50.8% over 4,000 in a separate check), inside the 50 to 52% target, so the side bonus stays at 0.02; the 48% readings from 900-match runs were sampling noise. The draft flips the winner in about 3% of matches, consistent with a draft worth about 3 win-rate points. CON has almost no effect on a +30 favourite (83.8 / 82.8%), which is expected at that gap; its effect between close teams belongs to the paired lever tests. **Still open under 9.1:** paired common-random-number lever tests, calibration at the Phase 1 rating scale (about 45), the joint Game Plan test, and a rerun after Team Bonds and Game Plan are implemented.
+
 Additional targets for the full game: no hero outside agreed pick/win bands at equal skill; no comp style beats the others by more than about 5 points in the league average; no training or fatigue schedule is strictly dominant.
 
 
@@ -539,3 +541,4 @@ Founder questions are in `company/DECISIONS.md`. Parameters still to define are 
 | 2026-11-07 | v1.2 after second independent review: style edge defined as +4% winner / -4% loser (matches prototype); CompMod rescaled (synergy +2.5% per pair type, cap +10%, clamp -10% to +10%) with realistic-range numbers; role-floor rule rewritten to prevent dead ends; draft order changed to our own (2+1 bans each); Phase 1 season defined as one split plus playoffs; training, fatigue (threshold 25, +15 per match), form/morale/chemistry rules, AI lineup rule, Phase 1 signing rule and player generation added; early-phase stat per slot; HeroFactor floor 0.90; power budget tied to difficulty; scouting formula fixed; luck line and win-probability draft edge in reports; full-pipeline calibration (9.1) required | Game Design Lead, Systems Lead |
 | 2026-11-07 | v1.3: Founder-approved Game Plan (7.8) and Team Bonds (7.7, replaces the single Chemistry number; COM now enters via Understanding; replacement cost per pair); Exhibition and Quick Match (7.9); free-agent recruitment, negotiation, prize share, release and expiry warning (7.2); sponsor lite and ledger (7.6); Potential per stat, personality, languages, country, help sheets (4.2, 7.4); Form Rating and trophy cabinet (10.1); editions and roadmap (section 1); extra QA tests (9.2); Phase 1 scope updated (12) | Game Design Lead, Systems Lead |
 | 2026-11-07 | v1.4 after independent QA review of v1.3 (3 critical, 9 serious findings): Form Rating redefined as Elo (the old definition was noise); Game Plan rebuilt on three simulator hooks and zero-sum controls (8 controls, triggers moved to +-0.40, Peel/Engage and Comeback removed); Team Bonds numbers corrected (ChemBonus 1.92 percent at Bond 60 / COM 60, diminishing Bond gains, bonds stored for all roster pairs); fatigue and morale numbers fixed so they actually build; recruitment (asking wage floor and Potential factor, prize weights, coarse refusals and lockout, personality thresholds), bankruptcy dismissal rule, Exhibition exclusions; determinism spec completed (outcome seed, stream names, tolerance); report attribution by counterfactual; standings tiebreaks defined; lever tests paired with tighter bands; economy and personality 10-season tests deferred; build order puts content before 9.1; dead data and minor items fixed | Game Design Lead, Systems Lead |
+| 2026-11-07 | v1.5 after the full-pipeline calibration (P-003): draft constants re-tuned so familiarity no longer dominates (HeroFactor familiarity weight 0.06; synergy +4%; needs -5%; damage balance -6%; CompMod cap 15%; lane counter +10%); 9.1 results recorded; hero set re-checked against the new constants | Systems Lead, QA & Balance |
