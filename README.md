@@ -1,8 +1,8 @@
 # MOBA Manager (working title)
 
-A mobile esports **manager** game focused entirely on the MOBA genre. You are the club owner and head coach: scout and sign players, train them, draft champions on match day, and climb through the league tiers. You never control a hero directly. Matches are simulated from your roster, your draft and your preparation.
+A mobile esports **manager** game focused entirely on the MOBA genre. You are the club owner and head coach: scout and sign players, train them, draft heroes on match day, and climb through the league tiers. You never control a hero directly. Matches are simulated from your roster, your draft and your preparation.
 
-Inspired by the management loop of ESMO: Esports Manager Online, but MOBA-only, with all names, art, champions, items and maps being original.
+Inspired by the management loop of ESMO: Esports Manager Online, but MOBA-only, with all names, art, heroes, items and maps being original.
 
 ## Status
 
@@ -20,7 +20,7 @@ company/
 docs/
   design/
     GDD-v1.md        Game Design Document (source of truth for rules)
-data/                (later) champions, items, players as CSV/JSON, no art
+data/                (later) heroes, items, players as CSV/JSON, no art
 src/                 (later) Godot project
 ```
 
@@ -29,4 +29,4 @@ src/                 (later) Godot project
 1. Design before code. Rules live in `docs/design/`, numbers live in `data/`, code reads both.
 2. Nobody approves their own work. Every deliverable has a different reviewer.
 3. Visuals come last. Placeholder names and plain icons until the pre-launch phase.
-4. Originality. Genre conventions are free to use; names, art, lore and exact champion kits are ours alone.
+4. Originality. Genre conventions are free to use; names, art, lore and exact hero kits are ours alone.

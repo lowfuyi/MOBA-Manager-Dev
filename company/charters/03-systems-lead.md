@@ -5,9 +5,9 @@
 **Owns**
 - Match simulation model: formulas, phases, events, randomness
 - Parameter files in `data/sim_params.*`
-- Player stat model and champion attribute model (the math, not the names)
+- Player stat model and hero attribute model (the math, not the names)
 
-**Inputs:** GDD rules, QA balance reports, Content Lead champion data.
+**Inputs:** GDD rules, QA balance reports, Content Lead hero data.
 
 **Outputs:** A written model spec (inputs, formulas, pseudocode, worked examples); the Google Sheet or script prototype; parameter files; a "why did this team win" explanation model for match reports.
 

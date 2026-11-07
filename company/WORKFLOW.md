@@ -9,7 +9,7 @@ Founder (Fuyi)  ........ vision, final approval, all "Founder decisions"
  └─ Producer ........... plans, assigns, tracks, enforces process
      ├─ Game Design Lead ......... rules, progression, economy, league structure
      ├─ Systems Lead ............. match simulation, formulas, numbers
-     ├─ Content Lead ............. original champions, items, names, lore
+     ├─ Content Lead ............. original heroes, items, names, lore
      ├─ UI/UX Lead ............... screen flows, wireframes, UX rules
      ├─ Engineering Lead ......... Godot code, data loading, builds
      ├─ QA & Balance Lead ........ test plans, simulation runs, balance reports
@@ -33,7 +33,7 @@ Status values: `Backlog`, `Spec`, `In build`, `In review`, `Needs Founder`, `Don
 |---|---|---|---|
 | Game Design Document sections | Game Design Lead | Systems Lead + IP Checker | Yes, major changes |
 | Match sim formulas and parameters | Systems Lead | QA & Balance Lead | Yes, when core feel changes |
-| Champions, items, names | Content Lead | IP Checker + QA & Balance Lead | Yes, the first full set |
+| Heroes, items, names | Content Lead | IP Checker + QA & Balance Lead | Yes, the first full set |
 | Screen flows and wireframes | UI/UX Lead | Game Design Lead | Yes, the first full flow |
 | Code | Engineering Lead | QA & Balance Lead | No (tests must pass) |
 | Test plans and balance reports | QA & Balance Lead | Systems Lead | No |

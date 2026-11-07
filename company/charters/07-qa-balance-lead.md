@@ -5,7 +5,7 @@
 **Owns**
 - Test plans and test cases
 - The batch simulation harness (thousands of matches per run)
-- Balance reports: champion win/pick rates, role strength, comp strength, snowball rate, match length distribution
+- Balance reports: hero win/pick rates, role strength, comp strength, snowball rate, match length distribution
 
 **Inputs:** Specs, builds, data files, simulator.
 
@@ -17,7 +17,7 @@
 
 **Targets to check (initial, to be tuned)**
 - Stronger team (by rating) wins roughly as intended by the GDD, never a certainty.
-- No champion above or below agreed pick/win-rate bands at equal skill.
+- No hero above or below agreed pick/win-rate bands at equal skill.
 - No single comp or role dominates the results.
 - Match length and comeback frequency fall within the GDD ranges.
 
