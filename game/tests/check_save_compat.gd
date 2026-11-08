@@ -8,7 +8,7 @@ extends Node
 ## The "tutorial" key does not exist before I-06. Until then a missing key counts as {"state": "legacy"}; once
 ## GameState writes the key, the same checks require it to be "legacy" and to survive next_season().
 
-const FIXTURES := ["save_0_6_a.json", "save_0_6_b.json", "save_0_6_c.json"]
+const FIXTURES := ["save_0_6_a.json", "save_0_6_b.json", "save_0_6_c.json", "save_0_6_d.json"]
 const TUTORIAL_STATE_SCRIPT := "res://src/tutorial/tutorial_state.gd"
 
 var checks := 0

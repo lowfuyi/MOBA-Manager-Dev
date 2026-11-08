@@ -8,6 +8,8 @@ extends SceneTree
 ##   b: mid-season (6 league games played), custom plan with a trigger, a released player and a hired free agent,
 ##      a training focus, a different lineup
 ##   c: season over (phase "done"), before next_season()
+##   d: a brand-new game as the club screen leaves it: first club, round 1, nothing played, written through the real
+##      GameState.save() (so it is a file the game itself wrote, not a stringified dictionary)
 
 const CLUB := "ironquill_wolves"
 const OUT := "res://tests/fixtures/"
@@ -18,6 +20,7 @@ func _initialize() -> void:
 	_write("save_0_6_a.json", _a(w))
 	_write("save_0_6_b.json", _b(World.load_default()))
 	_write("save_0_6_c.json", _c(World.load_default()))
+	_write_d(World.load_default())
 	print("fixtures written")
 	quit(0)
 
@@ -72,6 +75,25 @@ func _c(w: World) -> GameState:
 	gs.autoplay(true)
 	print("c phase: ", gs.d["phase"])
 	return gs
+
+
+func _write_d(w: World) -> void:
+	var gs := GameState.new_game(w, w.club_ids[0], 60604)
+	_check_new(gs)
+	GameState.delete_save()
+	assert(gs.save())
+	var src := FileAccess.open(GameState.SAVE_PATH, FileAccess.READ)
+	var text := src.get_as_text()
+	src.close()
+	GameState.delete_save()
+	var f := FileAccess.open(OUT + "save_0_6_d.json", FileAccess.WRITE)
+	f.store_string(text)
+	f.close()
+	print("save_0_6_d.json phase=", gs.d["phase"], " round=", gs.d["round"], " bytes=", text.length())
+
+
+func _check_new(gs: GameState) -> void:
+	assert(gs.d["round"] == 0 and gs.d["phase"] == "league" and not gs.d.has("tutorial"))
 
 
 func _write(name: String, gs: GameState) -> void:

@@ -2,6 +2,8 @@
 
 Owner: Engine / Graphics Programmer. Date: 2026-11-09. Status: proposal for review by the Lead Programmer and Technical Director. It covers the Alpha 0.7 screens and the arena that arrives in Alpha 0.8.
 
+**Revision 2026-11-09 (review wave 2a, fix 5).** Changed: the gates in 3.1 now start from the baseline (per-screen allowances with a ratchet, section 3.1a); the shadow limit and the font-pair limit are each one number (3.1a, 3.2); the OFL finding in section 8 is marked fixed; section 7 and 9 now say the probe exists. **Nothing was re-measured in this revision.** Every number below is still from the 2026-11-09 run described in section 2; this revision only re-read that table, the build plan, the art bible, UI-PASS-2 and the code. No Godot run was made for this edit.
+
 **Honest limit up front.** Everything below that is a *measurement* was taken on the build computer with software rendering (Mesa llvmpipe under Xvfb, Godot 4.3 GL Compatibility, 720 x 1280 window). Nothing was run on a phone. Every *budget number* is my proposal from engineering judgement plus those baselines; no number has been checked against real hardware. The Founder's phone, and a low-end phone, decide whether they hold (Alpha exit item 5.1).
 
 ## 1. Reference device and frame targets (proposed)
@@ -43,16 +45,56 @@ How to read "draw calls": in the Compatibility renderer a draw call is one batch
 
 ### 3.1 Screens other than the arena
 
+The "Target" and "Hard limit" columns are the limits for a **redesigned** screen (a screen rebuilt in Alpha 0.7 increments I-15 to I-21, and every new sheet, overlay or component). A screen that is not redesigned yet is held to its own per-screen allowance instead (3.1a), because the baseline already breaks several of these numbers on screens nobody is changing in 0.7.
+
 | Resource | Target | Hard limit | Baseline today | How measured | Where |
 |---|---|---|---|---|---|
-| Draw calls in one frame | 60 | 100 (scrolled content may peak at 120) | median 40, max 150 | `RENDER_TOTAL_DRAW_CALLS_IN_FRAME` in the probe | Computer (count is renderer-side and the same on a phone; frame time is not) |
-| Canvas items in one frame | 700 | 1,200 | median 451, max 1,018 | `RENDER_TOTAL_OBJECTS_IN_FRAME` | Computer |
-| Nodes in a screen | 120 | 200 | median 51, max 153 | recursive node count of `App.main._current` | Computer |
-| Nodes in the whole tree | 150 | 250 | max about 170 | `get_tree().get_node_count()` | Computer |
+| Draw calls in one frame | 60 | 100, at the top **and** at the bottom of the scroll (the earlier "scrolled content may peak at 120" is dropped: it was written without a scrolled baseline, and the only scrolled state that is over 100 today is Chemistry, which is a legacy allowance) | median 40, p90 55, max 150 (Chemistry scrolled) | `RENDER_TOTAL_DRAW_CALLS_IN_FRAME` in the probe | Computer (count is renderer-side and the same on a phone; frame time is not) |
+| Canvas items in one frame | 700 | 1,200 | median 451, max 1,018 (About); Chemistry scrolled 830 | `RENDER_TOTAL_OBJECTS_IN_FRAME` | Computer |
+| Nodes in a screen | 120 | 200 | median 51, p90 131, max 153 (Report) | recursive node count of `App.main._current` | Computer |
+| Nodes in the whole tree | 150 (report only) | 250 | max about 170 (screen max 153 plus 17 chrome) | `get_tree().get_node_count()` | Computer |
 | Long lists (free agents, results, log) | build at most 30 rows; more rows page or build on scroll | 60 rows | not yet over 30 | node count on the longest data set (a 40-hero grid is 3 columns, 14 rows) | Computer |
-| Shadowed surfaces visible at once | 6 | 8 | 0 today (flat panels) | count `StyleBoxFlat` with `shadow_size` > 0 in the visible tree | Computer (count); cost only on phone |
+| Shadowed surfaces visible at once | **6, one number: the gate is the limit** (reason in 3.1a) | 6 | 0 today (flat panels) | count `StyleBoxFlat` with `shadow_size` > 0 in the visible tree | Computer (count); cost only on phone |
 | Glowing things visible at once | 2 | 2 | 0 | same | Computer |
 | Screen transition (tab, sheet) | 250 ms or less, no frame over 50 ms | same | not measured | frame times through a transition in the probe | Computer gives a ratio; phone gives the truth |
+
+### 3.1a Gates: allowances for legacy screens, hard limits for redesigned ones
+
+**Why this section exists.** The first version of this document made 100 draw calls and 120 nodes into failing checks for every screen. Against its own baseline that fails on day one: Chemistry scrolled is 150 draw calls (limit 100) and Report is 153 nodes (target 120), Game plan 133. Chemistry is not redesigned in Alpha 0.7 (build plan section 2.1 lists it among the screens that keep `_rebuild`), so a gate that fails there trains everyone to ignore the check. Two kinds of screen, two rules.
+
+**Rule 1, legacy screen (not yet redesigned): the ratchet.** Its row in the allowance table below is its limit for draw calls and nodes. The check fails if a legacy screen goes above its row. A row may go down, never up, except at the two named re-baselines (rule 4). Counts are exact and repeatable (the probe uses a fixed seed and a fixed state), so the headroom in the first column is not for noise; it is the single allowance for what Alpha 0.7 does to every legacy screen before they are redesigned (I-02 raises body text from 28 to 32 px, I-04 clamps buttons to 96 px, both reflow every screen). The headroom is my guess of 10 percent, rounded up to the next 5; it was not measured. Rows that sit 10 percent or more under their allowance make the check print "tighten to N" (the ratchet going down is cheap to automate and keeps the allowance honest).
+
+**Rule 2, redesigned screen: target, hard limit, no ratchet.** When the increment that redesigns a screen lands, its row is **deleted from the allowance table in the same commit**. From then on the screen must be at or under the **target** (60 draw calls, 120 nodes, 700 canvas items) at the top and bottom of every scroll. A screen between target and hard limit needs one waiver line in the table: the number, the reason, and the Technical Director's name; a waiver can never go above the **hard limit** (100 draw calls, 200 nodes, 1,200 canvas items), and the hard limit always fails the check. New sheets, overlays and components start in this tier; a sheet or overlay is measured together with the screen under it.
+
+**Rule 3, a state with no row.** A state the check visits that has no row is held to the hard limits and printed as "NO ROW". From the aggregate figures only Chemistry scrolled is known to be over 100 draw calls and no state is over 200 nodes (max 153), but the 90th percentile is 55 draw calls and 131 nodes, so roughly four other states could sit above 55 and I did not itemise them in this document. The first run of the extended check lists every state of the 49 and each one gets a row at its measured value in that same commit.
+
+**Rule 4, re-baselines.** Exactly two moments may raise a legacy row, each as one commit reviewed by the Technical Director with every changed row written next to its old value: after I-04 (the overflow sweep has landed, so token sizes are final) and after I-22 (the "?" button and help hooks add nodes to every legacy screen). At a re-baseline each legacy row is reset to its measured value, up or down. Outside these two moments a raise needs the Technical Director's written reason in the table.
+
+**Allowances today.** "Today" is the measured value from section 2; the allowance is today plus 10 percent, rounded up to the next 5. Rows marked I-xx leave the table when that increment lands (rule 2); the "then" column is the limit from that day. Only the 12 states itemised in section 2 have rows; the other 37 states of the 49 have no per-state numbers in this document (rule 3).
+
+| Screen state | Status | Draw calls today | Draw-call allowance | Nodes today | Node allowance | Then (redesigned) |
+|---|---|---|---|---|---|---|
+| Title | legacy, I-04 sweep only | 8 | 10 | 10 | 15 | n/a |
+| Home hub | I-15 | 55 | 65 | 60 | 70 | target 60 / 120 |
+| Roster (Squad) | I-19 | 40 | 45 | 36 | 40 | target 60 / 120 |
+| Free agents | legacy | 40 | 45 | 55 | 65 | n/a |
+| Chemistry, top | legacy, not in 0.7 | 100 | 110 | 114 | 130 | n/a |
+| Chemistry, scrolled lower | legacy, not in 0.7 | **150** | **165** | 114 | 130 | n/a |
+| Draft, ban step 2 | I-16 | 42 | 50 | 81 | 90 | target 60 / 120 |
+| Game plan (trigger plan open) | I-17 | 49 | 55 | **133** | 150 | target 60 / 120 |
+| Match (text-and-clock stub) | legacy until the arena (0.8) replaces it, then section 3.5 | 12 | 15 | 20 | 25 | arena limits |
+| Match report | I-18 | 52 (24 to 52 across states) | 60 | **153** | 170 | target 60 / 120 |
+| Standings | I-20 | 29 | 35 | 82 | 95 | target 60 / 120 |
+| Settings | legacy | 40 | 45 | 65 | 75 | n/a |
+| Season end | legacy | 21 | 25 | 50 | 55 | n/a |
+
+What this table says in words. Chemistry scrolled stays the worst screen in the game (150 draw calls, 2.7 times the 90th percentile) and the table admits it instead of hiding it; it keeps its allowance until someone redesigns it, which Alpha 0.7 does not plan. My reading of the cause (from the pentagon drawing many separate lines and chips, section 2; **not profiled**) suggests drawing the pentagon in one `_draw` as the cheap fix; I did not measure how many calls that would save. Report (153 nodes) and Game plan (133 nodes) are the two nodes allowances above the 120 target, and both are redesigned in 0.7 (I-18, I-17), where rule 2 makes the target binding: if the redesigned versions cannot reach 120 nodes, that is a waiver with a reason, not a quiet raise of the number.
+
+**Canvas items.** One rule for all screens, no allowance rows: target 700, hard 1,200. Two states are known over the 700 target today and are named exceptions to the target only (both are under the hard limit): Chemistry scrolled (830) and About (1,018, mostly glyphs). The other states' canvas-item counts are not itemised here.
+
+**What the check does today, against this table (read from the code, not re-run).** `game/tests/perf_baseline.gd` visits six screens (Home, Squad, Draft, Game plan, Report, Standings) and fails only on the flat hard limits (nodes 200, draw calls 100, texture memory 48 MB); targets are counted and printed, not failed. By my baseline all six are under the hard limits today, so it does not fail on day one, but it also does not visit Chemistry, Settings, Free agents or any scrolled state, and it has no allowance file. To make this section real, the check needs three changes (requests in section 9, for the Lead Programmer or Tools Engineer): read the allowance table from a data file, visit all states including a scrolled one, and apply rules 1 to 3.
+
+**Shadow limit: 6, one number.** Three documents disagreed: the build plan gate said 6, this document said target 6 and hard 8, and `UI-PASS-2.md` 5.1 says "at most 8 shadowed nodes". Pick 6, as target and hard limit at once. Reason: a shadow adds no draw calls here (section 3.4), so its whole cost is fill area on the phone GPU, which I cannot measure on this computer; with no data, the cautious number is the right one, and loosening a limit after a phone test costs one edit, while tightening it after seven screens are built around eight shadows costs a rework. The design already needs few: art bible 4.1 gives real soft shadows to hero surfaces and sheets (Next match, Report hero, the open sheet, the selected tab pill), and `UI-PASS-2.md` 5.1 already says grids and long lists use the flat card. The build plan already says 6 and needs no change. **`UI-PASS-2.md` 5.1 must change from 8 to 6.** Also for the UI/UX Designer: `ART-BIBLE.md` 4.1 lists "cards, list rows, tiles" at E1 with a shadow, which a screen full of rows cannot afford under any limit; the E1 text should say that rows inside a list use the flat variant and only the card that holds them is shadowed. The first redesigned screen (Home, I-15) is the first real count against the 6; none exists yet.
 
 ### 3.2 Textures and memory
 
@@ -66,8 +108,10 @@ How to read "draw calls": in the Compatibility renderer a draw call is one batch
 | 9-slice card textures (if the baked-card route of art bible 4.1 is taken) | 3 textures of 128 x 128 or smaller, one per elevation, all in one atlas so the cards batch | 6 | draw calls of ten cards: 10 with `StyleBoxFlat`, **1** with `StyleBoxTexture` sharing one texture (measured, section 5) | Computer |
 | Compression | UI art and gradients lossless (PNG/WebP lossless); ETC2/ASTC only for the arena ground, after a banding check | n/a | visual check on a phone; ETC2 bands smooth gradients | Phone for the look |
 | Fonts (APK) | 5 static weights, Regular default | 0.5 MB compressed | export size (section 6) | Computer |
-| Font memory at runtime | 8 or fewer weight-and-size pairs alive | 12 | count distinct `(font, size)` in the type scale: art bible 5.2 lists about 11 | Computer count; RAM on phone |
+| Font memory at runtime | **12 weight-and-size pairs** (the one number: exactly what the art bible 5.2 type scale needs; see below) | 16 (the 12 plus `tnum` variants of the number styles) | count of distinct `(weight, size)` pairs requested through the type scale; the `tnum` variants counted separately | Computer count; RAM on phone |
 | Whole APK | 26 MB | 30 MB | export | Computer |
+
+**Font pairs: 12, one number.** The earlier target of 8 could not be met by the approved type scale. Counting `ART-BIBLE.md` 5.2 row by row (weight and size, not the style name): Display ExtraBold 64; Title Bold 48; Value Bold 40 and SemiBold 40; Heading SemiBold 36 and Bold 36 (the go button); Body Regular 32 and SemiBold 32 (buttons); Small Medium 26 and SemiBold 26 (hero names); Caption SemiBold 24 and Bold 24 (map labels, arena only). That is **11 pairs on the Alpha 0.7 screens and 12 once the arena's Bold 24 map labels arrive**; the "about 11" in the first version of this document was the 0.7 count. Getting to 8 would mean merging weights (for example Medium 26 into SemiBold, Bold 36 into SemiBold, dropping the Bold 24 map label), which changes the look that the Producer ruled in R1. The cost side is small and measured: whole-app texture memory is 9.2 MB today with the Regular font at several sizes, against a 32 MB target, so the pair count is not what protects memory. The texture-memory limits in this section do. What a pair costs on a phone (glyph atlas RAM) is **not measured**, and I have not measured what a `tnum` variant adds (I expect it to be a separate glyph cache, from how `FontVariation` works; unverified). So: 12 is the limit, 16 is the hard limit so the number styles can have `tnum` variants, and if the phone test shows memory trouble the weights to merge first are Medium 26 and Bold 36. **No other document has to change for this number.** `ART-BIBLE.md` 5.2 should carry one line "12 weight-and-size pairs, 11 before the arena" so a later scale change updates the count (UI/UX Designer), and the I-02 `UI.font()` helper should expose how many variations it has cached, so the check counts instead of reading the table by hand (Lead Programmer).
 
 ### 3.3 Redraw rules for timers and animation
 
@@ -201,7 +245,7 @@ func shot(name: String) -> void:
 		Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED), Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)])
 ```
 
-The probe is not a repo file yet (request in section 8). The font spike is: `godot --headless --path game --script res://tests/font_spike.gd` (add `-- render=<dir>` under Xvfb for the tnum picture).
+The probe is now a repo file, `game/tests/perf_baseline.gd` with `perf_baseline.tscn`, and `tools/run_all_checks.sh` calls it (found on re-reading the repo for this revision; its author is not recorded in the file, I did not run it, and I have not checked that it prints the same numbers as the listing above). It visits six screens, not the 49 states, and applies flat hard limits only (3.1a). The font spike is: `godot --headless --path game --script res://tests/font_spike.gd` (add `-- render=<dir>` under Xvfb for the tnum picture).
 
 ## 8. Export size and Android preset (APK impact of the fonts)
 
@@ -217,12 +261,13 @@ Measured with real exports on this computer (`--export-debug "Android"` to a scr
 
 The `export_presets.cfg` filter (`all_resources`, exclude `tests/*`, include `*.json`) lists all five fonts (as imported `.fontdata` plus `.import` files) and `default_font.tres`, so unused weights ship too (they are small). Checked by listing the exported APK. The pre-existing 24.4 MB APK is almost entirely the engine library (`libgodot_android.so` is 20.1 MB compressed), so the fonts are not the size problem.
 
-**Finding:** `assets/fonts/OFL.txt` is **not** in the APK. `all_resources` exports resources only, and a `.txt` is not one; the preset's include filter lists only `*.json`. The OFL says the licence text must accompany the font when it is redistributed; the About-screen credit does not replace it. Fix (not in my files): add `assets/fonts/OFL.txt` to `include_filter` in `game/export_presets.cfg`, or show the text in the About screen from a `.json` copy. The preset is the Lead Programmer's; flagged in the handback.
+**Finding (fixed).** When I measured the two exports above, `assets/fonts/OFL.txt` was **not** in the APK: `all_resources` exports resources only, a `.txt` is not one, and the preset's include filter listed only `*.json`. The OFL says the licence text must accompany the font when it is redistributed, and the About-screen credit does not replace it. **Fixed in commit `d78038d`**: `include_filter` in `game/export_presets.cfg` is now `*.json, assets/fonts/OFL.txt`. Verified by someone other than me, by listing the APK in the repo (`build/moba-esports-alpha.apk`, 24,720,507 bytes): `assets/assets/fonts/OFL.txt`, 4,377 bytes, is in it (Studio Manager review of 2026-11-09). I did not re-export or re-list the APK in this revision. Keep the listing as a standing check on every release APK. The "+308,652 bytes" row above was measured before the fix; the licence file adds 4,377 bytes (arithmetic, not a new export).
 
 ## 9. Open items and requests
 
 1. Decision: turn on `application/run/low_processor_mode` after an arena trial (my recommendation: yes, it is free and the idle-redraw measurement is stark).
-2. The probe in section 7 should live as `game/tests/perf_baseline.gd` with a one-line scene wrapper and be part of the check list, with the hard limits as failing checks (Lead Programmer).
+2. The probe exists as `game/tests/perf_baseline.gd` and is in `tools/run_all_checks.sh`, but it covers six screens with flat hard limits. To match 3.1a it must (a) read the per-screen allowance table from a data file (suggested `game/tests/perf_allowances.json`, one row per state: draw calls, nodes, status, increment, waiver reason), (b) visit all 49 states plus the scrolled state of every scrolling screen, (c) fail legacy screens over their row, redesigned screens over target without a waiver, any screen over a hard limit, and print "NO ROW" and "tighten to N" (Lead Programmer or Tools Engineer, small; it edits game test code, which I do not own).
+2a. A shadow counter for the same check (count visible `StyleBoxFlat` with `shadow_size` above 0, gate 6; glowing, gate 2). It does not exist in the probe (Lead Programmer).
 3. A debug-only overlay (FPS, draw calls, nodes, texture memory) for phone tests (Lead Programmer, small).
 4. Weights are not wired: Bold titles, SemiBold buttons and numbers, tnum on money, ratings, scores and times need `UI.font(weight, tnum)` helpers (UI Programmer, see handback).
 5. Everything marked "phone only" in section 4 stays open until the Founder's phone or a borrowed low-end phone has run a full match.

@@ -1,0 +1,18 @@
+{
+  "draft.meta_hint": {
+    "release_in": "I-16",
+    "reason": "New text says 'an up arrow means strong, a down arrow means weak'; the arrows are drawn by the new Draft screen. Until then the old screen still shows colour."
+  },
+  "about.title": {
+    "release_in": "I-25",
+    "reason": "New text says 'About Alpha 0.7'; the version label and build move to 0.7 in the acceptance step (App.VERSION_LABEL)."
+  },
+  "about.included.b": {
+    "release_in": "I-24",
+    "reason": "New text names a guided first game, a ? help button, lessons and a glossary; they do not exist until I-14, I-22 and I-23. Released by the cleanup step, checked against what ships."
+  },
+  "about.test.b": {
+    "release_in": "I-24",
+    "reason": "New tester questions ask about the guided first game, help on every screen, lessons and the glossary; same dependency as about.included.b."
+  }
+}

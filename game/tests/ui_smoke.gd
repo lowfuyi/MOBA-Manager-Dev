@@ -38,6 +38,7 @@ func _run() -> void:
 	App.go(ScreenClubSelect.new())
 	ok(cur() is ScreenClubSelect, "club select")
 	cur()._choose(App.world.club_ids[5])
+	print("ui smoke seed: ", App.gs.d["save_seed"], " (from the clock; the check count varies with it)")
 	ok(cur() is ScreenHub and App.gs != null, "hub after choosing a club")
 	# Alpha 0.5: bottom tab bar, tab roots, helpers
 	ok(App.main._tabbar.visible, "tab bar shown on the home page")
