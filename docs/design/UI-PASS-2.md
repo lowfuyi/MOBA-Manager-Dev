@@ -1,6 +1,6 @@
 # UI Pass 2: layout redesign spec (workstream W3)
 
-Date: 2026-11-08 · Author: UI/UX Designer · Status: spec for review (Art Director, Lead Game Designer, QA Manager), then the Founder checkpoint. No game code was changed.
+Date: 2026-11-08 - Author: UI/UX Designer - Status: spec for review (Art Director, Lead Game Designer, QA Manager), then the Founder checkpoint. No game code was changed.
 Answers Founder feedback 3: "everything is displayed linearly, the design is boring" (see `docs/ALPHA-0.7-PLAN.md`).
 Scope: Home, Squad, Draft, Game Plan, Standings, Match Report. Visual styling (colour, gradients, type, glow, illustration) is the art bible's job; here it is only referenced ("see the art bible"). This document fixes structure, hierarchy, sizes and interaction. The tutorial spec (W1) and the art bible (W2) are written in parallel; section 7 lists the hooks they need from this spec.
 
@@ -592,7 +592,7 @@ Draft complete (replaces the two text cards):
 | | [Balanced -36.7%]  [This plan +5.1% (^)]                       |   |
 | +----------------------------------------------------------------+   |
 |   (Overall)---------(Early)---------(Mid)---------(Late)             |  <- timeline 128
-|    2 dials          lead 2/4         lead 0/2      lead 0/2          |
+|    2 controls       lead 2/4         lead 0/2      lead 0/2          |
 | ===== EARLY GAME  (page changes when you tap a node or swipe) =====  |
 | Where you stand                                                      |
 | Top lane    -----|====+5.6      Mid lane   ====|-----  -20.7         |  <- 2x2 meters
