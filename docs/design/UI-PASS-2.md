@@ -1,8 +1,18 @@
 # UI Pass 2: layout redesign spec (workstream W3)
 
-Date: 2026-11-08 - Author: UI/UX Designer - Status: spec for review (Art Director, Lead Game Designer, QA Manager), then the Founder checkpoint. No game code was changed.
+Date: 2026-11-08 (revised the same day, wave 1b) - Author: UI/UX Designer - Status: spec for review (Art Director, Lead Game Designer, QA Manager), then the Founder checkpoint. No game code was changed.
 Answers Founder feedback 3: "everything is displayed linearly, the design is boring" (see `docs/ALPHA-0.7-PLAN.md`).
-Scope: Home, Squad, Draft, Game Plan, Standings, Match Report. Visual styling (colour, gradients, type, glow, illustration) is the art bible's job; here it is only referenced ("see the art bible"). This document fixes structure, hierarchy, sizes and interaction. The tutorial spec (W1) and the art bible (W2) are written in parallel; section 7 lists the hooks they need from this spec.
+Scope: Home, Squad, Draft, Game Plan, Standings, Match Report, and (new in the wave 1b revision) the **Match screen HUD for the Alpha 0.8 arena** (section 6.7). Alpha 0.7 keeps today's match screen. Visual styling (colour, gradients, type, glow, illustration) is the art bible's job; here it is only referenced ("see the art bible"). This document fixes structure, hierarchy, sizes and interaction. The tutorial spec (W1) and the art bible (W2) were written in parallel; section 7 lists the hooks they need from this spec.
+
+**Wave 1b revision (review `company/reviews/2026-11-08-wave1.md`; Producer rulings, which the Founder may overrule at the checkpoint):**
+1. **Type scale (C1):** the sizes of 2.2 stand (Body 32, Small 26, Caption 24 floor). The Art Director is re-issuing the token table in parallel; anything I am unsure of is marked "per ART-BIBLE token table".
+2. **Standings (C2):** three views (Table with a Points / Form switch, Playoffs, History). Unchanged from 6.5.
+3. **Squad (C3):** lane map plus bench grid; five avatar cards is the fallback. Unchanged; a gap is closed (a starter's player sheet, 6.2).
+4. **One helper name (C11):** **Coach** everywhere. "Advisor" is gone from this spec; the game strings that change are listed in `TUTORIAL.md` section 13.
+5. **In-arena and side colours (C4):** you = circle in the accent colour, them = hexagon in the coral colour. Blue / Red side is a **word plus a flag glyph** on Home and the draft board only (never in the arena, never colour alone).
+6. **"?" slot (C12):** the Draft header wireframe now shows it (6.3), and the Home hero states its contrast (6.1).
+7. **Club colour and needs-attention (C13):** club colour follows the art bible's strength rule; needs-attention follows the Art Director's re-issue. Marked "pending ART-BIBLE re-issue" where it matters (6.1).
+8. **Match HUD (C9):** new section 6.7, with a text-channel budget, the scoreboard strip, controls and large-text behaviour, and a list of things in `ACTION-VOCABULARY.md` and `ARENA-MAP.md` that do not fit, with proposed cuts.
 
 ## 0. Summary for the Founder (read this first)
 
@@ -10,13 +20,14 @@ Scope: Home, Squad, Draft, Game Plan, Standings, Match Report. Visual styling (c
 - **The plan.** Each of the six screens gets one strong shape instead of a stack:
   - Home: a club header with badge, one raised "next match" card, a swipe row of upcoming games, a 2 x 2 tile grid.
   - Squad: your five starters placed on a small lane map (like the arena), the bench as avatar cards, a swipe row of free agents.
-  - Draft: a five-lane board (you on the left, them on the right) above a grid of hero pictures; a bottom sheet to confirm.
+  - Draft: a five-lane board (you on the left, them on the right) above a grid of hero pictures; a bottom sheet to confirm; the Coach bar suggests a hero in one tap.
   - Game Plan: a timeline (Overall, Early, Mid, Late) with big stepped sliders, and the expected result always visible on top.
   - Standings: a podium for the top three, your own row highlighted and pinned, a bracket for the playoffs.
   - Report: a three-part story strip (Early, Mid, Late), one big hero number, then what changed.
+  - Match (Alpha 0.8, the arena): a scoreboard strip above, a text strip below, and a strict budget of how many words can appear at once (6.7).
 - **One decision per screen stays.** Home: play. Squad: who plays which role. Draft: this ban or pick. Game Plan: how we play. Report: continue. Standings has no decision; it answers "where do I stand and what do I need".
 - **Two things I need you to know.** (1) To meet the 16 sp / 48 dp rule on a 360 dp phone, text and buttons get about 15 percent bigger than today (body 28 to 32 px, buttons 92 to 96 px). Today many buttons are only 64 to 76 px, which is 32 to 38 dp: too small. (2) The art bible generates club badges and hero silhouettes in code, and gives players an initial avatar (a letter on a role ring, no faces). So the layouts never wait for painted art; only icons, empty-state pictures and backdrops are real asks (section 8.4).
-- **Recommendation:** approve the layouts below; start building with Home, Draft and Report because they are on every match day. Decisions are in section 9.
+- **Recommendation:** approve the layouts below; start building with Home, Draft and Report because they are on every match day. Decisions are in section 9. (D7, the body size, is settled by the Producer ruling: 32.)
 
 ## 1. What I reviewed, and the limits
 
@@ -42,6 +53,8 @@ Limits (honest): nothing here was built or run. Heights and positions are paper 
 - Today's tokens miss this: `S_BODY` 28 px (14 sp), `S_SMALL` 22 px (11 sp), chip text 20 px (10 sp), `BTN_H` 92 px, many buttons 64 to 76 px, the draft back button 80 x 64 px, tab buttons 88 px, `Screen` header buttons 80 px high.
 
 ### 2.2 Token changes this spec assumes (one global change, then re-shoot all screens)
+
+**Status (Producer ruling C1, 2026-11-08):** these UI-PASS-2 sizes are adopted: Body 32, Small 26, Caption 24 (the floor). The Art Director is re-issuing the art bible token table; where this section and the re-issue differ on anything other than those three sizes, the re-issue wins ("per ART-BIBLE token table"). Open points I cannot settle: (1) with Body 32, the art bible's Heading (32) is the same size as body, so the Heading is expected to rise to about 36 in the re-issue; (2) the 40 px ScreenHeader and BottomSheet title are not in the bible's scale (48 / 38 / 32) and need a decided token; (3) section titles: this spec said "accent colour", the bible says `TEXT` with teal only for the Caption group label; the bible's rule is used here until the re-issue; (4) map labels in ARENA-MAP are 20 px and must be 24 (6.7).
 
 | Token | Now | Pass 2 | Reason |
 |---|---|---|---|
@@ -76,7 +89,7 @@ Design rules that follow:
 ### 2.4 Colour-blind and colour-meaning rules (apply to every screen)
 
 The colour-blind palette swaps good/bad to sky blue (`56b4e9`) and vermillion (`d55e00`). Problems the current code has, and the rules that fix them:
-- In colour-blind mode, "good" (sky blue) is nearly the same as the Blue-side colour (`5aa9ff`), and "bad" (vermillion) is close to the Red-side colour (`ff7a7a`). **Rule: a side is never told by colour alone.** In every board, "You" is always on the left and "Them" on the right (whichever side you play), with a small B or R pip for the side.
+- In colour-blind mode, "good" (sky blue) is nearly the same as the Blue-side colour (`5aa9ff`), and "bad" (vermillion) is close to the Red-side colour (`ff7a7a`). **Rule: a side is never told by colour alone.** In every board, "You" is always on the left and "Them" on the right (whichever side you play). The side itself is a **word plus a flag glyph** ("Blue side", "Red side") on Home and on the draft board header; it is never shown in the arena, where you are a circle and they are a hexagon.
 - **Rule: good/bad is never colour alone.** Every green or red value carries a sign (+ or -), an arrow glyph (up, down, flat), or a tick or cross shape. Row tints and fills are reinforcement only.
 - **Rule: selected is never hue alone.** Selected = filled background + ring + check or thumb notch.
 - **Rule: role identity = icon + short code (TOP, JG, MID, BOT, SUP), colour second.** Role colours must come from a colour-blind-safe set and must not reuse the good/bad or coral/teal hues (see the art bible for the values).
@@ -89,18 +102,18 @@ The colour-blind palette swaps good/bad to sky blue (`56b4e9`) and vermillion (`
 
 | Topic | Art bible / W1 says | This spec | Result |
 |---|---|---|---|
-| Body size | Body 30 px (15 sp) | Body 32 px (16 sp), because the brief and the UI reference say 16 sp | **Decision D7.** I recommend 32; the font is narrower, so line length is about the same |
-| Small and caption | Small 26, Caption 22 | Small 26 (same), Caption 24 | Adopted nearly as is; 24 is my ask |
+| Body size | Body 30 px (15 sp) | Body 32 px (16 sp), because the brief and the UI reference say 16 sp | **Settled by Producer ruling C1 (D7): 32.** The font is narrower, so line length is about the same. Art Director re-issues the table with this |
+| Small and caption | Small 26, Caption 22 | Small 26 (same), Caption 24 | **Settled by ruling C1:** Caption 24 is the floor everywhere (also the tutorial and the arena) |
 | Display, Value, Title | 64 / 38 / 48 | Same | Adopted |
 | Hero tiles | 3 per row, 96 px circular silhouette | Same (216 px cards) | Adopted; my earlier 4-column grid is dropped |
 | Players | Initial avatar, no faces | Avatar everywhere in this spec | Adopted; "portrait kit" dropped |
 | Badges | Generated from the club id, 40 to 112 px | Hero 112, Next card 96 (large text 80), podium 88 / 72 / 72, rows 56, chips 44 | Adopted; all within the art bible's range |
-| Squad | Five role rows | Lane map plus avatar bench grid | **Decision D3.** The Founder asked for non-linear; rows are the fallback and the art bible's row component can serve the picker |
+| Squad | Five role rows | Lane map plus avatar bench grid | **Settled by ruling C3 (D3):** lane map plus bench grid; five avatar cards in a row is the fallback. The art bible's row component serves the picker. Art Director updates its 8.2 Roster row |
 | Chemistry | Lane-map layout | Squad map is the same idea | Compatible; UI Pass 3 can share the component |
 | Help "?" | 96 x 96 corner on every screen | Reserved in `ScreenHeader` (5.15) | Met |
 | Colour never the only cue | Rule (W1 contract 5) | Section 2.4 and every screen's (e) | Met |
 | Standings tabs break words | Fix with the redesign | Three views, segmented, scroll fallback | Met |
-| Squad card opens below the fold | Contract 4: scroll it into view | A bottom sheet opens in place, nothing is below the fold | Met |
+| Squad card opens below the fold | Contract 4: scroll it into view | A bottom sheet opens in place, nothing is below the fold | Met; TUTORIAL v1.1 replaced contract items 3, 4 and 6 and added the sheet contract (overlay above `BottomSheet`) |
 | Control ids | W1 section 8 ids stay | Section 7.3 maps every id to a component | Met, with two cautions for W1 |
 
 ## 3. Layout ideas evaluated
@@ -127,7 +140,7 @@ The colour-blind palette swaps good/bad to sky blue (`56b4e9`) and vermillion (`
 ## 4. Global pattern list
 
 1. **Card with depth.** Three elevations: flat (inside lists and grids), raised (hero cards: Next match, Report hero), sheet. Recipe in 5.1; the look (gradients, colour) is the art bible's. Performance rule: grids and long lists use the cheap flat card (1 px highlight, 2 px bottom edge, baked 9-slice, no live blur); only hero surfaces and sheets get a real soft shadow. At most 8 shadowed nodes on screen.
-2. **Section header.** Title (32 px, accent colour) + optional count chip + optional action on the right ("See all", a mini segmented control). 56 px high, action hit area 96 px. Always the same, so the eye learns it. A "?" help slot (96 x 96) lives in the screen header for W1.
+2. **Section header.** Title (32 px; colour per ART-BIBLE token table, pending re-issue: the bible says `TEXT`, teal only for the Caption group label) + optional count chip + optional action on the right ("See all", a mini segmented control). 56 px high, action hit area 96 px. Always the same, so the eye learns it. A "?" help slot (96 x 96) lives in the screen header for W1.
 3. **Screen header.** 96 px: back (96 x 96), title, up to two icon actions (96 x 96 each), help "?". Title may wrap to two lines.
 4. **Chip.** Passive status tag (44 px high, 24 px text, icon + word). Tappable chips are `Segmented` options or buttons, not chips. Status chips always have an icon so the meaning does not hang on colour.
 5. **Segmented control.** 2 to 4 options, equal width, 96 px high, never wraps inside a word. If any label does not fit its slot (large text), it becomes a horizontally scrolling strip with the selected item scrolled into view. 5 or 6 options (role filter) are stacked icon over a three-letter code.
@@ -161,7 +174,7 @@ Existing helpers in `ui.gd` (`card`, `chip`, `chips`, `tile`, `section`, `kv_row
 ```
 
 ### 5.2 SectionHeader and ScreenHeader
-- SectionHeader: 56 px; title 32 px; optional count chip; optional right action (hit 96). ScreenHeader: 96 px; back 96; title 40 px; up to two 96 px icon buttons; "?" 96 px.
+- SectionHeader: 56 px; title 32 px; optional count chip; optional right action (hit 96). ScreenHeader: 96 px; back 96; title 40 px (a size outside the bible's scale; per ART-BIBLE token table, pending re-issue); up to two 96 px icon buttons; "?" 96 px. The Draft header and the arena do not use the standard ScreenHeader (6.3 and 6.7 place the "?" themselves).
 - States: action pressed/disabled. Title wraps to two lines before it ever clips.
 
 ### 5.3 Chip (extends `UI.chip`)
@@ -291,13 +304,13 @@ Wireframe key: the frame is 720 px wide (1 character is about 10 px across; heig
 #### (b) New layout (above the fold ends at about y 1132)
 ```text
 +----------------------------------------------------------------------+
-|~~ club-colour gradient + arena skyline art, under status bar ~~      |  <- hero 0-248
+|~~ page gradient + 10% club wash + skyline art, under status bar ~~   |  <- hero 0-248
 |  .--------.   Northreach Corsairs                            [ ? ]   |
 |  | BADGE  |   Season 1 - Round 1 of 18 - Patch P1                    |
 |  |  112   |   Rank #9    0-1    (L)(-)(-)(-)(-)   last five games    |
 |  '--------'                                                          |
 | +----------------------------------------------------------------+   |  <- card top y=184
-| | NEXT LEAGUE GAME - ROUND 1                       [ Red side ]  |   |
+| | NEXT LEAGUE GAME - ROUND 1                  [flag  Red side]   |   |
 | |                                                                |   |
 | |   (BADGE  96)              VS              (BADGE  96)         |   |
 | |   Northreach                                Mossgate           |   |
@@ -327,10 +340,11 @@ Wireframe key: the frame is 720 px wide (1 character is about 10 px across; heig
 +----------------------------------------------------------------------+
 ```
 Notes on the frame:
-- The hero header is 248 px, full bleed under the status bar (art and gradient from the art bible, tinted with the club colours). Badge 112 on the left, club name 48 px (two lines if needed), season line 26 px, rank + record + five form pips (a pip is a circle with the letter W or L inside, so it is not colour alone).
+- The hero header is 248 px, full bleed under the status bar (art and gradient from the art bible). **Club colour follows the art bible's strength rule (C13, ART-BIBLE 3.7):** club colour is identity, not status, so the hero is the normal page gradient with at most a **10 percent wash** of the club's primary behind this club's own header, plus the badge; buttons, bars, chips and the chrome stay teal and coral. My first draft said "club-colour gradient"; that is withdrawn. If the Art Director's re-issue changes the wash strength, it wins (pending ART-BIBLE re-issue). Badge 112 on the left, club name 48 px (two lines if needed), season line 26 px, rank + record + five form pips (a pip is a circle with the letter W or L inside, so it is not colour alone).
+- **The "?" over the hero art (C12).** The hero art sits behind the "?" slot. The button is a solid 88 px circle (fill `PANEL3`, glyph `TEXT`, 7.1:1) with a 2 px ring in `TEXT2`; the **ring** carries the contrast, because the circle fill alone is only 1.1 to 1.8:1 against the hero (computed from the art bible's hex values, not seen on a device). Ring against the page gradient top `BG_GLOW` is 8.6:1; against a worst-case 10 percent club wash 7.5 to 8.0:1; against a skyline shape lifted 20 percent towards white 4.6:1 (all three above the 3:1 needed for a control boundary). Request to the Art Director (pending ART-BIBLE re-issue): keep the top-right 120 x 120 px of the hero art clear of shapes lighter than the gradient top plus 20 percent. The "never opened" dot is a shape (a filled circle on the ring), so it does not rely on colour.
 - The Next match card is raised and overlaps the hero by 64 px. It is the only raised card on the screen. Play is the only coral element. Auto-play drops to a text button (still a 96 px hit area), because it is the less common path.
 - The welcome tip card disappears from the layout: W1's coach overlay replaces it. Until W1 ships, a tip renders as a one-line banner (96 px) under the hero, not a 280 px card.
-- "Needs you" appears only when something needs a decision: a horizontal strip of tappable warning chips (96 px high each), swipeable when there are more than two.
+- "Needs you" appears only when something needs a decision: a horizontal strip of tappable warning chips (96 px high each), swipeable when there are more than two. **Structure is mine, treatment is the Art Director's (C13):** the art bible draws needs-attention as a gold left-rail card; this spec draws a swipe strip of chips. The structure (strip, 96 px chips, icon plus word) stays; colour, rail and card treatment follow whatever the Art Director re-issues (pending ART-BIBLE re-issue). Until then: a `WARN` icon plus the word, on a flat card chip.
 - Playoff state: the card shows the series ("Semi-final, best of 3") with win pips under the badges. Season over: the card becomes a "Champions" or "Season complete" card with the Season summary as its primary button. Eliminated: the "your season is over" line plus "Finish the season".
 
 #### (c) Data and functions feeding each block
@@ -454,7 +468,8 @@ Lane picker sheet (opens when a token is tapped):
 | Reinforcements | `gs.fa_players()` top six by rating, `gs.asking_wage(pid)`; opens `ScreenNegotiation` as now |
 
 #### (d) Interactions
-- Tap a token: lane picker sheet (size M, opened with the rows already scrolled so the current player is visible). Each row shows the change in team rating if you tap it, so the number is the preview. Tap a row: commits, closes, toast "Talfin now plays Mid" with Undo.
+- Tap a token: lane picker sheet (size M, opened with the rows already scrolled so the current player is visible). Each row shows the change in team rating if you tap it, so the number is the preview. Tap a row: commits, closes, toast "Talfin now plays Mid" with Undo. **Tap the "now playing" row** (the current starter, a chevron on its right): it changes nothing, so it opens that starter's player sheet. This closes a gap in my first draft, where bench cards opened the player sheet but a starter had no way to (found while rewriting the tutorial's steps 5 and 6). Id `squad.picker.card`. The picker header carries id `squad.picker.head`.
+- **Placeholder token positions (C10, pending):** the percentages above are a diagonal arrangement. Hollowmere is not diagonal (Mid is a vertical causeway, Top and Bot are arcs left and right, with the player's base at the bottom), so the final positions come from the arena map after the Art Director redraws the role glyphs and the lane motif.
 - Tap a bench card: player detail sheet (size L) with a segmented control Overview | Stats | Career. Overview: avatar 160, status bars (fatigue, form, morale as three 24 px bars with signed numbers), contract line, bond line, best heroes. Footer: "Put in lineup" (opens the lane picker for this player's best role), "Renew" when the contract ends within one season, and "Release" (a second sheet asks to confirm, with the cost, exactly as the current confirm text).
 - Long-press a bench card (400 ms): lifts it; drag it onto a token to swap. This is an accelerator only; the tap path always works. (Untested on touch: see risks.)
 - Swipe the Reinforcements carousel; tap a card to negotiate; "See all" opens the full Free agents screen.
@@ -479,14 +494,14 @@ Lane picker sheet (opens when a token is tapped):
 - The timer is a text "10 s"; nothing warns that it is running out except the colour turning red at 3 seconds.
 - Choosing a hero replaces the whole page with a slot list (`10_slotpanel_*`): the board disappears, so the player cannot see which lanes are already filled while choosing one. Five identical wide buttons.
 - Draft complete (`11`): two text cards listing the picks, then two stacked buttons; the composition lines are both green although the opponent's +12.0% is bad for the player.
-- Touch size: the back button is 80 x 64 px (32 dp high); the "advisor" button is 68 px.
+- Touch size: the back button is 80 x 64 px (32 dp high); the Coach button ("Take advisor's choice" in today's strings, renamed in `TUTORIAL.md` section 13) is 68 px.
 
 #### (b) New layout (compact board, the 1280 px case)
 ```text
 +----------------------------------------------------------------------+
-| [<]  YOUR TURN: BAN                      ( 8 s )   [ Auto-finish ]   |  <- header 104
+| [<]  YOUR BAN        ( 8 )  [ Auto-finish ]  [ ? ]                   |  <- header 104
 | steps: [x][x][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]   ban short, pick tall   |
-| YOU                          ROLE                          THEM      |  <- board 330
+| YOU [flag] Blue              ROLE              Red [flag] THEM       |  <- board 330
 | +--------------------------+ ( top ) +--------------------------+    |  <- rows 52
 | | [img] Open - Soldor      |         | Ottomere  [img]          |    |
 | +--------------------------+ ( jg  ) +--------------------------+    |
@@ -516,11 +531,11 @@ Lane picker sheet (opens when a token is tapped):
 +----------------------------------------------------------------------+
 ```
 Notes on the frame:
-- **Header (104 px):** back (96), "YOUR TURN: BAN" (40 px, wraps to two lines in large text), timer ring (72 px circle that drains; digits inside; at 3 s or less it turns the warning colour, shows a "!" and pulses), and "Auto-finish" (text button, 96 px hit). The 12 (or 16) step segments underneath show the whole order: bans are short bars, picks tall, the current one is highlighted, done ones carry the side pip.
-- **Board:** You are always on the left, Them on the right, with a B or R pip for the side. Rows are 52 px compact (hero silhouette Mini 44 + hero name; open slots show "Open" and the player's name so you can see who plays the lane) or 72 px full when the available height allows (rule below). Bans sit under the lanes (one slot at short drafts, three at full).
+- **Header (104 px) with the "?" slot (C12).** Five parts, left to right: back (96 x 96), title (40 px: "YOUR BAN", "YOUR PICK", "THEIR BAN", "THEIR PICK"; it wraps to two lines in large text), timer ring (72 px circle that drains; digits inside; at 3 s or less it turns the warning colour, shows a "!" and pulses), **Auto-finish** (text button, 26 px label, 176 x 96 hit), and **"?" (96 x 96 hit, 88 px circle, top right, the same corner as every other screen)**. Width budget at 720 (672 usable): 96 + 72 + 176 + 96 = 440 for the four fixed parts plus 4 gaps of 8 = 32, which leaves **200 px for the title**; "YOUR PICK" is about 160 px at 40 px, so it stays on one line. At 578 px (large text) 106 px is left, so the title takes two lines ("YOUR" / "PICK"), and the header is 128 px high (as 6.3(e) already says). The v1 title "YOUR TURN: BAN" (14 characters) did not fit beside a "?" and is shortened; the AI's turn is named in the grid overlay ("Mossgate is choosing a ban..."). Contrast of the "?" on this screen: the page gradient only, same circle and ring as Home (6.1), no art behind it. The 12 (or 16) step segments underneath show the whole order: bans are short bars, picks tall, the current one is highlighted, done ones carry the side flag.
+- **Board:** You are always on the left, Them on the right. The column headers carry the side as a **word plus a flag glyph** ("Blue" with a flag, "Red" with a flag), never colour alone and never a bare letter. Rows are 52 px compact (hero silhouette Mini 44 + hero name; open slots show "Open" and the player's name so you can see who plays the lane) or 72 px full when the available height allows (rule below). Bans sit under the lanes (one slot at short drafts, three at full).
 - **Needs strip (56 px):** the existing "Frontline / Initiator / Wave clear" checklist as ticked or empty chips; once three heroes are picked it adds the live composition style chip ("Skirmish +2.0%").
 - **Role filter (segmented, 96 px):** All, Top, Jg, Mid, Bot, Sup, with a tick on a role whose lane you have already filled. It filters by `role_primary` or `role_secondary`; "All" is the default. It never hides what the sim allows (off-role picks stay legal).
-- **Hero grid:** 3 columns of HeroCards (216 x 196, 12 px gap, 6 heroes fully visible plus a peeking third row; the art bible's 3-per-row tile); sorted exactly as today (by familiarity times fit, or by their best in the ban phase), so the best candidate is top left. The first row of the scroll area is the **Coach suggests** bar (88 px) with a one-tap "Take" (this is today's "Take advisor's choice").
+- **Hero grid:** 3 columns of HeroCards (216 x 196, 12 px gap, 6 heroes fully visible plus a peeking third row; the art bible's 3-per-row tile); sorted exactly as today (by familiarity times fit, or by their best in the ban phase), so the best candidate is top left. The first row of the scroll area is the **Coach suggests** bar (88 px) with a one-tap **Take** (today's "Take advisor's choice", renamed: the helper is **Coach**). The bar reads "Coach suggests: Veshra" and is also shown in the ban phase (the suggested ban).
 - **Board size rule (deterministic, testable):** the grid area must be at least 560 px high. If `usable_height - (header 104 + needs 56 + filter 96 + full board 400 + gaps 48)` is less than 560, use the compact board (330), otherwise the full board. At 720 x 1280 that is compact (grid about 574 px, 2.9 rows); at 720 x 1560 it is full. In large text the needs strip merges into the board header and the grid shows two rows of three.
 - **AI's turn:** the grid dims to 50 percent with a one-line overlay ("Mossgate is choosing a ban...") and the chosen hero flies from the grid into its lane (300 ms; instant when animations are off). No empty screen.
 
@@ -571,7 +586,7 @@ Draft complete (replaces the two text cards):
 | Needs strip | the existing `_needs_of(heroes)` and `Comp.evaluate(heroes)` (once 3 or more picks) |
 | Role filter | `hero["role_primary"]`, `hero["role_secondary"]`; filled lanes from `draft.open_slots(my_side)` |
 | Hero grid | `draft.avail`, the existing `scored` list (familiarity times `hero_fit`, or threat in the ban phase), `draft.meta[hid]` for the patch arrow (up if above 1.015, down if below 0.985, flat otherwise), archetype icon from `hero["archetype"]` |
-| Coach bar | `draft.ai_choice()` (as now) |
+| Coach bar | `draft.ai_choice()` (as now; the code name stays, the player-facing word is Coach) |
 | Pick sheet | hero fields (`archetype`, `tags`, `damage_type`, `power_early/mid/late`, `difficulty`, `strong_vs`), `w.hero_fit(h, s)`, `w.familiarity(p, hid)` for each open lane; the best lane = highest familiarity times fit (the inline `best_slot` logic in `_actions`; move it to a `Draft` helper, NEW) |
 | Confirm | `_apply({"hero": hid, "slot": s})` for a pick, `_apply({"hero": hid, "slot": ""})` for a ban; timeout still applies `draft.ai_choice()` |
 | Auto-finish | `_auto_rest()` (`draft.finish_with_ai()`), now with an inline "Sure?" second tap |
@@ -583,13 +598,13 @@ Draft complete (replaces the two text cards):
 - Tap "Take" on the coach bar: applies `ai_choice()` in one tap (this keeps the fast path for the 5-minute game).
 - Tap a role in the filter: filters the grid; tap "All" to reset. No swipe gestures in the draft (a swipe would fight the scroll under a running timer).
 - Long-press a hero card: peeks the same details as the sheet without the confirm button (a read-only sheet size S). Optional; a tap always gives the full sheet.
-- Timer reaches 0: the coach choice is applied and a toast says so ("Time is up: coach picked Veshra").
+- Timer reaches 0: the Coach's choice is applied and a toast says so ("Time is up: Coach picked Veshra").
 - Back or Android Back: closes the sheet first; with no sheet open it asks "Leave the draft?" in a size S confirm sheet (today it leaves silently).
-- "Auto-finish": first tap changes the label to "Sure?" for 3 s; a second tap finishes the draft with the advisor.
+- "Auto-finish": first tap changes the label to "Sure?" for 3 s; a second tap lets the Coach finish the draft. (While the tutorial's step 15 is up the armed state holds until tapped, `TUTORIAL.md` 3.2a.)
 
 #### (e) Large text and colour-blind
 - Large text: the grid stays 3 columns and the cards narrow to 183 px (every current hero name fits on one line at 26 px, up to 11 characters); the header title wraps to two lines (header 128); the board is always compact with 48 px rows; the sheet is size L (68 percent) so the lane control and the confirm button both fit.
-- Colour-blind: banned = grey plus a large X (not just dimmed); picked = tick plus the side stripe; recommended = a star shape; patch strength = an up, down or flat arrow glyph plus its percent in the sheet; the timer is a ring plus digits plus "!" at 3 s; the side is the left or right column with a B or R pip; the role filter uses icons and codes; the sheet's best lane is marked "best" in words.
+- Colour-blind: banned = grey plus a large X (not just dimmed); picked = tick plus the side stripe; recommended = a star shape; patch strength = an up, down or flat arrow glyph plus its percent in the sheet; the timer is a ring plus digits plus "!" at 3 s; the side is the left or right column plus the word and flag glyph in the column header; the role filter uses icons and codes; the sheet's best lane is marked "best" in words.
 
 #### (f) One primary decision
 "This ban or this pick." The screen shows only that choice at any time; the board is context and the sheet is the commit.
@@ -723,7 +738,7 @@ Playoffs view (a drawn bracket):
 +----------------------------------------------------------------------+
 | [<] Standings                                              [ ? ]     |
 | [   Table   ] [  Playoffs  ] [  History  ]                           |
-| CUT LINE: top 4 go through.  You are 5th, 3 points behind.           |  <- status line
+| CUT LINE: top 4 go through.  You are 9th, 3 points behind.           |  <- status line
 | SEMI-FINALS  (best of 3)                                             |
 | +----------------------------+     +----------------------------+    |
 | | (b) 1 Emberfen Hounds    2 |     | (b) 2 Mossgate Wardens   1 |    |
@@ -905,35 +920,40 @@ I adopt W1's mechanism (`TUTORIAL.md` section 8): a control is tagged with `UI.t
 | `home.attention` | the needs strip | unchanged |
 | `home.tile.standing`, `home.tile.chem` | two of the four tiles in the 2 x 2 grid | unchanged |
 | `home.offer` | an inline offer card placed under the needs strip | new slot, 0 px when empty |
-| `roster.row.0` (step 5) | the first starter's lane-map token (Top) | the "row" is now a token; W1 text says "this player" and still works |
-| `roster.card.head` (step 6) | the header of the player sheet (avatar, name, status bars) | the sheet opens in place; contract 4 is met without scrolling |
-| `roster.row.expiring` | the bench card or token with the contract chip | same chip |
-| `roster.card.contract`, `.renew`, `.release` | the contract line and footer buttons in the player sheet | inside a sheet: **W1 note below** |
+| `roster.row.0` (v1 step 5) | **retired.** Replaced by `squad.bench.0`, the first bench card (a read-only player sheet opens; a token opens the lane picker, which can change the lineup) | TUTORIAL v1.1 step 5 uses `squad.bench.0` |
+| `roster.card.head` (step 6) | the header of the player sheet (avatar, name, status bars) | the sheet opens in place; no scrolling needed |
+| `roster.row.expiring` (L3) | **retired.** Replaced by `squad.bench.expiring`, the first bench card with the contract chip | all ten contracts end together, so a bench card with the chip exists |
+| `roster.card.contract`, `.renew`, `.release` | the contract line and footer buttons in the player sheet | inside a sheet: see the sheet contract below this table |
+| `squad.picker.head`, `squad.picker.card` (new) | the lane picker's header, and the "now playing" row that opens that starter's player sheet | the header is the hole of tutorial variant 5-B |
 | `prematch.matchups`, `prematch.start_draft` | not changed here (Match day is left as is, D4) | |
-| `draft.choices` (step 12) | the Coach suggests bar plus the hero grid together | W1 text "tap any hero or take the advisor's choice" still true |
-| `draft.hero_grid` (step 13) | the 3-column HeroCard grid | |
+| `draft.choices` (steps 12 and 13) | the Coach suggests bar plus the hero grid together | the text names the Take button on the Coach bar |
+| `draft.hero_grid` | the 3-column HeroCard grid | no longer a first-run target |
 | `draft.slot_list` (step 14) | the "Plays as" lane row in the hero sheet | the sheet replaces the old role list; same job |
-| `draft.auto_rest` | the Auto-finish text button in the header | still 96 px high |
+| `draft.sheet.confirm` (new; steps 12 and 14) | the Ban or Pick button pinned in the hero sheet's footer | step 14's hole is the bounding box of `draft.slot_list` and this button |
+| `draft.auto_rest` (step 15) | the Auto-finish text button in the header (26 px label, 176 x 96 hit) | two taps in the real game (Sure?); the tutorial holds the armed state |
 | `draft.game_plan` | the "Game plan" button on the new Draft-complete screen | |
 | `gp.edge` | the sticky Edge hero | |
 | `gp.contests` | the 2 x 2 EdgeMeters (Top, Mid, Bot, Jungle) | |
 | `gp.tabs` | the PhaseStrip (Overall, Early, Mid, Late) | |
 | `gp.sliders` | the group of DetentTrack cards | |
-| `gp.coach` | the Coach button in the footer | opens the diff sheet |
+| `gp.coach` (step 17) | the Coach button in the footer | opens the diff sheet; raises `gp:coach_open` |
+| `gp.coach_apply` (new; step 17 stage B) | Apply, pinned in the Coach sheet; a sheet with nothing to change shows Close and raises `gp:coach_close` | |
 | `gp.start_match` | the coral Start the match button | |
 | `report.result` (step 21) | the result hero | |
-| `report.why` (step 22) | the **hero stat** card; a tap opens the factor sheet | W1 text "each bar is how much one factor moved the result" fits the sheet; the step may add "Tap it" as an event |
+| `report.why` (step 22) | the **hero stat** card; a tap opens the factor sheet (event `open:report_why`) | TUTORIAL v1.1 makes step 22 a tap on this card |
+| `report.why_sheet` (new; step 22 stage B) | the factor bars inside the size-L sheet | Next on the tutorial card closes the sheet |
 | `report.payoff`, `report.tip` | the "What this game changed" block and the tip card | |
 | `report.continue` (step 23) | the sticky coral Continue footer | |
-| `standings.tabs` | the Table / Playoffs / History segmented control | three, not five; step text "Playoffs shows the title series. My games lists your results. Trophies keeps your past seasons" **must change** (My games and Trophies move into History) |
+| `standings.tabs` | the Table / Playoffs / History segmented control | three, not five. TUTORIAL v1.1 lesson L1 and the Standings help row are rewritten for it (C2) |
 | `standings.table` | the table (podium plus rows) | |
-| `standings.form_list` (step 26) | the Table view with the Form switch on | W1 should add the tap on the switch to the step |
+| `stand.metric` (step 26; replaces `standings.form_list`) | the Points / Form switch in the Table header | the Club tile "Form Rating" opens Standings with the switch already on Form; the step asks for a tap on Points |
+| `match.controls`, `match.report_btn` | 0.7: today's Speed, Skip and See the report buttons. 0.8: the controls row and the end-of-show button (6.7) | ids unchanged; the 0.8 arena also holds `help.button` at the right end of the controls row |
 
-New ids from this spec (all optional for W1): `squad.map`, `squad.token.<slot>`, `squad.bench`, `squad.market`, `squad.auto`, `draft.timer`, `draft.steps`, `draft.board`, `draft.lane.<slot>`, `draft.needs`, `draft.filter`, `draft.coach`, `draft.card.<hid>`, `draft.sheet.lane_control`, `plan.chip`, `plan.phases`, `plan.control.<id>`, `plan.reset`, `stand.views`, `stand.podium`, `stand.own_row`, `stand.metric`, `stand.line`, `stand.bracket`, `report.story`, `report.stat`, `report.changed`, `report.dig`.
+New ids from this spec (all optional for the tutorial unless marked in `TUTORIAL.md` section 8): `squad.map`, `squad.token.<slot>`, `squad.bench`, `squad.bench.<n>`, `squad.market`, `squad.auto`, `draft.timer`, `draft.steps`, `draft.board`, `draft.lane.<slot>`, `draft.needs`, `draft.filter`, `draft.coach`, `draft.card.<hid>`, `draft.sheet.lane_control`, `plan.chip`, `plan.phases`, `plan.control.<id>`, `plan.reset`, `stand.views`, `stand.podium`, `stand.own_row`, `stand.metric`, `stand.line`, `stand.bracket`, `report.story`, `report.stat`, `report.changed`, `report.dig`; for the arena: `match.scoreboard`, `match.graph`, `match.plan_row`, `match.intent_row`, `match.feed`.
 
-Two cautions for W1 (their file, so I only flag them): (1) a coach spotlight must be able to target a control **inside a bottom sheet**, so the overlay has to sit above sheets and the sheet's own scrim must not swallow the taps the step waits for; (2) `draft.hero_grid` scrolls, so the hole must follow the card or the step should target the Coach suggests bar, which is always in the first row.
+**The sheet contract (settled with TUTORIAL v1.1; it was two cautions in my first draft).** (1) The coach overlay draws above every `BottomSheet` (its own canvas layer), so a step can spotlight a control inside a sheet, and the sheet's scrim is never the topmost node under the hole. (2) The overlay's dim panels cover a sheet's scrim and drag zone, so a sheet cannot be dismissed during a tutorial step. (3) `draft.hero_grid` scrolls, so first-run steps target `draft.choices` (the Coach bar sits in the first row, scrolled to the top at step start). (4) Sheets raise open events (`open:player_card`, `draft:sheet`, `gp:coach_open`, `open:report_why`), and the Coach sheet shows a Close button when it has no change to apply.
 
-Every `ScreenHeader` reserves the 96 x 96 "?" slot (top right) and takes a `help_key`, matching W1 contract item 2. The layouts already leave that room; none of the wireframes needs to change when W1 adds the button.
+Every `ScreenHeader` reserves the 96 x 96 "?" slot (top right) and takes a `help_key`, matching the tutorial's contract item 2. **One wireframe did have to change** (my first draft said none would): the Draft header had no slot and now shows it (6.3). Home states its contrast over the hero art (6.1). The arena has no top-right header; its "?" sits at the right end of the controls row (6.7).
 
 ### 7.4 New copy needed (Narrative Designer), all through `Strings`, none hard-coded
 
@@ -941,7 +961,9 @@ Every `ScreenHeader` reserves the 96 x 96 "?" slot (top right) and takes a `help
 - Report: eight story tags for the phase patterns (+++, ++-, +-+, +--, -++, -+-, --+, ---), the hero-stat sentences (for a normal factor and for luck; the luck sentence must be honest, see 7.6), "Dig deeper" tab names (Players, Moments, Draft), the title of the factor sheet (Why this happened), the tip action labels (Open squad).
 - Standings: view names (Table, Playoffs, History), the cut-line sentences (above, on, below the line, and after the playoffs), "YOU", empty-state lines.
 - Squad: sheet titles and the delta line ("team +1.2"), the swap note, "Find a player".
-- Draft: header lines (they exist), the "Leave the draft?" confirm, "Time is up: coach picked X", "Sure?", filter names (All and five role codes).
+- Draft: header lines ("YOUR BAN", "YOUR PICK", "THEIR BAN", "THEIR PICK"), the "Leave the draft?" confirm, "Time is up: Coach picked X", "Coach suggests: X", "Take", "Auto-finish", "Sure?", filter names (All and five role codes), the side words with a flag glyph ("Blue", "Red"). The game strings that change for the **Coach** rename are in `TUTORIAL.md` section 13.
+- Standings: the Points / Form switch says "Form" while player cards say "form" (recent performance). The switch label might read "Form Rating" if it fits (about 130 px at 24 px in a two-option switch): Narrative's call.
+- Match (arena, 6.7): phase chip words (Early, Mid, Late), a short plan-switch banner of at most 4 words for each `gp.switch.<id>` line, the status tags and intent labels (Gameplay owns these), and at most two commentary lines per game (Narrative).
 - Everything is plain words, short, and counted against the 24, 26 and 32 px slots in this spec.
 
 ### 7.5 Small additions to game code that these layouts need (engineering, no sim or balance change)
@@ -1024,14 +1046,14 @@ All art is original and goes to the IP & Originality Checker (the art bible sets
 | Mood faces | 4 (high, ok, low, poor) | 128 | 64 | Home mood tile |
 | Podium and trophy art | 3 medals, 1 crown, 3 cups (gold, silver, bronze), 1 empty slot | 256 | 96, 64 | Trophy shelf and champion |
 | Empty-state illustrations | 4 (no games yet, no free agents, no upcoming games or season over, playoffs not started) | 768 x 576 | 384 x 288 | Same style as the hero art |
-| Home hero backdrop | 1 (tintable by club colour) | 1440 x 496 | 720 x 248 | Gradient plus arena skyline strip; tileable edges |
+| Home hero backdrop | 1 (10 percent club wash only, ART-BIBLE 3.7; strength pending ART-BIBLE re-issue) | 1440 x 496 | 720 x 248 | Gradient plus arena skyline strip; tileable edges; the top-right 120 x 120 px clear of shapes lighter than the gradient top plus 20 percent (the "?" sits there, 6.1) |
 | Card depth set | 1 nine-slice (flat card, raised card, sheet top, grab handle) | 96 x 96 with 32 px slices | any | Baked shadows, so grids stay cheap |
 | Squad lane-map backdrop | 1 (inset) | 1344 x 880 | 672 x 440 | Aligned with the W4 arena map (coordinate with the Level / World Designer) |
 | Fonts | as the art bible decides | n/a | n/a | Must keep numerals tabular (aligned columns in tables) and cover the characters in `en.json` |
 
 ### 8.5 Not in the six screens, left as they are for now
 
-Match day (pre-game), Team chemistry (pentagon), Training, Finance, Free agents, Negotiation, Settings, the Plan and Club tab roots, Practice, Season end. They keep working with the new tokens (step 1) but will look older than the six. Suggested follow-up (UI Pass 3): the Chemistry pentagon becomes the same lane map as Squad (the UI reference v1 backlog item UI-5), Match day becomes a sheet on Home (D4 below), Plan and Club tabs use the 2 x 2 tile grid.
+The live Match screen (0.7: today's screen with the 75 s watch, Speed x1 / x2, Skip and See the report; the 0.8 arena HUD is section 6.7), Match day (pre-game), Team chemistry (pentagon), Training, Finance, Free agents, Negotiation, Settings, the Plan and Club tab roots, Practice, Season end. They keep working with the new tokens (step 1) but will look older than the six. Suggested follow-up (UI Pass 3): the Chemistry pentagon becomes the same lane map as Squad (the UI reference v1 backlog item UI-5), Match day becomes a sheet on Home (D4 below), Plan and Club tabs use the 2 x 2 tile grid.
 
 ---
 
@@ -1047,13 +1069,14 @@ For the Founder (recommendation first, plain words):
 | D4 | Match day (the screen between Home and the draft): keep it for 0.7, or fold it into a "Match preview" sheet on Home | **Keep for 0.7**, fold it in with UI Pass 3; changing the flow now adds risk to the tutorial (W1) |
 | D5 | Build with the art bible's code-drawn badges, hero silhouettes and initial avatars (no painted art needed), and simple code shapes for icons until the icon set lands | **Yes**, so the layouts are testable now and no step waits |
 | D6 | Home "Up next" swipe row: build it, or leave it out for now | **Build it last**; it is the least important block and the first to cut |
-| D7 | Body text at 32 px (16 sp) as the brief asks, or the art bible's 30 px (15 sp) | **32.** The brief and the UI reference both say 16 sp; the narrower font keeps the line length about the same. Fallback: 30 and accept 15 sp |
+| D7 | Body text at 32 px (16 sp) as the brief asks, or the art bible's 30 px (15 sp) | **32.** The brief and the UI reference both say 16 sp; the narrower font keeps the line length about the same. Fallback: 30 and accept 15 sp. **Producer ruling C1: 32 adopted by default; the Founder may overrule at the checkpoint** |
+| D8 | (new) Arena text: show **both** coaches' short labels in the live match (the scoreboard's text budget allows it only if the labels are 24 characters or fewer), or only yours | **Both, with the one long label shortened** (6.7). If the shortening is refused: yours only |
 
 For other roles: see the findings in 7.6 (Lead Game Designer and Systems Designer on the inert plan controls and kills consistency; Narrative on copy and the 12-character name check; Art Director on the asset list and the role-colour rules; W1 on the `tut_id` table).
 
 ## 10. Hand-offs
 
-- **Art Director:** use this spec's component list and section 8.4 for the art bible: depth recipe (5.1), role colours that are colour-blind safe and not good/bad hues (2.4), the Body 32 versus 30 question (D7), the club colour fields, text sizes (2.2) and the reconciliation table (2.5). Please confirm the asset counts and sizes, or tell me what should change.
+- **Art Director:** use this spec's component list and section 8.4 for the art bible: depth recipe (5.1), role colours that are colour-blind safe and not good/bad hues (2.4), the club colour fields, text sizes (2.2, now settled at 32 / 26 / 24 by ruling C1), the reconciliation table (2.5). In the re-issue please decide: the 40 px title token, the section-title colour, the club wash strength, the needs-attention treatment, the colour tokens for in-arena you (circle) and them (hexagon), and the 120 x 120 clear zone in the Home hero art. Also: art bible 8.2 Roster row (lane map), row badge 56 in Standings, map labels at 24 px. Please confirm the asset counts and sizes, or tell me what should change.
 - **Concept / Character / Environment Artists:** icons per 8.4, empty-state pictures, the Home hero backdrop, the lane-map backdrop, mood faces and trophies. Badges, hero silhouettes and initial avatars are code (art bible), so no painting is needed for them.
 - **Gameplay Programmer (Alpha 0.7 build):** steps 0 to 8 of 8.1; the small helpers in 7.5; do not rebuild whole pages on a tap.
 - **Engine / Graphics Programmer:** performance budget for the points in R1 (atlas, shadow limit, timer redraw, texture count), and a view on the spike.
