@@ -27,7 +27,7 @@ Direct hero control, real-time multiplayer matches, a 3D map, voice chat, esport
 
 ### Editions and roadmap (Founder decision)
 
-The game ships in stages, and the edition name changes with the stage. "MOBA Esports" is a working title.
+The game ships in stages, and the edition name changes with the stage. "Gloamline" is the game name (chosen 2026-11-09, trademark search still to do before launch); "MOBA Esports" was the working title.
 
 | Edition | Adds | In this document |
 |---|---|---|
@@ -47,7 +47,7 @@ Original names (all **placeholders pending IP Checker name search**):
 
 | Concept | Placeholder name |
 |---|---|
-| The map | Hollowmere |
+| The map | Wrenfell |
 | The base core | The Cairn |
 | Lane minions | Waves |
 | Early neutral objective (gold and speed buff) | Stoneback |

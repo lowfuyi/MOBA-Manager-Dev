@@ -194,7 +194,7 @@ func _run() -> void:
 			wide_names += " %s(%.0f>%.0f)" % [scr.get_script().get_global_name(), need, vw]
 	ok(wide_ok, "with large text no screen is wider than the display:" + wide_names)
 	ok(App.debug_info().contains("text=large") and App.debug_info().contains("startup="), "debug info shows text size and start-up time")
-	ok(App.feedback_text().contains("details for the developer") and App.feedback_text().contains("MOBA Esports"), "feedback note carries the debug lines")
+	ok(App.feedback_text().contains("details for the developer") and App.feedback_text().contains("Gloamline"), "feedback note carries the debug lines")
 	App.set_large_text(false)
 	App.set_colorblind(false)
 	ok(win.content_scale_factor == 1.0 and UI.GOOD == UI.GOOD_DEFAULT, "options switch back")

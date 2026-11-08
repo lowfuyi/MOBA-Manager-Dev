@@ -1,4 +1,4 @@
-# MOBA Manager (working title)
+# Gloamline (game name chosen 2026-11-09)
 
 A mobile esports **manager** game focused entirely on the MOBA genre. You are the club owner and head coach: scout and sign players, train them, draft heroes on match day, and climb through the league tiers. You never control a hero directly. Matches are simulated from your roster, your draft and your preparation.
 

@@ -112,7 +112,7 @@
  },
  {
   "id": "orrick",
-  "name": "Orrick",
+  "name": "Orlund",
   "placeholder": true,
   "archetype": "bruiser",
   "role_primary": "top",
@@ -178,7 +178,7 @@
  },
  {
   "id": "tuskal",
-  "name": "Tuskal",
+  "name": "Tarskel",
   "placeholder": true,
   "archetype": "bruiser",
   "role_primary": "jg",

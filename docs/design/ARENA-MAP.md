@@ -1,4 +1,4 @@
-# Arena map: Hollowmere (live match view)
+# Arena map: Wrenfell (live match view)
 
 Status: DRAFT v0.3 (pass 1c, alignment with the wave 1b review; no new places), 2026-11-09. Owner: Level / World Designer. Workstream W4 of `docs/ALPHA-0.7-PLAN.md`.
 Data: `game/data/arena_map.json` (map 0.3.0, schema 1, additive changes only; no id was renamed). Check: `python3 tools/validate_arena_map.py` (`--report` prints the numbers, `--selftest` runs the broken copies).
@@ -18,7 +18,7 @@ The map is a stage for a playback that the simulation has already decided. It ca
 
 ## 2. Why it is not a copy
 
-| Genre habit | Hollowmere |
+| Genre habit | Wrenfell |
 |---|---|
 | Square map, lanes on the edges plus a diagonal, a river across the middle | Tall oval for a portrait phone. A lake in the middle, no river |
 | Edge lanes run in straight lines | Top and Bot are arcs that curve around the lake. Top is long and narrow (40 px), Bot is shorter and wide (64 px) for two heroes |
@@ -34,7 +34,7 @@ Honest limit: three lanes, a jungle, towers and two neutral objectives are genre
 
 | Part | Name | Note |
 |---|---|---|
-| Map | Hollowmere | GDD placeholder, IP check pending |
+| Map | Wrenfell | GDD placeholder, IP check pending |
 | Lake / island | The Mere / the Moonhulk isle | new |
 | Top, Mid, Bot lanes | **Reedrun**, **Hush Causeway**, **Lanternway** | new. The screen keeps the words "Top / Mid / Bot" (as the feed does); flavour names only appear in commentary |
 | Jungle pockets | The Thicket (west), The Shallows (east) | new |

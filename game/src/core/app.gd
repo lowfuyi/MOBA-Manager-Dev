@@ -128,7 +128,7 @@ func autosave() -> void:
 
 
 func debug_info() -> String:
-	var lines: Array = ["MOBA Esports " + VERSION_LABEL, "godot " + Engine.get_version_info()["string"]]
+	var lines: Array = ["Gloamline " + VERSION_LABEL, "godot " + Engine.get_version_info()["string"]]
 	if gs != null:
 		lines.append("club=%s season=%s phase=%s round=%s seed=%s" % [gs.d["club"], gs.d["season"], gs.d["phase"], int(gs.d["round"]) + 1, gs.d["save_seed"]])
 		var ng := gs.next_game()

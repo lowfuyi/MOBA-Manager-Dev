@@ -94,7 +94,7 @@ def build(zoom):
     else:
         tx = ty = 0
     add(f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1280" width="720" height="1280" font-family="{FONT}">
-<title>Hollowmere arena map preview (720 x 1280 phone, arena 720 x 760, camera zoom {zoom:g})</title>
+<title>Wrenfell arena map preview (720 x 1280 phone, arena 720 x 760, camera zoom {zoom:g})</title>
 <desc>Drawn from game/data/arena_map.json by arena-map-preview.py; colours are the ART-BIBLE tokens. You are a teal circle, them a coral flat-top hexagon, Stoneback a gold rhombus (the hexagon means "them"). Guard towers are dimmer: scenery, never counted. Labels are 24 px Bold with a 5 px VOID outline. Header, text strip and buttons are placeholders for layout only.</desc>
 <defs>
   <radialGradient id="glowYou" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="{c_you}" stop-opacity="0.30"/><stop offset="0.6" stop-color="{c_you}" stop-opacity="0.10"/><stop offset="1" stop-color="{c_you}" stop-opacity="0"/></radialGradient>

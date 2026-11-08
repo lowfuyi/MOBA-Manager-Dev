@@ -4,7 +4,7 @@
   "map_version": "0.3.0",
   "date": "2026-11-09",
   "map_id": "hollowmere",
-  "name": "Hollowmere",
+  "name": "Wrenfell",
   "note": "Canonical frame: x 0 = west edge, 1 = east edge; y 0 = north edge (Red end), 1 = south edge (Blue end). Every Blue (B) entry has a Red (R) entry at (x, 1 - y). N = neutral, always on y = 0.5. Owner: Level / World Designer. Checked by tools/validate_arena_map.py.",
   "arena": {
     "px": [720, 760],
@@ -82,7 +82,7 @@
     {"id": "mere", "name": "The Mere", "p": [0.5, 0.5], "note": "the lake with the Moonhulk isle in the middle"}
   ],
   "names": {
-    "map": "Hollowmere",
+    "map": "Wrenfell",
     "lakes": "The Mere",
     "pockets": ["The Thicket", "The Shallows"],
     "lanes": {

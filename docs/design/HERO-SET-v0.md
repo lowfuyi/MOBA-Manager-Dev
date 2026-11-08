@@ -8,10 +8,10 @@
 |---|---|---|---|---|---|---|
 | Brannoch | Bruiser | Frontline, Waveclear | mixed / melee | 2 | 56/51/43 | Dunmarrow, Hegwin |
 | Dunmarrow | Bulwark | Frontline, Engage | magic / melee | 1 | 49/49/49 | Skarrow, Ottomere |
-| Skarrow | Bruiser | Frontline, Splitpush | mixed / melee | 3 | 57/52/44 | Hegwin, Orrick |
+| Skarrow | Bruiser | Frontline, Splitpush | mixed / melee | 3 | 57/52/44 | Hegwin, Orlund |
 | Hegwin | Bruiser | Frontline, Pick | mixed / mid | 3 | 47/59/47 | Ottomere, Vellgrim |
-| Ottomere | Bulwark | Frontline, Engage, Scaling | physical / melee | 2 | 42/50/58 | Orrick, Barrowick |
-| Orrick | Bruiser | Frontline, Scaling | physical / melee | 4 | 44/52/60 | Vellgrim, Brannoch |
+| Ottomere | Bulwark | Frontline, Engage, Scaling | physical / melee | 2 | 42/50/58 | Orlund, Barrowick |
+| Orlund | Bruiser | Frontline, Scaling | physical / melee | 4 | 44/52/60 | Vellgrim, Brannoch |
 | Vellgrim | Bulwark | Frontline, Engage | magic / melee | 3 | 51/51/51 | Barrowick, Dunmarrow |
 | Barrowick | Bruiser | Frontline, Pick | mixed / melee | 2 | 56/51/43 | Brannoch, Skarrow |
 
@@ -19,14 +19,14 @@
 
 | Hero | Archetype | Tags | Damage / range | Diff | Power E/M/L | Counters |
 |---|---|---|---|---|---|---|
-| Tuskal | Bruiser | Frontline, Splitpush | physical / melee | 2 | 56/51/43 | Gravenstone, Marrek |
+| Tarskel | Bruiser | Frontline, Splitpush | physical / melee | 2 | 56/51/43 | Gravenstone, Marrek |
 | Gravenstone | Bulwark | Frontline, Engage | physical / melee | 2 | 46/58/46 | Nimbrel, Quillith |
 | Nimbrel | Shade | Pick, Splitpush | mixed / melee | 4 | 57/43/56 | Marrek, Wyldrim |
 | Marrek | Bruiser | Frontline, Waveclear | mixed / melee | 3 | 43/51/59 | Quillith, Sootwing |
 | Quillith | Shade | Pick, Waveclear | mixed / mid | 3 | 56/42/55 | Wyldrim, Veshra |
-| Wyldrim | Bruiser | Frontline, Protect | mixed / melee | 3 | 57/52/44 | Sootwing, Tuskal |
+| Wyldrim | Bruiser | Frontline, Protect | mixed / melee | 3 | 57/52/44 | Sootwing, Tarskel |
 | Sootwing | Shade | Pick, Scaling | mixed / mid | 5 | 45/53/61 | Veshra, Gravenstone |
-| Veshra | Shade | Pick, Splitpush, Waveclear | mixed / melee | 3 | 57/52/44 | Tuskal, Nimbrel |
+| Veshra | Shade | Pick, Splitpush, Waveclear | mixed / melee | 3 | 57/52/44 | Tarskel, Nimbrel |
 
 ## Mid
 

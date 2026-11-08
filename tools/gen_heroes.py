@@ -10,6 +10,9 @@ index (bot-lane links). Order inside each slot below is therefore a deliberate r
 import json, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+# Display-name changes after the IP scan (2026-11-09). The id stays the ORIGINAL lower-case name on purpose: ids are
+# stable keys in saves, golden vectors and overrides, so a rename changes only the shown name, never the id.
+DISPLAY_RENAMES = {"orrick": "Orlund", "tuskal": "Tarskel"}
 SHAPES = {  # (early, mid, late) offsets from the budget average, each sums to 0
     "steady": (0, 0, 0), "early": (6, 1, -7), "early_mid": (4, 3, -7), "mid": (-4, 8, -4),
     "mid_late": (-7, 3, 4), "late": (-8, 0, 8), "spike": (5, -9, 4),
@@ -100,7 +103,7 @@ def build():
             counters = [ids[(i + 1) % 8], ids[(i + 3) % 8]]
             if slot == "sup":
                 counters.append(SLOTS["bot"][i][0].lower())
-            heroes.append({"id": name.lower(), "name": name, "placeholder": True, "archetype": arch,
+            heroes.append({"id": name.lower(), "name": DISPLAY_RENAMES.get(name.lower(), name), "placeholder": True, "archetype": arch,
                            "role_primary": slot, "role_secondary": sec,
                            "power_early": e, "power_mid": m, "power_late": l,
                            "damage_type": dmg, "range": rng, "difficulty": diff,

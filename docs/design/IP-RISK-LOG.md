@@ -128,3 +128,15 @@ I did not see the reference recording; I rely on `UI-UX-REFERENCE-v1.md`. Ideas,
 3. Art Director: redraw the role glyph set from Hollowmere shapes (E); make Ban a non-pink button (G); send the animal marks here when drawn.
 4. Content Lead: apply any approved hero renames through `tools/gen_heroes.py`; extend `block_list.json` with every ESMO hero name the Producer lists.
 5. Founder or Producer: before launch, a trademark search (USPTO, EUIPO, WIPO, IPOS, MyIPO as relevant) for the final game name and for any names the Founder keeps, then an IP lawyer.
+
+
+## Renames applied 2026-11-09 (Producer, Founder delegated)
+
+| Old | New | Where | Note |
+|---|---|---|---|
+| Hollowmere (map) | Wrenfell | arena_map.json, ARENA-MAP, ART-BIBLE, UI-PASS-2, ACTION-VOCABULARY, ESPORTS-NOTES, art files | Steam and App Store search 2026-11-09: no title named Wrenfell, Larkmere or Orlund; Thornmere returned an unrelated App Store hit. Not a trademark search. |
+| Orrick (hero) | Orlund | tools/gen_heroes.py DISPLAY_RENAMES, heroes.json, HERO-SET-v0.md | id `orrick` kept |
+| Tuskal (hero) | Tarskel | same | id `tuskal` kept |
+| MOBA Manager / MOBA Esports (title) | Gloamline | en.json app.title, project.godot, export label, README, GDD | name search as in DECISIONS.md; trademark search still open |
+
+Scan 2 still to run: role glyphs (pass 2b), flags, rhombus, style tile, the new names above, and the 18 label lines that use the `{place}` placeholder (Scan 1 counted 11).
