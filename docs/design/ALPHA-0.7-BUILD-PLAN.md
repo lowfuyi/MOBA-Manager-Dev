@@ -1,8 +1,23 @@
 # Alpha 0.7 "Guide and Look": Build Plan
 
-Version 1.0 · Date 2026-11-09 · Author: Lead Programmer · Status: for the Producer, Technical Director and QA Manager to review, then to hand to the Gameplay Programmer.
+Version 1.1 · Date 2026-11-09 · Author: Lead Programmer · Status: v1.1 patch after the Studio Manager review of wave 2a; for the Producer to hand to the Gameplay Programmer (I-00 is already in build and is recorded as amended, not redone).
 
-Inputs: `ALPHA-0.7-PLAN.md`, `UI-PASS-2.md`, `TUTORIAL.md`, `ART-BIBLE.md`, `PERF-BUDGET.md`, `COPY-0.7.md` and `copy/en_0_7.json`, the last section of `company/DECISIONS.md`, `company/reviews/2026-11-08-wave1b.md`, and the code in `game/src/core`, `game/src/ui`, `game/src/game`, `game/src/sim` and `game/tests` as it stands today (version label 0.6.0 alpha).
+**Change log, v1.0 to v1.1** (source: `company/reviews/2026-11-09-wave2a.md` section 4; the number in brackets is that review's fix number)
+
+| # | Change | Where |
+|---|---|---|
+| 1 | **Four copy keys are held out of the I-00 merge** (`draft.meta_hint`, `about.title`, `about.included.b`, `about.test.b`); `tools/merge_copy.py` takes a hold-list; I-00 merges 536 keys; release at I-16 and I-24/I-25. I-00 is recorded as **amended**, not a redo. [1] | 2.6, I-00, I-16, I-24, I-25 |
+| 2 | **CP2 moved from after I-16 to after I-18**, and the tag-only part of I-21 is pulled forward as **I-21a** (right after I-14). The Founder's first look at the tutorial now has 3 fallback steps of 27 instead of 15. The exact fallback list per checkpoint is in section 10. [2] | 0, 4.3, I-14, I-16, I-18, I-21a, 10 |
+| 3 | **Tutorial state of a brand-new save** defined (`new`, written by `new_game()`, not `legacy`); **resume after a kill** mid-tutorial-game defined; fresh-save fixture `save_0_6_d` added to the fixtures and to the I-00 and I-06 tests. [3] | 5, I-00, I-06, I-11, I-14 |
+| 4 | Stale statements removed: the OFL licence step is done (commit `d78038d`, verified by listing the APK); "Report moves ahead of Squad" was not a change from UI-PASS-2 8.1; the dangling "explained in section 4" pointer is gone. [4] | 0, 2.2, I-02, 4.3, K3, 13 |
+| 5 | Old welcome tips against the new Home offer card and the "Play without scrolling" acceptance: **the Home tip retires in I-15, the Report tip in I-18, the Pre-match tip in I-21a**, I-24 only deletes what is left. [9] | I-15, I-18, I-21a, I-24 |
+| 6 | Effort: tutorial block sum fixed (210 to 300), small increments re-costed, a **20 to 30 percent rework and review allowance** added, the day figures labelled a guess, and the screenshot counts that only fit when batched are named. [10] | 0, 3.1 R1, 8, 9.1 K13 |
+| 7 | Added: the Founder's "no mid-match interventions" quoted; I-00 tooling ownership (Gameplay Programmer builds, Lead Programmer reviews, Tools Engineer on call); permission for a second Gameplay Programmer instance on the guide lane (G2) from I-06; the five UI/UX answers still owed as an open table with owners. | 0, 4.1, 4.2, 12.1 |
+| 8 | Small knock-on fixes made while patching: tab bar tags added to I-03 (steps 3, 4, 7 and 24 need them), Match screen tags assigned to I-21a (no increment had them), K8 answered by the review's grep, D7 clause about "I-04's colour-blind check" corrected. | I-03, I-21a, K8, D7 |
+
+Not part of this patch (owners named by the review, still open): gates against the baseline [5], copy script and `en.json` update route [7, 8], B11 / nested / SVG outputs [11], GDD "coach" lines [13]. See section 13.
+
+Inputs: `ALPHA-0.7-PLAN.md`, `UI-PASS-2.md`, `TUTORIAL.md`, `ART-BIBLE.md`, `PERF-BUDGET.md`, `COPY-0.7.md` and `copy/en_0_7.json`, the last section of `company/DECISIONS.md`, `company/reviews/2026-11-08-wave1b.md`, `company/reviews/2026-11-09-wave2a.md`, and the code in `game/src/core`, `game/src/ui`, `game/src/game`, `game/src/sim` and `game/tests` as it stands today (version label 0.6.0 alpha).
 
 **Every effort number in this document is an estimate** (tool calls for one agent, including its own testing and redo). Nobody has built any of this yet. The measured numbers (section 2) were taken on this build computer, headless or under a software renderer, and say nothing about a phone.
 
@@ -10,13 +25,14 @@ Inputs: `ALPHA-0.7-PLAN.md`, `UI-PASS-2.md`, `TUTORIAL.md`, `ART-BIBLE.md`, `PER
 
 ## 0. Summary (phone-length)
 
-- **What this is.** 26 build steps (I-00 to I-25). Each is small enough to build, test and screenshot in one sitting (about 25 to 140 tool calls, estimate). The total is about 1,400 to 2,050 tool calls (estimate), or roughly 20 to 28 working days for one builder, fewer with two lanes in parallel.
-- **Order.** Safety net and spikes first, then look foundations (type sizes, colours, font, frame), then shared components, then the tutorial engine, then the six screens (Home, Draft, Game Plan, Report, Squad, Standings), then help sheets, lessons and acceptance. This follows UI-PASS-2 8.1 with three changes explained in section 4: the tutorial plumbing (tags and events) lands before the first screen, so no screen is built twice; Report moves ahead of Squad (shorter, and it closes the match-day loop); a spike for the 40-hero grid is added.
-- **Three checkpoints** where the Founder can see something real: CP1 after I-04 (same game, new type, colours and font), CP2 after I-16 (Home and Draft redesigned, tutorial engine playable: first APK for the phone test), CP3 after I-25 (everything, full check).
+- **Founder decision, final (company/DECISIONS.md):** "NO mid-match interventions. The player never changes anything during a match." Nothing in this plan adds one: `screen_match.gd` stays spectator-only (only its Speed, Skip and See-the-report buttons are tagged), and the tutorial and help never write a match result.
+- **What this is.** 26 build steps (I-00 to I-25; I-21 is split in two, so 27 dispatches). Each is small enough to build, test and screenshot in one sitting (about 15 to 140 tool calls, estimate). The base total is about 1,445 to 2,085 tool calls (estimate). With a 20 to 30 percent allowance for rework and review (5 of the 13 earlier dispatches needed a second round) it is **about 1,730 to 2,710 tool calls**. In days that is roughly 24 to 38 working days for one builder and 17 to 26 with two lanes. **The day figures are a guess**: nothing converts tool calls to days yet (the design documents' own figure is 57 developer days). Section 8.
+- **Order.** Safety net and spikes first, then look foundations (type sizes, colours, font, frame), then shared components, then the tutorial engine, then the six screens (Home, Draft, Game Plan, Report, Squad, Standings), then help sheets, lessons and acceptance. The screen order is the one in UI-PASS-2 8.1 (Home, Draft, Game Plan, Report, Squad, Standings), unchanged. What this plan adds to 8.1: the tutorial plumbing (tags and events) lands before the first screen, so no screen is built twice; the nested-scroll spike of 8.1 step 0 grows into four spikes, including surface cost (S3) and the 40-hero grid (S4); and the tag-only work for screens that are not redesigned (I-21a) is done before the Founder sees the tutorial.
+- **Three checkpoints** where the Founder can see something real: CP1 after I-04 (same game, new type, colours and font), **CP2 after I-18** (Home, Draft, Game Plan and Report redesigned, so the whole match-day loop is new; the guided first game is playable with 3 of 27 steps still showing a "cannot find that" card: first APK for the phone test), CP3 after I-25 (everything, full check). An optional **engine-preview APK** after I-16 is for scrolling, warmth and text only: the guide on it has 8 fallback steps and the Founder should tap Skip tutorial. Exact lists in section 10.
 - **Biggest findings from the code** (measured, section 2): every tap on Game Plan, Squad and Draft deletes and rebuilds the whole page (22 ms, 16 ms and 22 ms on this computer; 131 nodes on Game Plan). This is the pattern the plan replaces with build once and update in place. A tutorial that points at a button cannot survive a page that deletes the button on every tap, so this is a hard dependency, not a nicety.
-- **Old saves keep loading.** No change to `GameState.VERSION`. Tutorial progress is a new additive `tutorial` key with its own version; missing means "legacy". Section 5.
-- **One thing that cannot be settled here:** how it feels and performs on a real phone. First chance is the APK at CP2. Nothing in this plan has run on a phone.
-- **Decisions for the Founder: none.** Seven small decisions for other roles in section 12, each with a recommendation.
+- **Old saves keep loading.** No change to `GameState.VERSION`. Tutorial progress is a new additive `tutorial` key with its own version; a missing key means `legacy` (a save from before 0.7) and a brand-new save is written as `new` by `new_game()`. Section 5.
+- **One thing that cannot be settled here:** how it feels and performs on a real phone. First chance is the engine-preview APK after I-16 (if the Producer builds it) or CP2. Nothing in this plan has run on a phone.
+- **Decisions for the Founder: none.** The Producer should tell the Founder which tutorial steps are cards at each checkpoint (section 10). Eight small decisions for other roles in section 12, each with a recommendation; five UI/UX answers are still owed (12.1).
 
 ---
 
