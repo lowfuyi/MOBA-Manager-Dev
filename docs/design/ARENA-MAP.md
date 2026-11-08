@@ -1,7 +1,8 @@
 # Arena map: Hollowmere (live match view)
 
-Status: DRAFT v0.1, 2026-11-08. Owner: Level / World Designer. Workstream W4 of `docs/ALPHA-0.7-PLAN.md`.
-Data: `game/data/arena_map.json` (map 0.1.0, schema 1). Check: `python3 tools/validate_arena_map.py`.
+Status: DRAFT v0.2 (wave 1b reconciliation), 2026-11-08. Owner: Level / World Designer. Workstream W4 of `docs/ALPHA-0.7-PLAN.md`.
+Data: `game/data/arena_map.json` (map 0.2.0, schema 1, additive changes only; no id was renamed). Check: `python3 tools/validate_arena_map.py`.
+Colours: this document names colour tokens only. **All values are owned by `docs/design/ART-BIBLE.md`** (Art Director).
 Picture: `docs/design/art/arena-map-preview.png` (source `arena-map-preview.svg`).
 
 The map is a stage for a playback that the simulation has already decided. It cannot change who wins. It gives every simulated contest one clear place to happen.
@@ -57,7 +58,7 @@ Honest limit: three lanes, a jungle, towers and two neutral objectives are genre
 - Top lane stays on the left and Bot on the right in every match, so the player learns one picture. A 180 degree turn would swap them.
 - The map is mirror-symmetric, so both sides are fair. The simulation's small Blue-side bonus (0.02) stays a number, not a place.
 - Text and icons are drawn in screen space and are never flipped.
-- Colour follows the scoreboard and feed, not "Blue/Red": **you = teal circle**, **them = rose hexagon**. The shape differs, so it also works in colour-blind mode.
+- Colour follows the scoreboard and feed, not "Blue/Red" (ruling C4): **you = `ACCENT` teal circle**, **them = `CORAL` hexagon**, the same pair as the versus bar. `BAD` is for status and loss tone only (for example a feed line you lost). The words Blue and Red, with a flag glyph, appear on Home and the draft board and **never in the arena**. The shape differs as well as the colour, so it works in colour-blind mode.
 
 ## 5. Coordinates and speed
 
@@ -102,6 +103,8 @@ Spawn pads are at least 60 px apart (40 px tokens).
 
 **Towers.** Per side: two on each lane (inner, outer) and two gate towers. 16 in all. Icon 28 px.
 
+**Tower tally (ruling C5).** The scoreboard counts **6 towers per side**: outer and inner in each of Top, Mid and Bot (`scoreboard: true` in the data). The 2 guard towers at each gate are **scenery** (`scoreboard: false`): never counted, never part of `T_X`, and they fall only in the closing push, at 72.0 s and 72.4 s, between the resolve of `fight_late` (71.25 s) and the fall of the Cairn (74.0 s). The repair tower of the vocabulary (F8) is a counted lane tower, not a guard tower. The preview draws the guard towers dimmer. Data: `tower_tally` and the per-tower flag; the validator fails if a guard tower is counted, if a lane tower is not, or if a guard tower falls outside the closing push.
+
 | Tower | Blue position | Arc fraction `s` from own gate |
 |---|---|---|
 | Top inner / outer | (0.179, 0.791) / (0.118, 0.666) | 0.15 / 0.31 |
@@ -125,9 +128,9 @@ Dotted trails link camps to the lanes and pockets. They are walkable edges in th
 
 | Name | Sim contest | Position | Icon | Shape and colour |
 |---|---|---|---|---|
-| Stoneback | obj_mid | (0.780, 0.500) | 48 px | amber hexagon, shell pattern |
-| Moonhulk | obj_late | (0.500, 0.500), on the island | 48 px | pale lilac disc with a crescent |
-| The Cairn (x2) | siege | (0.500, 0.925) / (0.500, 0.075) | 48 px | stacked stones in the team colour |
+| Stoneback | obj_mid | (0.780, 0.500) | 48 px | hexagon with a shell pattern, token `WARN` |
+| Moonhulk | obj_late | (0.500, 0.500), on the island | 48 px | disc with a crescent, placeholder token `ARENA_MOON_PALE` |
+| The Cairn (x2) | siege | (0.500, 0.925) / (0.500, 0.075) | 48 px | stacked stones, rim in `ACCENT` (yours) or `CORAL` (theirs) |
 
 **Fight zones** (circle, radius in px): top_clash (0.110, 0.5) 48; mid_clash (0.5, 0.5) 76; bot_clash (0.890, 0.5) 48; mossback_clearing (0.215, 0.5) 78; stoneback_pit (0.780, 0.5) 70; moonhulk_isle (0.5, 0.5) 76; thicket and shallows (own half) 90; gate 64; cairn 52. The island holds ten tokens only just (r 76 px): use 36 px tokens in the big fights.
 
@@ -181,22 +184,25 @@ Every walk keeps at least 1 s to spare. Tight ones: the Stoneback swing and the 
 
 The validator also checks that no two icons overlap at these sizes.
 
-New colours the programmer should add as tokens (Arena Dusk): Moonhulk lilac `b9c6ff`, moss green `8fcf7a`, bramble `e0a35a`, lake blues `0e3550` to `2f7f8f`. Stoneback uses the existing WARN amber. "You" uses ACCENT; "them" uses BAD, so the colour-blind swap applies.
+Colours (token names only; **values owned by ART-BIBLE**): you `ACCENT`, them `CORAL`, Stoneback `WARN`, status text `BAD` / `GOOD`, surfaces `VOID`, `PANEL`, `TEXT2`. The map needs a few colours the bible does not yet define. Until the Art Director issues them, these descriptive placeholders stand in: `ARENA_LAKE_DEEP`, `ARENA_LAKE_EDGE` (the Mere), `ARENA_MOON_PALE` (Moonhulk and its pulse), `ARENA_MOSS` (leaf camps, Mossback, pocket shade), `ARENA_BRAMBLE` (camp wheels), `ARENA_LANE` (lane paths). Watch-outs for the Art Director: `ARENA_MOON_PALE` must stay apart from the Top role ring, `ARENA_MOSS` apart from `GOOD` and the Jungle ring, and `ARENA_BRAMBLE` apart from `CORAL` (ten coral hexagons stand near amber camps).
 
 ## 10. How it was checked
 
-- `python3 tools/validate_arena_map.py --report`: all 11 checks pass (structure, ids, range, mirror, lanes, spawns, towers, camps, water, spacing, stages).
+- `python3 tools/validate_arena_map.py --report`: all 14 checks pass (structure, ids, range, mirror, lanes, spawns, towers, camps, water, spacing, stages, plus three new in 0.2: units, tally, variants).
+- Wave 1b: 24 further broken copies (for units, tally, variants and a few old checks) all exit 1, each tripping the check it targets. List in the handback of that task; the copies are not kept in the repo.
 - 11 deliberately broken copies of the file (a tower moved, a coordinate at 1.2, a spawn deleted, a lane cut, a tower in the lake, a walk that is too slow, and others) all fail with exit code 1.
+- Wave 1b: the preview was recoloured (them = coral hexagons, guard towers dimmed), re-rendered and viewed twice (full frame, then enlarged crops of both halves).
 - The preview was drawn, looked at and corrected twice: first pass found a missing moon crescent, a star icon that read as UI, tags hiding towers, clipped text and floating bases; the second found a label touching a tag and checked a flipped version.
 
-**Not tested:** a real phone (touch feel, speed, heat), frame rate, a colour-blind simulation, the flip inside the engine (only drawn), and any trademark or store search.
+**Not tested:** neither held-fight staging has been prototyped or shown to anyone (see 7.1); a real phone (touch feel, speed, heat), frame rate, a colour-blind simulation, the flip inside the engine (only drawn), and any trademark or store search.
 
 ## 11. Hand-offs
 
 | To | Ask |
 |---|---|
-| Technical Designer | Read `stages`, `zones`, `nodes` and `edges`; decide who stands where in each zone. The match winner can lose the late fight (the sim sums three phases): stage that case as a held fight at the gate, then a lost siege |
+| Technical Designer | Read `stages`, `zones`, `nodes` and `edges`; decide who stands where in each zone. The match winner can lose the late fight (19 percent of games): build both stagings of section 7.1 (`late_fight_variants` in the data) and let the tester question decide. Key choreography on the ids of section 12 |
 | Engine / Graphics Programmer | One `y` flip when the player is Red; budget about 45 icons (16 towers, 13 camps, 4 objectives, 10 tokens) |
-| UI/UX Designer | Confirm the 150 px strip under the arena and the teal circle / rose hexagon rule |
-| Art Director | Take the preview as a start; it uses code-drawn shapes only |
+| UI/UX Designer | Confirm the 150 px strip under the arena and the teal circle / coral hexagon rule (ruling C4) |
+| Art Director | Issue the colour tokens named in section 9 (placeholders `ARENA_*`); map labels are still 20 px and the type scale wants 24 (C1), which needs a redraw of the preview |
+| Gameplay Designer | Re-key the vocabulary to the ids of section 12; confirm the wave-front reading in 12.5 and the `lead_carries` tag text |
 | IP & Originality Checker | Screen section 3 names and the layout |

@@ -271,22 +271,22 @@
     {"id": "bot", "name": "Lanternway", "sim_contest": "bot", "width_px": 64, "length_u": 0.8411, "nodes": ["B.bot.gate", "B.bot.1", "B.bot.2", "B.bot.3", "B.bot.4", "N.bot.mid", "R.bot.4", "R.bot.3", "R.bot.2", "R.bot.1", "R.bot.gate"], "clash": {"neutral_s": 0.5, "max_shift_s": 0.15, "note": "s = arc fraction from Blue gate (0) to Red gate (1)"}}
   ],
   "towers": [
-    {"id": "B.top.inner", "side": "B", "lane": "top", "tier": "inner", "s": 0.15, "p": [0.1786, 0.7906]},
-    {"id": "R.top.inner", "side": "R", "lane": "top", "tier": "inner", "s": 0.85, "p": [0.1786, 0.2094]},
-    {"id": "B.top.outer", "side": "B", "lane": "top", "tier": "outer", "s": 0.31, "p": [0.1177, 0.6663]},
-    {"id": "R.top.outer", "side": "R", "lane": "top", "tier": "outer", "s": 0.69, "p": [0.1177, 0.3337]},
-    {"id": "B.mid.inner", "side": "B", "lane": "mid", "tier": "inner", "s": 0.08, "p": [0.5, 0.7436]},
-    {"id": "R.mid.inner", "side": "R", "lane": "mid", "tier": "inner", "s": 0.92, "p": [0.5, 0.2564]},
-    {"id": "B.mid.outer", "side": "B", "lane": "mid", "tier": "outer", "s": 0.17, "p": [0.5, 0.6914]},
-    {"id": "R.mid.outer", "side": "R", "lane": "mid", "tier": "outer", "s": 0.83, "p": [0.5, 0.3086]},
-    {"id": "B.bot.inner", "side": "B", "lane": "bot", "tier": "inner", "s": 0.15, "p": [0.8088, 0.7763]},
-    {"id": "R.bot.inner", "side": "R", "lane": "bot", "tier": "inner", "s": 0.85, "p": [0.8088, 0.2237]},
-    {"id": "B.bot.outer", "side": "B", "lane": "bot", "tier": "outer", "s": 0.31, "p": [0.8742, 0.6588]},
-    {"id": "R.bot.outer", "side": "R", "lane": "bot", "tier": "outer", "s": 0.69, "p": [0.8742, 0.3412]},
-    {"id": "B.guard.l", "side": "B", "lane": "base", "tier": "guard", "s": null, "p": [0.405, 0.765]},
-    {"id": "R.guard.l", "side": "R", "lane": "base", "tier": "guard", "s": null, "p": [0.405, 0.235]},
-    {"id": "B.guard.r", "side": "B", "lane": "base", "tier": "guard", "s": null, "p": [0.595, 0.765]},
-    {"id": "R.guard.r", "side": "R", "lane": "base", "tier": "guard", "s": null, "p": [0.595, 0.235]}
+    {"id": "B.top.inner", "side": "B", "lane": "top", "tier": "inner", "s": 0.15, "p": [0.1786, 0.7906], "scoreboard": true},
+    {"id": "R.top.inner", "side": "R", "lane": "top", "tier": "inner", "s": 0.85, "p": [0.1786, 0.2094], "scoreboard": true},
+    {"id": "B.top.outer", "side": "B", "lane": "top", "tier": "outer", "s": 0.31, "p": [0.1177, 0.6663], "scoreboard": true},
+    {"id": "R.top.outer", "side": "R", "lane": "top", "tier": "outer", "s": 0.69, "p": [0.1177, 0.3337], "scoreboard": true},
+    {"id": "B.mid.inner", "side": "B", "lane": "mid", "tier": "inner", "s": 0.08, "p": [0.5, 0.7436], "scoreboard": true},
+    {"id": "R.mid.inner", "side": "R", "lane": "mid", "tier": "inner", "s": 0.92, "p": [0.5, 0.2564], "scoreboard": true},
+    {"id": "B.mid.outer", "side": "B", "lane": "mid", "tier": "outer", "s": 0.17, "p": [0.5, 0.6914], "scoreboard": true},
+    {"id": "R.mid.outer", "side": "R", "lane": "mid", "tier": "outer", "s": 0.83, "p": [0.5, 0.3086], "scoreboard": true},
+    {"id": "B.bot.inner", "side": "B", "lane": "bot", "tier": "inner", "s": 0.15, "p": [0.8088, 0.7763], "scoreboard": true},
+    {"id": "R.bot.inner", "side": "R", "lane": "bot", "tier": "inner", "s": 0.85, "p": [0.8088, 0.2237], "scoreboard": true},
+    {"id": "B.bot.outer", "side": "B", "lane": "bot", "tier": "outer", "s": 0.31, "p": [0.8742, 0.6588], "scoreboard": true},
+    {"id": "R.bot.outer", "side": "R", "lane": "bot", "tier": "outer", "s": 0.69, "p": [0.8742, 0.3412], "scoreboard": true},
+    {"id": "B.guard.l", "side": "B", "lane": "base", "tier": "guard", "s": null, "p": [0.405, 0.765], "scoreboard": false},
+    {"id": "R.guard.l", "side": "R", "lane": "base", "tier": "guard", "s": null, "p": [0.405, 0.235], "scoreboard": false},
+    {"id": "B.guard.r", "side": "B", "lane": "base", "tier": "guard", "s": null, "p": [0.595, 0.765], "scoreboard": false},
+    {"id": "R.guard.r", "side": "R", "lane": "base", "tier": "guard", "s": null, "p": [0.595, 0.235], "scoreboard": false}
   ],
   "camps": [
     {"id": "B.w1", "side": "B", "kind": "moss", "pocket": "thicket", "node": "B.w1", "p": [0.215, 0.7]},
@@ -342,6 +342,91 @@
     {"id": "cairn.B", "side": "B", "kind": "base", "c": [0.5, 0.925], "r_px": 52, "note": "the Cairn itself: siege ground"},
     {"id": "cairn.R", "side": "R", "kind": "base", "c": [0.5, 0.075], "r_px": 52, "note": "the Cairn itself: siege ground"}
   ],
+  "units": {
+    "body_width_px": 36,
+    "body_width_u": 0.0474,
+    "note": "One body width = the 36 px token used in big fights (the standard token is 40 px; scale by 40/36 = 1.11 if a fight is drawn at 40). Hero range in the action vocabulary: melee 1, mid 3, long 5 body widths. One 'step' = one body width.",
+    "range_body_widths": {"melee": 1, "mid": 3, "long": 5},
+    "range_px": {"melee": 36, "mid": 108, "long": 180},
+    "range_u": {"melee": 0.0474, "mid": 0.1421, "long": 0.2368},
+    "step_px": 36
+  },
+  "tower_tally": {
+    "per_side": 6,
+    "counted": "lane towers only: outer and inner in each of top, mid and bot (tiers inner and outer, flag scoreboard true)",
+    "scenery": "the two guard towers at each gate (tier guard, flag scoreboard false) are decor: never counted, never part of T_X, and they fall only in the closing push",
+    "guard_fall_window_s": [71.25, 74.0],
+    "guard_fall_s": [72.0, 72.4],
+    "note": "C5 ruling (wave 1 review). Window opens when fight_late resolves and closes when the Cairn falls (ACTION-VOCABULARY F13). The repair tower of F8 is a counted lane tower, not a guard tower."
+  },
+  "late_fight_variants": {
+    "applies_when": "the match winner W loses the fight_late contest (about 19 percent of games, ACTION-VOCABULARY 2.3 close_push, variant lead_carries). When W also wins fight_late the default stage fight_late (gate of the match loser) is used unchanged.",
+    "frame": "Canonical frame: W is Blue (south, y > 0.5), U (the match loser, who won the fight) is Red (north). If W is Red, mirror every point to (x, 1 - y) and swap B and R in node ids. The player's view flip is applied after that.",
+    "default": "held_island",
+    "status": "DRAFT. Neither staging has been prototyped or shown to a tester. The Technical Designer builds both; the Founder's tester question 'Results felt fair' decides.",
+    "icon_rule": "After obj_late resolves the Moonhulk icon fades to a 50 percent ring drawn under the tokens, so ten bodies can stand on the island.",
+    "variants": [
+      {
+        "id": "held_island",
+        "name": "Held on the isle",
+        "proven": false,
+        "ground": "island",
+        "zone_W": "moonhulk_isle",
+        "zone_U": "moonhulk_isle",
+        "u_mirrors_w": true,
+        "kills_change": 0,
+        "story": "Both teams are already on the Moonhulk isle after obj_late. The last fight is a stand-off there that U holds: nobody leaves, nobody dies beyond the ledger. While U's heroes are pinned, W's lead (a six-dot reserve pack) runs along Hush Causeway, the guard towers fall and the Cairn breaks.",
+        "formation": {
+          "W": {"top": [0.4444, 0.5263], "jg": [0.5556, 0.5263], "sup": [0.5, 0.5263], "mid": [0.4722, 0.5711], "bot": [0.5278, 0.5711]},
+          "U": {"top": [0.4444, 0.4737], "jg": [0.5556, 0.4737], "sup": [0.5, 0.4737], "mid": [0.4722, 0.4289], "bot": [0.5278, 0.4289]}
+        },
+        "events": [
+          {"t_s": 63.0, "event": "formation", "what": "Ten tokens settle into the formation points (top, jg, sup in the front rank, mid and bot behind)"},
+          {"t_s": 66.0, "event": "clash", "what": "Fight cues start; nobody changes ground"},
+          {"t_s": 68.0, "event": "pack_leaves", "what": "W's reserve pack leaves the isle along Hush Causeway at rush speed"},
+          {"t_s": 71.25, "event": "resolve_held", "what": "Fight resolves: U holds the isle and nobody moves. Tag text for the lead carries is for Gameplay and Narrative to set. No kill count change"},
+          {"t_s": 72.0, "event": "guard_fall_1", "what": "First guard tower falls (scenery)"},
+          {"t_s": 72.4, "event": "guard_fall_2", "what": "Second guard tower falls (scenery)"},
+          {"t_s": 72.5, "event": "cairn_crack", "what": "The pack reaches the Cairn, it cracks"},
+          {"t_s": 74.0, "event": "cairn_fall", "what": "The Cairn falls to W; end card from 74.0 to 75.0"}
+        ],
+        "legs": [
+          {"actor": "lead_pack", "from": "N.moonhulk", "to": "R.mid.1", "speed": "rush", "start_s": 68.0, "arrive_by_s": 71.25},
+          {"actor": "lead_pack", "from": "R.mid.1", "to": "R.cairn", "speed": "rush", "start_s": 71.25, "arrive_by_s": 74.0}
+        ]
+      },
+      {
+        "id": "held_gate",
+        "name": "Held at the gate",
+        "proven": false,
+        "ground": "land",
+        "zone_U": "gate.R",
+        "u_mirrors_w": false,
+        "kills_change": 0,
+        "story": "U falls back and holds its own gate; W's heroes stand off at the causeway mouth, out of melee reach (64 px between the front ranks), trading ranged fire. W's reserve pack takes the long way, along the Thicket trail from Mossback, and joins the causeway behind W's line. The guard towers fall and the Cairn breaks.",
+        "formation": {
+          "U": {"top": [0.4444, 0.1995], "sup": [0.5, 0.1995], "jg": [0.5556, 0.1995], "mid": [0.4722, 0.1574], "bot": [0.5278, 0.1574]},
+          "W": {"top": [0.3417, 0.2837], "jg": [0.3944, 0.2837], "mid": [0.4472, 0.2837], "bot": [0.5528, 0.2837], "sup": [0.6056, 0.2837]}
+        },
+        "events": [
+          {"t_s": 63.0, "event": "formation", "what": "Both groups are in place: U inside the gate plaza, W in a line of five at the causeway mouth, a clear gap of 40 px (76 px between the two middle tokens) in the middle for the lane"},
+          {"t_s": 66.0, "event": "clash", "what": "Ranged fire across the gap; melee heroes may step up to 28 px forward and back"},
+          {"t_s": 69.2, "event": "pack_waits", "what": "The reserve pack reaches the causeway mouth and waits in the gap in W's line"},
+          {"t_s": 71.25, "event": "resolve_held", "what": "Fight resolves: U holds the gate, W's line stays out of melee reach. Tag text for the lead carries is for Gameplay and Narrative to set. No kill count change"},
+          {"t_s": 72.0, "event": "guard_fall_1", "what": "First guard tower falls (scenery)"},
+          {"t_s": 72.4, "event": "guard_fall_2", "what": "Second guard tower falls (scenery)"},
+          {"t_s": 72.5, "event": "cairn_crack", "what": "The pack runs through the gate plaza to the Cairn, it cracks"},
+          {"t_s": 74.0, "event": "cairn_fall", "what": "The Cairn falls to W; end card from 74.0 to 75.0"}
+        ],
+        "legs": [
+          {"actor": "W_heroes", "from": "N.moonhulk", "to": "R.mid.1", "speed": "walk", "start_s": 61.0, "arrive_by_s": 66.0},
+          {"actor": "U_heroes", "from": "N.moonhulk", "to": "R.mid.gate", "speed": "rotate", "start_s": 61.0, "arrive_by_s": 66.0},
+          {"actor": "lead_pack", "from": "N.mossback", "to": "R.mid.1", "speed": "rush", "start_s": 66.0, "arrive_by_s": 71.25},
+          {"actor": "lead_pack", "from": "R.mid.1", "to": "R.cairn", "speed": "rush", "start_s": 71.25, "arrive_by_s": 74.0}
+        ]
+      }
+    ]
+  },
   "stages": [
     {"contest": "top", "order": 1, "t_frac": 0.18, "t_s": 13.5, "zone": "top_clash", "actors": ["top"], "title": "Top lane duel", "since": "start", "travel": [{"from": "B.spawn.top", "to": "N.top.mid", "speed": "walk"}]},
     {"contest": "mid_lane", "order": 2, "t_frac": 0.21, "t_s": 15.75, "zone": "mid_clash", "actors": ["mid"], "title": "Mid lane duel on the Causeway", "since": "start", "travel": [{"from": "B.spawn.mid", "to": "N.moonhulk", "speed": "walk"}]},
@@ -350,8 +435,8 @@
     {"contest": "obj_mid", "order": 5, "t_frac": 0.45, "t_s": 33.75, "zone": "stoneback_pit", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Stoneback taken", "since": "start", "travel": [{"from": "B.cairn", "to": "N.stoneback", "speed": "walk"}]},
     {"contest": "fight_mid", "order": 6, "t_frac": 0.6, "t_s": 45.0, "zone": "mossback_clearing", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Mid-game team fight", "since": "obj_mid", "travel": [{"from": "N.stoneback", "to": "N.mossback", "speed": "rotate"}]},
     {"contest": "obj_late", "order": 7, "t_frac": 0.8, "t_s": 60.0, "zone": "moonhulk_isle", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Moonhulk taken", "since": "fight_mid", "travel": [{"from": "N.mossback", "to": "N.moonhulk", "speed": "walk"}]},
-    {"contest": "fight_late", "order": 8, "t_frac": 0.95, "t_s": 71.25, "zone": "gate.*", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Decisive fight at the Cairn Gate", "since": "obj_late", "travel": [{"from": "N.moonhulk", "to": "B.mid.gate", "speed": "walk"}], "zone_rule": "gate of the team that loses the match"},
-    {"contest": "siege", "order": 9, "t_frac": 1.0, "t_s": 75.0, "zone": "cairn.*", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Siege of the Cairn", "since": "fight_late", "travel": [{"from": "B.mid.gate", "to": "B.cairn", "speed": "walk"}], "zone_rule": "cairn of the team that loses the match"}
+    {"contest": "fight_late", "order": 8, "t_frac": 0.95, "t_s": 71.25, "zone": "gate.*", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Decisive fight at the Cairn Gate", "since": "obj_late", "travel": [{"from": "N.moonhulk", "to": "B.mid.gate", "speed": "walk"}], "zone_rule": "when the match winner also wins fight_late: the gate of the team that loses the match. When the match winner loses fight_late (about 19 percent of games): see late_fight_variants (default held_island), not the gate", "variant_when_winner_loses": "late_fight_variants"},
+    {"contest": "siege", "order": 9, "t_frac": 1.0, "t_s": 75.0, "zone": "cairn.*", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Siege of the Cairn", "since": "fight_late", "travel": [{"from": "B.mid.gate", "to": "B.cairn", "speed": "walk"}], "zone_rule": "cairn of the team that loses the match (always, in every variant)"}
   ],
   "waves": {
     "suggested": true,

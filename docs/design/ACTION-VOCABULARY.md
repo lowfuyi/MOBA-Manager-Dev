@@ -4,13 +4,28 @@ Owner: Gameplay / Champion Designer. Date: 2026-11-08. Workstream W4 (live match
 
 This is the contract between the simulation and the arena. The simulation decides the match first. The arena only plays it back, and it can never change who wins. Every name here is a placeholder that follows the GDD (map Hollowmere, early objective Stoneback, late objective Moonhulk, base core the Cairn, hero names from HERO-SET-v0) and still goes to the IP & Originality Checker.
 
+Revision 2026-11-08 (wave 1b, reconciliation): places, nodes and towers now use the ids of `game/data/arena_map.json` (C6); the scoreboard counts 6 towers per side and the 2 guard towers are scenery (C5); the late fight has a held-fight rule and a new invariant I9 for the case where the match winner loses it (C8); the loose claims in the review are corrected (sections 0, 4.1, 2.1); colours follow the one-rule ruling (C4); the two open questions are settled (section 10).
+
+### Who owns what in this file
+
+| Part | Owner | Note |
+|---|---|---|
+| Beats, cues, scoreboard rules, invariants | Gameplay / Champion Designer | The scoreboard maths is also read by the Systems Designer, who owns `Report.story` once it exists (S3) |
+| **Intent labels and status tags (all of section 4.3)** | Gameplay / Champion Designer | The 52 intents and their ids, the rule that decides when each shows, and the length limit |
+| **Commentary lines** (the caster-style sentence line, any text that is not an intent label or a status tag) | **Narrative Designer** | Written to the Esports Manager's tone rules (`docs/design/ESPORTS-NOTES.md`). Not written in this file |
+| Tutorial and help copy | UI/UX Designer drafts, Narrative Designer polishes | Not in this file |
+| Map ids, positions, unit conversion of "body width" | Level / World Designer | `game/data/arena_map.json` is the authority |
+| Colour tokens | Art Director | This file names roles only (see the colour rule in section 2.2) |
+
+If the Narrative Designer rewrites an intent label or a status tag for tone, the id, the "shown when" rule, the 28-character limit and the checks in section 4.1 stay as they are here. Gameplay re-runs the label check after any such edit.
+
 ## 0. Summary
 
 1. The arena reads one finished result (`res`) and builds a **show script** before the first frame. Nothing in the script is decided during playback.
-2. Every one of the eight real contests becomes one visible beat at the same moment the existing feed and the report's "Key moments" already stamp it (`Report.FEED_ORDER`: 0.18, 0.21, 0.24, 0.27, 0.45, 0.60, 0.80, 0.95 of the game clock). In the 75 s window that is 13.5, 15.75, 18.0, 20.25, 33.75, 45.0, 60.0 and 71.25 s. So the arena clock, the feed line and the report agree to the second.
+2. There are twelve beat ids. Not every one is tied to a simulation trigger, and this file says so plainly in section 2.1: eight read a field of the result directly (a contest, `plan_used`, the final or the picks), two are derived from formulas over sim outputs (`tower_break`, `tower_push`), and two are cosmetic walking with no sim link (`rotate_stone`, `reset`). Every one of the eight real contests becomes one visible beat at the same moment the existing feed and the report's "Key moments" already stamp it (`Report.FEED_ORDER`: 0.18, 0.21, 0.24, 0.27, 0.45, 0.60, 0.80, 0.95 of the game clock). In the 75 s window that is 13.5, 15.75, 18.0, 20.25, 33.75, 45.0, 60.0 and 71.25 s. So the arena clock, the feed line and the report agree to the second.
 3. The scoreboard is a pure function of the contests: a lead ladder whose last step equals `res.final` exactly, tower credits from a pressure sum, kills taken from `Report.kda`, objectives from the signs of `obj_mid` and `obj_late`. Section 5 gives the formulas, a worked example and eight invariants. I ran the formulas on 40,000 simulated matches and all invariants held (section 9).
 4. Variety (who strikes first, small path jitter, which wording) comes only from a new stream family named `show`, seeded from `res.mseed`. It never touches a simulation stream, and the same seed plays the same show.
-5. Intent labels (52 intents, 156 lines, all 28 characters or fewer) show the coach's posture before a beat. They say what a side is trying, never what will happen.
+5. Intent labels (52 intents, 156 lines, all 28 characters or fewer) show the coach's posture before a beat. They say what a side is trying, never what will happen. Gameplay owns them; the Narrative Designer owns commentary lines (see "Who owns what").
 6. Two things the arena needs are not in the result today: the Game Plan sets (`res.plans`, which also exposes a bug in the report's attribution) and a kill rate that suits a 75 s show. Both are in section 2.5 for the Systems Designer.
 
 ## 1. The contract
@@ -71,21 +86,23 @@ Windows do not overlap, so the shares add to 100%. Resolve times are the feed st
 | 0.0 to 4.0 | `opening` | 4.0 | 5.3% | none |
 | 4.0 to 21.0 | `lane_phase`: `lane_trade` top, mid, bot and `jungle_play` | 17.0 | 22.7% | top 13.5, mid 15.75, bot 18.0, jungle 20.25 |
 | 21.0 to 24.0 | `plan_check` | 3.0 | 4.0% | none (reads `plan_used`) |
-| 24.0 to 31.0 | `rotate_stone` (with `tower_break` at 25.0 to 28.0) | 7.0 | 9.3% | none |
+| 24.0 to 31.0 | `rotate_stone` (with `tower_break` at 25.0 to 28.0; far-lane heroes start walking earlier, see 2.3) | 7.0 | 9.3% | none |
 | 31.0 to 36.5 | `objective_stone` | 5.5 | 7.3% | obj_mid 33.75 |
 | 36.5 to 51.0 | `team_fight` mid, then `tower_push` | 14.5 | 19.3% | fight_mid 45.0 |
 | 51.0 to 54.0 | `reset` | 3.0 | 4.0% | none |
 | 54.0 to 63.0 | `objective_moon` | 9.0 | 12.0% | obj_late 60.0 |
 | 63.0 to 71.25 | `team_fight` late | 8.25 | 11.0% | fight_late 71.25 |
-| 71.25 to 75.0 | `close_push` | 3.75 | 5.0% | Cairn falls at 74.0, hold to 75.0 |
+| 71.25 to 75.0 | `close_push` (with the two scenery guard towers of the loser falling, 2.3) | 3.75 | 5.0% | Cairn falls at 74.0, hold to 75.0 |
 
 The game clock shown on the scoreboard is `show_time / 75 * Report.game_minutes(res) * 60`, so resolve stamps read like the report ("01:58 Top lane" in the worked example).
 
-Two deliberate choices, both open to review (section 10): (1) lane beats stay in chronological order. The Esports notes suggest ordering lane beats by size, but that would break the report stamps. (2) Early tower credits fall in the rotation window (25.0 to 28.0 s, about minute 3:40 to 4:10 of an 11 min game), not at the lane resolves (minute 2 to 3), because a tower at minute 2 reads as wrong to anyone who knows the genre.
+Two deliberate choices, settled in section 10: (1) lane beats stay in chronological order, size is shown by tier effects and camera, never by order. (2) Early tower credits fall in the rotation window (25.0 to 28.0 s, about minute 3:40 to 4:10 of an 11 min game), not at the lane resolves (minute 2 to 3).
 
 ## 2. Beats
 
 ### 2.1 Beat index
+
+**What "tied to a sim trigger" means, plainly.** Of the twelve beat ids (`opening`, `lane_trade`, `jungle_play`, `plan_check`, `rotate_stone`, `tower_break`, `objective_stone`, `team_fight`, `tower_push` with its `tower_dive` variant, `objective_moon`, `reset`, `close_push`): eight read a field of the result directly (`opening`, `lane_trade`, `jungle_play`, `plan_check`, `objective_stone`, `team_fight`, `objective_moon`, `close_push`), two are Derived (`tower_break`, `tower_push`), and **two are Cosmetic with no sim link at all: `rotate_stone` and `reset`**. They exist so the heroes can walk from one place to the next, they carry 13.3% of the 75 s, and nothing in them is ever shown as news. Even inside the eight, some staging is Interpretive (gank or invade, who starts a take) and is marked so in the rows below.
 
 Support levels: **Direct** = the sim output itself says it. **Derived** = a deterministic formula over sim output (section 5). **Interpretive** = a story told from a real output, with the choice rule stated. **Cosmetic** = no sim link at all, never shown as news.
 
@@ -102,7 +119,7 @@ Support levels: **Direct** = the sim output itself says it. **Derived** = a dete
 | `tower_push` / `tower_dive` | tower credits of the fight, `res.style[W]` | Derived. Dive vs siege flavour: Interpretive | inside 19.3% |
 | `objective_moon` | `contests.obj_late` | Direct | 12.0% |
 | `team_fight` late | `contests.fight_late` | Direct | 11.0% |
-| `close_push` | `res.blue_won`, `contests.fight_late` | Direct (winner). `clean_close` vs `lead_carries` is Direct from the signs | 5.0% |
+| `close_push` | `res.blue_won`, `contests.fight_late` | Direct (winner). `clean_close` vs `lead_carries` is Direct from the signs. The two guard towers falling is Cosmetic (scenery, never counted) | 5.0% |
 | overlay `lead_flip` | rule F5 | Derived | no time |
 | overlay `upset` | F1: `abs(x) >= 0.8`, sign of x differs from sign of c | Derived | no time |
 | overlay `snowball`, `comeback` | arc F6 | Derived | no time |
@@ -110,7 +127,9 @@ Support levels: **Direct** = the sim output itself says it. **Derived** = a dete
 
 ### 2.2 Look by margin (shared by every beat)
 
-Sizes come from `Report.margin_word`. A loss is the same picture from the other side: your units are on the losing end of the same tier, plus a loss tone (cool edge vignette at 12% opacity for 0.8 s at the resolve moment, feed line in the BAD colour, no celebratory sound). A decisive loss shows a decisive collapse of your units. We never soften it with a fake near-win.
+Sizes come from `Report.margin_word`. A loss is the same picture from the other side: your units are on the losing end of the same tier, plus a loss tone (cool edge vignette at 12% opacity for 0.8 s at the resolve moment, feed line in the status-loss colour, no celebratory sound). A decisive loss shows a decisive collapse of your units. We never soften it with a fake near-win. The one place the look of a result is held back is the held fight (section 2.3, `close_push`), and there the result itself is still shown truthfully.
+
+**Colour rule (Founder-level ruling, C4; the Art Director owns every token).** In the arena **you = teal circle, them = coral hexagon**, the same pair as the versus bar. The status-loss colour (`BAD`) means only status and loss tone: the loss vignette, a loss feed line, a lost-lead number. It never marks the opponent's units. Blue side and Red side are never shown as colours in the arena (only as a word plus a flag glyph on Home and the draft board). Every cue also keeps its shape (circle against hexagon, rule H6). This file names roles ("amber", "pale blue", "warm white-gold") as a description of the intent, not as token values; the Art Director maps them to tokens.
 
 | Tier | Lane trade and jungle | Objective | Team fight | Camera and sound |
 |---|---|---|---|---|
@@ -120,15 +139,30 @@ Sizes come from `Report.margin_word`. A loss is the same picture from the other 
 
 Front-loading: the kill times inside a beat's kill window are warped by `u^g` with `g` = 1.0 narrow, 0.8 clear, 0.6 decisive, so decisive beats finish their killing earlier and narrow beats stay open until the end.
 
-Wave front formula for a lane beat: `front = 0.6 * abs(c) * sgn(winner)` of the lane length, measured from the centre toward the loser's outer tower, eased in over the beat.
+Wave front formula for a lane beat: `front = 0.6 * abs(c)`, measured from the centre toward the loser's outer tower, eased in over the beat, so `front = 0.60` is the farthest the clash goes. In map terms the clash point moves from `neutral_s` (0.5) toward the loser by `(front / 0.60) * max_shift_s`, with `max_shift_s` from `arena_map.json` lanes (top 0.15, mid 0.29, bot 0.15 of the arc). A decisive beat therefore ends just in front of the loser's outer tower, which is what the tier table says.
 
 ### 2.3 Beat cards
 
-Units below use placeholder zone ids for the Level / World Designer to map: `base_B`, `base_R`, `lane_top`, `lane_mid`, `lane_bot`, `jungle_B`, `jungle_R`, `pit_stone` (Stoneback), `pit_moon` (Moonhulk), `tw.<side>.<lane>.<outer|inner>`, `cairn.<side>`. W means the side that won the beat's contest, U the other side. Health bars are decoration: a hero's bar reaches zero only at a kill event of the ledger.
+**Ids.** Every place, node and tower below is keyed on `game/data/arena_map.json` (the Level / World Designer's authority; ARENA-MAP.md has the id map). Beat ids (section 2.1) and cue ids (section 3.2) are this file's and did not change. Sim contest ids (`top`, `mid_lane`, `bot`, ...) are the sim's. The key:
+
+| Idea | Map id(s) | Note |
+|---|---|---|
+| Hero start | node `<side>.spawn.<slot>`, slot in `top jg mid bot sup` | e.g. `B.spawn.top` |
+| Lane duel place | zones `top_clash`, `mid_clash`, `bot_clash` | `mid_clash` is the island end of the causeway, node `N.moonhulk`; the sim's `mid_lane` is the map's lane id `mid` |
+| Lane waypoints | nodes `<side>.<lane>.gate`, `.1` to `.4`, centres `N.top.mid`, `N.bot.mid` | lane ids `top`, `mid`, `bot` |
+| Own jungle | zones `thicket.<side>` and `shallows.<side>` | camps `<side>.w1` to `w3` (Thicket), `<side>.e1` to `e3` (Shallows) |
+| Big shared camp and the mid-fight place | node `N.mossback`, zone `mossback_clearing` | |
+| Early objective | objective `N.stoneback`, zone `stoneback_pit` | sim contest `obj_mid` |
+| Late objective | objective `N.moonhulk`, zone `moonhulk_isle` | sim contest `obj_late` |
+| Base | zones `gate.<side>` (Cairn Gate) and `cairn.<side>`; node and objective `<side>.cairn` | |
+| Scored towers (12) | `<side>.<lane>.<tier>`, lane in `top mid bot`, tier in `outer inner` | e.g. `B.top.outer`; tower ids name the side that owns the tower |
+| **Scenery towers (4)** | `<side>.guard.l`, `<side>.guard.r` | never counted, see F8 |
+
+`B` and `R` in a map id are the simulator's Blue and Red in the canonical map (Blue south). They are not "you" and "them": the arena mirrors the picture so the player's team is at the bottom, and you are teal circles, them coral hexagons, whichever letter you are. W means the side that won the beat's contest, U the other side. Health bars are decoration: a hero's bar reaches zero only at a kill event of the ledger.
 
 #### opening (0.0 to 4.0 s)
 
-Trigger: none (lineups, styles, plans). Heroes rise at their base, walk to their zones: top to `lane_top`, mid to `lane_mid`, bot and sup to `lane_bot`, jungler to its own jungle. Banners show the two club names. Each side has a style chip from `res.style[side]` (Dive, Siege, Protect, Skirmish). Your side also shows the plan chip (section 4.2). Labels: `open_plan` or `open_free` for you, `style_*` for the opponent.
+Trigger: none (lineups, styles, plans). Heroes rise on their spawn pads (`<side>.spawn.<slot>`) and walk to their zones: top to `top_clash`, mid to `mid_clash`, bot and sup to `bot_clash`, jungler to its own jungle (`thicket.<side>`). The map's validator gives the walks as 7.9, 5.4, 8.8 and 6.6 s, all inside the first contest times. Banners show the two club names. Each side has a style chip from `res.style[side]` (Dive, Siege, Protect, Skirmish). Your side also shows the plan chip (section 4.2). Labels: `open_plan` or `open_free` for you, `style_*` for the opponent.
 
 #### lane_trade (top, mid, bot) (build 4.0 s to resolve, payoff 2.5 s after)
 
@@ -136,22 +170,22 @@ Triggers: `contests.top` (resolve 13.5 s), `contests.mid_lane` (15.75 s), `conte
 
 | Slot | Winning side W | Losing side U |
 |---|---|---|
-| top (lane top) | Steps to the lane centre, lands short trades every 1.0 to 1.5 s, last-hits, shoves the wave forward by the front formula | Falls back toward its own tower, last-hits only in tower range, health bar drops by about `0.5 * abs(c)` |
-| mid (lane mid) | Same as top. Ranged mid heroes poke from range, melee ones short trade | Backs off, wave pushed against it |
-| bot and sup (duo) | Both hold the centre, sup stands one step behind the carry (mender) or one step ahead (bulwark, binder). Duo trades twice as often | Duo stacks under the tower, carry last-hits at the edge of tower range |
+| top (`top_clash`) | Steps to the lane centre (`N.top.mid`), lands short trades every 1.0 to 1.5 s, last-hits, shoves the wave forward by the front formula | Falls back toward its own outer tower (`<U>.top.outer`), last-hits only in tower range, health bar drops by about `0.5 * abs(c)` |
+| mid (`mid_clash`, on the island end of the causeway) | Same as top. Ranged mid heroes poke from range, melee ones short trade | Backs off along the causeway, wave pushed against it |
+| bot and sup (duo, `bot_clash`) | Both hold the centre (`N.bot.mid`), sup stands one step behind the carry (mender) or one step ahead (bulwark, binder). Duo trades twice as often | Duo stacks under the tower, carry last-hits at the edge of tower range |
 | jg | In the lane phase it is shown only in `jungle_play`. Otherwise clears camps | Same |
 
-Kills: only the ledger's kills for this beat (section 5), using the killer and victim rule P2 in section 5.2. Payoff: a pressure arrow over the lane pointing at U's tower, the wave sitting at the front position, and the feed line. No tower falls here; plates and tower shake are decoration. Tower credits fall in `tower_break`.
+Kills: only the ledger's kills for this beat (section 5), using the killer and victim rule P2 in section 5.2. Payoff: a pressure arrow over the lane pointing at U's outer tower (`<U>.<lane>.outer`, lane in `top mid bot`), the wave sitting at the front position, and the feed line. No tower falls here; plates and tower shake are decoration. Tower credits fall in `tower_break`.
 
 #### jungle_play (resolve 20.25 s, build from 12.5 s)
 
-Trigger: `contests.jungle`. Winner side J.
+Trigger: `contests.jungle`. Winner side J. Place (map stage `jungle`): `thicket.*`, `shallows.*` and `mossback_clearing`.
 
 Variant choice (Interpretive, deterministic): let `m_L = sgn(J) * c[L]` for lanes top, mid_lane, bot. If any `m_L > 0` then the variant is **gank** into the lane with the largest `m_L` (ties: top, mid, bot). Otherwise **invade**. So a gank is only ever shown into a lane the same side actually won. If the winner's plan has a jungle focus that matches a won lane, that lane is the target.
 
 | Slot | Variant gank | Variant invade |
 |---|---|---|
-| jg of J | Leaves its jungle at 12.5 s, passes through the jungle edge, appears behind U's laner at about resolve minus 1.5 s with `blink_fade` or `charge_trail`, trades with the lane | Crosses to the other jungle, takes camps (camp icons flip side colour), then fights the arriving jungler |
+| jg of J | Leaves its jungle (`thicket.<J>` or `shallows.<J>`) at 12.5 s, passes through the jungle edge, appears behind U's laner at about resolve minus 1.5 s with `blink_fade` or `charge_trail`, trades with the lane | Crosses the centre line into `thicket.<U>` or `shallows.<U>` (the big camp `N.mossback` is shared), takes camps (a camp's rim flips to the taker's marker shape and colour, circle or hexagon, never colour alone), then fights the arriving jungler |
 | lane hero of J in the target lane | Hits together with the jungler | Keeps farming |
 | jg of U | Arrives late along the opposite path with a trail that ends one step short, then retreats | Arrives, loses the trade, is pushed back |
 | lane hero of U in the target lane | Takes the damage, retreats or dies per ledger | Keeps farming |
@@ -171,13 +205,24 @@ For the opponent the banner is smaller and uses the same rule. The opponent's pl
 
 #### rotate_stone and tower_break (24.0 to 31.0 s)
 
-Cosmetic movement plus Derived tower events. All five heroes of each side walk to `pit_stone`. Group shape follows the chosen plan's `g`: `g > 0` walks in one tight pack, `g < 0` has top and bot arrive last with their waves still shoving behind them, `g = 0` loose. All five are always present at the pit, because `obj_mid` is rated on all five slots.
+Cosmetic movement plus Derived tower events. All five heroes of each side walk to `stoneback_pit`. Group shape follows the chosen plan's `g`: `g > 0` walks in one tight pack, `g < 0` has top and bot arrive last with their waves still shoving behind them, `g = 0` loose. All five are always present at the pit by 31.0 s, because `obj_mid` is rated on all five slots.
 
-`tower_break`, 25.0 to 28.0 s: ledger tower credits of the lane beats fall here, top at 25.0, mid at 26.5, bot at 28.0. The lane hero of the side with the credit finishes the shoved wave into the tower (`tower_hit_beam` then `tower_crack`, `tower_fall`). Which tower falls is rule F9.
+**Walk check (new, from `arena_map.json`).** I ran a shortest-path search over the map's 80 edges at the map's walk speed (0.060 u/s) and rotate speed (1.5 x):
+
+| From | To `stoneback_pit` at walk speed | At rotate speed |
+|---|---|---|
+| `top_clash` (`N.top.mid`) | 14.4 s | 9.6 s |
+| `mid_clash` (`N.moonhulk`) | 10.3 s | 6.8 s |
+| `bot_clash` (`N.bot.mid`) | 1.7 s | 1.2 s |
+| `mossback_clearing` (`N.mossback`, the jungler) | 12.7 s | 8.5 s |
+
+The validator checks the walk from the Cairn (9.5 s) but not from the lanes. If the top hero leaves at 24.0 s it arrives at 38.4 s at walk speed, which is after the take resolves at 33.75 s. So the staging rule is: heroes leave their lane **when the jungle contest resolves (20.25 s) at the latest**, and the top, mid and jungle heroes walk at rotate speed. Arrivals are then top 29.9 s, mid 27.1 s, jungler 28.8 s, all before 31.0 s. This uses `rotate_mult` on a leg where ARENA-MAP says it is "used only for the Stoneback to Mossback swing"; it needs the Level Designer's confirmation (hand-off 4). The windows in section 1.4 do not change, because the walking is Cosmetic and starts inside the lane phase.
+
+`tower_break`, 25.0 to 28.0 s: ledger tower credits of the lane beats fall here, top at 25.0, mid at 26.5, bot at 28.0. **The shoved minion wave and a `tower_hit_beam` break the tower; no hero does it**, because the heroes are already on their way to the pit (walk check above). Then `tower_crack` and `tower_fall`. Which tower falls is rule F9; the id is `<owner>.<lane>.<tier>`, for example `R.top.outer`.
 
 #### objective_stone (31.0 to 36.5 s) and objective_moon (54.0 to 63.0 s)
 
-Triggers: `contests.obj_mid` (resolve 33.75 s) and `contests.obj_late` (resolve 60.0 s). Winner W takes it. Moonhulk has a longer approach: approach 54.0 to 57.0, take 57.0 to 60.0, payoff 60.0 to 63.0.
+Triggers: `contests.obj_mid` (resolve 33.75 s, place `stoneback_pit`) and `contests.obj_late` (resolve 60.0 s, place `moonhulk_isle`). Winner W takes it. The island holds ten tokens only just (radius 76 px), so the Moonhulk fight and take use the 36 px token size (ARENA-MAP). Moonhulk has a longer approach: approach 54.0 to 57.0, take 57.0 to 60.0, payoff 60.0 to 63.0.
 
 Initiator (Cosmetic staging, deterministic): the side whose chosen plan has `m > 0` (Stoneback) or `l > 0` (Moonhulk); else the side whose style is dive; else a coin from the bare `show` stream. The initiator starts the progress ring. If W is not the initiator the staging is a **steal**: the ring flips to W's colour in its last 10%. The winner is always real; only who starts is staging.
 
@@ -191,7 +236,7 @@ Kills in the beat come from the ledger. Payoff: Stoneback gives W an amber `obje
 
 #### team_fight (mid 36.5 to 51.0 s, late 63.0 to 71.25 s)
 
-Triggers: `contests.fight_mid` (resolve 45.0 s) and `contests.fight_late` (resolve 71.25 s). Phases for the mid fight: approach 36.5 to 40.0, clash 40.0 to 45.0, payoff 45.0 to 51.0 (chase and `tower_push`). Late fight: approach 63.0 to 66.0, clash 66.0 to 71.25, then `close_push`.
+Triggers: `contests.fight_mid` (resolve 45.0 s, place `mossback_clearing`) and `contests.fight_late` (resolve 71.25 s). Phases for the mid fight: the teams leave the pit when the take resolves (33.75 s, rotate speed), approach 36.5 to 41.2, clash 41.2 to 45.0, payoff 45.0 to 51.0 (chase and `tower_push`). **Changed in this revision:** the clash used to start at 40.0 s. The walk from `stoneback_pit` to the clearing centre is 8.5 s at rotate speed (12.7 s at walk speed), so the teams reach the zone rim at about 41.1 s and the centre at 42.25 s; the kill window of `fight_mid` is now 41.2 to 45.0 (section 5.1). Kill counts do not change. Late fight: approach 63.0 to 66.0, clash 66.0 to 71.25, then `close_push`. Late-fight place when the game winner also wins it: `gate.<U>`, U being the game loser (the map's `fight_late` stage); the island to that gate is 4.8 s at walk speed, so the teams are there by 64.8 s. When the game winner loses it, see the held fight in `close_push`.
 
 Initiator (Cosmetic): a side with style dive if exactly one has it, else the side with the higher chosen-plan `g`, else a coin from `show`. Style decides the opening move of each side, because the style triangle is a real fight input (`style_edge`):
 
@@ -218,7 +263,7 @@ Kill order and who strikes first: from the ledger and the `show` stream (section
 
 #### tower_push and tower_dive (mid fight payoff 45.0 to 51.0 s; late fight payoff 71.25 s on)
 
-Trigger: the tower credits the ledger gives this fight beat (rules F8 and F9). Tower fall times: spread evenly from resolve plus 1.0 s to the end of the payoff (mid 51.0, late 73.8).
+Trigger: the tower credits the ledger gives this fight beat (rules F8 and F9). Tower ids are `<owner>.<lane>.<tier>` (12 scored towers per game, six per side). Tower fall times: spread evenly from resolve plus 1.0 s to the end of the payoff (mid 51.0, late 73.8).
 
 | Style of W | Visual |
 |---|---|
@@ -229,7 +274,7 @@ Trigger: the tower credits the ledger gives this fight beat (rules F8 and F9). T
 
 #### reset (51.0 to 54.0 s)
 
-Cosmetic. Units regroup and reposition toward `pit_moon`. If the chosen plan has `t != 0`, label `tempo_scale` or `tempo_push` at 51.5 s.
+Cosmetic. Units regroup and walk toward `moonhulk_isle`. If the chosen plan has `t != 0`, label `tempo_scale` or `tempo_push` at 51.5 s. Walk check, same method as `rotate_stone`: from the tower sites of the lane pushes (nearest lane nodes `<side>.top.2` and `.3`, `<side>.mid.1`, `<side>.bot.2` and `.3`) the island is 10.0 to 12.4 s at walk speed and 6.7 to 8.2 s at rotate speed, and from `mossback_clearing` it is 10.3 s (6.9 s). A team that is still pushing a tower at 51.0 s therefore reaches the island at 57.7 to 59.2 s at rotate speed, inside the take (57.0 to 60.0 s) but not at its start. So `reset` is walked at rotate speed, and the Moonhulk take may start with its guards still arriving; the ring is shown from 57.0 s regardless. The map's own check (island from the clearing, 10.3 s of 15.0 s) assumes the team stands at the clearing at 45.0 s and does not cover the tower pushes (hand-off 4).
 
 #### close_push (71.25 to 75.0 s)
 
@@ -237,10 +282,23 @@ Trigger: `res.blue_won` (the game winner W) and the sign of `contests.fight_late
 
 | Variant | Condition | Visual |
 |---|---|---|
-| `clean_close` | W also won `fight_late` | W's survivors walk straight to the Cairn |
-| `lead_carries` | W lost `fight_late` | The loser holds the last fight, but W's earlier lead carries: W's units arrive at full strength and the Cairn still falls. Guaranteed true: before `fight_late` the lead for W is `l_7 = final_W + 0.30 * abs(c_fight_late)`, which is positive and larger than the swing the last fight took back (`0.30 * abs(c)`) |
+| `clean_close` | W also won `fight_late` | The fight was at `gate.<U>`. W's survivors run straight to the Cairn (`cairn.<U>`); gate to Cairn is 2.3 s at walk speed, so this leg is run at rush speed (2 x walk, 1.15 s) inside the 1.25 s run window |
+| `lead_carries` (the **held fight**) | W lost `fight_late` (18.9% of games in the 40,000-match run; 55% of them are close games) | Staged by the held-fight rules HF1 to HF6 below. The visible story is: the last fight went to U, W's lead was bigger than the fight took back, the Cairn falls to W |
 
-Timeline: 71.25 to 72.5 run, 72.5 to 74.0 Cairn cracks (`cairn_crack`), 74.0 Cairn falls (`cairn_fall`), 74.0 to 75.0 victory or defeat hold with the end card. If the ledger has a repair tower (F8) it falls at 73.0. The loser's units defend and die or scatter, never win.
+Timeline: 71.25 to 72.5 run, 72.5 to 74.0 Cairn cracks (`cairn_crack`), 74.0 Cairn falls (`cairn_fall`), 74.0 to 75.0 victory or defeat hold with the end card. If the ledger has a repair tower (F8) it falls at 73.0. **The two guard towers of U (`<U>.guard.l` at 72.7 s and `<U>.guard.r` at 73.3 s) crumble** (`tower_crack`, `tower_fall`; no `tower_hit_beam`, no gold pop, no scoreboard change): they are scenery, never counted, and fall only here (rule F8). The loser's units defend and die or scatter, never win the match.
+
+**Held fight (C8).** The sim sums three phases, so the match winner can lose the last fight and still win the game. Before `fight_late` the lead for W is `l_7 = final_W + 0.30 * abs(c_fight_late)`, and after it `l_8 = final_W`; both are positive, and the difference is exactly what the lost fight took back (checked on 40,000 matches, invariant I9). In gold: W leads by +6,400 before the fight in the median game and by at least +2,200 in 95% of held fights; at 75 s the lead is +2,500 in the median held fight, under +1,000 in about a fifth of them, and never below +100. If the fight is staged the way the first draft did it (U wins at its own gate, then W's units walk in and break the Cairn), a viewer sees "won the fight, lost the match", which fails the tester question "Results felt fair". The rules:
+
+| # | Rule |
+|---|---|
+| HF1 | **The result is shown truthfully.** U is the fight's winner, with the size word, kills and feed line of the ledger. The arena adds, removes or moves no kill, death or tower (I9e). The fight is never renamed "a hold" in any text. |
+| HF2 | **Place and timing belong to the Level / World Designer's held-fight staging** (ARENA-MAP section 7 and the stage data). Default: the fight is held away from `gate.<U>`, at the island or the mid gate, and W's reserves arrive as "the lead". An alternative staging is allowed; both obey HF1 and HF3 to HF6. Constraints from this file: the Cairn still falls at 74.0 s (F13), and W's units must be at `gate.<U>` in time. Gate to Cairn is 2.3 s at walk speed and island to gate is 4.8 s, so a fight that stays on the island until 71.25 s cannot finish the push by 74.0 s (4.8 + 2.3 = 7.1 s against 2.75 s); the clash has to drift toward the gate in its last seconds, or the staging has to accept the Cairn falling later than 74.0 s in this variant. I did not decide this; it is hand-off 3. |
+| HF3 | **"The lead" is the number, not extra units.** Reserves are W's own heroes who fell in this fight, re-entering 1.2 s after death (the second-round rule in `team_fight`), plus ambient minions. They are never additional heroes and never add or remove a kill, death or assist. At 71.25 s the gold lead number steps down by the fight's step and **stays positive and visible**, with `lead_flash` at the same moment; the lead graph for W stays above zero. |
+| HF4 | **The look of the result is held back, not changed.** U's win keeps its tier look except: no chase, no zoom toward U, no `edge_flash`, no `buff_aura`, camera stays wide. W's loss keeps its tier look except that its heroes fall back toward their reserves instead of scattering, and the `wipe` banner is not shown for W in this fight (the deaths still are). A wipe of W in the late fight happens in 14% of held fights (52 of 377 in a 2,000-match run). |
+| HF5 | **Labels and tags.** At 71.5 s W shows `push_lead` and U shows `def_last`; `push_base` never shows in a held fight. No `lead_flip`, `tag_flip` or `tag_back` is shown at `fight_late` (the lead cannot flip there, see I9b). The end card is the normal Victory card for W; "Play of the game" is never `fight_late`, because its step for W is negative. |
+| HF6 | **Both seats.** The same picture is shown whether the player is W or U. If the player is U, the player sees the fight won, then W's `push_lead` and a lead number that explains why the Cairn still falls; no extra string is added. A one-line commentary sentence that says "the lead was bigger than the last fight" is the Narrative Designer's to write (hand-off 5). |
+
+The Technical Designer's prototype of the two stagings on this case and the Founder's tester question decide which staging ships. Neither may break HF1 or I9.
 
 ### 2.4 Overlays (no time of their own)
 
@@ -341,11 +399,11 @@ Tier 1 must exist on a low-end phone. Tier 2 should. Tier 3 is dropped first whe
 | # | Rule |
 |---|---|
 | R1 | 28 characters or fewer after filling placeholders (`{lane}` counts as 3, `{hero}` as 11). All 156 lines were measured: the longest is 26 characters. |
-| R2 | A label states a posture or decision ("Going for Stoneback"). It never states or predicts a result. A side that attempts and fails still told the truth. |
+| R2 | A label states a posture or decision ("Going for Stoneback"). It never states or predicts a result. A side that attempts and fails still told the truth. Four lines that predicted a result ("win later", "late wins", "No stopping them", "One fight decides it") were reworded, and "Big lead, safe push" was reworded because the lead at 75 s is under 1,000 gold in about a fifth of held fights (section 2.3). |
 | R3 | One label per side at a time, on screen 2.5 s (1.25 s at 2x speed), shown as a pill on that side's banner with an `intent_ping` at the target zone. Windows are fixed (the table below) so two labels of one side never collide. |
 | R4 | Variant choice is order independent: for each (intent, side) pair there is a stream `show:label:<intent>:<side>`. The k-th use in a match draws the k-th value, `v = u mod 3`, and if it equals the previous variant of that pair it becomes `(v + 1) mod 3`. Adding a label elsewhere never shifts another. |
 | R5 | A plan label shows only when the matching control of the plan in force is non-zero. "Taking a big risk" never shows when `r` is 0. |
-| R6 | Neutral wording: no pronouns, so the same line works on either banner. |
+| R6 | Wording that reads correctly on either banner. A label sits on one side's banner, so "their" and "them" always mean the other side, and "it" means the thing the line names (the objective, the plan, the game, or an idiom such as "Playing it by ear"). "You", "your" and "we" appear only in lines shown to the player's own side alone, which today is only `open_plan`. (The first version of this rule said "no pronouns"; that was false for 17 lines. I changed the rule, not the lines, because those lines read correctly on both banners. Three of the 17 were also replaced for another reason, see R2.) |
 | R7 | Until request S1 is done the opponent's labels use style, jungle and lane context only. |
 | R8 | Precedence when two rules fit (highest first): plan switch, plan control, objective role, style, lane or fallback. |
 
@@ -413,7 +471,7 @@ Label windows (show seconds): opening 0.5 to 3.0. Lanes: top 5.0, mid 7.5, bot 1
 | `rot_split` | 24.2 s, chosen plan `g` < 0 | Staying spread out | Lanes keep pushing | Split up, hold lanes |
 | `rot_pit` | 24.2 s, `g` = 0 | Moving to the objective | Rotating to the pit | Heading for Stoneback |
 | `rot_late` | 54.5 s, both sides | Heading for Moonhulk | Rotating to Moonhulk | Regroup at Moonhulk |
-| `tempo_scale` | 51.5 s, chosen plan `t` > 0 | Scaling for late game | Farm now, win later | Patience, late wins |
+| `tempo_scale` | 51.5 s, chosen plan `t` > 0 | Scaling for late game | Farm now, fight later | Patience, late power |
 | `tempo_push` | 51.5 s, chosen plan `t` < 0 | Pushing the early pace | Speed up, snowball | No time to waste |
 
 **Objectives (Stoneback 31.0 s, Moonhulk 57.0 s)**
@@ -447,8 +505,8 @@ Label windows (show seconds): opening 0.5 to 3.0. Lanes: top 5.0, mid 7.5, bot 1
 | `push_tower` | 46.0 s, side with a tower credit on `fight_mid` | Pushing the tower | Siege on their tower | Taking the outer tower |
 | `push_dive` | Same, its style is `dive` and the fight tier is clear or decisive (replaces push_tower) | Diving under the tower | Tower dive, no fear | Dive and delete |
 | `push_base` | 71.5 s, game winner, clean close (it also won `fight_late`) | Pushing for the Cairn | The Cairn is open | Everyone to the Cairn |
-| `push_lead` | 71.5 s, game winner lost `fight_late` (lead carries, section 2.3) | Lead carries the push | Big lead, safe push | Closing it out |
-| `def_last` | 71.5 s, game loser | Defending the Cairn | Last stand at the Cairn | Nowhere left to run |
+| `push_lead` | 71.5 s, game winner lost `fight_late` (held fight, lead carries, section 2.3) | Lead carries the push | Ahead, pushing on | Pushing with the lead |
+| `def_last` | 71.5 s, game loser (also when it won `fight_late`) | Defending the Cairn | Last stand at the Cairn | Holding on at the Cairn |
 
 **Status tags (centre of the screen, 2.0 s, at the beat's resolve time)**
 
@@ -457,8 +515,8 @@ Label windows (show seconds): opening 0.5 to 3.0. Lanes: top 5.0, mid 7.5, bot 1
 | `tag_upset` | Beat winner had `x` of the wrong sign with `abs(x)` >= 0.8; tag goes to the winner's side | Against the odds! | Nobody saw that coming | The underdog strikes |
 | `tag_flip` | Lead flips (rule F5) and it is not a comeback flip | The lead changes hands | Turning point | Momentum swings |
 | `tag_back` | Lead flips to the game winner and the arc is comeback (replaces tag_flip) | Comeback is on | Back from behind | Never out of it |
-| `tag_snow` | Arc is stomp: at `fight_mid` resolve | Snowball rolling | No stopping them | Pressure everywhere |
-| `tag_close` | Arc is close: at 62.0 s, before the last fight | Anything can happen | Still level, still tense | One fight decides it |
+| `tag_snow` | Arc is stomp: at `fight_mid` resolve | Snowball rolling | Ahead and pressing | Pressure everywhere |
+| `tag_close` | Arc is close: at 62.0 s, before the last fight | Anything can happen | Still level, still tense | Neck and neck |
 
 
 ## 5. Scoreboard rules
@@ -470,14 +528,14 @@ The scoreboard shows clock, kills, towers, the two objectives, gold lead, and a 
 | Id | Rule |
 |---|---|
 | F7 | Gold lead for side X after beat k: `G = 100 * round(200 * s_X * L_k)` (the lead of F4 times 20,000 gold per 1.00, rounded to 100). The step for beat k eases in with smoothstep over the 2.0 s starting at that beat's resolve time. Sign guard: at 75 s, if the rounded lead is 0 but `final != 0`, show +100 for W (this happens in 0.45% of games). |
-| F8 | Pressure and tower totals: `P_X = sum over k of fw[k] * max(0, s_X * c[k])`. Identity: `P_B - P_R = res.final`. Towers destroyed by X: `T_X = min(6, round(8 * P_X))`. Each side has six towers (outer and inner in each of three lanes). Ordering repair: if `T_W <= T_U` then `T_W = T_U + 1`; if that exceeds 6 then `T_W = 6` and `T_U = 5`. The repair tower (needed in 11% of games) falls during `close_push` at 73.0 s ("the push takes a tower on the way"). |
-| F9 | Tower placement: split `T_X` (minus the repair tower) over the beats by Hamilton's method with weights `fw[k] * max(0, s_X * c[k])` (the jungle beat gets weight 0, because no lane tower belongs to it). Hamilton: quota `q_i = N * w_i / sum(w)`, take floors, give the remaining units to the largest fractional parts, ties to the earlier beat; if the sum of weights is 0, all go to the first beat. Lane of each tower: for a lane beat, that lane first. For other beats, the lanes sorted by X's lane margin `s_X * c[lane]` descending. After each tower the lane goes to the back of the order. Tier: outer first, then inner. Times: lane beats in `tower_break` (25.0, 26.5, 28.0 for top, mid, bot); objective beats at resolve plus 2.0 s, plus 1.2 s each further; fight beats spread from resolve plus 1.0 s to the end of the payoff; repair tower at 73.0 s. |
+| F8 | Pressure and tower totals: `P_X = sum over k of fw[k] * max(0, s_X * c[k])`. Identity: `P_B - P_R = res.final`. Towers destroyed by X: `T_X = min(6, round(8 * P_X))`. **The scoreboard counts six towers per side: the outer and the inner tower in each of the three lanes (ids `<side>.<lane>.outer` and `<side>.<lane>.inner`, lane in `top mid bot`).** The map has eight towers per side; the other two, `<side>.guard.l` and `<side>.guard.r` at the gate, are **scenery**: they are never counted in `T_X`, never in a tower credit, never in the tower line of the scoreboard or the report, and they fall only in the closing push (the loser's pair crumbles at 72.7 and 73.3 s, section 2.3). Ruling C5. Ordering repair: if `T_W <= T_U` then `T_W = T_U + 1`; if that exceeds 6 then `T_W = 6` and `T_U = 5`. The repair tower (needed in 11% of games) falls during `close_push` at 73.0 s ("the push takes a tower on the way"). |
+| F9 | Tower placement: split `T_X` (minus the repair tower) over the beats by Hamilton's method with weights `fw[k] * max(0, s_X * c[k])` (the jungle beat gets weight 0, because no lane tower belongs to it). Hamilton: quota `q_i = N * w_i / sum(w)`, take floors, give the remaining units to the largest fractional parts, ties to the earlier beat; if the sum of weights is 0, all go to the first beat. Lane of each tower (lane keys here are the sim's `top`, `mid_lane`, `bot`; the tower id uses `top`, `mid`, `bot`): for a lane beat, that lane first. For other beats, the lanes sorted by X's lane margin `s_X * c[lane]` descending. After each tower the lane goes to the back of the order. Tier: outer first, then inner. Times: lane beats in `tower_break` (25.0, 26.5, 28.0 for top, mid, bot); objective beats at resolve plus 2.0 s, plus 1.2 s each further; fight beats spread from resolve plus 1.0 s to the end of the payoff; repair tower at 73.0 s. |
 | F10 | Kill totals: `K_X = Report.kda(res).team[X].k`. Never recomputed. Report guarantees `K_W > K_U`, and `K_U` kills are `W`'s deaths. |
 | F11 | Kill placement: each side's kills are split over nine beats (the eight contests plus `base_push`) by Hamilton with weights `KP[k] * (1 + 0.8 * s_X * c[k])`, where `KP` is top 0.6, mid_lane 0.6, bot 0.9, jungle 0.7, obj_mid 1.0, fight_mid 3.0, obj_late 1.2, fight_late 4.0, base_push 0.5. For `base_push` the margin term is +0.5 for W and -0.5 for U. Fight rule: in both fights the winner must have at least as many kills as the loser. If not, move one kill of the winner from its non-fight beat with the most kills into the fight, else move one kill of the loser out of the fight into any other beat, repeating (at most 40 moves). Needed in 1.1% of games. |
 | F12 | Objectives: Stoneback to the side with `s_X * c[obj_mid] > 0`, Moonhulk to the side with `s_X * c[obj_late] > 0`. The tally is exactly that, no repair. The game winner can lose both (14% of games), and the staging then shows why the game was still won (the fights). |
-| F13 | The Cairn falls at 74.0 s to W. No other beat can end the game. |
+| F13 | The Cairn (`cairn.<U>`) falls at 74.0 s to W. No other beat can end the game. The two guard towers of U fall at 72.7 and 73.3 s, are scenery, and change no number on the scoreboard. |
 
-Kill windows (each ends at the beat's resolve time, so a beat's kills are complete when it resolves): top 8.0 to 13.5, mid_lane 9.5 to 15.75, bot 11.0 to 18.0, jungle 13.0 to 20.25, obj_mid 31.5 to 33.75, fight_mid 40.0 to 45.0, obj_late 57.0 to 60.0, fight_late 66.0 to 71.25, base_push 71.5 to 74.0.
+Kill windows (each ends at the beat's resolve time, so a beat's kills are complete when it resolves): top 8.0 to 13.5, mid_lane 9.5 to 15.75, bot 11.0 to 18.0, jungle 13.0 to 20.25, obj_mid 31.5 to 33.75, fight_mid 41.2 to 45.0, obj_late 57.0 to 60.0, fight_late 66.0 to 71.25, base_push 71.5 to 74.0.
 
 ### 5.2 Per-hero pairing (who kills whom)
 
@@ -508,10 +566,11 @@ Kill windows (each ends at the beat's resolve time, so a beat's kills are comple
 | I2 | Gold lead of the game winner at 75 s is positive. |
 | I3 | Kills per side equal `Report.kda` team kills, and the winner has more. |
 | I4 | Per-hero kills and deaths from the events equal `Report.kda` per hero. |
-| I5 | `T_W > T_U`, both at most 6, and the placed towers add up to `T`. |
+| I5 | `T_W > T_U`, both at most 6, and the placed towers add up to `T`. Every placed tower id is one of the 12 scored tower ids of `arena_map.json`; a guard tower id (`*.guard.l`, `*.guard.r`) is never placed, never counted, and falls only inside `close_push`. |
 | I6 | The objective tally equals the signs of `obj_mid` and `obj_late`. |
 | I7 | In each fight the contest winner has at least as many kills as the loser. |
 | I8 | Every size word and result word in the arena is the output of `Report.margin_word` and `Report.result_word`. |
+| I9 | **Held fight.** Whenever the game winner W loses `fight_late` (18.9% of games): (a) `l_7 > l_8 > 0` and `l_7 - l_8 = 0.30 * abs(c_fight_late)` within 1e-9, so W is ahead before the fight and after it, and the fight took back only part of the lead; (b) no lead flip exists at `fight_late`, so no `tag_flip` or `tag_back` can show there; (c) the label of W at the close is `push_lead` (never `push_base`) and the label of U is `def_last`; (d) the gold lead of W is positive before the fight and at 75 s (it is the sign-guarded F7 number); (e) the staging adds no kill, death or tower: the events in every beat equal the ledger's counts per side; (f) the match is still won by W with the Cairn at 74.0 s (F13). Where W wins `fight_late` the close label is `push_base`. Not simulated here, to be tested on stage data: in the held case the `fight_late` zone is not `gate.<U>` unless the Level Designer's staging says so. |
 
 ### 5.5 Worked example
 
@@ -571,21 +630,22 @@ Blue is you. Score is kills Blue to Red, towers Blue to Red, objectives (Stoneba
 | 20.25 | jungle resolves | Clear loss: Nimbrel is a step late everywhere; the lead graph is at its lowest | | 1-4, 0-0, 0-0, -2,500 |
 | 21.0 | plan_check | Amber banner across your side: "Early game over: you are behind, switching to your 'if behind' plan." Plan chip becomes "Group up, Secure them, Take risks". Red's chip pulses "Plan holds" | You: "Switching to the backup". Red: "Reading the game" | same |
 | 24.2 | rotate_stone | All five of you walk together to Stoneback; Red walks loosely | You: "All five heading mid". Red: "Moving to the objective" | same |
-| 25.0 / 26.5 | tower_break | Skarrow pushes through Red's top outer tower (falls at 25.0). Red's mid wave breaks your mid outer tower (26.5) | | 1-4, 1-1, 0-0, -2,500 |
+| 25.0 / 26.5 | tower_break | Your shoved top wave and a beam break Red's top outer tower (`R.top.outer`, falls at 25.0), while Skarrow is already walking to the pit. Red's mid wave breaks your mid outer tower (`B.mid.outer`, 26.5) | | 1-4, 1-1, 0-0, -2,500 |
 | 31.0 | objective_stone | You start the ring, Red tries to steal | You: "Starting Stoneback". Red: "Making them hurry" | |
 | 33.75 | objective_stone resolves | Narrow win: the ring flips back in your colour in its last 8%. Amber burst and aura on your team. Skarrow, Ellowen get kills, Dunmarrow gets one (31.9 to 33.1) | | 3-5, 1-1, 1-0, -1,500 |
 | 37.0 | team_fight mid approach | You advance together, Red splits to bait | You: "Going all in". Red: "Skirmish, stay loose" | same |
-| 45.0 | team_fight mid resolves | Decisive win. Nimbrel flanks and removes three of Red's heroes in 1.4 s (41.6 to 42.9); Red's Dunmarrow trades one of yours. Red collapses at about 40% of the clash. Lead flips to you | Tag: "Back from behind" | 8-6, 1-1, 1-0, +2,400 |
-| 46.0 / 47.2 | tower_push | Your siege style stays at range edge; Red's top inner (46.0) and bot outer (47.2) fall | You: "Pushing the tower" | 8-6, 3-1, 1-0, +2,400 |
+| 45.0 | team_fight mid resolves | Decisive win. Nimbrel flanks and removes three of Red's heroes in 1.0 s (42.4 to 43.4); Red's Dunmarrow trades one of yours. Red collapses at about 40% of the clash. Lead flips to you | Tag: "Back from behind" | 8-6, 1-1, 1-0, +2,400 |
+| 46.0 / 47.2 | tower_push | Your siege style stays at range edge; Red's top inner (`R.top.inner`, 46.0) and bot outer (`R.bot.outer`, 47.2) fall | You: "Pushing the tower" | 8-6, 3-1, 1-0, +2,400 |
 | 51.0 | reset | Both sides regroup toward Moonhulk | none (tempo 0) | same |
 | 54.5 | rotate (late) | Both sides rotate | You: "Heading for Moonhulk". Red: "Regroup at Moonhulk" | same |
 | 57.0 | objective_moon | Red starts the ring; you contest | You: "Objectives come first". Red: "Starting Moonhulk" | |
 | 60.0 | objective_moon resolves | Clear loss. Red takes Moonhulk despite the edge going in (x = +0.86 for you). Pale-blue pulse on Red. Red's Dunmarrow and Gravenstone get the kills (58.2, 59.1) | Tag on Red: "Against the odds!" | 8-8, 3-1, 1-1, +500 |
-| 62.0 | tower | Red takes your mid inner tower | | 8-8, 3-2, 1-1, +500 |
+| 62.0 | tower | Red takes your mid inner tower (`B.mid.inner`) | | 8-8, 3-2, 1-1, +500 |
 | 63.5 | team_fight late approach | You: group, risk. Red: skirmish | You: "Taking a big risk". Red: "Circling for a catch" | same |
 | 71.25 | team_fight late resolves | Decisive win: seven Red deaths in 66 to 71 s (Harkin takes three), Red's Dunmarrow trades Nimbrel at 71.15. Edge flash. No wipe banner: only three different Red heroes fall (Dunmarrow four times, Sparrowe twice, Dusken once), so it is two rounds of fighting, not a wipe | | 15-9, 3-2, 1-1, +6,400 |
 | 71.5 | close_push (clean_close) | You walk straight to the Cairn. Red's survivors scatter | You: "The Cairn is open". Red: "Last stand at the Cairn" | |
-| 72.25 / 73.45 | tower_push | Red's bot inner (72.25) and mid outer (73.45) fall on the way; Ellowen takes the last kill at 72.36 | | 16-9, 5-2, 1-1, +6,400 |
+| 72.25 / 73.45 | tower_push | Red's bot inner (`R.bot.inner`, 72.25) and mid outer (`R.mid.outer`, 73.45) fall on the way; Ellowen takes the last kill at 72.36 | | 16-9, 5-2, 1-1, +6,400 |
+| 72.7 / 73.3 | close_push (scenery) | Red's two gate towers (`R.guard.l`, `R.guard.r`) crumble as your units pass. No beam, no gold pop, and the tower count stays 5-2 (they are not counted, F8) | | same |
 | 74.0 | close_push | Cairn cracks at 72.5 and falls at 74.0 | | same |
 | 74.0 to 75.0 | end card | "Victory", "Clear win", length 11:00. "Decided by" the largest positive factor of `Report.attribution`. Play of the game: Decisive teamfight (step +0.2968) | | 16-9, 5-2, 1-1, +6,400 |
 

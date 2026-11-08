@@ -17,6 +17,10 @@ What it checks (each line of output is one check):
   water          nothing is placed in the lake except on the island; only bridge edges cross the lake
   spacing        no two icons overlap at the real pixel size (720 x 760 arena)
   stages         every simulated contest has a place and a time, and the walk fits in the time before it
+  units          body width (hero range unit) agrees with the pixel and map-unit conversions in the doc
+  tally          the scoreboard counts 6 towers per side; the 2 guard towers are scenery and fall only in the closing push
+  variants       the 'held fight' stagings for the game winner losing fight_late: tokens fit and do not overlap,
+                 walks fit their clock, the timeline ends with the Cairn falling
 
 Standard library only. Distances use map units: 1 unit = arena.unit_px (760 px) and dx is scaled by x_scale.
 """
@@ -33,9 +37,13 @@ SIM_CONTESTS = ["top", "mid_lane", "bot", "jungle", "obj_mid", "fight_mid", "obj
 TOL = 0.001            # mirror tolerance in normalised units (0.7 px)
 TRAVEL_MARGIN_S = 1.0  # a group must arrive at least this long before its contest is shown
 SAMPLE_PX = 4.0
+RANGE_BODY_WIDTHS = {"melee": 1, "mid": 3, "long": 5}   # ACTION-VOCABULARY 3.1
+SCOREBOARD_TOWERS_PER_SIDE = 6                           # ACTION-VOCABULARY 5.1 F8 (C5 ruling)
+LEG_ACTORS = ("W_heroes", "U_heroes", "lead_pack")
 
 REQUIRED = ["schema", "schema_version", "map_version", "arena", "view", "icons_px", "speeds", "watch_seconds", "camera",
-            "terrain", "bases", "nodes", "edges", "lanes", "towers", "camps", "objectives", "spawns", "zones", "stages"]
+            "terrain", "bases", "nodes", "edges", "lanes", "towers", "camps", "objectives", "spawns", "zones", "stages",
+            "units", "tower_tally", "late_fight_variants"]
 
 
 class Ctx:
@@ -622,9 +630,193 @@ def check_stages(ctx):
     return errs
 
 
+def _speed_mult(d, name):
+    return {"walk": 1.0, "rotate": d["speeds"]["rotate_mult"], "rush": d["speeds"]["rush_mult"]}.get(name)
+
+
+def check_units(ctx):
+    d, errs = ctx.d, []
+    u = d["units"]
+    body = u["body_width_px"]
+    if not 24 <= body <= d["icons_px"]["hero"]:
+        errs.append(f"units.body_width_px {body} must be between 24 and the hero token ({d['icons_px']['hero']} px)")
+    if abs(u["body_width_u"] * ctx.unit - body) > 0.5:
+        errs.append(f"units.body_width_u {u['body_width_u']} x {ctx.unit:g} px is {u['body_width_u'] * ctx.unit:.1f} px, not {body}")
+    if u.get("range_body_widths") != RANGE_BODY_WIDTHS:
+        errs.append(f"units.range_body_widths must be {RANGE_BODY_WIDTHS} (the action vocabulary's numbers)")
+    for k, mult in RANGE_BODY_WIDTHS.items():
+        if abs(u.get("range_px", {}).get(k, -1) - body * mult) > 0.5:
+            errs.append(f"units.range_px.{k} is {u.get('range_px', {}).get(k)}, expected {body * mult}")
+        if abs(u.get("range_u", {}).get(k, -1) - body * mult / ctx.unit) > 0.0006:
+            errs.append(f"units.range_u.{k} is {u.get('range_u', {}).get(k)}, expected {body * mult / ctx.unit:.4f}")
+    if u.get("step_px") != body:
+        errs.append("units.step_px must equal the body width (one step = one body width)")
+    return errs
+
+
+def check_tally(ctx):
+    d, errs = ctx.d, []
+    t = d["tower_tally"]
+    lanes = {l["id"] for l in d["lanes"]}
+    if t.get("per_side") != SCOREBOARD_TOWERS_PER_SIDE:
+        errs.append(f"tower_tally.per_side is {t.get('per_side')}, the scoreboard tally is {SCOREBOARD_TOWERS_PER_SIDE} per side")
+    for side in "BR":
+        mine = [x for x in d["towers"] if x["side"] == side]
+        for x in mine:
+            if not isinstance(x.get("scoreboard"), bool):
+                errs.append(f"tower {x['id']}: missing boolean 'scoreboard' flag")
+        counted = [x for x in mine if x.get("scoreboard") is True]
+        if len(counted) != SCOREBOARD_TOWERS_PER_SIDE:
+            errs.append(f"side {side}: {len(counted)} towers are counted on the scoreboard, expected {SCOREBOARD_TOWERS_PER_SIDE}")
+        for x in counted:
+            if x["tier"] not in ("inner", "outer") or x["lane"] not in lanes:
+                errs.append(f"tower {x['id']}: only lane towers (inner, outer) may count on the scoreboard")
+        for x in mine:
+            if x["tier"] == "guard" and x.get("scoreboard") is not False:
+                errs.append(f"tower {x['id']}: a guard tower is scenery and must have scoreboard false")
+    win = t.get("guard_fall_window_s", [0, 0])
+    fl = next((s for s in d["stages"] if s["contest"] == "fight_late"), None)
+    if not fl or abs(win[0] - fl["t_s"]) > 0.01:
+        errs.append(f"tower_tally.guard_fall_window_s must open when fight_late resolves ({fl['t_s'] if fl else '?'} s), got {win[0]}")
+    if not (win[0] < win[1] <= d["watch_seconds"]):
+        errs.append(f"tower_tally.guard_fall_window_s {win} must end inside the watch window")
+    falls = t.get("guard_fall_s", [])
+    guards = len([x for x in d["towers"] if x["side"] == "B" and x["tier"] == "guard"])
+    if len(falls) != guards:
+        errs.append(f"tower_tally.guard_fall_s has {len(falls)} times for {guards} guard towers per side")
+    if falls != sorted(falls):
+        errs.append("tower_tally.guard_fall_s must be in time order")
+    for f in falls:
+        if not win[0] < f < win[1]:
+            errs.append(f"guard tower fall at {f} s is outside the closing push {win}")
+    return errs
+
+
+def check_variants(ctx):
+    d, errs = ctx.d, []
+    lv = d["late_fight_variants"]
+    t = d["tower_tally"]
+    by = {s["contest"]: s for s in d["stages"]}
+    body = d["units"]["body_width_px"]
+    ws = float(d["watch_seconds"])
+    zones = {z["id"]: z for z in d["zones"]}
+    variants = lv.get("variants", [])
+    ids = [v["id"] for v in variants]
+    if len(variants) < 2 or len(set(ids)) != len(ids):
+        errs.append("late_fight_variants needs at least two variants with unique ids")
+    if lv.get("default") not in ids:
+        errs.append(f"late_fight_variants.default '{lv.get('default')}' is not one of {ids}")
+    unproven = [v["id"] for v in variants if v.get("proven") is not False]
+    if unproven:
+        errs.append(f"variants {unproven}: must say proven false (nothing here has been prototyped)")
+    resolve_t = by["fight_late"]["t_s"]
+    obj_t = by["obj_late"]["t_s"]
+    for v in variants:
+        vid = v["id"]
+        form = v.get("formation", {})
+        pts = []
+        for team in ("W", "U"):
+            for slot in SLOTS:
+                p = form.get(team, {}).get(slot)
+                if not p or len(p) != 2 or not all(isinstance(c, (int, float)) and 0.04 <= c <= 0.96 for c in p):
+                    errs.append(f"{vid}: formation {team}.{slot} missing or outside the safe margin")
+                else:
+                    pts.append((f"{team}.{slot}", p))
+        if len(pts) != 10:
+            continue
+        if v.get("u_mirrors_w"):
+            for slot in SLOTS:
+                if not _mirror_ok(form["W"][slot], form["U"][slot]):
+                    errs.append(f"{vid}: U.{slot} should mirror W.{slot}")
+        for i in range(len(pts)):
+            for j in range(i + 1, len(pts)):
+                gap = ctx.dist_px(pts[i][1], pts[j][1])
+                if gap < body:
+                    errs.append(f"{vid}: tokens {pts[i][0]} and {pts[j][0]} are {gap:.0f} px apart, bodies are {body} px")
+        ground = v.get("ground")
+        for label, p in pts:
+            if ground == "island":
+                off = ctx.dist_px(p, d["terrain"]["island"]["c"])
+                if off > ctx.island["r_px"] - body / 2:
+                    errs.append(f"{vid}: {label} is {off:.0f} px from the island centre, limit {ctx.island['r_px'] - body / 2:.0f}")
+            elif ground == "land":
+                if ctx.in_water(p, margin_px=body / 2):
+                    errs.append(f"{vid}: {label} touches the lake")
+            else:
+                errs.append(f"{vid}: ground must be 'island' or 'land'")
+                break
+            for tw in d["towers"]:
+                need = body / 2 + d["icons_px"]["tower"] / 2
+                if ctx.dist_px(p, tw["p"]) < need:
+                    errs.append(f"{vid}: {label} sits on tower {tw['id']} ({ctx.dist_px(p, tw['p']):.0f} px, needs {need:.0f})")
+        for zkey, team in (("zone_W", "W"), ("zone_U", "U")):
+            zid = v.get(zkey)
+            if zid is None:
+                continue
+            if zid not in zones:
+                errs.append(f"{vid}: {zkey} '{zid}' is not a zone")
+                continue
+            z = zones[zid]
+            for slot in SLOTS:
+                off = ctx.dist_px(form[team][slot], z["c"])
+                if off > z["r_px"] - body / 2:
+                    errs.append(f"{vid}: {team}.{slot} is {off:.0f} px from the centre of {zid}, limit {z['r_px'] - body / 2:.0f}")
+        if v.get("kills_change") != 0:
+            errs.append(f"{vid}: kills_change must be 0 (the ledger owns kills)")
+        # timeline
+        ev = v.get("events", [])
+        times = [e["t_s"] for e in ev]
+        names = {e["event"]: e["t_s"] for e in ev}
+        if times != sorted(times) or len(set(times)) != len(times):
+            errs.append(f"{vid}: events must be in strictly rising time order")
+        for need_ev in ("formation", "clash", "resolve_held", "cairn_crack", "cairn_fall"):
+            if need_ev not in names:
+                errs.append(f"{vid}: event '{need_ev}' is missing")
+        if "resolve_held" in names and abs(names["resolve_held"] - resolve_t) > 0.01:
+            errs.append(f"{vid}: resolve_held at {names['resolve_held']} s but fight_late resolves at {resolve_t} s")
+        if "cairn_fall" in names and abs(names["cairn_fall"] - t["guard_fall_window_s"][1]) > 0.01:
+            errs.append(f"{vid}: cairn_fall at {names['cairn_fall']} s must close the guard-tower window ({t['guard_fall_window_s'][1]} s)")
+        if times and (times[0] < obj_t or times[-1] > ws):
+            errs.append(f"{vid}: events must lie between obj_late ({obj_t} s) and the end of the watch ({ws:g} s)")
+        if all(k in names for k in ("cairn_crack", "cairn_fall")) and not names["cairn_crack"] < names["cairn_fall"]:
+            errs.append(f"{vid}: cairn_crack must come before cairn_fall")
+        for f in t["guard_fall_s"]:
+            if "cairn_crack" in names and f > names["cairn_crack"]:
+                errs.append(f"{vid}: guard tower falls at {f} s, after the Cairn cracks ({names['cairn_crack']} s)")
+        # walks
+        legs = v.get("legs", [])
+        pack_end = None
+        for leg in legs:
+            tag = f"{vid}: {leg.get('actor')} {leg.get('from')} to {leg.get('to')}"
+            if leg.get("actor") not in LEG_ACTORS:
+                errs.append(f"{tag}: unknown actor")
+                continue
+            dist = ctx.shortest(leg["from"]).get(leg["to"]) if leg["from"] in ctx.nodes and leg["to"] in ctx.nodes else None
+            mult = _speed_mult(d, leg.get("speed"))
+            if dist is None or mult is None:
+                errs.append(f"{tag}: unknown node, no walk, or unknown speed")
+                continue
+            need_s = dist / (float(d["speeds"]["walk_u_s"]) * mult)
+            have_s = leg["arrive_by_s"] - leg["start_s"]
+            if leg["start_s"] < obj_t:
+                errs.append(f"{tag}: starts at {leg['start_s']} s, before the Moonhulk is taken ({obj_t} s)")
+            if leg["arrive_by_s"] > ws:
+                errs.append(f"{tag}: must arrive by {leg['arrive_by_s']} s, after the watch ends")
+            if need_s > have_s - TRAVEL_MARGIN_S:
+                errs.append(f"{tag}: takes {need_s:.1f} s at {leg['speed']} speed, only {have_s:.1f} s available (margin {TRAVEL_MARGIN_S:g} s)")
+            if leg["actor"] == "lead_pack":
+                pack_end = leg
+        if not pack_end or pack_end["to"] != "R.cairn" or pack_end["arrive_by_s"] > t["guard_fall_window_s"][1]:
+            errs.append(f"{vid}: the lead pack's last leg must end at the loser's Cairn (canonical R.cairn) before it falls")
+        elif "cairn_crack" in names and pack_end["start_s"] > names["cairn_crack"]:
+            errs.append(f"{vid}: the lead pack starts its last leg after the Cairn cracks")
+    return errs
+
+
 CHECKS = [("structure", check_structure), ("ids", check_ids), ("range", check_range), ("mirror", check_mirror),
           ("lanes", check_lanes), ("spawns", check_spawns), ("towers", check_towers), ("camps", check_camps),
-          ("water", check_water), ("spacing", check_spacing), ("stages", check_stages)]
+          ("water", check_water), ("spacing", check_spacing), ("stages", check_stages),
+          ("units", check_units), ("tally", check_tally), ("variants", check_variants)]
 
 
 def report(ctx):
@@ -638,7 +830,17 @@ def report(ctx):
             dist = ctx.shortest(tr["from"]).get(tr["to"], float("nan"))
             mult = {"walk": 1.0, "rotate": d["speeds"]["rotate_mult"], "rush": d["speeds"]["rush_mult"]}[tr["speed"]]
             print(f"    {s['contest']:<10} at {s['t_s']:5.2f} s  {tr['from']:<14} -> {tr['to']:<12} {dist:.3f} u  {dist / d['speeds']['walk_u_s'] / mult:4.1f} s ({tr['speed']})")
+    u = d["units"]
+    print(f"  units: body width {u['body_width_px']} px = {u['body_width_u']:.4f} u; range melee/mid/long = {u['range_px']['melee']}/{u['range_px']['mid']}/{u['range_px']['long']} px")
+    for v in d["late_fight_variants"]["variants"]:
+        print(f"  held fight '{v['id']}'{' (default)' if v['id'] == d['late_fight_variants']['default'] else ''}:")
+        for leg in v["legs"]:
+            dist = ctx.shortest(leg["from"]).get(leg["to"], float("nan"))
+            need = dist / (d["speeds"]["walk_u_s"] * _speed_mult(d, leg["speed"]))
+            slack = leg["arrive_by_s"] - leg["start_s"] - need
+            print(f"    {leg['actor']:<9} {leg['from']:<11} -> {leg['to']:<10} {dist:.3f} u {need:4.1f} s ({leg['speed']}) leaves {leg['start_s']:5.2f}, due {leg['arrive_by_s']:5.2f}, spare {slack:.1f} s")
     counts = {k: len(d[k]) for k in ("nodes", "edges", "towers", "camps", "zones", "stages")}
+    counts["scoreboard_towers_per_side"] = d["tower_tally"]["per_side"]
     print("  counts:", counts)
 
 

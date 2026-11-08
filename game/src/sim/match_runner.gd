@@ -28,7 +28,8 @@ static func build_teams(world: World, d: Draft) -> Array:
 
 
 ## plans: {"B": plan_set | "ai", "R": plan_set | "ai"}; a missing side plays neutral, "ai" is the coach's
-## suggestion for that team. An empty dictionary reproduces the plain simulator exactly (golden vectors).
+## suggestion for that team. The result's "plans" key holds the resolved sets that were played (a missing side
+## stays missing = neutral), so Report.attribution replays the same game. An empty dictionary reproduces the plain simulator exactly (golden vectors).
 static func finish(world: World, d: Draft, plans: Dictionary = {}) -> Dictionary:
 	var teams := build_teams(world, d)
 	var ta: Dictionary = teams[0]
@@ -47,7 +48,7 @@ static func finish(world: World, d: Draft, plans: Dictionary = {}) -> Dictionary
 		for s in SLOTS:
 			pick_ids[t][s] = d.picks[t][s]["id"]
 	return {"match_id": d.match_id, "mseed": d.mseed, "blue_won": r["a_won"], "final": r["final"], "sim": r,
-			"team_a": ta, "team_b": tb, "picks": pick_ids, "bans": d.bans.duplicate(true), "log": d.log.duplicate(true),
+			"team_a": ta, "team_b": tb, "plans": sets.duplicate(true), "picks": pick_ids, "bans": d.bans.duplicate(true), "log": d.log.duplicate(true),
 			"lineups": {"B": _ids(d.lineups["B"]), "R": _ids(d.lineups["R"])},
 			"comp": {"B": ta["comp_mod"], "R": tb["comp_mod"]}, "style": {"B": ta["style"], "R": tb["style"]},
 			"full_draft": d.order.size() == Draft.ORDER_FULL.size()}
