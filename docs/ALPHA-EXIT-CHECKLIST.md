@@ -70,7 +70,7 @@ Last updated: 2026-11-08 (end of Alpha 0.6 work).
 |---|---|---|---|
 | 6.1 | First-game tutorial that can be dismissed | Done, light version | Three one-time tips (Home, before a game, after a game), each dismissed with one tap and remembered on the device; Settings can show them again. A step-by-step guided first game is not built; add it if testers still get lost |
 | 6.2 | Text size option and colour-blind-safe option | Done | Settings -> Comfort: larger text and buttons (+15 percent, every screen tested to fit the narrower layout), colour-blind friendly colours (blue and orange for good and bad). Not yet tried by a colour-blind person |
-| 6.3 | Privacy line in the app (nothing leaves the phone in Alpha) and a simple feedback route | Done | Settings shows a privacy line and a "Copy feedback note" button (a short template plus the debug lines). The note says to send it to "whoever gave you this build": the Founder should name a contact for outside testers |
+| 6.3 | Privacy line in the app (nothing leaves the phone in Alpha) and a simple feedback route | Done | Settings shows a privacy line and a "Copy feedback note" button (a short template plus the debug lines). The note says to send it to "whoever gave you this build": the contact for outside testers is the Alpha feedback form (see ALPHA-FEEDBACK-FORM.md); the Founder runs the script once to create it, then sends the link with the APK |
 | 6.4 | Closed-beta distribution set up (Play Console closed track or direct APK) | Founder | Needs a developer account decision |
 | 6.5 | Signed with a proper release key (debug key must never ship) | Founder | Key kept by the Founder |
 
