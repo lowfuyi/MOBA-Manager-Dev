@@ -1,38 +1,83 @@
 # Esports notes: making the live match feel like real MOBA esports
 
-Owner: Esports Manager. Date: 2026-11-08. For workstream W4 (Alpha 0.7 plan). Advice only: the simulation decides the result, and the arena only plays it back. Map and objective names are the GDD placeholders (Hollowmere, Stoneback, Moonhulk, the Cairn).
+Owner: Esports Manager. First written 2026-11-08, reworked 2026-11-08 (wave 1b, fix list in `company/reviews/2026-11-08-wave1.md` section 1, conflict C7). For workstream W4 (Alpha 0.7 plan). Advice only: the simulation decides the result, and the arena only plays it back. Map and objective names are the GDD placeholders (Hollowmere, Stoneback, Moonhulk, the Cairn).
 
-## 1. Phases of a pro match and what viewers see
+**Authority.** All second-by-second numbers live in `ACTION-VOCABULARY.md` section 1.4 and in the `stages` of `game/data/arena_map.json`. Both follow `Report.FEED_ORDER` (`game/src/sim/report.gd`). This file gives genre guidance only: what to show, what to skip, where to put emphasis. If a number here ever disagrees with those two files, they win.
 
-| Phase | Real match (about) | What viewers see | Our sim contest and time |
+## 1. Phases of a pro match and where our fixed stamps sit
+
+The sim fixes eight contests at these fractions of game time (`Report.FEED_ORDER`), plus the siege at 1.0. The four lane results are spread from 0.18 to 0.27, not all at 0.25 (the GDD 8.5 text says 0.25L; the code is the truth). In the 75 s show the stamps are 13.5, 15.75, 18.0, 20.25, 33.75, 45.0, 60.0, 71.25 and 75 s. The scoreboard clock is `show time / 75 x game minutes` (game length is clamped to 9 to 16 min), so in a 12 min game the stamps read 2:10, 2:31, 2:53, 3:14, 5:24, 7:12, 9:36, 11:24, 12:00.
+
+| Phase | Real match (about) | What viewers see | Our contest and stamp |
 |---|---|---|---|
-| Laning | 0 to 12 min | Heroes farm waves one-on-one or two-on-two. Small trades, one lane pushed in, one hero short of health. The jungler passes through and may strike one lane. | Top, Mid, Bot, Jungle results at 0.25L |
-| First rotations | 8 to 15 min | Lanes break, heroes walk together, scouts check bushes, the first tower falls. Tension is in who arrives first. | Early objective (Stoneback) at 0.45L |
-| Objective fights | 12 to 25 min | Both teams stack around a neutral objective. One side starts the take, the other tries to steal or punish. | Mid fight 0.60L, late objective (Moonhulk) 0.80L |
-| Team fights | any time after about 12 min | Ten heroes collide for 5 to 15 seconds. Someone initiates, someone is caught, the losing team breaks apart. | Mid fight 0.60L, late fight 0.95L |
-| Comeback | after a long deficit | The behind team wins one fight or objective and the lead shrinks. It needs one clean pick or a smart defence. | Only when the sim supports it (see section 2) |
-| Closing out | last 3 to 5 min | The leading team pushes lanes together, towers drop, then the base core. A single lost fight can flip it. | Base siege at 1.0L |
+| Laning | 0 to 12 min | Heroes farm waves one-on-one or two-on-two. Small trades, one lane pushed in, one hero short of health. The jungler passes through and may strike one lane. | Top 0.18 (13.5 s), Mid 0.21 (15.75 s), Bot 0.24 (18.0 s), Jungle 0.27 (20.25 s) |
+| First rotations | 8 to 15 min | Lanes break, heroes walk together, scouts check bushes, the first tower falls. Tension is in who arrives first. | Early objective (Stoneback) 0.45 (33.75 s); first towers in the 25 to 28 s rotation window (see 2.4) |
+| Team fight | any time after about 12 min | Ten heroes collide for 5 to 15 seconds. Someone initiates, someone is caught, the losing team breaks apart. | Mid fight 0.60 (45.0 s), late fight 0.95 (71.25 s) |
+| Objective fights | 12 to 25 min | Both teams stack around a neutral objective. One side starts the take, the other tries to steal or punish. | Stoneback 0.45, late objective (Moonhulk) 0.80 (60.0 s) |
+| Comeback | after a long deficit | The behind team wins one fight or objective and the lead shrinks. It needs one clean pick or a smart defence. | Only when the sim's arc says so (2.3) |
+| Closing out | last 3 to 5 min | The leading team pushes lanes together, towers drop, then the base core. A single lost fight can flip it. | Siege at 1.0 (75 s), Cairn falls at 74 s |
 
-## 2. A 75-second highlight
+Honest limit: our games are 9 to 16 min against roughly 25 to 35 min in a real pro match, so everything is compressed about 2.5 times. The "real match" column is general genre knowledge, not measured. A genre-literate viewer will accept the compression if three things hold: nothing happens before it plausibly could (no tower at minute 2), the order of events is the order of the clock, and the clock is labelled as game time. Call the four early beats "lane lead", not "lane phase result": in a real game the lane phase is only judged at around minute 10 to 14, which here is about the first towers.
 
-Show only moments where the lead changes or is defended, and let a quiet stretch last a second or two so the next beat lands.
+## 2. The 75 s show on the fixed stamps
 
-| Seconds | Beat | Show | Skip |
-|---|---|---|---|
-| 0 to 5 | Setup | Both five-hero rosters, plan labels, clock starts | Walking out from base |
-| 5 to 22 | Lanes | Four short beats, about 4 s each, ordered by size of result (largest first) | Farming with no result |
-| 22 to 34 | First objective | The approach, the take or the steal, who gets the reward | Waiting for it to spawn |
-| 34 to 47 | Mid fight | Full team collision, one clear initiator, a visible turn | Individual last hits |
-| 47 to 57 | Late objective | Setup, a risk, a payoff, a lead number that jumps | Recalls and shopping |
-| 57 to 69 | Late fight | The longest fight, slowed slightly at the decisive moment | Repeating earlier kills |
-| 69 to 75 | Closing | Siege on the Cairn, last hit, a 2 s hold on the result | Credits, statistics |
+### 2.1 Mapping (windows copied from ACTION-VOCABULARY 1.4)
 
-Pacing: loudest effects on the two big fights and the final hit; a calm beat between them so release is felt.
+| Window (s) | Beat | Stamp inside | Show (genre reason) | Skip |
+|---|---|---|---|---|
+| 0 to 4 | Opening | none | Two five-hero rosters, plan labels, clock starts. Viewers need to know who is who before anything happens. | Walking out from base |
+| 4 to 21 | Four lane beats | 13.5 top, 15.75 mid, 18.0 bot, 20.25 jungle | One small trade per lane and a pressure arrow. The jungler is seen walking toward a lane before it flips, as real ganks come before the flip. | Farming with no result |
+| 21 to 24 | Plan check | none | A calm beat: the plan chip, a lead-graph marker. Quiet time lets the next beat land. | Anything loud |
+| 24 to 31 | Rotation, early towers | none (towers 25.0 to 28.0) | The map opens: heroes leave lanes, first towers fall, both teams walk to the same place. | Recalls and shopping |
+| 31 to 36.5 | First objective | 33.75 | Approach, the take or the steal attempt, who gets the reward. | Waiting for it to spawn |
+| 36.5 to 51 | Mid fight, then push | 45.0 | Full team collision, one clear initiator, a visible turn, then the winner pushes. | Individual last hits |
+| 51 to 54 | Reset | none | A breath: reposition, heal, lead number settles. | Shopping detail |
+| 54 to 63 | Late objective | 60.0 | Setup, a risk, a payoff, a lead number that jumps. | Repeating earlier takes |
+| 63 to 71.25 | Late fight | 71.25 | The longest fight and the most important one. | Repeating earlier kills |
+| 71.25 to 75 | Closing | Cairn falls at 74.0 | Siege, last hit, a 1 s hold on the result. | Credits, statistics |
 
-Stomp versus close game:
-- **Stomp:** the lead line climbs steadily, fights end early and one-sided; speed through the middle, let the loser try one idea that fails, finish with a calm siege.
-- **Close game:** the lead line crosses zero at least once; hold fights longer, show a near-miss, keep the result unclear until the late fight.
-- **Comeback or snowball:** dramatise one only when the sim's signed contest results show it. Never invent a swing.
+Rule for all of them: the resolve stamp never moves, and a quiet stretch of a second or two before it makes the stamp feel bigger.
+
+### 2.2 Lane beats: emphasis, not order
+
+Real broadcasts show lanes as they happen, and rank them only in a recap. So the playback order is chronological (top, mid, bot, jungle) and the report stamps match. What can still say "this lane mattered most":
+
+1. Tier effects from ACTION-VOCABULARY 2.2 (zoom, flash, sound strength): the largest result gets the strongest allowed tier, the smallest stays calm.
+2. Hold length inside its slot. Slots are 2.25 s apart (13.5, 15.75, 18.0), so a hold is at most about 2 s; give the biggest result the full hold and the smallest about 1 s.
+3. Camera: on the biggest result, stay close to the winner; on a narrow one, keep both heroes in frame.
+4. The recap in the plan-check window (21 to 24 s): one commentary line names the biggest lane lead ("Top is where this game is leaning"), and the lead graph marker for that lane is drawn bigger. This is the place where "by size" belongs, because by then all four stamps have passed.
+
+### 2.3 Stomp, close game and comeback with fixed stamps
+
+A fixed-stamp show cannot move a fight earlier, add a beat or stretch a window. It can vary these five things, all already allowed by ACTION-VOCABULARY 2.2:
+
+| Lever | Stomp (decisive tiers, arc "stomp") | Close game (narrow tiers, arc "close") |
+|---|---|---|
+| Tier effects | Zoom, edge flash and the big sound on the two fights and the last hit. | Soft sounds, no flash until the late fight. Save the big sound for the last hit. |
+| Hold lengths inside a window | Kills are front-loaded, so the fight ends early; the freed seconds go to the loser's one failed idea and a calm siege. | Kills are spread to the end of the window; hold the camera on the near-miss (loser retreats at low health, last strike). |
+| Camera | Follows the winner, wide shot of pressure. | Keeps both sides in frame until the last second. |
+| Sound | Rising pressure, no tension drops. | A tension pad that only resolves at the late stamp. |
+| Text | Fewer lines, plain ("Towers fall one after another"). | A lead-flip tag when the lead line crosses zero, one commentary line at the late fight that says it is open. |
+
+Comeback and snowball: dramatise only what the sim's arc (F6) and lead flip (F5) report. Never invent a swing. When the match winner loses the late fight but still wins (about 19% of simulated games, from ACTION-VOCABULARY 1.3), the genre has a ready story: the lead carried the push, or the teams traded and one had more. Say that, in words like "a fight lost, the lead still stands", and never show the loser celebrating. This is advice for the staging question C8; the Technical Designer and the tester question decide.
+
+### 2.4 Text on screen at once (advice for the Match HUD; UI/UX Designer decides layout)
+
+Four text channels compete on a portrait phone: the intent label per side (a pill, 28 characters at most), the status tag (centre, few words), the commentary line (4 to 9 words) and the feed (3 lines). Numbers (clock, kills, towers, gold lead) are glanced, not read, and the plan chip is static after the first seconds, so none of those count toward the budget. My estimate, not measured: a viewer reading at a glance while watching action takes in about two words per second, so no more than about 10 new words should appear in any 2.5 s span.
+
+| Moment | New text allowed at once | What to hold back |
+|---|---|---|
+| Calm (opening, plan check, rotation, reset, siege hold) | Up to four: two intent pills (read as one item), status tag, one commentary line, feed line | Nothing; still keep new items one at a time |
+| Fight (the windows around 45.0 and 71.25 s, about 3 s each side of the stamp) | Up to three: the two pills already on screen, the status tag, and one line. The line is a feed line OR a commentary line, never both new together | New pills. Commentary waits until about 1 s after the stamp. Feed shows only kills and takes, newest first, older lines fade at 4 s |
+| Resolve stamp (the 1 s after any stamp) | Two: status tag and one feed line | Commentary and new intent labels |
+| Closing hold (74 to 75 s) | One: the end caption ("play of the game", matching the first line of the report's "why") | Everything else fades |
+
+Why: real broadcasts clear the middle of the screen during a fight and bring summaries back afterwards (LHM, see Sources, opened and read). In our case the "middle" is the arena. Also keep animation short: it should show a change, not delay it.
+
+### 2.5 Answers to ACTION-VOCABULARY section 10 (items 1 and 2)
+
+1. **Chronological lane beats: I agree.** The genre shows events in clock order and ranks them afterwards, so chronological playback plus emphasis (2.2) is more authentic than largest-first, and it keeps the report stamps true. I withdraw "ordered by size" from my first draft. One caution: the jungle result at 0.27 comes last, but real jungle ganks cause lane flips. Keep the jungler's visible walk from 12.5 s (as the vocabulary already has it) so the viewer sees the cause before the flip.
+2. **Early towers at 25 to 28 s: I agree.** At 0.33 to 0.37 of the game clock this is about 4:00 to 4:30 in a 12 min game, which scaled by the 2.5 times compression is about minute 10 to 11 of a real match, where first towers fall. A tower at 2 to 3 min on the clock would look wrong to anyone who knows the genre. Three conditions, all advice: (a) only outer towers in this window; (b) the earliest fall of the match gets the one "First tower" tag, as a first kill would; (c) if one side takes two or three towers in the 3 s window, show one banner for the sweep, not three tags. Small disagreement: top at 25.0, mid 26.5, bot 28.0 mirrors the lane order, which is good, but if the ledger gives one side all three, that side has a lead that real games would call a snowball; make sure the "snowball" overlay agrees with it.
 
 ## 3. How casters and graphics communicate
 
@@ -46,29 +91,32 @@ Stomp versus close game:
 | Play of the game | Names the match's best moment | Yes, once, at the end, as a replayed beat on the result screen. |
 | Five player panels with items and levels | Detail for experts | Behind a tap only. |
 
-Broadcast lessons: keep the action clear during fights, show only data you can trust, and pair kills with gold and objectives.
+Broadcast lessons: a scoreboard should show who is ahead, by how much, and where it came from, so kills alone are not enough (gold and towers too, LHM and gaming.net, see Sources). Keep the action clear during fights, show only data you can trust, and pair kills with gold and objectives. Viewers also watch preparation before an objective, and what the winner does with the reward afterwards (gaming.net); the rotation and push windows serve that.
 
 ## 4. Commentary style
 
 - **Tone:** warm, excited but not shouting, fair to both sides.
-- **Length:** 4 to 9 words in fights, up to 14 in calm moments; one line at a time, on screen about 2.5 s.
+- **Length:** 4 to 9 words in fights, up to 14 in calm moments; one line at a time, on screen about 2.5 s (see the text budget in 2.4).
 - **Variety:** at least 3 phrasings per event type, no repeat within 20 lines, a mix of facts and feeling.
 - **Truth:** every line comes from a real sim event; never predict a result the sim has not produced.
+- **Ownership:** these are tone samples. The Narrative Designer owns final commentary (conflict C14); the Gameplay Designer owns intent labels and status tags.
 
-Sample lines (original; replace names with the actual hero, lane and club names):
+Sample lines (original; replace names with the actual hero, lane and club names). "When" uses the stamps of section 2:
 
-| Situation | Lines |
-|---|---|
-| Opening | 1. "Both teams are in position, and the clock is running." 2. "Five heroes each, three lanes, one Cairn each to protect." |
-| Lane lead | 3. "{Top hero} is clearly ahead, and the wave is leaning their way." 4. "A quiet lane, but that small lead will matter later." |
-| Lane swing | 5. "The jungler has arrived, and that lane just flipped." 6. "A narrow escape, and the pressure drops." |
-| Objective | 7. "Everyone is gathering around Stoneback." 8. "It is taken cleanly, and the buff goes to {team}." 9. "A steal attempt, and it nearly works!" |
-| Team fight start | 10. "They commit, and it is five against five." 11. "The first strike lands on the back line." |
-| Team fight result | 12. "One side is falling apart, and the other presses." 13. "Three down for {team}. That decides this fight." |
-| Comeback | 14. "A small chance appears, and {team} grabs it." 15. "The gold gap is shrinking, and the crowd feels it." |
-| Stomp | 16. "There is no answer to this pressure." 17. "Towers fall one after another." |
-| Closing | 18. "The Cairn is exposed, and nobody can stop the push." 19. "One last hit, and it is over." |
-| Close finish | 20. "That was a game decided by one fight." |
+| Situation | When | Lines |
+|---|---|---|
+| Opening | 0.5 to 3 s | 1. "Both teams are in position, and the clock is running." 2. "Five heroes each, three lanes, one Cairn each to protect." |
+| Lane lead | after 13.5 / 15.75 / 18.0 s | 3. "{Top hero} is clearly ahead, and the wave is leaning their way." 4. "A quiet lane, but that small lead will matter later." |
+| Lane swing | 20.25 s, only if the jungle result flips a lane | 5. "The jungler has arrived, and that lane just flipped." 6. "A narrow escape, and the pressure drops." |
+| Biggest lane (recap) | 21 to 24 s | 7. "Top is where this game is leaning." |
+| Objective | 31 to 36.5 s, 54 to 63 s | 8. "Everyone is gathering around Stoneback." 9. "It is taken cleanly, and the buff goes to {team}." 10. "A steal attempt, and it nearly works!" |
+| Team fight start | 36.5 s, 63 s | 11. "They commit, and it is five against five." 12. "The first strike lands on the back line." |
+| Team fight result | after 45.0 / 71.25 s | 13. "One side is falling apart, and the other presses." 14. "Three down for {team}. That decides this fight." |
+| Comeback (arc "comeback" only) | after the flip | 15. "A small chance appears, and {team} grabs it." 16. "The gold gap is shrinking, and the crowd feels it." |
+| Stomp (arc "stomp" only) | push windows | 17. "There is no answer to this pressure." 18. "Towers fall one after another." |
+| Lead carries (match winner lost the late fight) | 71.25 to 74 s | 19. "A fight lost, but the lead still stands." |
+| Closing | 71.25 to 75 s | 20. "The Cairn is exposed, and nobody can stop the push." 21. "One last hit, and it is over." |
+| Close finish | 74 to 75 s | 22. "That was a game decided by one fight." |
 
 ## 5. Do not copy
 
@@ -82,12 +130,15 @@ Sample lines (original; replace names with the actual hero, lane and club names)
 1. Show one slim scoreboard and a thin gold-lead graph above the arena so the story of the match is readable at a glance.
 2. Give every fight a visible beat order (approach, first strike, turn, result), with the camera nearest the decisive moment.
 3. Put one intent label per side near its heroes, and make each label come from the Game Plan or the sim's contest.
-4. Spend the 75 s by the table in section 2, giving the two big fights and the closing most of the time.
-5. End on a 2 s hold with a "play of the game" caption that matches the first line of the report's "why you won or lost".
+4. Spend the 75 s on the fixed stamps of section 2.1. Do not reorder beats; vary tier effects, hold length, camera, sound and text (2.2 and 2.3).
+5. Keep to the text budget of 2.4 in fights: three new-text slots at most, one line at a time.
+6. End on a short hold (about 1 s, inside the 74 to 75 s window) with a "play of the game" caption that matches the first line of the report's "why you won or lost".
 
 ## Sources
 
-- LHM, "What makes a good League of Legends broadcast overlay?" (lhm.gg/blog/what-makes-a-good-lol-broadcast-overlay), used for overlay hierarchy and fight-safe display.
-- gaming.net, "League of Legends things to watch beyond kill score", used for gold, objectives and what viewers watch.
-- Studio files: GDD-v1.11 sections 2, 8.3, 8.5, 8.7; UI-UX-REFERENCE-v1 section 2.3; ALPHA-0.7-PLAN.
-- Phase timings and pacing are general genre knowledge, not measured.
+Both web sources were re-opened on 2026-11-08 with a page-fetch tool. That tool returns a summary of the page, not the full text, so I read summaries, not every paragraph. The titles below name a real game; they are reference only and nothing from them is copied into the game.
+
+- LHM.gg, "What Makes a Good League of Legends Broadcast Overlay?", Michael Majka, published 19 July 2026. Opened. Used for: persistent-information order (team identity, game state, timer, economy, objectives, player status), the scoreboard should show who is ahead and by how much (so gold and towers, not kills alone), fight-safe display (keep the centre clear, suppress non-essential panels, detail before fights, not during), and "animation should communicate a state change, not delay it".
+- Gaming.net, "League of Legends: 7 Things to Watch Beyond the Kill Score", Jordan Pike, published 26 October 2026. Opened. Its byline says the article is AI-generated and reviewed by the site's editorial team, so I treat it as weak support. Used only for: gold (not kills) shows an advantage, farming, vision, and preparation before an objective plus what the winner does with the reward. The title I gave in the first draft was shortened; this is the page's real title.
+- Studio files: `ACTION-VOCABULARY.md` sections 1.3, 1.4, 2.2, 10; `game/data/arena_map.json` stages; `game/src/sim/report.gd` (`FEED_ORDER`, `game_minutes`); GDD-v1.11 sections 2, 8.3, 8.5, 8.7; UI-UX-REFERENCE-v1 section 2.3; ALPHA-0.7-PLAN.
+- Phase timings, the 2.5 times compression, the reading-speed figure and the pacing advice are general genre knowledge and my estimates, not measured. Nothing here has been tested on a phone.
