@@ -11,6 +11,10 @@ config/features=PackedStringArray("4.3", "GL Compatibility")
 Strings="*res://src/core/strings.gd"
 App="*res://src/core/app.gd"
 
+[gui]
+
+theme/custom_font="res://assets/fonts/default_font.tres"
+
 [display]
 window/size/viewport_width=720
 window/size/viewport_height=1280
