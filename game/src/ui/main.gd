@@ -45,6 +45,7 @@ func _ready() -> void:
 	App.main = self
 	get_tree().set_auto_accept_quit(false)
 	show_screen(ScreenTitle.new())
+	App.mark_started()
 
 
 func _build_tabbar(parent: Control) -> void:

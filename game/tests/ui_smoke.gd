@@ -67,8 +67,17 @@ func _run() -> void:
 	rs._auto()
 	var st := ScreenStandings.new()
 	App.go(st)
-	for t in ["table", "playoffs", "results"]:
+	for t in ["table", "form", "playoffs", "results", "trophies"]:
 		st._set_tab(t)
+		await get_tree().process_frame
+		ok(cur() == st and st.body.get_child_count() > 1, "standings tab builds: " + t)
+	var fst := ScreenStandings.new("form")
+	App.go(fst)
+	ok(fst._tab == "form", "standings can open on the form tab")
+	var club_scr := ScreenClub.new()
+	App.go(club_scr)
+	await get_tree().process_frame
+	ok(cur() == club_scr, "club tab with the Form Rating tile")
 	var se := ScreenSettings.new()
 	App.go(se)
 	se._confirm_reset = true
@@ -144,6 +153,77 @@ func _run() -> void:
 	await get_tree().process_frame
 	ok(cur() is ScreenFreeAgents, "negotiation returns to the free agent list")
 	App.go(ScreenHub.new())
+	# Alpha 0.6 comfort options and tips
+	var win := get_window()
+	win.size = Vector2i(720, 1280)    # a phone-shaped window, so layout widths mean something headless
+	await get_tree().process_frame
+	ok(absf(get_viewport().get_visible_rect().size.x - 720.0) < 1.0, "test window is phone sized (%.0f wide)" % get_viewport().get_visible_rect().size.x)
+	ok(UI.GOOD == UI.GOOD_DEFAULT and win.content_scale_factor == 1.0, "defaults: normal colours and text size")
+	ok(not App.tip_seen("hub"), "the hub tip has not been seen on a fresh device")
+	var hub_t := ScreenHub.new()
+	App.go(hub_t)
+	await get_tree().process_frame
+	var kids_with := hub_t.body.get_child_count()
+	hub_t.body.get_child(1).queue_free()    # the tip card sits right under the club header
+	App.tip_mark("hub")
+	App.go(ScreenHub.new())
+	await get_tree().process_frame
+	ok(cur().body.get_child_count() == kids_with - 1, "the hub tip stays away once dismissed")
+	App.tips_reset()
+	ok(not App.tip_seen("hub"), "tips can be brought back from Settings")
+	var sets := ScreenSettings.new()
+	App.go(sets)
+	await get_tree().process_frame
+	App.set_colorblind(true)
+	ok(UI.colorblind and UI.GOOD == UI.GOOD_CB and UI.BAD == UI.BAD_CB, "colour-blind palette applies")
+	App.set_large_text(true)
+	ok(absf(win.content_scale_factor - App.LARGE_SCALE) < 0.001 and App.large_text(), "large text applies and is remembered")
+	await get_tree().process_frame
+	ok(get_viewport().get_visible_rect().size.x < 640.0, "the layout width shrinks to fit the larger text (%.0f)" % get_viewport().get_visible_rect().size.x)
+	var wide_ok := true
+	var wide_names := ""
+	for scr in [ScreenHub.new(), ScreenRoster.new("hub"), ScreenPlan.new(), ScreenClub.new(), ScreenSettings.new(), ScreenStandings.new(), ScreenStandings.new("form"),
+			ScreenTraining.new(), ScreenChemistry.new(), ScreenFinance.new(), ScreenPractice.new(), ScreenFreeAgents.new("hub")]:
+		App.go(scr)
+		await get_tree().process_frame
+		await get_tree().process_frame
+		var vw := get_viewport().get_visible_rect().size.x
+		var need: float = scr.body.get_combined_minimum_size().x + 48.0
+		if need > vw + 0.5:
+			wide_ok = false
+			wide_names += " %s(%.0f>%.0f)" % [scr.get_script().get_global_name(), need, vw]
+	ok(wide_ok, "with large text no screen is wider than the display:" + wide_names)
+	ok(App.debug_info().contains("text=large") and App.debug_info().contains("startup="), "debug info shows text size and start-up time")
+	ok(App.feedback_text().contains("details for the developer") and App.feedback_text().contains("MOBA Esports"), "feedback note carries the debug lines")
+	App.set_large_text(false)
+	App.set_colorblind(false)
+	ok(win.content_scale_factor == 1.0 and UI.GOOD == UI.GOOD_DEFAULT, "options switch back")
+	App.go(ScreenHub.new())
+	# Exhibition and Quick Match through the real screens (GDD 7.9): a best of 3 stopped early, then a Quick Match
+	var prs := ScreenPractice.new()
+	App.go(prs)
+	await get_tree().process_frame
+	ok(cur() is ScreenPractice and App.gs.practice_available(), "practice screen opens with the day free")
+	var table_before := JSON.stringify(App.gs.standings())
+	prs._set_len(3)
+	prs._start(App.gs.practice_opponents()[0]["club"], 3)
+	ok(cur() is ScreenPreMatch and App.gs.practice_in_progress(), "a practice series starts at the pre-match screen")
+	await _play_with_ui(App.gs.practice_game(), false)
+	ok(cur() is ScreenPractice, "the practice report returns to the practice screen")
+	ok(App.gs.practice_in_progress() or App.gs.d.has("exh_last"), "one practice game played")
+	App.gs.end_practice()
+	ok(not App.gs.practice_in_progress() and App.gs.practice_available(), "leaving a series early keeps the day free")
+	var prs2 := ScreenPractice.new()
+	App.go(prs2)
+	prs2._quick_match()
+	ok(cur() is ScreenPreMatch and App.gs.practice_in_progress(), "Quick Match starts a one-game series")
+	await _play_with_ui(App.gs.practice_game(), true)
+	ok(not App.gs.practice_in_progress() and not App.gs.practice_available(), "Quick Match ends after one game and uses the day")
+	ok(JSON.stringify(App.gs.standings()) == table_before, "practice never touches the table")
+	App.go(ScreenPractice.new())
+	await get_tree().process_frame
+	ok(cur() is ScreenPractice, "practice screen shows the used day")
+	App.go(ScreenHub.new())
 	# full-UI games, then fast ones, through the whole season
 	var played := 0
 	var full_ui := 0
@@ -164,6 +244,20 @@ func _run() -> void:
 			cur()._leave()
 		played += 1
 	ok(App.gs.d["phase"] == "done", "season completes (%d games by me, %d via UI)" % [played, full_ui])
+	var career_ok := false
+	for pid3 in (App.gs.d["lineup"] as Dictionary).values():
+		career_ok = career_ok or int(App.gs.career_all().get(pid3, {}).get("g", 0)) > 0
+	ok(career_ok, "the season built a career record")
+	var rsc := ScreenRoster.new("hub")
+	App.go(rsc)
+	await get_tree().process_frame
+	rsc._toggle_player((App.gs.d["lineup"] as Dictionary).values()[0])
+	await get_tree().process_frame
+	ok(cur() == rsc, "roster detail with the career section builds")
+	var tro := ScreenStandings.new("trophies")
+	App.go(tro)
+	await get_tree().process_frame
+	ok(cur() == tro and tro.body.get_child_count() > 1, "trophy cabinet shows the finished season")
 	ok(full_ui >= 4, "enough games through the full UI")
 	App.go(ScreenHub.new())
 	App.go(ScreenSeasonEnd.new())

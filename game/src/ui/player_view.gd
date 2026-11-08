@@ -3,24 +3,76 @@ extends RefCounted
 ## Shared pieces for showing one player: the stat bars and the hero line used by the roster and the market.
 
 
+const STAT_HELP := {"mec": "stat.help.mec", "sen": "stat.help.sen", "lan": "stat.help.lan", "tft": "stat.help.tft",
+		"mac": "stat.help.mac", "com": "stat.help.com", "con": "stat.help.con", "clu": "stat.help.clu"}
+const LOG_KEYS := {"signed": "career.log.signed", "released": "career.log.released", "renewed": "career.log.renewed", "birthday": "career.log.birthday",
+		"title": "career.log.title", "runner_up": "career.log.runner_up", "left": "career.log.left", "best_game": "career.log.best_game"}
+
+
 ## Eight stat bars with "now / potential" and, when `gains` is set, this season's change in brackets.
+## Tap a row to read what the stat does.
 static func stat_block(parent: VBoxContainer, p: Dictionary, gains: bool = false) -> void:
+	var tip := UI.label(Strings.t("stat.help.tip"), UI.S_SMALL - 2, UI.DIM)
+	parent.add_child(tip)
 	for st in World.STATS:
 		var row := UI.hbox()
-		var name_l := UI.label(Strings.t("stat." + st), UI.S_SMALL, UI.TEXT)
-		name_l.custom_minimum_size = Vector2(230, 0)
-		name_l.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		row.add_child(name_l)
+		var help := UI.label(Strings.t(STAT_HELP[st]), UI.S_SMALL - 2, UI.ACCENT)
+		help.visible = false
+		var name_b := UI.button(Strings.t("stat." + st) + "  ?", func(): help.visible = not help.visible, "flat", 44)
+		name_b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		for sn in ["normal", "hover", "pressed", "focus"]:    # slim padding so a long stat name fits the column
+			var sb: StyleBox = name_b.get_theme_stylebox(sn).duplicate()
+			sb.content_margin_left = 4.0
+			sb.content_margin_right = 4.0
+			name_b.add_theme_stylebox_override(sn, sb)
+		name_b.clip_text = true
+		name_b.custom_minimum_size = Vector2(250, 44)
+		name_b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		row.add_child(name_b)
 		var bar := UI.bar(float(p["stats"][st]), 100.0, UI.ACCENT, 20)
 		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(bar)
 		var gain := App.gs.season_gain(p["id"], st) if gains else 0.0
 		var gain_txt := "" if absf(gain) < 0.05 else " (%+.1f)" % gain
 		var val := UI.label("%d / %d%s" % [int(round(float(p["stats"][st]))), p["potential"][st], gain_txt], UI.S_SMALL, UI.GOOD if gain >= 0.05 else UI.DIM, HORIZONTAL_ALIGNMENT_RIGHT)
-		val.custom_minimum_size = Vector2(190, 0)
+		val.custom_minimum_size = Vector2(170, 0)
 		val.size_flags_horizontal = Control.SIZE_SHRINK_END
 		row.add_child(val)
 		parent.add_child(row)
+		parent.add_child(help)
+	parent.add_child(UI.label(Strings.t("stat.help.pot"), UI.S_SMALL - 2, UI.DIM))
+
+
+## "Career with us": games, wins, kills/deaths/assists, best game and milestones (GDD 4.2). Collapsed by default.
+static func career_section(parent: VBoxContainer, pid: String) -> void:
+	var gs := App.gs
+	var c: Dictionary = gs.career_all().get(pid, {})
+	var box := UI.section(parent, Strings.t("career.h"), false)
+	if c.is_empty() or int(c.get("g", 0)) == 0 and (c.get("log", []) as Array).is_empty():
+		box.add_child(UI.label(Strings.t("career.none"), UI.S_SMALL, UI.DIM))
+		return
+	var g := int(c["g"])
+	if g > 0:
+		UI.kv_row(box, Strings.t("career.games"), Strings.f("career.games_v", {"g": g, "w": int(c["w"])}))
+		UI.kv_row(box, Strings.t("career.winrate"), "%d%%" % int(round(100.0 * float(c["w"]) / float(g))))
+		UI.kv_row(box, Strings.t("career.kda"), "%d / %d / %d" % [int(c["k"]), int(c["d"]), int(c["a"])])
+		UI.kv_row(box, Strings.t("career.ratio"), "%.1f" % Career.kda_ratio(int(c["k"]), int(c["d"]), int(c["a"])), UI.ACCENT)
+		if int(c["best_k"]) > 0:
+			UI.kv_row(box, Strings.t("career.best"), Strings.f("career.best_v", {"k": int(c["best_k"]), "opp": gs.club_name(String(c.get("best_vs", gs.club())))}), UI.GOOD)
+		var se: Dictionary = (c["by_season"] as Dictionary).get(str(int(gs.d["season"])), {})
+		if not se.is_empty():
+			UI.kv_row(box, Strings.t("career.season"), "%d / %d / %d  (%dg)" % [int(se["k"]), int(se["d"]), int(se["a"]), int(se["g"])])
+	var log: Array = c["log"]
+	if not log.is_empty():
+		box.add_child(UI.label(Strings.t("career.log_h"), UI.S_SMALL, UI.TEXT))
+		for i in range(log.size() - 1, maxi(-1, log.size() - 9), -1):
+			var e: Dictionary = log[i]
+			var a: Dictionary = (e["a"] as Dictionary).duplicate()
+			if a.has("opp"):
+				a["opp"] = gs.club_name(String(a["opp"]))
+			var text := Strings.f(LOG_KEYS[e["k"]], a)
+			box.add_child(UI.label(Strings.f("career.log_line", {"s": int(e["s"]), "text": text}), UI.S_SMALL - 2, UI.DIM))
+	box.add_child(UI.label(Strings.t("career.note"), UI.S_SMALL - 2, UI.DIM))
 
 
 static func best_heroes_line(parent: VBoxContainer, p: Dictionary) -> void:

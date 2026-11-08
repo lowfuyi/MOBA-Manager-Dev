@@ -10,7 +10,10 @@ func _init(g: Dictionary = {}) -> void:
 
 
 func go_back() -> void:
-	App.go(ScreenHub.new())
+	if game["kind"] == "exhibition":
+		App.go(ScreenPractice.new())
+	else:
+		App.go(ScreenHub.new())
 
 
 func _ready() -> void:
@@ -18,8 +21,11 @@ func _ready() -> void:
 	var me := gs.club()
 	var my_side := "B" if game["blue"] == me else "R"
 	var opp: String = game["red"] if my_side == "B" else game["blue"]
-	setup(Strings.t("pre.title"), go_back)
+	setup(Strings.t("pre.title.practice" if game["kind"] == "exhibition" else "pre.title"), go_back)
+	Tips.show(body, "prematch")
 	var c := UI.card(body, UI.PANEL2)
+	if game["kind"] == "exhibition":
+		c.add_child(UI.label(Strings.f("pre.practice_note", {"game": game["game"], "bo": game["best_of"]}), UI.S_SMALL, UI.WARN))
 	c.add_child(UI.label(Strings.f("pre.versus", {"me": gs.club_name(me), "opp": gs.club_name(opp)}), UI.S_BIG, UI.TEXT))
 	c.add_child(UI.label(Strings.f("pre.side", {"side": Strings.t("hub.side.blue" if my_side == "B" else "hub.side.red")}), UI.S_SMALL, UI.DIM))
 	var secs: int = 15 if game["full"] else 10

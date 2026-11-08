@@ -98,6 +98,10 @@ static func tick_players(w: World, d: Dictionary, plist: Array, played: Array, h
 	for p in plist:
 		var pid: String = p["id"]
 		var fat := w.fatigue_of(pid)
+		if human and (d.get("exh_busy", []) as Array).has(pid):
+			# played a practice series today (GDD 7.9): no training and no rest, only the match-day tiredness if he played
+			w.fatigue[pid] = clampf(fat + (float(data()["fat_match"]) if played.has(pid) else 0.0), 0.0, 100.0)
+			continue
 		var f := focus_of(d, p, human)
 		var training: bool = f["k"] != "rest"
 		if f["k"] == "stat":

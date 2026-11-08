@@ -40,6 +40,10 @@ static func new_game(w: World, club_id: String, save_seed: int, season: int = 1,
 	gs._bind()
 	gs._init_economy(carry)
 	gs.reset_lineup()
+	gs.d["frating"] = (carry["frating"] as Dictionary).duplicate() if carry.has("frating") else gs._initial_frating()
+	for k in ["pace", "career", "exh_n"]:
+		if carry.has(k):
+			gs.d[k] = carry[k]
 	return gs
 
 
@@ -63,6 +67,8 @@ static func from_dict(w: World, data: Dictionary) -> GameState:
 	gs._bind()
 	if not gs.d.has("cash"):
 		gs._init_economy({})
+	if not gs.d.has("frating"):  # saves from before Alpha 0.6: ratings start from today's team ratings
+		gs.d["frating"] = gs._initial_frating()
 	return gs
 
 
@@ -233,6 +239,7 @@ func _sim_fixture(f: Dictionary) -> void:
 	f["played"] = true
 	f["final"] = float(r["final"])
 	f["winner"] = f["blue"] if r["blue_won"] else f["red"]
+	_rate(f["blue"], f["red"], bool(r["blue_won"]), "league", 1)
 
 
 func _round_fixtures(round_index: int) -> Array:
@@ -272,15 +279,21 @@ func _series_game(s: Dictionary) -> Dictionary:
 
 ## Called after the managed club finished a game (result from MatchRunner.finish).
 func record_human_game(game: Dictionary, result: Dictionary) -> void:
+	if game["kind"] == "exhibition":
+		record_exhibition_game(game, result)
+		return
 	var winner: String = game["blue"] if result["blue_won"] else game["red"]
 	_remember(game, result, winner)
 	_grow_familiarity(game, result)
+	var my_side := "B" if game["blue"] == club() else "R"
+	Career.record_game(d, result, my_side, winner == club(), game["red"] if my_side == "B" else game["blue"])
 	if game["kind"] == "league":
 		for f in d["fixtures"]:
 			if f["id"] == game["id"]:
 				f["played"] = true
 				f["final"] = float(result["final"])
 				f["winner"] = winner
+		_rate(game["blue"], game["red"], bool(result["blue_won"]), "league", 1)
 		_finish_round_if_done()
 	else:
 		var side := "B" if game["blue"] == club() else "R"
@@ -334,6 +347,7 @@ func _tick_day() -> void:
 		if c == club():
 			_scrim_bonds()
 	d["train_last"] = mine
+	d["exh_busy"] = []
 	Progression.tick_players(world, d, world.free_agent_players(), [], false)
 	world.fam_bonus = d["fam_bonus"]
 	d["clock"] = int(d["clock"]) + 1
@@ -344,6 +358,144 @@ func _tick_day() -> void:
 func _tick_human_playoff_day() -> void:
 	d["train_last"] = Progression.tick_club(world, d, club(), (d["lineup"] as Dictionary).values(), true)
 	d["clock"] = int(d["clock"]) + 1
+
+
+# ---------------------------------------------------------------- Exhibition and Quick Match (GDD 7.9)
+const EXH_FATIGUE := 5.0     # per game, instead of the +15 of a league match day
+const EXH_BOND := 2.0        # per pair of starters, per game
+const QUICK_RANGE := 5.0     # Quick Match opponent: Team Rating within this many points
+
+
+## One practice series per match day, in the league phase only (the playoffs have no calendar days).
+func practice_available() -> bool:
+	return d["phase"] == "league" and not bool(d.get("dismissed", false)) and int(d.get("exh_day", -1)) != int(d["clock"]) and not practice_in_progress()
+
+
+func practice_in_progress() -> bool:
+	return d.has("exh") and not (d["exh"] as Dictionary).is_empty()
+
+
+## Opponents for Exhibition: every other club in the league, with team rating, best first.
+func practice_opponents() -> Array:
+	var rows: Array = []
+	for c in world.club_ids:
+		if c != club():
+			rows.append({"club": c, "rating": world.team_rating(lineup_for(c))})
+	rows.sort_custom(func(x, y): return x["rating"] > y["rating"])
+	return rows
+
+
+## Quick Match opponent: drawn from the clubs within QUICK_RANGE of our Team Rating (the nearest one when none is).
+func quick_match_opponent() -> String:
+	var mine := world.team_rating(lineup_for(club()))
+	var near: Array = []
+	var best := ""
+	var best_gap := 1e9
+	for r in practice_opponents():
+		var gap := absf(float(r["rating"]) - mine)
+		if gap <= QUICK_RANGE:
+			near.append(r["club"])
+		if gap < best_gap:
+			best_gap = gap
+			best = r["club"]
+	if near.is_empty():
+		return best
+	var rng := Pcg32.contest_stream(int(d["save_seed"]), "exh-pick:%d" % int(d.get("exh_n", 0)))
+	return near[int(rng.next_float() * near.size()) % near.size()]
+
+
+## Open a practice series against `opp` (best of 1, 3 or 5). Returns "" or a reason key.
+func start_practice(opp: String, best_of: int) -> String:
+	if not practice_available():
+		return "practice.unavailable"
+	if opp == club() or not world.clubs.has(opp):
+		return "practice.bad_opponent"
+	d["exh"] = {"opp": opp, "best_of": best_of if best_of in [3, 5] else 1, "me": 0, "them": 0, "games": 0}
+	return ""
+
+
+## Leave a series half-way. The games already played keep their small effects; the day is not used up.
+func end_practice() -> void:
+	d["exh"] = {}
+
+
+## The next game of the series in progress, in the same shape as next_game(): {} when there is none.
+func practice_game() -> Dictionary:
+	if not practice_in_progress():
+		return {}
+	var x: Dictionary = d["exh"]
+	var g: int = int(x["games"]) + 1
+	var me_blue: bool = g % 2 == 1
+	return {"kind": "exhibition", "id": "exh:%d:%d" % [int(d["save_seed"]), int(d.get("exh_n", 0)) + 1],
+			"blue": club() if me_blue else x["opp"], "red": x["opp"] if me_blue else club(), "full": false,
+			"round": int(d["round"]), "series": "X", "game": g, "best_of": int(x["best_of"])}
+
+
+## A finished practice game. Never touches the table, Form Rating, Form, Morale, sponsor, history or career.
+func record_exhibition_game(game: Dictionary, result: Dictionary) -> void:
+	var my_side := "B" if game["blue"] == club() else "R"
+	var starters: Array = (result["lineups"][my_side] as Dictionary).values()
+	for pid in starters:
+		world.fatigue[pid] = clampf(world.fatigue_of(pid) + EXH_FATIGUE, 0.0, 100.0)
+	for i in starters.size():
+		for j in range(i + 1, starters.size()):
+			_raise_bond(starters[i], starters[j], EXH_BOND)
+	d["exh_n"] = int(d.get("exh_n", 0)) + 1
+	if not practice_in_progress():
+		return
+	var x: Dictionary = d["exh"]
+	x["games"] = int(x["games"]) + 1
+	var won: bool = result["blue_won"] == (my_side == "B")
+	if won:
+		x["me"] = int(x["me"]) + 1
+	else:
+		x["them"] = int(x["them"]) + 1
+	var need: int = int(x["best_of"]) / 2 + 1
+	if int(x["me"]) >= need or int(x["them"]) >= need:
+		d["exh_last"] = {"opp": x["opp"], "best_of": int(x["best_of"]), "me": int(x["me"]), "them": int(x["them"]), "won": int(x["me"]) >= need}
+		d["exh_day"] = int(d["clock"])
+		d["exh_busy"] = starters.duplicate()   # they spent the day playing: no training and no rest today
+		d["exh"] = {}
+
+
+## True while a series is waiting for its next game.
+func practice_series() -> Dictionary:
+	return d["exh"] if practice_in_progress() else {}
+
+
+# ---------------------------------------------------------------- Form Rating (GDD 10.1)
+func _initial_frating() -> Dictionary:
+	var tr := {}
+	for c in world.club_ids:
+		tr[c] = world.team_rating(lineup_for(c))
+	return FormRating.initial(tr)
+
+
+## One rated result (a league game, or a finished playoff series). Zero-sum between the two clubs.
+func _rate(a: String, b: String, a_won: bool, stage: String, best_of: int) -> void:
+	var fr: Dictionary = d["frating"]
+	var delta := FormRating.delta(float(fr[a]), float(fr[b]), a_won, stage, best_of)
+	fr[a] = float(fr[a]) + delta
+	fr[b] = float(fr[b]) - delta
+
+
+func career_all() -> Dictionary:
+	return Career.all(d)
+
+
+func form_rating(club_id: String) -> float:
+	return float(d["frating"][club_id])
+
+
+## Clubs sorted by Form Rating, best first: [{"club", "rating", "rank"}].
+func form_ranking() -> Array:
+	var rows: Array = []
+	for c in world.club_ids:
+		rows.append({"club": c, "rating": form_rating(c)})
+	rows.sort_custom(func(x, y): return x["rating"] > y["rating"])
+	for i in rows.size():
+		rows[i]["rank"] = i + 1
+	return rows
 
 
 # ---------------------------------------------------------------- bonds, form and morale
@@ -591,6 +743,7 @@ func _add_series_game(s: Dictionary, game: Dictionary, winner: String, final: fl
 	if s["wins_a"] >= need or s["wins_b"] >= need:
 		s["done"] = true
 		s["winner"] = s["a"] if s["wins_a"] >= need else s["b"]
+		_rate(s["a"], s["b"], s["winner"] == s["a"], "final" if s["id"] == "F" else "semi", int(s["best_of"]))
 
 
 ## Simulate every series the managed club is not part of (and everything once it is out),
@@ -646,8 +799,15 @@ func _archive_season() -> void:
 			elif s["winner"] == club() and s["id"] != "F":
 				series_result = "finalist"
 	_pay_playoff_prize(series_result)
+	if series_result == "champion" or series_result == "runner_up":
+		for pid in (d["lineup"] as Dictionary).values():
+			Career.add_log(d, pid, "title" if series_result == "champion" else "runner_up")
+	var prize := 0.0
+	for e in d["ledger"]:
+		if int(e["s"]) == int(d["season"]) and String(e["k"]).begins_with("prize"):
+			prize += float(e["a"])
 	(d["seasons_done"] as Array).append({"season": d["season"], "rank": mine.get("rank", 0), "w": mine.get("w", 0), "l": mine.get("l", 0),
-			"result": series_result, "champion": d["champion"]})
+			"result": series_result, "champion": d["champion"], "prize": snappedf(prize, 0.1)})
 
 
 func playoff_label(s: Dictionary) -> String:
@@ -656,6 +816,11 @@ func playoff_label(s: Dictionary) -> String:
 
 func next_season() -> GameState:
 	var left_club := _expire_contracts()
+	for pid in left_club:
+		Career.add_log(d, pid, "left")
+	for pid in d["roster"]:
+		if not left_club.has(pid):
+			Career.add_log(d, pid, "birthday", {"age": world.age_of(world.players[pid]) + 1})
 	Progression.age_everyone(world)
 	var fa: Array = (d["fa"] as Array).duplicate()
 	fa.append_array(left_club)
@@ -678,7 +843,7 @@ func next_season() -> GameState:
 			"miss": {}, "was_start": {}, "fam_bonus": d["fam_bonus"], "history": d["history"], "settings": d["settings"], "seasons_done": d["seasons_done"], "plan": plan_set(),
 			"stat_gain": (d["stat_gain"] as Dictionary).duplicate(true), "fatigue": {}, "train": d["train"],
 			"roster": roster, "fa": fa, "contracts": contracts, "cash": d["cash"], "r0": d["r0"], "ledger": d["ledger"],
-			"clock": d["clock"], "lock": d["lock"]}
+			"clock": d["clock"], "lock": d["lock"], "frating": d["frating"], "pace": pace(), "career": career_all(), "exh_n": int(d.get("exh_n", 0))}
 	var lu: Dictionary = d["lineup"]
 	var gs := GameState.new_game(world, club(), int(d["save_seed"]) + 1000 * int(d["season"]), int(d["season"]) + 1, carry)
 	gs.d["lineup"] = lu
@@ -923,6 +1088,7 @@ func release(pid: String) -> String:
 	if why != "":
 		return why
 	_earn("release", -release_cost(pid))
+	Career.add_log(d, pid, "released")
 	(d["roster"] as Array).erase(pid)
 	(d["contracts"] as Dictionary).erase(pid)
 	(d["fa"] as Array).append(pid)
@@ -1059,12 +1225,14 @@ func offer(pid: String, wage: int, length: int, renewal: bool = false) -> Dictio
 			var c: Dictionary = d["contracts"][pid]
 			c["wage"] = wage
 			c["left"] = int(c["left"]) + length
+			Career.add_log(d, pid, "renewed", {"len": length})
 			_after_roster_change()
 		else:
 			_earn("signing", -signing_fee(wage))
 			(d["fa"] as Array).erase(pid)
 			(d["roster"] as Array).append(pid)
 			(d["contracts"] as Dictionary)[pid] = {"wage": wage, "left": length + (1 if d["phase"] == "done" else 0)}
+			Career.add_log(d, pid, "signed", {"wage": wage})
 			_after_roster_change()
 		return {"code": "accepted", "rounds_left": 0}
 	var used := negotiation_rounds_used(pid) + 1

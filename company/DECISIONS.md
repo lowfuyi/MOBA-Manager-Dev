@@ -88,3 +88,15 @@
 - **No game rule changed in this build.** Tests that guard the rules (1,727 headless checks before this build) are unchanged and pass.
 - **Still open after Alpha 0.5:** UI backlog UI-5, UI-6, UI-8 to UI-12 (see the UI reference), a real-phone usability session with the Founder, plus the older open items (second independent GDD review, name search, monetization, rating-scale calibration, role review, youth intake, Exhibition and Quick Match).
 
+
+## Producer decision log: Alpha 0.6, Alpha exit checklist (2026-11-08)
+
+- **Founder approved** turning the Alpha exit criteria into a checklist and working through every item that can be done on a computer. The checklist is `docs/ALPHA-EXIT-CHECKLIST.md`: Alpha ends when groups 1 to 5 are Done and the Founder signs; group 6 before the first outside tester; group 7 before launch.
+- **Scope of Alpha 0.6** (Producer's call): finish the Phase 1 features that were still missing (Exhibition and Quick Match, Form Rating and trophy cabinet, career log with derived kills/deaths/assists, stat help), the comfort options and tips that outside testers need, the long-run QA, and a soak test. No rule of the match simulator changed.
+- **Game Plan limit ruling.** The 3-point limit of GDD 9.2.1 is read as applying between clubs within 30 rating points. The single 10 percent underdog matchup gains +4.3 from variance, the same as in Alpha 0.2; it is the comeback valve, not a dominant plan. Founder may overrule.
+- **Practice matches use no calendar day of training or rest** for the starters that played them (their day is spent playing), and use the short draft. Exhibition is limited to one series per match day and to the league phase.
+- **Stat help is one line per stat** instead of the two-line sheets in GDD 4.2; Morale, Fatigue and Personality are explained in place on the player card.
+- **Colour-blind option** swaps green and red for sky blue and vermillion; text size option is one step (+15 percent). Both are stored on the device, not in the save.
+- **Welcome tips are a light version of a tutorial** (three one-time cards). A guided first game stays optional until testers show they need it.
+- **Still open after Alpha 0.6:** the phone items (2.5, 3.7, 4.1 to 4.4, 5.1 to 5.3), the Founder items (6.4 distribution, 6.5 release key, 7.1 game name and trademark search), the independent second GDD review (7.3, not started: a fresh reviewer is needed), store policy review (7.4), and the older items (monetization, role review, youth intake, transfers).
+

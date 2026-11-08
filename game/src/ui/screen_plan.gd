@@ -32,6 +32,9 @@ func _ready() -> void:
 			UI.WARN if tired > 0 else UI.GOOD, func(): App.go(ScreenTraining.new())))
 	body.add_child(UI.tile(Strings.t("plan.chem.h"), UI.pct(gs.chem_bonus()), Strings.f("plan.chem.sub", {"avg": "%.0f" % gs.bond_mean()}),
 			UI.ACCENT, func(): App.go(ScreenChemistry.new())))
+	var pv: String = Strings.t("plan.practice.busy") if gs.practice_in_progress() else Strings.t("plan.practice.ready" if gs.practice_available() else "plan.practice.used")
+	body.add_child(UI.tile(Strings.t("plan.practice.h"), pv, Strings.t("plan.practice.sub"),
+			UI.ACCENT if gs.practice_available() or gs.practice_in_progress() else UI.DIM, func(): App.go(ScreenPractice.new())))
 	var c := UI.card(body)
 	c.add_child(UI.label(Strings.t("plan.gp.h"), UI.S_BODY, UI.ACCENT))
 	var custom := not GamePlan.is_neutral(gs.plan_set()["default"]) or not (gs.plan_set()["triggers"] as Array).is_empty()

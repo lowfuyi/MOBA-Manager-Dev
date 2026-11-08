@@ -40,6 +40,7 @@ func _ready() -> void:
 			when = Strings.f("hub.when.done", {"season": gs.d["season"]})
 	top.add_child(UI.label(when, UI.S_SMALL, UI.DIM))
 	body.add_child(top)
+	Tips.show(body, "hub")
 	var g := gs.next_game()
 	if gs.d["phase"] == "done":
 		_done_card()

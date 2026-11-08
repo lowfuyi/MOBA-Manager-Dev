@@ -11,7 +11,7 @@ var under_of: Callable    # (a, b) -> understanding of a hearing b, 0..100
 
 
 func _init() -> void:
-	custom_minimum_size = Vector2(560, 560)
+	custom_minimum_size = Vector2(480, 520)
 	mouse_filter = Control.MOUSE_FILTER_PASS
 
 

@@ -17,12 +17,40 @@ func shot(name: String) -> void:
 	img.save_png("%s/%s.png" % [dir, name])
 
 
+func _open_section(node: Node, needle: String) -> bool:
+	if node is Button and (node as Button).text.begins_with("+ ") and (node as Button).text.contains(needle):
+		(node as Button).pressed.emit()
+		return true
+	for ch in node.get_children():
+		if _open_section(ch, needle):
+			return true
+	return false
+
+
+func _tap_text(node: Node, needle: String) -> bool:
+	if node is Button and (node as Button).text.contains(needle):
+		(node as Button).pressed.emit()
+		return true
+	for ch in node.get_children():
+		if _tap_text(ch, needle):
+			return true
+	return false
+
+
 func _ready() -> void:
 	var e := OS.get_environment("SHOT_DIR")
 	if e != "":
 		dir = e
 	await get_tree().process_frame
+	var big := OS.get_environment("LARGE") != ""
+	var cb := OS.get_environment("COLORBLIND") != ""
+	if big:
+		App.set_large_text(true)
+	if cb:
+		App.set_colorblind(true)
 	await _tour()
+	App.set_large_text(false)
+	App.set_colorblind(false)
 	get_tree().quit(0)
 
 
@@ -40,6 +68,8 @@ func _tour() -> void:
 	await shot("04_hub")
 	(cur().body.get_parent() as ScrollContainer).scroll_vertical = 700
 	await shot("04b_hub_lower")
+	App.go(ScreenPractice.new())
+	await shot("04d_practice")
 	(cur().body.get_parent() as ScrollContainer).scroll_vertical = 0
 	for tab in ["plan", "club", "more"]:
 		App.go_tab(tab)
@@ -130,10 +160,16 @@ func _tour() -> void:
 	var sc: ScrollContainer = cur().body.get_parent()
 	sc.scroll_vertical = 900
 	await shot("15_report_mid")
+	_open_section(cur(), "Player lines")
+	await get_tree().process_frame
+	sc.scroll_vertical = 1100
+	await shot("15b_report_lines")
 	cur()._leave()
 	var st := ScreenStandings.new()
 	App.go(st)
 	await shot("16_standings")
+	st._set_tab("form")
+	await shot("16b_standings_form")
 	st._set_tab("results")
 	await shot("17_standings_results")
 	App.go(ScreenSettings.new())
@@ -141,6 +177,28 @@ func _tour() -> void:
 	App.gs.autoplay(true)
 	App.go(ScreenHub.new())
 	await shot("19_hub_after")
+	var tro := ScreenStandings.new("trophies")
+	App.go(tro)
+	await shot("19b_trophies")
+	var rsc := ScreenRoster.new("hub")
+	App.go(rsc)
+	rsc._toggle_player(App.gs.d["lineup"]["mid"])
+	await get_tree().process_frame
+	_open_section(cur(), "Career with us")
+	_tap_text(cur(), "Mechanics")
+	await get_tree().process_frame
+	var sc2: ScrollContainer = cur().body.get_parent()
+	sc2.scroll_vertical = 500
+	await shot("19c_roster_career")
+	sc2.scroll_vertical = 1000
+	await shot("19d_roster_career_lower")
+	sc2.scroll_vertical = 1650
+	await shot("19f_roster_career_bottom")
+	sc2.scroll_vertical = 2400
+	await shot("19g_roster_career_log")
+	var prs := ScreenPractice.new()
+	App.go(prs)
+	await shot("19e_practice")
 	App.go(ScreenSeasonEnd.new())
 	await shot("20_season_end")
 	GameState.delete_save()

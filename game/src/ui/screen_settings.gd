@@ -43,11 +43,25 @@ func _rebuild() -> void:
 	ab.toggled.connect(func(v): App.set_animate(v))
 	m.add_child(ab)
 	m.add_child(UI.label(Strings.t("settings.animate_hint"), UI.S_SMALL, UI.DIM))
+	var acc := UI.card(body)
+	acc.add_child(UI.label(Strings.t("settings.access_h"), UI.S_BODY, UI.ACCENT))
+	acc.add_child(_toggle(Strings.t("settings.large_text"), App.large_text(), func(v): App.set_large_text(v)))
+	acc.add_child(UI.label(Strings.t("settings.large_text_hint"), UI.S_SMALL, UI.DIM))
+	acc.add_child(_toggle(Strings.t("settings.colorblind"), UI.colorblind, func(v): App.set_colorblind(v); _rebuild()))
+	acc.add_child(UI.label(Strings.t("settings.colorblind_hint"), UI.S_SMALL, UI.DIM))
+	acc.add_child(UI.button(Strings.t("settings.tips_again"), func(): App.tips_reset(); App.toast(Strings.t("settings.tips_done"), UI.GOOD), "normal", 76))
 	_pace_card()
+	var pv := UI.card(body)
+	pv.add_child(UI.label(Strings.t("settings.privacy_h"), UI.S_BODY, UI.ACCENT))
+	pv.add_child(UI.label(Strings.t("settings.privacy_body"), UI.S_SMALL, UI.DIM))
+	var fb := UI.card(body)
+	fb.add_child(UI.label(Strings.t("settings.feedback_h"), UI.S_BODY, UI.ACCENT))
+	fb.add_child(UI.label(Strings.t("settings.feedback_body"), UI.S_SMALL, UI.DIM))
+	fb.add_child(UI.button(Strings.t("settings.copy_feedback"), func(): DisplayServer.clipboard_set(App.feedback_text()); App.toast(Strings.t("settings.copied"), UI.GOOD), "primary", 76))
 	var d := UI.card(body)
 	d.add_child(UI.label(Strings.t("settings.debug_h"), UI.S_BODY, UI.ACCENT))
 	d.add_child(UI.label(App.debug_info(), UI.S_SMALL - 2, UI.DIM))
-	d.add_child(UI.button(Strings.t("settings.copy_debug"), func(): DisplayServer.clipboard_set(App.debug_info()), "normal", 76))
+	d.add_child(UI.button(Strings.t("settings.copy_debug"), func(): DisplayServer.clipboard_set(App.debug_info()); App.toast(Strings.t("settings.copied"), UI.GOOD), "normal", 76))
 	var r := UI.card(body)
 	if _confirm_reset:
 		r.add_child(UI.label(Strings.t("settings.reset_confirm"), UI.S_BODY, UI.WARN))
@@ -56,6 +70,17 @@ func _rebuild() -> void:
 	else:
 		r.add_child(UI.button(Strings.t("settings.reset"), func(): _confirm_reset = true; _rebuild(), "danger", 76))
 	body.add_child(UI.button(Strings.t("hub.about"), func(): App.go(ScreenAbout.new())))
+
+
+func _toggle(text: String, on: bool, cb: Callable) -> CheckButton:
+	var t := CheckButton.new()
+	t.text = text
+	t.button_pressed = on
+	t.custom_minimum_size = Vector2(0, 80)
+	t.focus_mode = Control.FOCUS_NONE
+	t.mouse_filter = Control.MOUSE_FILTER_PASS
+	t.toggled.connect(cb)
+	return t
 
 
 static func _mmss(sec: float) -> String:

@@ -11,8 +11,20 @@ const PANEL3 := Color("27406a")
 const LINE := Color(1, 1, 1, 0.07)       # hairline around cards
 const ACCENT := Color("3fd0b8")
 const CORAL := Color("ff8a5c")           # the one primary action on a screen (Play)
-const GOOD := Color("5bd68a")
-const BAD := Color("ef6b6b")
+const GOOD_DEFAULT := Color("5bd68a")
+const BAD_DEFAULT := Color("ef6b6b")
+const GOOD_CB := Color("56b4e9")          # colour-blind friendly pair: sky blue and vermillion
+const BAD_CB := Color("d55e00")
+static var GOOD := GOOD_DEFAULT
+static var BAD := BAD_DEFAULT
+static var colorblind := false
+
+
+static func set_colorblind(v: bool) -> void:
+	colorblind = v
+	GOOD = GOOD_CB if v else GOOD_DEFAULT
+	BAD = BAD_CB if v else BAD_DEFAULT
+
 const WARN := Color("f2c14e")
 const TEXT := Color("e8eef5")
 const DIM := Color("9db0c6")
@@ -92,6 +104,7 @@ static func button(text: String, cb: Callable, kind: String = "normal", min_h: i
 	b.text = text
 	b.custom_minimum_size = Vector2(0, min_h)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART    # a long caption wraps instead of widening the page (large text)
 	b.focus_mode = Control.FOCUS_NONE
 	b.mouse_filter = Control.MOUSE_FILTER_PASS    # lets a swipe that starts on a button scroll the page
 	match kind:

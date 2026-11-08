@@ -20,7 +20,9 @@ func go_back() -> void:
 
 
 func _leave() -> void:
-	if App.gs.d["phase"] == "done":
+	if game["kind"] == "exhibition":
+		App.go(ScreenPractice.new())
+	elif App.gs.d["phase"] == "done":
 		App.go(ScreenSeasonEnd.new())
 	else:
 		App.go(ScreenHub.new())
@@ -49,11 +51,16 @@ func _ready() -> void:
 		card.create_tween().tween_property(card, "modulate:a", 1.0, UI.T_FADE)
 	var att := Report.attribution(res, my_side)
 	_standout(my_side, att)
-	_payoff()
-	_tip()
+	if game["kind"] == "exhibition":
+		_practice_card()
+	else:
+		_payoff()
+		_tip()
+		Tips.show(body, "report")
 	body.add_child(UI.button(Strings.t("common.continue"), _leave, "play"))
 	# 2. the details, one tap away
 	_why(att)
+	_lines(my_side)
 	_moments(my_side)
 	_draft_recap(my_side)
 	body.add_child(UI.button(Strings.t("common.continue"), _leave, "primary"))
@@ -82,6 +89,20 @@ func _standout(my_side: String, att: Dictionary) -> void:
 	var c := UI.card(body)
 	c.add_child(UI.label(Strings.f("report.standout" if good else "report.weak", {"name": App.world.players[pid]["name"], "role": Strings.t("role." + slot),
 			"hero": hero, "pct": "%d" % int(round(absf(float(pick["share"])) * 100.0))}), UI.S_BODY, UI.GOOD if good else UI.WARN))
+
+
+## Practice games change only fatigue and bonds, and the series stands where it stands.
+func _practice_card() -> void:
+	var gs := App.gs
+	var c := UI.card(body, UI.PANEL2)
+	c.add_child(UI.label(Strings.t("report.practice.h"), UI.S_BODY, UI.ACCENT))
+	c.add_child(UI.label(Strings.t("report.practice.body"), UI.S_SMALL, UI.TEXT))
+	var x := gs.practice_series()
+	if not x.is_empty():
+		c.add_child(UI.label(Strings.f("report.practice.series", {"me": x["me"], "them": x["them"], "bo": x["best_of"]}), UI.S_SMALL, UI.ACCENT))
+	elif gs.d.has("exh_last"):
+		var l: Dictionary = gs.d["exh_last"]
+		c.add_child(UI.label(Strings.f("report.practice.done", {"result": Strings.t("practice.last.win" if l["won"] else "practice.last.loss"), "me": l["me"], "them": l["them"], "bo": l["best_of"]}), UI.S_SMALL, UI.GOOD if l["won"] else UI.BAD))
 
 
 func _col_label(text: String, color: Color, size: int) -> Label:
@@ -161,12 +182,25 @@ func _why(att: Dictionary) -> void:
 		var b := UI.bar(absf(float(f["share"])) * 100.0, 60.0, UI.GOOD if good else UI.BAD, 20)
 		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(b)
-		var v := UI.label(("+" if good else "-") + "%d%%" % int(round(absf(float(f["share"])) * 100.0)), UI.S_SMALL, UI.DIM, HORIZONTAL_ALIGNMENT_RIGHT)
+		var pv := int(round(absf(float(f["share"])) * 100.0))
+		var v := UI.label(("" if pv == 0 else ("+" if good else "-")) + "%d%%" % pv, UI.S_SMALL, UI.DIM, HORIZONTAL_ALIGNMENT_RIGHT)
 		v.custom_minimum_size = Vector2(90, 0)
 		v.size_flags_horizontal = Control.SIZE_SHRINK_END
 		row.add_child(v)
 		c.add_child(row)
 	c.add_child(UI.label(Strings.t("report.why_note"), UI.S_SMALL - 2, UI.DIM))
+
+
+func _lines(my_side: String) -> void:
+	var w := App.world
+	var c := UI.section(body, Strings.t("report.lines_h"), false)
+	var k := Report.kda(res)
+	c.add_child(UI.label(Strings.t("report.lines_head"), UI.S_SMALL - 2, UI.DIM))
+	for s in GameState.SLOTS:
+		var l: Dictionary = k[my_side][s]
+		var p: Dictionary = w.players[res["lineups"][my_side][s]]
+		UI.kv_row(c, "%s  %s" % [Strings.t("role.short." + s), p["name"]], "%d / %d / %d" % [int(l["k"]), int(l["d"]), int(l["a"])])
+	c.add_child(UI.label(Strings.t("report.lines_note"), UI.S_SMALL - 2, UI.DIM))
 
 
 func _moments(my_side: String) -> void:

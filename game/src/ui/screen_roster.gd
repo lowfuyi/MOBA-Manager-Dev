@@ -131,6 +131,8 @@ func _player_detail(parent: VBoxContainer, p: Dictionary) -> void:
 	_bond_line(d, p)
 	PlayerView.stat_block(d, p, App.gs.d["roster"].has(p["id"]))
 	PlayerView.best_heroes_line(d, p)
+	if App.gs.d["roster"].has(p["id"]):
+		PlayerView.career_section(d, p["id"])
 	_contract_controls(d, p)
 
 
