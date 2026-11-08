@@ -1,0 +1,39 @@
+{
+  "version": "v0",
+  "note": "Team Bonds (GDD 7.7), Player Form and Morale (GDD 4.2, 4.4, 8.6). One tick = one match day = 3.5 calendar days (half a week). Constants marked (QA) were set by the bond-farming test in GDD 9.2 rather than by the table in 7.7.",
+  "bond": {
+    "start_club": 30,
+    "start_new_signing": 20,
+    "game_gain": 4.0,
+    "scrim_week_gain": 1.5,
+    "ticks_per_week": 2,
+    "growth": {"professional": 1.0, "balanced": 1.0, "casual": 1.1, "temperamental": 0.8},
+    "lang_ok_fluency": 50,
+    "lang_mismatch": 0.65,
+    "com_floor": 0.4,
+    "com_weight": 0.6,
+    "chem_bonus_max": 0.042,
+    "note_scrim": "(QA) GDD 7.7 says +3 per scrim week, but with two games a week at +4 that would make the scrim route 37 percent faster than play, over the 20 percent limit of test 9.2.2; +1.5 gives 19 percent."
+  },
+  "days_per_tick": 3.5,
+  "form": {
+    "min": -10.0,
+    "max": 10.0,
+    "per_match": 2.0,
+    "daily_keep": 0.9
+  },
+  "morale": {
+    "min": 0.0,
+    "max": 100.0,
+    "neutral": 60.0,
+    "drift_per_day": 1.0,
+    "starter_swing": 6.0,
+    "bench_swing": 1.0,
+    "playoff_mult": 1.5,
+    "swing_mult": {"professional": 0.8, "balanced": 1.0, "casual": 1.0, "temperamental": 1.5},
+    "miss_grace": 2,
+    "miss_loss": 6.0,
+    "miss_forget": 6
+  },
+  "offseason_days": 28
+}

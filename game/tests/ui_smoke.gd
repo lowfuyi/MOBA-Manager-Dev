@@ -38,7 +38,7 @@ func _run() -> void:
 	ok(cur() is ScreenClubSelect, "club select")
 	cur()._choose(App.world.club_ids[5])
 	ok(cur() is ScreenHub and App.gs != null, "hub after choosing a club")
-	for scr in [ScreenRoster.new("hub"), ScreenStandings.new(), ScreenSettings.new(), ScreenAbout.new()]:
+	for scr in [ScreenRoster.new("hub"), ScreenStandings.new(), ScreenSettings.new(), ScreenAbout.new(), ScreenChemistry.new()]:
 		App.go(scr)
 		await get_tree().process_frame
 		ok(cur() == scr, "screen opens: " + scr.get_class())
@@ -74,6 +74,8 @@ func _run() -> void:
 	ok(App.gs.focus_of(tp)["k"] == "hero", "hero practice set from the screen")
 	tr._choose(tp["id"], "rest", "")
 	ok(App.gs.focus_of(tp)["k"] == "rest", "rest set from the screen")
+	tr._choose(tp["id"], "scrim", "")
+	ok(App.gs.focus_of(tp)["k"] == "scrim", "team scrim set from the screen")
 	tr._auto_one(tp["id"])
 	tr._coach_all()
 	ok(not (App.gs.d["train"] as Dictionary).has(tp["id"]), "coach picks everything again")

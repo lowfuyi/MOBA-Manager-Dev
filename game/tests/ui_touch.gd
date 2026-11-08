@@ -221,6 +221,16 @@ func _run() -> void:
 	get_tree().root.propagate_notification(NOTIFICATION_WM_GO_BACK_REQUEST)
 	await frames()
 	ok(cur() is ScreenHub, "back request in training returns to the hub")
+	# 4b. team chemistry: the screen is longer than the phone, scrolls by swipe and the back request returns to the hub
+	App.go(ScreenChemistry.new())
+	await frames(4)
+	var cs := scroller()
+	ok(cs.get_v_scroll_bar().max_value > cs.size.y, "chemistry screen is longer than the screen")
+	await swipe(Vector2(360, 700), 300)
+	ok(cs.scroll_vertical > 100, "chemistry: a swipe over the pentagon scrolls (scroll=%d)" % cs.scroll_vertical)
+	get_tree().root.propagate_notification(NOTIFICATION_WM_GO_BACK_REQUEST)
+	await frames()
+	ok(cur() is ScreenHub, "back request in chemistry returns to the hub")
 	# 5. free agents: a swipe that starts on a player row scrolls the market; a tap opens the talks; back returns
 	App.go(ScreenFreeAgents.new("hub"))
 	await frames(4)

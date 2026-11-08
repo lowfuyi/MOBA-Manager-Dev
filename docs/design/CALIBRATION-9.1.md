@@ -121,3 +121,23 @@ Changes made from the first run (all in `game/data/economy_v0.json`):
 
 Known gaps: only one seed per club and 5 to 6 seasons (the 10-season GDD target is not met yet, the long runs take about 40 minutes on this machine); AI clubs do not trade, so strong clubs have no cash sink. Both go to the next economy pass if testers report money feeling empty.
 
+
+
+## Addendum: Bonds, Form and Morale in the loop (Alpha 0.4, 2026-11-08)
+
+Question (GDD 9.1 "re-run with bonds in the loop", 9.2 tests 2 and 3): do chemistry, Form and Morale change how well strength predicts results, and can bonds be farmed? Script: `tools/chem_qa.gd`; every club in turn is the managed club (the human side plays on the AI's lineup rules), whole league splits (18 games, no playoffs) are played with the new model and with the old fixed-TeamMod model (`World.qa_static`), same seeds, 4 splits per club, 40 splits per model.
+
+| Model | Spearman (team rating vs league points) | Win rate, 3 strongest clubs | Win rate, 3 weakest | Standard deviation of points |
+|---|---|---|---|---|
+| Old: fixed TeamMod 0.96 percent, no Form or Morale | 0.826 | 0.707 | 0.314 | 10.7 |
+| New: Bonds, Form, Morale live | 0.826 | 0.724 | 0.294 | 11.5 |
+
+Reading: strength stays as good a predictor as before. The new model stretches the table by about 7 percent (the strong win a little more, the weak a little less) because Form follows results: after a winning run a starter carries up to +4.5 Form (1.8 rating points). It is a margin lever, not a snowball. Chemistry itself barely separates clubs: after one split every computer-run squad sits at a bond level near 75, so the bonus ranges 1.6 to 2.5 percent across the league; the managed club's edge comes from keeping its five together and from signing carefully (a new starter at Bond 20 costs about 0.5 percent at Bond 60).
+
+Checks that are unit tests (`game/tests/bonds_tests.gd`):
+- Chemistry curve (9.2 test 3): Bond 60 and COM 60 gives 1.915 percent (target 1.7 to 2.0); new club 0.96 percent; Bond 100 with COM 60 gives 3.19 and with COM 100 gives 4.2; replacing one starter costs 0.51 percent; a starter with no shared language multiplies his 8 of 20 values by 0.65 (synthetic roster).
+- Pace: a pair needs 27 games together to pass Bond 85 at the default rate (design target "about 30").
+- Bond farming (9.2 test 2): playing every match day and adding a scrim every tick is 9 percent faster than playing alone over a split (18 ticks), 18 percent on the first tick, so the limit of 20 percent holds. This needed the scrim base lowered from +3 to +1.5 a week (see GDD 7.7 implementation notes). Exhibition does not exist yet, so its route is not tested.
+- Form and Morale rules: ranges, decay, personality swings, playoff weight, the benched-starter rule, AI squads, save round trip and migration of a pre-0.4 save.
+
+Known gaps: one split at a time (no multi-season run with bonds, so the long-run effect of carried-over bonds is untested), no joint Game Plan rerun with chemistry (open item since Alpha 0.2), the Python reference pipeline and golden vectors still use the fixed TeamMod (the GDScript model is the only one with bonds).

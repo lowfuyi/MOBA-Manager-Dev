@@ -41,11 +41,23 @@ func _ready() -> void:
 		for s in gs.d["playoffs"]["series"]:
 			if s["id"] == game["series"]:
 				c.add_child(UI.label(Strings.f("report.series", {"stage": Strings.t(gs.playoff_label(s)), "a": gs.club_name(s["a"]), "wa": s["wins_a"], "b": gs.club_name(s["b"]), "wb": s["wins_b"]}), UI.S_BODY, UI.ACCENT, HORIZONTAL_ALIGNMENT_CENTER))
+	c.add_child(UI.label(Strings.f("report.bonds", {"avg": "%.0f" % _bond_mean(), "bonus": UI.pct(gs.chem_bonus())}), UI.S_SMALL, UI.DIM, HORIZONTAL_ALIGNMENT_CENTER))
 	body.add_child(UI.button(Strings.t("common.continue"), _leave, "primary"))
 	_why(my_side, won)
 	_moments(my_side)
 	_draft_recap(my_side)
 	body.add_child(UI.button(Strings.t("common.continue"), _leave, "primary"))
+
+
+func _bond_mean() -> float:
+	var ids: Array = (App.gs.d["lineup"] as Dictionary).values()
+	var t := 0.0
+	var n := 0
+	for i in ids.size():
+		for j in range(i + 1, ids.size()):
+			t += App.gs.bond(ids[i], ids[j])
+			n += 1
+	return t / float(maxi(1, n))
 
 
 func _why(my_side: String, won: bool) -> void:

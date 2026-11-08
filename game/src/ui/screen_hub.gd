@@ -43,6 +43,7 @@ func _ready() -> void:
 	else:
 		_next_card(g)
 	body.add_child(UI.button(Strings.t("hub.roster"), func(): App.go(ScreenRoster.new("hub"))))
+	body.add_child(UI.button(Strings.t("hub.chemistry"), func(): App.go(ScreenChemistry.new())))
 	body.add_child(UI.button(Strings.t("hub.training"), func(): App.go(ScreenTraining.new())))
 	body.add_child(UI.button(Strings.t("hub.free_agents"), func(): App.go(ScreenFreeAgents.new("hub"))))
 	body.add_child(UI.button(Strings.t("hub.finance"), func(): App.go(ScreenFinance.new())))
@@ -71,6 +72,7 @@ func _next_card(g: Dictionary) -> void:
 	c.add_child(UI.label(Strings.f("hub.side_line", {"side": side, "draft": Strings.t("hub.draft.full" if g["full"] else "hub.draft.short")}), UI.S_SMALL, UI.DIM))
 	if extra != "":
 		c.add_child(UI.label(extra, UI.S_SMALL, UI.ACCENT))
+	c.add_child(UI.label(Strings.f("hub.chem", {"bonus": UI.pct(gs.chem_bonus())}), UI.S_SMALL, UI.ACCENT))
 	var tired := gs.tired_starters().size()
 	if tired > 0:
 		c.add_child(UI.label(Strings.f("hub.tired_warn", {"n": tired}), UI.S_SMALL, UI.WARN))

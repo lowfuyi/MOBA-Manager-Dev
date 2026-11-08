@@ -38,6 +38,7 @@ func _ready() -> void:
 		m.add_child(UI.label(Strings.f("pre.row", {"role": Strings.t("role." + s), "mine": a["name"], "rm": "%.0f" % ra, "theirs": b["name"], "rt": "%.0f" % rb}), UI.S_SMALL, col))
 		if App.world.player_fit(a, s) < 1.0:
 			m.add_child(UI.label(Strings.f("pre.offrole", {"name": a["name"]}), UI.S_SMALL - 2, UI.WARN))
+	m.add_child(UI.label(Strings.f("pre.chem", {"bonus": UI.pct(gs.chem_bonus())}), UI.S_SMALL, UI.ACCENT))
 	var tired := gs.tired_starters()
 	if not tired.is_empty():
 		var tc := UI.card(body, UI.PANEL2, 14)

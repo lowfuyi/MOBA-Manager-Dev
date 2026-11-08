@@ -162,5 +162,19 @@ static func fatigue_tag(fat: float) -> String:
 	return "  -  " + (txt + " -%.0f" % pen if pen >= 0.5 else txt)
 
 
+## Form and morale as words for roster rows: "" when nothing stands out.
+static func mood_tag(frm: float, mor: float) -> String:
+	var parts := PackedStringArray()
+	if frm >= 3.0:
+		parts.append(Strings.t("mood.hot"))
+	elif frm <= -3.0:
+		parts.append(Strings.t("mood.cold"))
+	if mor >= 75.0:
+		parts.append(Strings.t("mood.happy"))
+	elif mor < 40.0:
+		parts.append(Strings.t("mood.unhappy"))
+	return "" if parts.is_empty() else "  -  " + ", ".join(parts)
+
+
 static func fatigue_color(fat: float) -> Color:
 	return GOOD if fat < 25.0 else (WARN if fat < 50.0 else BAD)

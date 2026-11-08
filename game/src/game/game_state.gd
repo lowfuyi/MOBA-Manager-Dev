@@ -5,7 +5,7 @@ extends RefCounted
 ## Alpha 0.3 scope: league (double round robin, one game per fixture) + playoffs (top 4,
 ## best of 3 semis, best of 5 final), Game Plan, training, fatigue and ageing, and now contracts,
 ## the free-agent market, a cash balance with a sponsor, and dismissal when the club stays in debt.
-## No Bonds yet.
+## Alpha 0.4 adds Team Bonds (pairs on the managed roster, one level per AI squad), Player Form and Morale.
 
 const SAVE_PATH := "user://save.json"
 const VERSION := 1
@@ -32,8 +32,11 @@ static func new_game(w: World, club_id: String, save_seed: int, season: int = 1,
 		"train_last": [], "season_base": (carry.get("stat_gain", {}) as Dictionary).duplicate(true),
 		"roster": (carry["roster"] as Array) if carry.has("roster") else w.orig_ids(club_id).duplicate(),
 		"fa": (carry["fa"] as Array) if carry.has("fa") else w.orig_free_agents(),
+		"form": carry.get("form", {}), "morale": carry.get("morale", {}), "bonds": carry.get("bonds", {}),
+		"ai_bond": carry.get("ai_bond", {}), "miss": carry.get("miss", {}), "was_start": carry.get("was_start", {}),
 	}
 	w.fam_bonus = gs.d["fam_bonus"]
+	gs._init_bonds(not carry.has("bonds"))
 	gs._bind()
 	gs._init_economy(carry)
 	gs.reset_lineup()
@@ -53,6 +56,10 @@ static func from_dict(w: World, data: Dictionary) -> GameState:
 		gs.d["roster"] = w.orig_ids(gs.d["club"]).duplicate()
 		gs.d["fa"] = w.orig_free_agents()
 	w.fam_bonus = gs.d["fam_bonus"]
+	if not gs.d.has("bonds"):  # saves from before Alpha 0.4: the club starts as a new club with every pair at 30
+		for k in ["form", "morale", "bonds", "ai_bond", "miss", "was_start"]:
+			gs.d[k] = {}
+		gs._init_bonds(true)
 	gs._bind()
 	if not gs.d.has("cash"):
 		gs._init_economy({})
@@ -63,6 +70,7 @@ static func from_dict(w: World, data: Dictionary) -> GameState:
 func _bind() -> void:
 	world.bind_roster(club(), d["roster"], d["fa"])
 	world.bind_progress(d["stat_gain"], d["fatigue"], int(d["season"]) - 1)
+	world.bind_condition(d["form"], d["morale"], d["bonds"], d["ai_bond"])
 
 
 static func _schedule(club_ids: Array, season_tag: String) -> Array:
@@ -275,6 +283,8 @@ func record_human_game(game: Dictionary, result: Dictionary) -> void:
 				f["winner"] = winner
 		_finish_round_if_done()
 	else:
+		var side := "B" if game["blue"] == club() else "R"
+		_after_game(club(), (result["lineups"][side] as Dictionary).values(), winner == club(), true, false)
 		for s in d["playoffs"]["series"]:
 			if s["id"] == game["series"]:
 				_add_series_game(s, game, winner, float(result["final"]))
@@ -306,6 +316,9 @@ func _grow_familiarity(game: Dictionary, result: Dictionary) -> void:
 ## The log of the managed club's training is kept for the screen that reports it.
 func _tick_day() -> void:
 	var mine: Array = []
+	var won := {}
+	for f in _round_fixtures(int(d["round"])):
+		won[f["winner"]] = true
 	for c in world.club_ids:
 		var ids: Array = []
 		if c == club():
@@ -317,6 +330,9 @@ func _tick_day() -> void:
 		var log := Progression.tick_club(world, d, c, ids, c == club())
 		if c == club():
 			mine = log
+		_after_game(c, ids, won.has(c), false, true)
+		if c == club():
+			_scrim_bonds()
 	d["train_last"] = mine
 	Progression.tick_players(world, d, world.free_agent_players(), [], false)
 	world.fam_bonus = d["fam_bonus"]
@@ -328,6 +344,122 @@ func _tick_day() -> void:
 func _tick_human_playoff_day() -> void:
 	d["train_last"] = Progression.tick_club(world, d, club(), (d["lineup"] as Dictionary).values(), true)
 	d["clock"] = int(d["clock"]) + 1
+
+
+# ---------------------------------------------------------------- bonds, form and morale
+## Pairs of a roster all start at 30 for a new club; whoever joins later starts at 20 with everybody.
+func _init_bonds(new_club: bool) -> void:
+	var b: Dictionary = d["bonds"]
+	var roster: Array = d["roster"]
+	if new_club:
+		var start := float(Bonds.data()["bond"]["start_club"])
+		for i in roster.size():
+			for j in range(i + 1, roster.size()):
+				b[Bonds.pair_key(roster[i], roster[j])] = start
+	var ab: Dictionary = d["ai_bond"]
+	for c in world.club_ids:
+		if not ab.has(c):
+			ab[c] = float(Bonds.data()["bond"]["start_club"])
+	_sync_bonds()
+
+
+## Every pair on the roster has a bond (a new signing starts at 20), and pairs with anyone who left are gone.
+func _sync_bonds() -> void:
+	var roster: Array = d["roster"]
+	var b: Dictionary = d["bonds"]
+	var fresh := float(Bonds.data()["bond"]["start_new_signing"])
+	for i in roster.size():
+		for j in range(i + 1, roster.size()):
+			var k := Bonds.pair_key(roster[i], roster[j])
+			if not b.has(k):
+				b[k] = fresh
+	for k in b.keys():
+		var ids := String(k).split("|")
+		if not roster.has(ids[0]) or not roster.has(ids[1]):
+			b.erase(k)
+
+
+## One game played by `club_id` with these five starters. `day` also lets the calendar day pass (league),
+## which pulls Form back toward 0 and Morale toward 60. Playoff games have no calendar here.
+func _after_game(club_id: String, starters: Array, won: bool, playoff: bool, day: bool) -> void:
+	var days := Bonds.days_per_tick()
+	for pid in world.clubs[club_id]["player_ids"]:
+		var p: Dictionary = world.players[pid]
+		var started := starters.has(pid)
+		var frm := world.form_of(pid)
+		var mor := world.morale_of(pid)
+		if started:
+			frm = Bonds.form_after_match(frm, won)
+			d["miss"][pid] = 0
+			d["was_start"][pid] = true
+		else:
+			d["miss"][pid] = int(d["miss"].get(pid, 0)) + 1
+		mor = Bonds.morale_after_match(mor, p["personality"], started, won, playoff)
+		if not started:
+			mor = Bonds.clamp_morale(mor - Bonds.miss_loss(int(d["miss"][pid]), bool(d["was_start"].get(pid, false))))
+			if int(d["miss"][pid]) > int(Bonds.data()["morale"]["miss_forget"]):
+				d["was_start"][pid] = false
+		if day:
+			frm = Bonds.form_after_days(frm, days)
+			mor = Bonds.morale_after_days(mor, days)
+		d["form"][pid] = frm
+		d["morale"][pid] = mor
+	_play_together(club_id, starters)
+
+
+## Bond +4 for each pair of starters who played together (the managed club keeps every pair, an AI squad one level).
+func _play_together(club_id: String, starters: Array) -> void:
+	var base := float(Bonds.data()["bond"]["game_gain"])
+	if club_id == club():
+		for i in starters.size():
+			for j in range(i + 1, starters.size()):
+				_raise_bond(starters[i], starters[j], base)
+	else:
+		var g := 0.0
+		for pid in starters:
+			g += Bonds.growth_of(world.players[pid]["personality"])
+		d["ai_bond"][club_id] = Bonds.gain(float(d["ai_bond"][club_id]), base, g / float(maxi(1, starters.size())))
+
+
+func _raise_bond(a: String, b: String, base: float) -> void:
+	var k := Bonds.pair_key(a, b)
+	var g := Bonds.pair_growth(world.players[a], world.players[b])
+	d["bonds"][k] = Bonds.gain(float(d["bonds"].get(k, float(Bonds.data()["bond"]["start_new_signing"]))), base, g)
+
+
+## A team-scrim week gives +1.5 to a pair when both have it as their focus; one tick is half a week.
+func _scrim_bonds() -> void:
+	var ids: Array = []
+	for pid in d["roster"]:
+		var f: Dictionary = (d["train"] as Dictionary).get(pid, {})
+		if f.get("k", "") == "scrim":
+			ids.append(pid)
+	var b: Dictionary = Bonds.data()["bond"]
+	var base := float(b["scrim_week_gain"]) / float(b["ticks_per_week"])
+	for i in ids.size():
+		for j in range(i + 1, ids.size()):
+			_raise_bond(ids[i], ids[j], base)
+
+
+func bond(a: String, b: String) -> float:
+	return world.bond_of(a, b)
+
+
+func form_of(pid: String) -> float:
+	return world.form_of(pid)
+
+
+func morale_of(pid: String) -> float:
+	return world.morale_of(pid)
+
+
+## Chemistry of the managed club's lineup (0 to 100) and the rating bonus it gives.
+func chem() -> float:
+	return world.chem_of(lineup())
+
+
+func chem_bonus() -> float:
+	return Bonds.chem_bonus(chem())
 
 
 func _finish_round_if_done() -> void:
@@ -523,7 +655,15 @@ func next_season() -> GameState:
 	for pid in roster:
 		var c: Dictionary = (d["contracts"] as Dictionary)[pid]
 		contracts[pid] = {"wage": int(c["wage"]), "left": int(c["left"]) - 1 if not _kept_by_board(pid) else int(c["left"])}
-	var carry := {"fam_bonus": d["fam_bonus"], "history": d["history"], "settings": d["settings"], "seasons_done": d["seasons_done"], "plan": plan_set(),
+	var days := float(Bonds.data()["offseason_days"])
+	var form_c := {}
+	for pid in d["form"]:
+		form_c[pid] = Bonds.form_after_days(float(d["form"][pid]), days)
+	var morale_c := {}
+	for pid in d["morale"]:
+		morale_c[pid] = Bonds.morale_after_days(float(d["morale"][pid]), days)
+	var carry := {"form": form_c, "morale": morale_c, "bonds": (d["bonds"] as Dictionary).duplicate(), "ai_bond": (d["ai_bond"] as Dictionary).duplicate(),
+			"miss": {}, "was_start": {}, "fam_bonus": d["fam_bonus"], "history": d["history"], "settings": d["settings"], "seasons_done": d["seasons_done"], "plan": plan_set(),
 			"stat_gain": (d["stat_gain"] as Dictionary).duplicate(true), "fatigue": {}, "train": d["train"],
 			"roster": roster, "fa": fa, "contracts": contracts, "cash": d["cash"], "r0": d["r0"], "ledger": d["ledger"],
 			"clock": d["clock"], "lock": d["lock"]}
@@ -780,6 +920,7 @@ func release(pid: String) -> String:
 
 
 func _after_roster_change() -> void:
+	_sync_bonds()
 	world.refresh_lineup(club())
 	_fix_lineup()
 

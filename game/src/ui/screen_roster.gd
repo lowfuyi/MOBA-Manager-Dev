@@ -36,6 +36,8 @@ func _rebuild() -> void:
 	head.add_child(UI.label(Strings.f("roster.team_rating", {"rating": "%.1f" % w.team_rating(lu)}), UI.S_BIG, UI.TEXT))
 	head.add_child(UI.label(Strings.t("roster.hint"), UI.S_SMALL, UI.DIM))
 	head.add_child(UI.label(Strings.f("roster.squad_count", {"n": gs.roster_slots_used(), "max": Economy.data()["max_roster"], "cash": PlayerView.money(gs.cash()), "bill": PlayerView.money(gs.wage_bill())}), UI.S_SMALL, UI.TEXT))
+	head.add_child(UI.label(Strings.f("hub.chem", {"bonus": UI.pct(gs.chem_bonus())}), UI.S_SMALL, UI.ACCENT))
+	head.add_child(UI.button(Strings.t("hub.chemistry"), func(): App.go(ScreenChemistry.new()), "normal", 76))
 	head.add_child(UI.button(Strings.t("hub.free_agents"), func(): App.go(ScreenFreeAgents.new("roster")), "normal", 76))
 	var c := UI.card(body)
 	c.add_child(UI.label(Strings.t("roster.lineup"), UI.S_BODY, UI.ACCENT))
@@ -43,7 +45,7 @@ func _rebuild() -> void:
 		var p: Dictionary = lu[s]
 		var fit := w.player_fit(p, s)
 		var tag := "" if fit >= 1.0 else ("  (" + Strings.t("roster.offrole") + ")")
-		var txt := Strings.f("roster.slot_row", {"role": Strings.t("role." + s), "name": p["name"], "rating": "%.0f" % w.slot_score(p, s)}) + tag + UI.fatigue_tag(w.fatigue_of(p["id"]))
+		var txt := Strings.f("roster.slot_row", {"role": Strings.t("role." + s), "name": p["name"], "rating": "%.0f" % w.slot_score(p, s)}) + tag + UI.fatigue_tag(w.fatigue_of(p["id"])) + UI.mood_tag(w.form_of(p["id"]), w.morale_of(p["id"]))
 		var b := UI.button(txt, _toggle_slot.bind(s), "primary" if _pick_slot == s else "normal", 76)
 		c.add_child(b)
 		if _pick_slot == s:
@@ -58,7 +60,7 @@ func _rebuild() -> void:
 		for s in GameState.SLOTS:
 			if lu[s]["id"] == p["id"]:
 				starting = true
-		var line := Strings.f("roster.player_row", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "age": w.age_of(p), "rating": "%.0f" % _best(w, p)}) + UI.fatigue_tag(w.fatigue_of(p["id"]))
+		var line := Strings.f("roster.player_row", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "age": w.age_of(p), "rating": "%.0f" % _best(w, p)}) + UI.fatigue_tag(w.fatigue_of(p["id"])) + UI.mood_tag(w.form_of(p["id"]), w.morale_of(p["id"]))
 		if starting:
 			line += "  *"
 		sq.add_child(UI.button(line, _toggle_player.bind(p["id"]), "flat" if _open_player != p["id"] else "normal", 70))
@@ -115,9 +117,32 @@ func _player_detail(parent: VBoxContainer, p: Dictionary) -> void:
 	d.add_child(UI.label(Strings.f("roster.detail", {"personality": Strings.t("personality." + p["personality"]), "country": p["country"]}), UI.S_SMALL, UI.DIM))
 	var fat := w.fatigue_of(p["id"])
 	d.add_child(UI.label(Strings.f("roster.fatigue_line", {"fat": "%.0f" % fat}), UI.S_SMALL, UI.fatigue_color(fat)))
+	var mor := w.morale_of(p["id"])
+	d.add_child(UI.label(Strings.f("roster.mood_line", {"form": "%+.1f" % w.form_of(p["id"]), "morale": "%.0f" % mor, "word": Strings.t("mood.word." + Bonds.mood_word(mor))}), UI.S_SMALL, UI.TEXT))
+	d.add_child(UI.label(Strings.t("roster.mood_help"), UI.S_SMALL - 2, UI.DIM))
+	_bond_line(d, p)
 	PlayerView.stat_block(d, p, App.gs.d["roster"].has(p["id"]))
 	PlayerView.best_heroes_line(d, p)
 	_contract_controls(d, p)
+
+
+func _bond_line(parent: VBoxContainer, p: Dictionary) -> void:
+	var gs := App.gs
+	var total := 0.0
+	var n := 0
+	var best := -1.0
+	var best_name := ""
+	for sid in (gs.d["lineup"] as Dictionary).values():
+		if sid == p["id"]:
+			continue
+		var b := gs.bond(p["id"], sid)
+		total += b
+		n += 1
+		if b > best:
+			best = b
+			best_name = App.world.players[sid]["name"]
+	if n > 0:
+		parent.add_child(UI.label(Strings.f("roster.bond_line", {"avg": "%.0f" % (total / float(n)), "name": best_name, "best": "%.0f" % best}), UI.S_SMALL, UI.TEXT))
 
 
 func _contract_controls(parent: VBoxContainer, p: Dictionary) -> void:

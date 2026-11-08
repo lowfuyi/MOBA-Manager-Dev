@@ -1,6 +1,7 @@
 class_name Progression
 extends RefCounted
-## Training, fatigue and ageing (GDD 7.3). Pure functions over World + the save dictionary.
+## Training, fatigue and ageing (GDD 7.3). A focus is {"k": "stat"|"hero"|"rest"|"scrim", "v": ...}; a team scrim
+## trains no stat (it only builds Bonds, see GameState) but tires like any training. Pure functions over World + the save dictionary.
 ## Everything the UI or tests need to know about growth lives here; constants are in data/training_v0.json.
 
 static var _data: Dictionary = {}

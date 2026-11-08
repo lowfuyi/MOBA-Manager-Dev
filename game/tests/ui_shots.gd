@@ -74,6 +74,11 @@ func _tour() -> void:
 	await shot("08c_training_picker")
 	trs._toggle_heroes()
 	await shot("08d_training_heroes")
+	var chs := ScreenChemistry.new()
+	App.go(chs)
+	await shot("08e_chemistry")
+	(chs.body.get_parent() as ScrollContainer).scroll_vertical = 900
+	await shot("08f_chemistry_lower")
 	var d := ScreenDraft.new(g)
 	App.go(d)
 	await shot("09_draft_start")

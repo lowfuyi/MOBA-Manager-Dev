@@ -67,3 +67,13 @@
 - **Computer-run clubs do not sign, release or pay anybody** in Phase 1; their squads stay as in the data. Free agents train and age like everybody else.
 - **Still open after Alpha 0.3:** 10-season economy run (5 to 6 seasons done), rich clubs have no cash sink, no youth intake, so the only new talent is the 40-player pool (it never refills except with released and expired players).
 
+
+## Producer decision log: Alpha 0.4 (2026-11-08)
+
+- **Alpha 0.4 scope chosen by the Producer** (the Founder said "Go ahead" to my offer): Team Bonds (GDD 7.7) and Player Form and Morale (4.2, 8.6), the part of Phase 1 that makes squad changes and rotation matter. Exhibition and Quick Match stay for a later alpha.
+- **Scrim bonus halved (+3 to +1.5 per week).** The design document gave +3 but also forbade any bond route more than 20 percent faster than normal play; with two games a week the two could not both hold (37 percent). I kept the QA rule and changed the number. Founder may want a different trade-off (for example scrims at +3 with a fatigue cost); it is one constant in `bonds_v0.json`.
+- **Computer-run clubs use one bond level per squad** (start 30, same gain rule), not 45 pairs each. Their chemistry still uses the real lineup's Communication, so it follows who actually plays. This keeps the season simulation fast; pair-level bonds for AI clubs would only matter once AI clubs trade players.
+- **One match day = 3.5 calendar days** for the "each day" rules of Form and Morale. Without this the Form decay (x0.9 a day) would have been applied once per match day, leaving Form 2.5 times as large.
+- **Morale does not yet enter contract talks or the player's willingness to renew.** It affects only the rating in matches in this build.
+- **Old saves open as a new club** (every pair at 30, neutral form and morale) rather than being refused.
+- **Still open after Alpha 0.4:** multi-season run with bonds, joint Game Plan rerun with chemistry, Exhibition and Quick Match, staff bonus, the club Form Rating (GDD 10.1), the earlier open items (second GDD review, name search, monetization, rating-scale calibration, role review of Alpha, youth intake).

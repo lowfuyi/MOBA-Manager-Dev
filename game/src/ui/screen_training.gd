@@ -23,6 +23,8 @@ func _focus_text(p: Dictionary) -> String:
 			return Strings.f("train.f.stat", {"stat": Strings.t("stat." + String(f["v"]))})
 		"hero":
 			return Strings.f("train.f.hero", {"hero": App.world.heroes[f["v"]]["name"]})
+		"scrim":
+			return Strings.t("train.f.scrim")
 	return Strings.t("train.f.rest")
 
 
@@ -82,6 +84,7 @@ func _picker(parent: VBoxContainer, p: Dictionary) -> void:
 		for e in elig:
 			var txt2 := Strings.f("train.hero_btn", {"hero": w.heroes[e[1]]["name"], "fam": "%.0f" % float(e[0])})
 			box.add_child(UI.button(txt2, _choose.bind(p["id"], "hero", e[1]), "primary" if cur["k"] == "hero" and cur["v"] == e[1] else "normal", 60))
+	box.add_child(UI.button(Strings.t("train.scrim_btn"), _choose.bind(p["id"], "scrim", ""), "primary" if cur["k"] == "scrim" else "normal", 66))
 	box.add_child(UI.button(Strings.t("train.rest_btn"), _choose.bind(p["id"], "rest", ""), "primary" if cur["k"] == "rest" else "normal", 66))
 	box.add_child(UI.button(Strings.t("train.auto_btn"), _auto_one.bind(p["id"]), "normal", 66))
 

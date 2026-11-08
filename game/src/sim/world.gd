@@ -25,6 +25,12 @@ var fam_bonus: Dictionary = {}    # "player|hero" -> trained familiarity points 
 var fatigue: Dictionary = {}      # player id -> 0..100 (saved; missing = fresh)
 var progress: Dictionary = {}     # player id -> {stat: points gained or lost since the start} (saved)
 var season_offset := 0            # seasons played so far: everybody is this many years older
+var form: Dictionary = {}         # player id -> Form -10..+10 (saved; missing = 0)
+var morale: Dictionary = {}       # player id -> Morale 0..100 (saved; missing = the neutral 60)
+var bonds: Dictionary = {}        # "a|b" -> Bond 0..100 for the managed club's roster pairs (saved)
+var ai_bond: Dictionary = {}      # club id -> one bond level for a whole AI squad (saved)
+var dynamic_chem := false         # true once a save is bound: teams then carry their real chemistry
+var qa_static := false            # QA only: keep every team at the default TeamMod and neutral form/morale (the pre-0.4 model)
 
 var fa_ids: Array = []            # free agents right now (saved by the game; starts as the players without a club)
 
@@ -104,6 +110,51 @@ func bind_progress(prog: Dictionary, fat: Dictionary, offset: int) -> void:
 	for pid in progress:
 		_apply_one(pid)
 	_lineup_cache.clear()
+
+
+## Point the world at one save's Form, Morale and Bonds. Without it (tests, tools) every team gets the
+## default TeamMod and nobody is in or out of form.
+func bind_condition(frm: Dictionary, mor: Dictionary, bnd: Dictionary, aib: Dictionary) -> void:
+	form = frm
+	morale = mor
+	bonds = bnd
+	ai_bond = aib
+	dynamic_chem = not qa_static
+
+
+func form_of(pid: String) -> float:
+	return float(form.get(pid, 0.0))
+
+
+func morale_of(pid: String) -> float:
+	return float(morale.get(pid, Params.f("cal_morale")))
+
+
+func bond_of(a: String, b: String) -> float:
+	return float(bonds.get(Bonds.pair_key(a, b), float(Bonds.data()["bond"]["start_new_signing"])))
+
+
+## Chemistry (the mean of the 20 Understanding values) of a lineup {slot: player}.
+func chem_of(lineup: Dictionary) -> float:
+	var five: Array = []
+	for s in SLOTS:
+		five.append(lineup[s])
+	var cid := _club_of(lineup["top"]["id"])
+	if cid == "" or cid == _roster_club:
+		return Bonds.chem(five, bond_of)
+	return Bonds.chem_flat(five, float(ai_bond.get(cid, float(Bonds.data()["bond"]["start_club"]))))
+
+
+## TeamMod for a lineup: ChemBonus now, plus the staff bonus once there are staff.
+func team_mod_of(lineup: Dictionary) -> float:
+	return Bonds.chem_bonus(chem_of(lineup))
+
+
+func _club_of(pid: String) -> String:
+	for cid in club_ids:
+		if (clubs[cid]["player_ids"] as Array).has(pid):
+			return cid
+	return ""
 
 
 func _restore(pid: String) -> void:
@@ -242,7 +293,7 @@ func familiarity(p: Dictionary, hid: String) -> float:
 
 
 func phase_rating(p: Dictionary, slot: String, hero: Dictionary, phase: String, fam: float, meta: float,
-		morale: float = -1.0, fat: float = 0.0) -> float:
+		morale: float = -1.0, fat: float = 0.0, frm: float = 0.0) -> float:
 	if morale < 0.0:
 		morale = Params.f("cal_morale")
 	var fam_w := Params.f("fam_w")
@@ -255,7 +306,7 @@ func phase_rating(p: Dictionary, slot: String, hero: Dictionary, phase: String, 
 			pb = base
 		_:
 			pb = 0.8 * base + 0.2 * float(p["stats"]["clu"])
-	var cond := (morale - 50.0) * 0.06 - Progression.fatigue_penalty(fat)
+	var cond := frm * 0.4 + (morale - 50.0) * 0.06 - Progression.fatigue_penalty(fat)
 	var hf := ((1.0 - fam_w) + fam_w * fam / 100.0) * (0.90 + 0.10 * minf(1.0, float(p["stats"]["mec"]) / (15.0 * float(hero["difficulty"]))))
 	var fit := player_fit(p, slot) * hero_fit(hero, slot)
 	return (pb + cond) * hf * fit * (1.0 + (float(hero["power_" + phase]) - 50.0) / 200.0) * meta
@@ -351,13 +402,14 @@ func lane_mods(mine: Dictionary, theirs: Dictionary) -> Dictionary:
 func build_team(lineup: Dictionary, picks_mine: Dictionary, picks_theirs: Dictionary, meta: Dictionary,
 		con_override: float = -1.0, neutral_draft: bool = false, team_mod: float = -1.0) -> Dictionary:
 	if team_mod < 0.0:
-		team_mod = Params.f("team_mod_default")
+		team_mod = team_mod_of(lineup) if dynamic_chem else Params.f("team_mod_default")
 	var ratings := {}
 	for ph in ["early", "mid", "late"]:
 		var r := {}
 		for s in SLOTS:
 			var hero: Dictionary = picks_mine[s]
-			r[s] = phase_rating(lineup[s], s, hero, ph, familiarity(lineup[s], hero["id"]), float(meta[hero["id"]]), -1.0, fatigue_of(lineup[s]["id"]))
+			r[s] = phase_rating(lineup[s], s, hero, ph, familiarity(lineup[s], hero["id"]), float(meta[hero["id"]]),
+					(morale_of(lineup[s]["id"]) if dynamic_chem else -1.0), fatigue_of(lineup[s]["id"]), (form_of(lineup[s]["id"]) if dynamic_chem else 0.0))
 		ratings[ph] = r
 	var mine_list: Array = []
 	for s in SLOTS:
