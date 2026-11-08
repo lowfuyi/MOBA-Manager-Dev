@@ -110,7 +110,7 @@ The colour-blind palette swaps good/bad to sky blue (`56b4e9`) and vermillion (`
 | Badges | Generated from the club id, 40 to 112 px | Hero 112, Next card 96 (large text 80), podium 88 / 72 / 72, rows 56, chips 44 | Adopted; all within the art bible's range |
 | Squad | Five role rows | Lane map plus avatar bench grid | **Settled by ruling C3 (D3):** lane map plus bench grid; five avatar cards in a row is the fallback. The art bible's row component serves the picker. Art Director updates its 8.2 Roster row |
 | Chemistry | Lane-map layout | Squad map is the same idea | Compatible; UI Pass 3 can share the component |
-| Help "?" | 96 x 96 corner on every screen | Reserved in `ScreenHeader` (5.15) | Met |
+| Help "?" | 96 x 96 corner on every screen | Reserved in `ScreenHeader` (5.2) | Met. The Draft header now shows the slot (6.3), Home states its contrast over the hero art (6.1), and the arena puts it at the right end of the controls row (6.7.6) |
 | Colour never the only cue | Rule (W1 contract 5) | Section 2.4 and every screen's (e) | Met |
 | Standings tabs break words | Fix with the redesign | Three views, segmented, scroll fallback | Met |
 | Squad card opens below the fold | Contract 4: scroll it into view | A bottom sheet opens in place, nothing is below the fold | Met; TUTORIAL v1.1 replaced contract items 3, 4 and 6 and added the sheet contract (overlay above `BottomSheet`) |
@@ -873,6 +873,209 @@ Notes on the frame:
 #### (f) One primary decision
 "Continue." The page is a reward and an explanation; the only thing to do is to move on. The tip's action link is secondary and optional.
 
+---
+
+### 6.7 Match screen HUD (arena, Alpha 0.8)
+
+Added in the wave 1b revision (review conflict C9: nobody owned this HUD, and the sources do not fit on one phone screen). **Nothing here was built or run; sizes are paper estimates, and text widths are estimates because the art bible's font is not installed.** I read `ARENA-MAP.md`, `ACTION-VOCABULARY.md` (sections 1.4, 2.4, 4, 5), `ESPORTS-NOTES.md` (2.4, 4), `game/i18n/en.json` (the `feed.*` and `match.*` strings) and the art bible tokens. I did not edit any of them; where they do not fit, section 6.7.1 says so and proposes the cut.
+
+**Which release.** **Alpha 0.7 keeps today's match screen** with the 75 s watch (feed list, bar, Speed x1 / x2, Skip to the end, See the report). It only gets the global changes (new tokens, 96 px buttons, the "?" in the standard top-right corner, the ids `match.controls` and `match.report_btn`). **Alpha 0.8 replaces it with the arena** (`ARENA-MAP.md`: a 720 x 760 arena between a scoreboard strip and a text strip), and everything below is the HUD around that arena. The result, the length and every number are decided before the show starts; the HUD is playback only and never changes them (ACTION-VOCABULARY H1 to H6).
+
+#### 6.7.1 Diagnosis: what the sources ask for against the room
+
+| Source asks for | Room | Verdict and proposed cut (the cut is a proposal to the owner; I do not edit their file) |
+|---|---|---|
+| Scoreboard 190 px (ARENA-MAP 4) with clock, kills, towers, two objectives, gold lead, lead graph (ACTION-VOCABULARY 5), plus two banners, a phase chip and a status tag | The 190 px starts at the top of the screen, so it **includes the 48 px status bar and notch**: 142 px of content. Three rows (44 + 46 + 44) fit, four do not | **Does not fit as listed.** Cuts: the two objectives become **markers on the lead graph** at their beats (a stone glyph and a moon glyph in the owner's shape), not a separate row; the gold lead sits beside the clock; banners show the badge and the club's last word (at most 8 characters: "Corsairs", "Wardens"), not the full name |
+| Text strip 150 px under the arena (ARENA-MAP 4, "my assumption, for UI/UX to confirm") with an intent pill per side, a plan chip, an "If behind" chip, a 3-line feed, a commentary line, banners | Plan row 44 + intent row 48 + a 2-line feed 80 + gaps is **198 px**, not 150 | **Does not fit.** Proposal: take **48 px from the controls strip** (180 to 132, which still holds a 96 px button, 12 px above it and the 24 px bottom margin). The arena stays 720 x 760 and the scoreboard stays 190. If the Level Designer refuses: plan chips move into scoreboard row A and the feed drops to one line (worse) |
+| Intent label up to 28 characters per side, both shown (R3); 26 characters is the longest | Two pills side by side at 24 px need about 2 x (26 x 10 + 52) = 630 px of the 672 available **if** the font is Barlow Semi Condensed at 0.42 em (10 px a character at 24 px); in today's font (about 0.52 em, 12.5 px) they need about 750 px. At 24 characters: 590 and 700 px | **Fits only with the narrow font.** Proposal to Gameplay: label limit **24 characters** (only one of the 156 lines is longer: "Fight now, objective later", 26; for example "Fight, then objective"); even then today's font would not fit a pair. Rule in the HUD: if the pair does not fit, show only yours |
+| `intent_ping`: "a ring on the target zone with a line to the label" (2.5 s) | The label is 200 to 760 px below the zone; the line would cross the arena | **Cut the line.** Keep the ring: a circle ring for your label, a hexagon ring for theirs (same shape as the pill's glyph), so the eye links them without a line |
+| Status tags up to 24 characters ("Still level, still tense"), "centre status tag" | Scoreboard centre slot is 348 px (280 in large text): about 20 characters at 24 px plus a glyph | **Tags over 20 characters do not fit large text.** Proposal to Gameplay: 20 characters (three of 15 tag lines are longer: "Nobody saw that coming" 22, "The lead changes hands" 22, "Still level, still tense" 24) |
+| Plan chip with up to 3 parts, "If behind" chip with its top 2 parts (ACTION-VOCABULARY 4.2) | Chip row 672 px (578 in large text): about 280 + 150 = 430 px for 2 parts plus a short chip | Three parts fit only in normal text. **Cut:** the "If behind" chip says only "If behind" (parts open in a read-only sheet on tap); the plan chip drops its last part until it fits; no ellipsis |
+| Esports: commentary line plus a 3-line feed | Feed block holds 2 lines at 26 px (80 px); 1 line in large text | **Cut to 2 lines.** The second line is the previous result, or a commentary line in a calm gap, never both |
+| Feed line text = the Report's feed text, "identical" (ACTION-VOCABULARY 1.2): "02:25  Top lane: they win it (narrowly)" is 7 words | The four lane results arrive 2.25 s apart (13.5, 15.75, 18.0, 20.25). Two 7-word lines are 14 words in 2.5 s, against a budget of about 10 | **Does not fit by itself, before anything else is shown.** Proposal: the arena uses a **short feed form** of the same event: "Top lane: they win it" (5 words, no clock stamp because the scoreboard shows the clock, the size as 1 to 3 dots plus the tick or cross glyph). The Report keeps its full line. Same events, same order, same stamps |
+| `kill_ping`: killer flash, **"+gold" text**, skull mark (ACTION-VOCABULARY 3.2) | About 20 to 30 kills in 75 s, mostly in two fights | **Cut the "+gold" text.** It is a number the ledger does not count (section 2.5 says the arena shows no per-hero gold), and floating text over 40 px tokens cannot meet the 24 px floor in a fight. Keep the skull mark |
+| Plan switch banner uses the existing `gp.switch.<id>` text, 13 words ("Early game over: you are behind, switching to your 'if behind' plan.") | A 3 s banner at 21.0 s, 0.75 s after the jungle result | **Too long.** Proposal: a short form of at most **4 words** for each (for example "Switching to If behind"); the long line stays in the Report and help |
+| Map labels 20 px bold (ARENA-MAP 9) | Floor is 24 px | **Raise to 24 px** with the 3 px outline, or hide zone labels and keep only the slot letter on tokens; the validator checks icon overlap, not label overlap, so labels need their own check |
+| Intent windows are 2.5 s, 1.25 s at x2 (R3) | A 4-word label needs about 2 s to read at the Esports rate of 2 words per second | **At Speed x2 hide both intent labels** (feed lines and tags stay). The windows are not re-timed |
+| Four pill windows start within 1.5 s of a feed line (jungle 12.5, plan check 21.2, mid push 46.0, close 71.5) | | The scheduler (6.7.4) drops the pill that would break the budget; proposal to Gameplay: start mid push at 47.5 s so it survives |
+
+#### 6.7.2 Layout
+
+Vertical stack at 720 x 1280 (the design case). The arena is fixed; the strips give way.
+
+| Strip | y from | y to | Height | Holds |
+|---|---|---|---|---|
+| Safe area | 0 | 48 | 48 | nothing drawn (status bar, notch; use the display's real safe area where reported) |
+| Scoreboard | 48 | 190 | 142 | row A 44, row B 46, row C 44, gaps 4 + 4 |
+| Arena | 190 | 950 | 760 | `ARENA-MAP.md`, 720 wide, not interactive |
+| Text strip | 950 | 1148 | 198 | plan row 44, gap 8, intent row 48, gap 8, feed block 80, bottom 10 |
+| Controls | 1148 | 1280 | 132 | 12 gap, buttons 96, 24 bottom margin |
+
+```text
++----------------------------------------------------------------------+
+| status bar and notch: 48 px, nothing drawn                           |  <- safe 0-48
+| (b) CORSAIRS         04:57   (o) +1,500          WARDENS (b)         |  <- A 44
+| [K] 7   [T] 3          [ Mid ]  or a tag         [K] 5   [T] 1       |  <- B 46
+| lead graph ~~~/\___~~~(S)~~~~~~~~~~~~~~(M)~~~~~~~~~~~~~~~~~~~~~      |  <- C 44
++----------------------------------------------------------------------+  y 190
+|                                                                      |
+|        ARENA  720 x 760   (docs/design/ARENA-MAP.md)                 |
+|        your units: circles, at the bottom. theirs: hexagons.         |
+|        no text here except 24 px zone labels (6.7.1)                 |
+|        not interactive in 0.8: no taps on the map                    |
+|                                                                      |
++----------------------------------------------------------------------+  y 950
+| plan:  [ Group up, Contest them ]  [ If behind ]                     |  <- plan row 44
+| (o) Going for Stoneback              Chip them from range (h)        |  <- intent row 48
+| ok  Top lane: you win it  ..                                         |
+|  x  Mid lane: they win it  .   (previous line, dim)                  |  <- feed block 80
++----------------------------------------------------------------------+  y 1148
+| [ Speed x1 ]  [    Skip to the end    ]            [ ? ]             |  <- controls 132
++----------------------------------------------------------------------+  y 1280
+ key: (b) badge 40 px   (o) circle glyph = you   (h) hexagon glyph = them
+      [K] kills glyph  [T] towers glyph  (S) stone glyph  (M) moon glyph
+      ok / x = tick and cross shapes   . / .. / ... = margin dots 1 to 3
+ The frame shows a busy moment on purpose: both pills and two feed lines.
+ The budget (6.7.4) allows it only because the feed lines are over 2.5 s old.
+```
+
+The same wireframe in words:
+
+- **Row A (44 px):** left banner (badge 40, last word of the club name at 26 px), centre (clock 32 px and the gold lead 32 px with the leader's shape glyph and a sign: "(o) +1,500" means you lead), right banner mirrored. You are always left, them right, and the player's base is always at the bottom of the arena (ARENA-MAP 4).
+- **Row B (46 px):** left: kills and towers with glyphs, numbers 32 px; right: the same for them; **centre slot 348 px: the phase chip ("Early", "Mid", "Late", 24 px) or, for 2.0 s, the status tag** (glyph plus up to 20 characters, 24 px).
+- **Row C (44 px):** the lead graph, a 20 px band across 672 px (time on x, the lead ladder of ACTION-VOCABULARY F4 on y, centre line = even, above = you), with 8 beat markers, the two **objective markers** (stone at 45 percent of the width, moon at 80 percent: an empty outline before the beat, the owner's shape glyph after it) and two ticks at the phase borders (24.0 s and 51.0 s). Markers are 28 px glyphs straddling the band. No text on the graph.
+- **Plan row (44 px):** the plan chip ("Group up, Contest them", the first two or three parts) and the "If behind" chip (dim until the plan check at 21.0 s, lit after it if that plan is in force). Both are static: they fade in at 3.0 s, after the opening labels, so the first 2.5 s are not overloaded. A tap on either opens a read-only size S sheet with the whole plan (the show pauses while it is open). No plan chip for the opponent exists (ACTION-VOCABULARY R7, request S1).
+- **Intent row (48 px):** your label left with a circle glyph, theirs right with a hexagon glyph, each a pill of at most 24 characters (proposed) at 24 px. If the pair does not fit 672 px, only yours shows.
+- **Feed block (80 px):** line 1 is the newest result, line 2 is the previous result (dim) or, in a calm gap, a commentary line. A banner takes over both lines.
+- **Controls (132 px):** Speed, Skip, "?" (6.7.6).
+
+#### 6.7.3 What is in the scoreboard strip (ACTION-VOCABULARY section 5)
+
+| Item | Where | Size | Source and rule |
+|---|---|---|---|
+| Clock | row A centre | 32 px, tabular figures | `show_time / 75 * Report.game_minutes(res) * 60` (1.4), so the report's stamps read the same |
+| Gold lead | row A centre, right of the clock | 32 px, glyph and sign | F7; the leader's shape glyph, never colour alone; "+0" shows no glyph |
+| Kills per side | row B, outer left and right | 32 px, glyph | F10: `Report.kda(res)` team kills; never recomputed |
+| Towers per side | row B, next to kills | 32 px, glyph | F8, 0 to 6; the two guard towers are scenery and never counted (C5) |
+| Objectives (Stoneback, Moonhulk) | row C, on the graph | 28 px glyph | F12: the sign of `obj_mid` and `obj_late`; the owner's shape (circle or hexagon) over the stone or moon glyph |
+| Lead graph | row C | 20 px band | F4 ladder, one marker per beat; a flip (F5) pops a diamond marker; the gold number also flashes (`lead_flash`) |
+| Phase chip | row B centre | 24 px | Early until 24.0 s, Mid from 24.0, Late from 51.0 (the Report's three bands; 6.7.5) |
+| Status tag | row B centre, 2.0 s | 24 px, at most 20 characters | `tag_flip`, `tag_back`, `tag_upset`, `tag_snow`, `tag_close` (2.4); replaces the phase chip meanwhile |
+| Banners (club) | row A | badge 40, last word 26 px | `Corsairs`, `Wardens`: the longest last word in `clubs.json` is 8 characters; a data check flags a longer one |
+
+#### 6.7.4 The text budget: how many text channels at once
+
+**The answer in one line.** At most **3 transient text items visible at once** (a pair of intent labels counts as one item, the status tag is one, the feed block is one), plus the static plan row; a banner leaves **one**. And at most **10 new words in any 2.5 seconds**. Every text is 24 px or larger (feed lines 26, banners 26 or 32). Static numbers (clock, kills, towers, gold lead, graph, phase chip) do not count: they are glanced, not read.
+
+The 10 words is the Esports Manager's own unmeasured estimate (ESPORTS-NOTES 2.4: about 2 words a second, about 10 new words in 2.5 s). I keep it as the test number; if a tester session shows a different reading speed, change the one constant.
+
+| # | Channel | Where | Max at once (normal / large text) | Time on screen | Size | Rule when it cannot show |
+|---|---|---|---|---|---|---|
+| 1 | Plan chip | plan row, left | 1 / 1 (two parts) | whole show from 3.0 s | 24 | never dropped; loses its last part until it fits |
+| 2 | "If behind" chip | plan row, right | 1 / 1 | whole show, dim until 21.0 s | 24 | never dropped |
+| 3 | Intent label, yours | intent row, left | 1 / 1 | 2.5 s (hidden at x2) | 24 | dropped if the word budget is full |
+| 4 | Intent label, theirs | intent row, right | 1 / 0 | 2.5 s (hidden at x2) | 24 | dropped if the budget is full, if the pair does not fit 672 px, always in large text |
+| 5 | Centre status tag | row B centre | 1 / 1 | 2.0 s | 24 | dropped if the budget is full; the graph marker and gold flash still show the event |
+| 6 | Feed line | feed block, line 1 | 1 new (+1 previous, dim) / 1 | newest 4 s | 26 | **never dropped**: it is the sim's result; a banner holds it and it returns |
+| 7 | Commentary line | feed block, line 2 | 1 / 0 | 2.5 s | 24 | only in a calm gap; at most 2 per game (6.7.4 below) |
+| 8 | Banner | feed block, both lines (hides the intent row) | 1 / 1 | plan switch 3.0 s; wipe 2.0 s; end card stays | 26, end card 32 | wins over everything below it |
+
+**Admission order** (highest first): banner, feed line, status tag, intent pair, intent (yours only), commentary. The scheduler never delays and never shrinks text: it admits an item if no 2.5 s window then holds more than 10 new words, otherwise it drops it. A wipe banner ("Team wiped", 2 words) **replaces** the feed line of that beat (the Report's Moments list still has the full line). Both limits are one function of the show script, so QA can test it without a phone.
+
+**What the model says** (a small script run in this task, not saved in the repo; assumptions: 15 label windows from ACTION-VOCABULARY 4.1, feed stamps from 1.4, a pair of labels averages 6.9 words (the 156 labels average 3.47: 11 are 2 words, 66 are 3, 75 are 4, 3 are 5 and 1 is 6), a feed line 5 words in the short form, a status tag 3 words, a short banner 4 words, and a status tag offered at every stamp as a worst case; not measured on a phone):
+
+| Case | Result |
+|---|---|
+| Unmanaged: both labels in all 15 windows, 7-word feed lines (clock and size word), a tag at every stamp, a banner at 21.0 s and a wipe banner at each fight, a 7-word commentary line after each stamp | up to **7 text items at once**; more than 10 new words in 142 of 291 quarter-second span starts; the worst span has 34 words (at 13.5 s; banner words not even counted) |
+| Same, with 7-word feed lines **under the scheduler** | nothing else is admitted at all: the lane stamps (2.25 s apart) already use 14 words in 2.5 s. This is why the feed needs the 5-word short form |
+| Scheduler, 5-word feed lines, no plan switch, no wipe | **at most 3 items at once** (by construction: pair, tag, feed block); both labels shown in 11 of 15 windows, yours only in 2, none in 2 (mid push 46.0 and close 71.5, because a feed line lands within 0.25 to 1.0 s); 4 of the 9 possible tag slots keep their text (the others rely on the graph marker and the gold flash) |
+| Scheduler, 5-word feed lines, plan switch and two wipes (worst case) | at most 3 items at once; labels both in 11, yours only in 3, none in 1 (plan check 21.2, which the plan-switch banner covers anyway) |
+| Where a commentary line (8 words) still fits the budget | 26.75 to 28.5 s, 39.5 to 42.5 s, 47.5 to 49.0 s, 66.0 to 68.75 s. **At most 2 commentary lines per game**; the Narrative Designer writes for those four slots. Esports' "recap in the plan check" (ESPORTS-NOTES 2.2, item 4) has no room at 21 to 24 s, because the jungle result (20.25 s), the plan banner and the rotation labels (24.2 s) already fill the budget; move it to the first slot |
+
+Per moment, in the Esports Manager's terms (ESPORTS-NOTES 2.4) and what the layout does with it:
+
+| Moment | New text allowed | Layout |
+|---|---|---|
+| Calm (opening, rotation, reset, siege hold) | pill pair, one tag, one commentary line | pills in the intent row; the commentary line in feed line 2 only in the four slots above |
+| Fight (the windows around 45.0 and 71.25 s) | tag plus one feed line; pills already on screen stay | no new pills; commentary waits |
+| Resolve stamp (1 s after any stamp) | tag plus one feed line | nothing else starts |
+| Closing hold (74.0 to 75.0 s) | one: the end card | everything else fades; see 6.7.6 |
+
+#### 6.7.5 The Report's story vocabulary on the HUD (Early, Mid, Late)
+
+The player should see the same story twice, once live and once in the report (UI-PASS-2 7.6 item 3).
+
+| Report story (6.6) | On the arena HUD |
+|---|---|
+| Three phase bands **Early, Mid, Late** | The phase chip in row B (24 px) and two ticks on the lead graph. Boundaries come from the show timeline: **Early 0 to 24.0 s** (opening, lanes, jungle, plan check), **Mid 24.0 to 51.0 s** (Stoneback and the mid fight with its push), **Late from 51.0 s** (reset, Moonhulk, the late fight, the close). They are the Report's contests grouped as `Report.FEED_ORDER` groups them: Early four, Mid two, Late two |
+| Contest chips: Top, Mid, Bot, Jungle / Objective, Fight / Objective, Fight, each with a tick or a cross and 1 to 3 dots | Feed lines use the game's own contest names (`feed.t.*`: "Top lane", "Mid lane", "Bot lane", "Jungle control", "Mid-game objective", "Mid-game fight", "Late objective", "Decisive teamfight"), a tick or cross glyph in front, 1 to 3 dots after. Note for Narrative: the Report chips say "Objective" and "Fight" under Mid and Late, the feed says "Mid-game objective", "Decisive teamfight". Use one name set in both |
+| "Mid" is both a lane (Early, a lane contest) and a phase | The lane is always "Mid lane" in feed text and carries the role icon; the phase is the chip "Mid". The Report's Early chip `[ MID ]` should read "MID LANE" for the same reason (note for 6.6 and for Narrative) |
+| Size words narrow, clear, decisive (`Report.margin_word`) | The dots (1, 2, 3) in the feed; the words appear on the end card and in the Report (arena I8) |
+| Story tag from the eight phase-sign patterns (6.6) | The end card's second line is **the same story tag** the Report shows, one function (`Report.story`, request S3), not the arena's own arc names (close, comeback, stomp, steady) |
+| Hero stat: the biggest factor, luck included | The end card's "Decided by:" line uses the same factor text (ACTION-VOCABULARY 5.3) |
+
+#### 6.7.6 Controls, skip, speed, "?" and the end of the show
+
+| Control | Rule |
+|---|---|
+| **Speed x1 / x2** | One toggle button, 200 x 96 px, label shows the current speed; id `match.controls` covers Speed and Skip together. A tap changes the playback rate; it never changes a result. At x2: both intent labels hidden, feed hold 4 s of real time or until the next line, tags and banners unchanged. The four lane lines arrive 1.1 s apart at x2, so they will flash by; they are all in the Report, and the model above only budgets x1 |
+| **Skip to the end** | One tap, no confirm (watching or skipping never changes the result, and the 5-minute pillar says do not add taps). It jumps show time to 75 s: the scoreboard shows its final state in one frame (it is a function of show time, ACTION-VOCABULARY H4), labels and commentary do not replay, the feed block shows the end card. Neutral button, not coral |
+| **Android Back** | During the show it acts as Skip (the result is decided and saved; the report is the only exit). After the show it acts as See the report. No "Leave the match?" sheet |
+| **"?"** | 96 x 96 at the **right end of the controls row** (the one place it is not top right, because the scoreboard owns the top). Opens the help sheet; **the show pauses while any sheet is open** and resumes on close (ACTION-VOCABULARY H4 keeps the 75 s as playback length, so pausing does not change it). Tutorial step 19 highlights `match.controls`; the "?" is outside that hole |
+| **Arena taps** | None in 0.8. No hero, tower or camp can be tapped, so nothing can be hit by accident while the player reaches for Speed or Skip |
+| **End of show (74 to 75 s, then stays)** | The Cairn falls at 74.0 s and holds to 75.0 s. Then the feed block becomes the **end card**: line 1 the result word at 32 px with a flag shape (a broken flag for a defeat) and the margin word and length (`Report.result_word`, `Report.game_minutes`), line 2 "Decided by:" and the Report's factor text, 26 px. Speed and Skip are replaced by one **See the report** button (coral, 96 px high, the only coral on the screen; id `match.report_btn`) and the "?" stays |
+| Quick mode (Settings) | The arena is not shown; the flow goes straight to the report as today |
+
+#### 6.7.7 Large text, tall phones, colour-blind, and the other modes
+
+- **Large text (626 x 1113 logical).** Text in the arena is drawn in screen space and takes the text scale; the map art scales with the width, so the arena is **626 x 661**. The stack becomes: safe 48, scoreboard 122 (row A 40, row B 44, row C 34, gaps 2 + 2), arena 661, text strip 150 (plan row 44, intent 48, one feed line 38, gaps 8 + 8, 4 spare), controls 132 = 1113. Changes: **one** intent label (yours), **one** feed line (no previous line), **no commentary**, the plan chip shows two parts, the centre slot is 280 px (tags of 20 characters or fewer; longer variants are skipped in favour of a shorter variant of the same tag), the arena's zone labels are hidden (token slot letters stay). The budget numbers of 6.7.4 apply with the "large" column.
+- **Tall phone (720 x 1560).** The arena stays 720 x 760 and the controls stay at the bottom. The extra 280 px goes to the lead graph (row C grows by 40, a taller story) and the text strip (the feed block shows the last 4 results, 5 lines, +120); the rest is air above the scoreboard. No new text channel is added.
+- **Colour-blind.** You are a **circle**, they are a **hexagon** in the pills, the gold lead glyph, the objective markers and the zone rings: shape first, colour second (accent colour and coral colour, token names per ART-BIBLE token table, pending re-issue; the colour-blind palette swap does not touch these two). Feed lines carry a tick or cross shape. The lead graph has a centre line and a fill pattern, not a hue pair. `BAD` is for loss tone only (ACTION-VOCABULARY 2.2) and never marks "them". Blue / Red side does not appear in the arena at all (C4).
+- **Animations off.** Pills, tags and banners appear and disappear instantly; the graph updates in steps; the show still plays at its own pace (that is the 75 s, not an animation setting; ARENA-MAP 8 covers reduced camera motion).
+- **Contrast.** Pills and chips sit on the E1 strip surface, where tinted chips are allowed (art bible 3.4: 4.5 to 6.5:1). Banners are on a solid E3 fill with `TEXT`, never `DIM`. Nothing in the HUD sits on the map art; text on the map (zone labels) has a 3 px outline.
+
+#### 6.7.8 Data feeding the HUD
+
+| Block | Source |
+|---|---|
+| Show time, clock | the show script's clock; `Report.game_minutes(res)` |
+| Kills, towers, objectives, gold lead, graph | the ledger of ACTION-VOCABULARY section 5 (F4, F7 to F12), ideally one function `Report.story(res, my_side)` (request S3 to the Systems Designer) so the arena, the Report and QA share it |
+| Feed lines | `Report.feed(res, my_side)` events (key, mine, size, t) with the short form |
+| Intent labels, tags | the label catalogue of ACTION-VOCABULARY 4.3 and the tag table in 2.4 (owner: Gameplay) |
+| Plan chips | `App.gs.plan_set()` today, `res.plans` after request S1 |
+| Commentary | Narrative Designer, 4 slots, at most 2 used |
+| End card | `Report.result_word`, `Report.game_minutes`, `Report.attribution`, `Report.story` |
+
+#### 6.7.9 Interactions: summary
+
+Speed toggles, Skip jumps, Back skips, "?" opens a sheet and pauses, the plan row opens a read-only sheet and pauses, the arena is inert, See the report leaves. No gesture is needed for anything.
+
+#### 6.7.10 Tests QA Automation can run without a phone
+
+1. **Budget:** for 10,000 seeded shows, in normal and large text: at most 10 new words in any 2.5 s window, at most 3 transient items visible at once (1 under a banner), no feed line dropped, no label ellipsised.
+2. **Floor:** every `Label` in the HUD has a font size of 24 px or more; feed lines 26; numbers 32.
+3. **Geometry:** at 720 x 1280, 720 x 1560 and 626 x 1113 the arena is 720 x 760 (626 x 661 large), strips do not overlap, all buttons are at least 96 px high, the "?" is inside the controls row.
+4. **Fit:** with the theme font, a pill, tag or chip that fits is not ellipsised, and one that does not fit is dropped by the rule, not clipped (this also settles the font-width estimates that this section could not measure).
+5. **Skip and speed:** one tap each; Back acts as Skip; a sheet pauses the show clock and closing resumes it; the final scoreboard after Skip equals the one after a full play (kills, towers, objectives, gold lead).
+6. **Tie-out:** kills, towers and gold lead equal the Report's numbers (ACTION-VOCABULARY I1 to I8).
+
+#### 6.7.11 One primary decision
+
+None while the show plays: it is a spectator screen, which is why Skip and Speed are neutral and the arena takes no taps. When the show ends the one decision is **See the report** (the only coral).
+
+#### 6.7.12 What I could not check, and what I need from others
+
+I could not measure any text width (Barlow Semi Condensed is not installed; the estimates use 0.42 em for it and 0.52 em for today's font), could not see the arena (it does not exist yet), and could not test touch. The 10-word budget is an unmeasured estimate by the Esports Manager. The model in 6.7.4 shows the budget is **tight but possible only with the cuts in (a)**; without them the lane phase alone breaks it.
+
+| To | Ask |
+|---|---|
+| Level / World Designer | Controls strip 180 to 132 and text strip 150 to 198 (or accept the worse fallback); map labels 24 px; zone label overlap check; confirm the player's base at the bottom and the 142 px scoreboard content height (the 190 px includes the status bar) |
+| Gameplay / Champion Designer | Intent label limit 24 characters (one line); tag limit 20 characters (three lines); short plan-switch banner (4 words) for each `gp.switch.<id>`; drop the `intent_ping` line and the `kill_ping` "+gold" text; start mid push at 47.5 s; hide intent labels at x2; confirm "no pronouns" is not needed for the short feed form |
+| Systems Designer | `Report.story(res, my_side)` (S3) as the single source for scoreboard, end card and story tag; a short feed form `feed.line.short` ("{title}: {result}") with `feed.win.short` "you win it" and `feed.loss.short` "they win it" and the size as dots |
+| Esports Manager / Narrative Designer | Commentary: at most 2 lines per game, 8 words or fewer, for the slots 26.75 to 28.5, 39.5 to 42.5, 47.5 to 49.0 and 66.0 to 68.75 s; one contest name set for feed and Report chips |
+| Art Director | Tokens for in-arena you (circle) and them (hexagon) and for glyphs (kills, towers, stone, moon, flag); 24 px outlined map labels; the Report chip `[ MID ]` as "MID LANE" |
+| Technical Designer | The HUD scheduler is a pure function of the show script (testable); keep text out of the show data except label ids |
+
 ## 7. Cross-cutting requirements
 
 ### 7.1 Test matrix every screen must pass (acceptance for "fits 720 px in normal and large text")
@@ -1007,8 +1210,9 @@ Sizes are developer days for one Gameplay Programmer including their own testing
 | 7 | **Standings** (podium, rows, bracket, history) | M | Read-only; lowest risk; can move up to step 2 if a safe early win is wanted |
 | 8 | Polish and the full 72-image test matrix, audits of 7.1, fixes | M | Acceptance |
 | (parallel) | Plan and Club tab tiles move to the 2 x 2 tile grid and new tokens (the two tabs are still stacked wide tiles, `04c_tab_plan`); the Match day screen adopts the new components | S | Not in the six screens but they will look out of place next to them |
+| (0.8, after the arena exists) | **Match HUD** (6.7): scoreboard strip, text strip with the scheduler, controls, end card, large-text rules, tests of 6.7.10 | M | Not in the 0.7 total; depends on the arena, the short feed form and `Report.story`; designer guess, low confidence |
 
-About 38 developer days in total plus QA. If time is short, cut in this order: Home carousel, drag-to-swap on Squad, History mini story strips, Report starter chips sheet.
+About 38 developer days in total for 0.7 plus QA (the 0.8 HUD adds about 3 to 4 more). If time is short, cut in this order: Home carousel, drag-to-swap on Squad, History mini story strips, Report starter chips sheet.
 
 ### 8.2 Biggest risks and what to do about them
 
@@ -1080,7 +1284,10 @@ For other roles: see the findings in 7.6 (Lead Game Designer and Systems Designe
 - **Concept / Character / Environment Artists:** icons per 8.4, empty-state pictures, the Home hero backdrop, the lane-map backdrop, mood faces and trophies. Badges, hero silhouettes and initial avatars are code (art bible), so no painting is needed for them.
 - **Gameplay Programmer (Alpha 0.7 build):** steps 0 to 8 of 8.1; the small helpers in 7.5; do not rebuild whole pages on a tap.
 - **Engine / Graphics Programmer:** performance budget for the points in R1 (atlas, shadow limit, timer redraw, texture count), and a view on the spike.
-- **UI/UX Designer (me), next:** tutorial flow (`docs/design/TUTORIAL.md`) uses the id mapping in 7.3 (my cautions for W1 are there); after the Founder checkpoint, a pixel-level pass on each screen (spacing, states) once the art bible lands.
+- **Level / World Designer, Gameplay / Champion Designer, Systems Designer, Esports Manager, Technical Designer:** the cuts and asks for the arena HUD are in 6.7.1 and 6.7.12 (strip heights, label and tag lengths, short feed form, commentary slots, `Report.story`).
+- **Lead Game Designer:** the helper is **Coach** and the player is the **Manager**; GDD v1 line 12 ("owner and head coach") and 7.8 ("the coach's second lever") should follow (`TUTORIAL.md` section 13).
+- **Narrative Designer:** the Coach strings in `TUTORIAL.md` section 13, the "Form" switch label (7.4), one contest name set for feed and Report chips (6.7.5).
+- **UI/UX Designer (me), next:** tutorial flow (`docs/design/TUTORIAL.md`, v1.1 matches this spec) uses the id mapping in 7.3 and the sheet contract; after the Founder checkpoint, a pixel-level pass on each screen (spacing, states) once the art bible lands.
 - **Narrative Designer:** the copy list in 7.4; display names of at most 12 characters.
 - **Lead Game Designer and Systems Designer:** decide on the inert-controls question (7.6 item 1) and the kills source (item 2).
 - **QA Manager / QA Automation:** the 72-image matrix, the fixtures and the five audits (7.1).

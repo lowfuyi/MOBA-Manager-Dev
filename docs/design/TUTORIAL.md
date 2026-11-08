@@ -166,6 +166,8 @@ Counts: 2 modal (1, 27), 5 info (2, 3, 6, 10, 21), 20 do-steps (4, 5, 7, 8, 9, 1
 
 **Alpha 0.8 variant of step 19.** When the match screen becomes the arena (UI-PASS-2 6.7), the step 19 text is out of date ("Contests appear in the feed"). From 0.8 it reads `tut.watch.arena` "Your team is the circles. Watch the fight, or use Speed x2 or Skip to the end." (17 words, no colour word, the shape carries the meaning). Target `match.controls`, event and dim as before (ring only, nothing dimmed). Step 20 and the id `match.report_btn` do not change.
 
+**Fallback layout text for step 5.** If the five-avatar-card fallback of Squad ships instead of the lane map (UI-PASS-2 D3), `squad.bench.0` stays on the first bench card and the text is `tut.squad_bench.alt` "Your five starters play every game. Tap a bench player to open their card." (14 words), because "the map" would be wrong.
+
 **Variant 5-B (only if the Founder wants the lineup picker taught).** Step 5 targets a lane-map token (`squad.token.top`), completes on `open:lane_picker`; step 6 targets the picker header (`squad.picker.head`) only, so the rows below it are blocked by the dim (a tap on a row would commit a **real** lineup change, which breaks "nothing real is changed"). Text for 5-B: `tut.squad_token` "Your five starters stand on the map. Tap one to see who else could play that role." (17 words) and `tut.picker` "Each row shows the change to team rating if you pick that player. We will not change anything now." (19 words). I did not make 5-B the default because the bench-card sheet is read-only and cannot change the lineup.
 
 ### 3.2a Steps that open a sheet or need a confirm: how each still obeys "one tap to continue or skip"
