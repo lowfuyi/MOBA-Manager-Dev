@@ -100,3 +100,16 @@
 - **Welcome tips are a light version of a tutorial** (three one-time cards). A guided first game stays optional until testers show they need it.
 - **Still open after Alpha 0.6:** the phone items (2.5, 3.7, 4.1 to 4.4, 5.1 to 5.3), the Founder items (6.4 distribution, 6.5 release key, 7.1 game name and trademark search), the independent second GDD review (7.3, not started: a fresh reviewer is needed), store policy review (7.4), and the older items (monetization, role review, youth intake, transfers).
 
+
+
+## Producer decision log: Founder's play-test feedback, Alpha 0.7 plan (2026-11-08)
+
+- **Founder feedback supersedes an earlier ruling.** The Alpha 0.6 line "A guided first game stays optional until testers show they need it" no longer stands. The Founder played Alpha 0.6 and said the tutorial is close to non-existent, the look is a long way from pleasing, screens are laid out as straight lists, and the match has too little going on. These four points outrank every other open item. The plan is `docs/ALPHA-0.7-PLAN.md`.
+- **Team expanded to 43 agents** with an independent Studio Manager who scores every handback (`company/TEAM.md`, `company/STUDIO-MANAGEMENT.md`). Agents never commit or push; the Producer commits after the Studio Manager's review.
+- **Spec stage first, then a Founder checkpoint, then build.** Wave 1 specs: esports notes, tutorial, art bible, arena map, action vocabulary, layouts.
+- **Producer rulings kept within the Founder's standing rules (the Founder may overrule at the checkpoint):**
+  - The match arena is a deterministic playback of the already-decided result. It never changes who wins. Randomness for variety comes only from a new `show` stream family; no simulation stream is touched.
+  - The 75 s watch window stays (Founder decision on record).
+  - Recommended build order: Alpha 0.7 "Guide and Look" (tutorial, visual pass, layouts), then Alpha 0.8 "Arena".
+- **Defect found by the Gameplay / Champion Designer, confirmed by the Producer reading the code:** `MatchRunner.finish` returns no `plans` key, but `Report.attribution` reads `result.get("plans", {})`, so "why you won or lost" can mis-attribute and the plan factor can never show. To be fixed in the build stage (Systems Designer item S1), with a test.
+- **Still needed from the Founder at the checkpoint:** build order; coach decisions shown as labels (recommended) or player intervention (Beta); approve one visual direction; plus the design decisions the Studio Manager's report lists.
