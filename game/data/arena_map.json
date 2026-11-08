@@ -1,0 +1,363 @@
+{
+  "schema": "moba-manager/arena-map",
+  "schema_version": 1,
+  "map_version": "0.1.0",
+  "date": "2026-11-08",
+  "map_id": "hollowmere",
+  "name": "Hollowmere",
+  "note": "Canonical frame: x 0 = west edge, 1 = east edge; y 0 = north edge (Red end), 1 = south edge (Blue end). Every Blue (B) entry has a Red (R) entry at (x, 1 - y). N = neutral, always on y = 0.5. Owner: Level / World Designer. Checked by tools/validate_arena_map.py.",
+  "arena": {
+    "px": [720, 760],
+    "unit_px": 760,
+    "x_scale": 0.9474,
+    "safe_margin": [0.04, 0.04],
+    "layout_px": {
+      "screen": [720, 1280],
+      "scoreboard_y": [0, 190],
+      "arena_y": [190, 950],
+      "feed_y": [950, 1100],
+      "controls_y": [1100, 1280]
+    }
+  },
+  "view": {
+    "player_team_at_bottom": true,
+    "flip_when_player_side": "R",
+    "flip": "y",
+    "keep_x": true,
+    "note": "Mirror, never rotate: top lane stays on the left and bot lane on the right in every match. Text and icons are drawn in screen space and are never flipped."
+  },
+  "icons_px": {
+    "hero": 40,
+    "tower": 28,
+    "cairn": 48,
+    "stoneback": 48,
+    "moonhulk": 48,
+    "camp_moss": 24,
+    "camp_bramble": 28,
+    "mossback": 36,
+    "spawn_pad": 48
+  },
+  "ambient_px": {
+    "minion": 14
+  },
+  "speeds": {
+    "walk_u_s": 0.06,
+    "rotate_mult": 1.5,
+    "rush_mult": 2.0,
+    "note": "u = map unit = 760 px (see arena.unit_px); 0.06 u/s = 45.6 px/s. Distance = hypot(dx * x_scale, dy)."
+  },
+  "watch_seconds": 75,
+  "camera": {
+    "default": {
+      "rect_px": [0, 0, 720, 760],
+      "zoom": 1.0,
+      "pan": false
+    },
+    "focus": {
+      "max_zoom": 1.3,
+      "ease_in_s": 0.45,
+      "hold_min_s": 2.0,
+      "ease_out_s": 0.6,
+      "clamp_to_map": true,
+      "contests": ["obj_mid", "fight_mid", "obj_late", "fight_late", "siege"]
+    },
+    "reduced_motion_zoom": 1.0,
+    "shake": false
+  },
+  "terrain": {
+    "mere": {
+      "c": [0.5, 0.5],
+      "r_px": 128
+    },
+    "island": {
+      "c": [0.5, 0.5],
+      "r_px": 76
+    },
+    "base_yard_r_u": 0.22
+  },
+  "areas": [
+    {"id": "thicket", "name": "The Thicket", "p": [0.215, 0.5], "note": "west jungle pocket (wide, open); centre point for tutorial highlights"},
+    {"id": "shallows", "name": "The Shallows", "p": [0.78, 0.5], "note": "east jungle pocket (narrow, tight); centre point for tutorial highlights"},
+    {"id": "mere", "name": "The Mere", "p": [0.5, 0.5], "note": "the lake with the Moonhulk isle in the middle"}
+  ],
+  "names": {
+    "map": "Hollowmere",
+    "lakes": "The Mere",
+    "pockets": ["The Thicket", "The Shallows"],
+    "lanes": {
+      "top": "Reedrun",
+      "mid": "Hush Causeway",
+      "bot": "Lanternway"
+    },
+    "ui_lane_words": {
+      "top": "Top",
+      "mid": "Mid",
+      "bot": "Bot"
+    }
+  },
+  "slots": {
+    "top": {
+      "lane": "top"
+    },
+    "jg": {
+      "zone": "thicket"
+    },
+    "mid": {
+      "lane": "mid"
+    },
+    "bot": {
+      "lane": "bot"
+    },
+    "sup": {
+      "lane": "bot"
+    }
+  },
+  "bases": {
+    "B": {
+      "cairn": [0.5, 0.925],
+      "yard_r_u": 0.22,
+      "gate_node": "B.mid.gate"
+    },
+    "R": {
+      "cairn": [0.5, 0.075],
+      "yard_r_u": 0.22,
+      "gate_node": "R.mid.gate"
+    }
+  },
+  "nodes": [
+    {"id": "N.top.mid", "p": [0.11, 0.5], "kind": "lane"},
+    {"id": "N.bot.mid", "p": [0.89, 0.5], "kind": "lane"},
+    {"id": "N.moonhulk", "p": [0.5, 0.5], "kind": "objective"},
+    {"id": "N.mossback", "p": [0.215, 0.5], "kind": "camp"},
+    {"id": "N.stoneback", "p": [0.78, 0.5], "kind": "objective"},
+    {"id": "B.top.gate", "p": [0.3, 0.845], "kind": "lane"},
+    {"id": "R.top.gate", "p": [0.3, 0.155], "kind": "lane"},
+    {"id": "B.top.1", "p": [0.21, 0.822], "kind": "lane"},
+    {"id": "R.top.1", "p": [0.21, 0.178], "kind": "lane"},
+    {"id": "B.top.2", "p": [0.148, 0.76], "kind": "lane"},
+    {"id": "R.top.2", "p": [0.148, 0.24], "kind": "lane"},
+    {"id": "B.top.3", "p": [0.118, 0.67], "kind": "lane"},
+    {"id": "R.top.3", "p": [0.118, 0.33], "kind": "lane"},
+    {"id": "B.top.4", "p": [0.11, 0.58], "kind": "lane"},
+    {"id": "R.top.4", "p": [0.11, 0.42], "kind": "lane"},
+    {"id": "B.mid.gate", "p": [0.5, 0.79], "kind": "lane"},
+    {"id": "R.mid.gate", "p": [0.5, 0.21], "kind": "lane"},
+    {"id": "B.mid.1", "p": [0.5, 0.735], "kind": "lane"},
+    {"id": "R.mid.1", "p": [0.5, 0.265], "kind": "lane"},
+    {"id": "B.mid.shore", "p": [0.5, 0.672], "kind": "lane"},
+    {"id": "R.mid.shore", "p": [0.5, 0.328], "kind": "lane"},
+    {"id": "B.mid.rim", "p": [0.5, 0.6], "kind": "lane"},
+    {"id": "R.mid.rim", "p": [0.5, 0.4], "kind": "lane"},
+    {"id": "B.bot.gate", "p": [0.7, 0.845], "kind": "lane"},
+    {"id": "R.bot.gate", "p": [0.7, 0.155], "kind": "lane"},
+    {"id": "B.bot.1", "p": [0.78, 0.808], "kind": "lane"},
+    {"id": "R.bot.1", "p": [0.78, 0.192], "kind": "lane"},
+    {"id": "B.bot.2", "p": [0.84, 0.742], "kind": "lane"},
+    {"id": "R.bot.2", "p": [0.84, 0.258], "kind": "lane"},
+    {"id": "B.bot.3", "p": [0.874, 0.66], "kind": "lane"},
+    {"id": "R.bot.3", "p": [0.874, 0.34], "kind": "lane"},
+    {"id": "B.bot.4", "p": [0.887, 0.58], "kind": "lane"},
+    {"id": "R.bot.4", "p": [0.887, 0.42], "kind": "lane"},
+    {"id": "B.spawn.top", "p": [0.335, 0.862], "kind": "spawn"},
+    {"id": "R.spawn.top", "p": [0.335, 0.138], "kind": "spawn"},
+    {"id": "B.spawn.jg", "p": [0.415, 0.838], "kind": "spawn"},
+    {"id": "R.spawn.jg", "p": [0.415, 0.162], "kind": "spawn"},
+    {"id": "B.spawn.mid", "p": [0.5, 0.822], "kind": "spawn"},
+    {"id": "R.spawn.mid", "p": [0.5, 0.178], "kind": "spawn"},
+    {"id": "B.spawn.bot", "p": [0.585, 0.838], "kind": "spawn"},
+    {"id": "R.spawn.bot", "p": [0.585, 0.162], "kind": "spawn"},
+    {"id": "B.spawn.sup", "p": [0.665, 0.862], "kind": "spawn"},
+    {"id": "R.spawn.sup", "p": [0.665, 0.138], "kind": "spawn"},
+    {"id": "B.w1", "p": [0.215, 0.7], "kind": "camp"},
+    {"id": "R.w1", "p": [0.215, 0.3], "kind": "camp"},
+    {"id": "B.w2", "p": [0.3, 0.65], "kind": "camp"},
+    {"id": "R.w2", "p": [0.3, 0.35], "kind": "camp"},
+    {"id": "B.w3", "p": [0.235, 0.585], "kind": "camp"},
+    {"id": "R.w3", "p": [0.235, 0.415], "kind": "camp"},
+    {"id": "B.e1", "p": [0.76, 0.705], "kind": "camp"},
+    {"id": "R.e1", "p": [0.76, 0.295], "kind": "camp"},
+    {"id": "B.e2", "p": [0.7, 0.655], "kind": "camp"},
+    {"id": "R.e2", "p": [0.7, 0.345], "kind": "camp"},
+    {"id": "B.e3", "p": [0.745, 0.6], "kind": "camp"},
+    {"id": "R.e3", "p": [0.745, 0.4], "kind": "camp"},
+    {"id": "B.cairn", "p": [0.5, 0.925], "kind": "base"},
+    {"id": "R.cairn", "p": [0.5, 0.075], "kind": "base"}
+  ],
+  "edges": [
+    {"a": "B.top.gate", "b": "B.top.1", "len_u": 0.0883},
+    {"a": "B.top.1", "b": "B.top.2", "len_u": 0.0854},
+    {"a": "B.top.2", "b": "B.top.3", "len_u": 0.0944},
+    {"a": "B.top.3", "b": "B.top.4", "len_u": 0.0903},
+    {"a": "B.top.4", "b": "N.top.mid", "len_u": 0.08},
+    {"a": "N.top.mid", "b": "R.top.4", "len_u": 0.08},
+    {"a": "R.top.4", "b": "R.top.3", "len_u": 0.0903},
+    {"a": "R.top.3", "b": "R.top.2", "len_u": 0.0944},
+    {"a": "R.top.2", "b": "R.top.1", "len_u": 0.0854},
+    {"a": "R.top.1", "b": "R.top.gate", "len_u": 0.0883},
+    {"a": "B.mid.gate", "b": "B.mid.1", "len_u": 0.055},
+    {"a": "B.mid.1", "b": "B.mid.shore", "len_u": 0.063},
+    {"a": "B.mid.shore", "b": "B.mid.rim", "bridge": true, "len_u": 0.072},
+    {"a": "B.mid.rim", "b": "N.moonhulk", "len_u": 0.1},
+    {"a": "N.moonhulk", "b": "R.mid.rim", "len_u": 0.1},
+    {"a": "R.mid.rim", "b": "R.mid.shore", "bridge": true, "len_u": 0.072},
+    {"a": "R.mid.shore", "b": "R.mid.1", "len_u": 0.063},
+    {"a": "R.mid.1", "b": "R.mid.gate", "len_u": 0.055},
+    {"a": "B.bot.gate", "b": "B.bot.1", "len_u": 0.0843},
+    {"a": "B.bot.1", "b": "B.bot.2", "len_u": 0.0871},
+    {"a": "B.bot.2", "b": "B.bot.3", "len_u": 0.0881},
+    {"a": "B.bot.3", "b": "B.bot.4", "len_u": 0.0809},
+    {"a": "B.bot.4", "b": "N.bot.mid", "len_u": 0.0801},
+    {"a": "N.bot.mid", "b": "R.bot.4", "len_u": 0.0801},
+    {"a": "R.bot.4", "b": "R.bot.3", "len_u": 0.0809},
+    {"a": "R.bot.3", "b": "R.bot.2", "len_u": 0.0881},
+    {"a": "R.bot.2", "b": "R.bot.1", "len_u": 0.0871},
+    {"a": "R.bot.1", "b": "R.bot.gate", "len_u": 0.0843},
+    {"a": "B.spawn.top", "b": "B.top.gate", "len_u": 0.0373},
+    {"a": "B.spawn.mid", "b": "B.mid.gate", "len_u": 0.032},
+    {"a": "B.spawn.bot", "b": "B.bot.gate", "len_u": 0.1092},
+    {"a": "B.spawn.sup", "b": "B.bot.gate", "len_u": 0.0373},
+    {"a": "B.cairn", "b": "B.spawn.mid", "len_u": 0.103},
+    {"a": "B.spawn.jg", "b": "B.spawn.top", "len_u": 0.0795},
+    {"a": "B.spawn.jg", "b": "B.spawn.mid", "len_u": 0.0821},
+    {"a": "B.spawn.bot", "b": "B.spawn.mid", "len_u": 0.0821},
+    {"a": "B.spawn.sup", "b": "B.spawn.bot", "len_u": 0.0795},
+    {"a": "B.top.1", "b": "B.w1", "len_u": 0.1221},
+    {"a": "B.w1", "b": "B.w2", "len_u": 0.0948},
+    {"a": "B.w2", "b": "B.w3", "len_u": 0.0895},
+    {"a": "B.w1", "b": "B.w3", "len_u": 0.1166},
+    {"a": "B.w3", "b": "N.mossback", "len_u": 0.0871},
+    {"a": "B.w3", "b": "B.top.4", "len_u": 0.1185},
+    {"a": "B.w2", "b": "B.mid.1", "len_u": 0.2077},
+    {"a": "B.spawn.jg", "b": "B.w2", "len_u": 0.2173},
+    {"a": "B.spawn.jg", "b": "B.mid.gate", "len_u": 0.0937},
+    {"a": "B.bot.2", "b": "B.e1", "len_u": 0.0843},
+    {"a": "B.e1", "b": "B.e2", "len_u": 0.0757},
+    {"a": "B.e2", "b": "B.e3", "len_u": 0.0696},
+    {"a": "B.e1", "b": "B.e3", "len_u": 0.106},
+    {"a": "B.e3", "b": "N.stoneback", "len_u": 0.1054},
+    {"a": "B.e3", "b": "B.bot.4", "len_u": 0.136},
+    {"a": "B.e2", "b": "B.mid.1", "len_u": 0.2057},
+    {"a": "R.spawn.top", "b": "R.top.gate", "len_u": 0.0373},
+    {"a": "R.spawn.mid", "b": "R.mid.gate", "len_u": 0.032},
+    {"a": "R.spawn.bot", "b": "R.bot.gate", "len_u": 0.1092},
+    {"a": "R.spawn.sup", "b": "R.bot.gate", "len_u": 0.0373},
+    {"a": "R.cairn", "b": "R.spawn.mid", "len_u": 0.103},
+    {"a": "R.spawn.jg", "b": "R.spawn.top", "len_u": 0.0795},
+    {"a": "R.spawn.jg", "b": "R.spawn.mid", "len_u": 0.0821},
+    {"a": "R.spawn.bot", "b": "R.spawn.mid", "len_u": 0.0821},
+    {"a": "R.spawn.sup", "b": "R.spawn.bot", "len_u": 0.0795},
+    {"a": "R.top.1", "b": "R.w1", "len_u": 0.1221},
+    {"a": "R.w1", "b": "R.w2", "len_u": 0.0948},
+    {"a": "R.w2", "b": "R.w3", "len_u": 0.0895},
+    {"a": "R.w1", "b": "R.w3", "len_u": 0.1166},
+    {"a": "R.w3", "b": "N.mossback", "len_u": 0.0871},
+    {"a": "R.w3", "b": "R.top.4", "len_u": 0.1185},
+    {"a": "R.w2", "b": "R.mid.1", "len_u": 0.2077},
+    {"a": "R.spawn.jg", "b": "R.w2", "len_u": 0.2173},
+    {"a": "R.spawn.jg", "b": "R.mid.gate", "len_u": 0.0937},
+    {"a": "R.bot.2", "b": "R.e1", "len_u": 0.0843},
+    {"a": "R.e1", "b": "R.e2", "len_u": 0.0757},
+    {"a": "R.e2", "b": "R.e3", "len_u": 0.0696},
+    {"a": "R.e1", "b": "R.e3", "len_u": 0.106},
+    {"a": "R.e3", "b": "N.stoneback", "len_u": 0.1054},
+    {"a": "R.e3", "b": "R.bot.4", "len_u": 0.136},
+    {"a": "R.e2", "b": "R.mid.1", "len_u": 0.2057},
+    {"a": "N.mossback", "b": "N.top.mid", "len_u": 0.0995},
+    {"a": "N.stoneback", "b": "N.bot.mid", "len_u": 0.1042}
+  ],
+  "lanes": [
+    {"id": "top", "name": "Reedrun", "sim_contest": "top", "width_px": 40, "length_u": 0.8768, "nodes": ["B.top.gate", "B.top.1", "B.top.2", "B.top.3", "B.top.4", "N.top.mid", "R.top.4", "R.top.3", "R.top.2", "R.top.1", "R.top.gate"], "clash": {"neutral_s": 0.5, "max_shift_s": 0.15, "note": "s = arc fraction from Blue gate (0) to Red gate (1)"}},
+    {"id": "mid", "name": "Hush Causeway", "sim_contest": "mid_lane", "width_px": 56, "length_u": 0.58, "nodes": ["B.mid.gate", "B.mid.1", "B.mid.shore", "B.mid.rim", "N.moonhulk", "R.mid.rim", "R.mid.shore", "R.mid.1", "R.mid.gate"], "clash": {"neutral_s": 0.5, "max_shift_s": 0.29, "note": "s = arc fraction from Blue gate (0) to Red gate (1)"}},
+    {"id": "bot", "name": "Lanternway", "sim_contest": "bot", "width_px": 64, "length_u": 0.8411, "nodes": ["B.bot.gate", "B.bot.1", "B.bot.2", "B.bot.3", "B.bot.4", "N.bot.mid", "R.bot.4", "R.bot.3", "R.bot.2", "R.bot.1", "R.bot.gate"], "clash": {"neutral_s": 0.5, "max_shift_s": 0.15, "note": "s = arc fraction from Blue gate (0) to Red gate (1)"}}
+  ],
+  "towers": [
+    {"id": "B.top.inner", "side": "B", "lane": "top", "tier": "inner", "s": 0.15, "p": [0.1786, 0.7906]},
+    {"id": "R.top.inner", "side": "R", "lane": "top", "tier": "inner", "s": 0.85, "p": [0.1786, 0.2094]},
+    {"id": "B.top.outer", "side": "B", "lane": "top", "tier": "outer", "s": 0.31, "p": [0.1177, 0.6663]},
+    {"id": "R.top.outer", "side": "R", "lane": "top", "tier": "outer", "s": 0.69, "p": [0.1177, 0.3337]},
+    {"id": "B.mid.inner", "side": "B", "lane": "mid", "tier": "inner", "s": 0.08, "p": [0.5, 0.7436]},
+    {"id": "R.mid.inner", "side": "R", "lane": "mid", "tier": "inner", "s": 0.92, "p": [0.5, 0.2564]},
+    {"id": "B.mid.outer", "side": "B", "lane": "mid", "tier": "outer", "s": 0.17, "p": [0.5, 0.6914]},
+    {"id": "R.mid.outer", "side": "R", "lane": "mid", "tier": "outer", "s": 0.83, "p": [0.5, 0.3086]},
+    {"id": "B.bot.inner", "side": "B", "lane": "bot", "tier": "inner", "s": 0.15, "p": [0.8088, 0.7763]},
+    {"id": "R.bot.inner", "side": "R", "lane": "bot", "tier": "inner", "s": 0.85, "p": [0.8088, 0.2237]},
+    {"id": "B.bot.outer", "side": "B", "lane": "bot", "tier": "outer", "s": 0.31, "p": [0.8742, 0.6588]},
+    {"id": "R.bot.outer", "side": "R", "lane": "bot", "tier": "outer", "s": 0.69, "p": [0.8742, 0.3412]},
+    {"id": "B.guard.l", "side": "B", "lane": "base", "tier": "guard", "s": null, "p": [0.405, 0.765]},
+    {"id": "R.guard.l", "side": "R", "lane": "base", "tier": "guard", "s": null, "p": [0.405, 0.235]},
+    {"id": "B.guard.r", "side": "B", "lane": "base", "tier": "guard", "s": null, "p": [0.595, 0.765]},
+    {"id": "R.guard.r", "side": "R", "lane": "base", "tier": "guard", "s": null, "p": [0.595, 0.235]}
+  ],
+  "camps": [
+    {"id": "B.w1", "side": "B", "kind": "moss", "pocket": "thicket", "node": "B.w1", "p": [0.215, 0.7]},
+    {"id": "R.w1", "side": "R", "kind": "moss", "pocket": "thicket", "node": "R.w1", "p": [0.215, 0.3]},
+    {"id": "B.w2", "side": "B", "kind": "moss", "pocket": "thicket", "node": "B.w2", "p": [0.3, 0.65]},
+    {"id": "R.w2", "side": "R", "kind": "moss", "pocket": "thicket", "node": "R.w2", "p": [0.3, 0.35]},
+    {"id": "B.w3", "side": "B", "kind": "bramble", "pocket": "thicket", "node": "B.w3", "p": [0.235, 0.585]},
+    {"id": "R.w3", "side": "R", "kind": "bramble", "pocket": "thicket", "node": "R.w3", "p": [0.235, 0.415]},
+    {"id": "B.e1", "side": "B", "kind": "moss", "pocket": "shallows", "node": "B.e1", "p": [0.76, 0.705]},
+    {"id": "R.e1", "side": "R", "kind": "moss", "pocket": "shallows", "node": "R.e1", "p": [0.76, 0.295]},
+    {"id": "B.e2", "side": "B", "kind": "moss", "pocket": "shallows", "node": "B.e2", "p": [0.7, 0.655]},
+    {"id": "R.e2", "side": "R", "kind": "moss", "pocket": "shallows", "node": "R.e2", "p": [0.7, 0.345]},
+    {"id": "B.e3", "side": "B", "kind": "bramble", "pocket": "shallows", "node": "B.e3", "p": [0.745, 0.6]},
+    {"id": "R.e3", "side": "R", "kind": "bramble", "pocket": "shallows", "node": "R.e3", "p": [0.745, 0.4]},
+    {"id": "N.mossback", "side": "N", "kind": "mossback", "pocket": "thicket", "node": "N.mossback", "p": [0.215, 0.5]}
+  ],
+  "objectives": [
+    {"id": "N.stoneback", "side": "N", "kind": "early_objective", "name": "Stoneback", "sim_contest": "obj_mid", "p": [0.78, 0.5], "node": "N.stoneback", "zone": "stoneback_pit", "icon_px": 48, "reward": "gold and a speed buff (GDD 3)"},
+    {"id": "N.moonhulk", "side": "N", "kind": "late_objective", "name": "Moonhulk", "sim_contest": "obj_late", "p": [0.5, 0.5], "node": "N.moonhulk", "zone": "moonhulk_isle", "icon_px": 48, "reward": "the decisive team buff (GDD 3)"},
+    {"id": "B.cairn", "side": "B", "kind": "base_core", "name": "The Cairn", "sim_contest": "siege", "p": [0.5, 0.925], "node": "B.cairn", "zone": "cairn.B", "icon_px": 48, "reward": "destroy it to win"},
+    {"id": "R.cairn", "side": "R", "kind": "base_core", "name": "The Cairn", "sim_contest": "siege", "p": [0.5, 0.075], "node": "R.cairn", "zone": "cairn.R", "icon_px": 48, "reward": "destroy it to win"}
+  ],
+  "spawns": {
+    "pad_r_px": 26,
+    "B": {
+      "top": [0.335, 0.862],
+      "jg": [0.415, 0.838],
+      "mid": [0.5, 0.822],
+      "bot": [0.585, 0.838],
+      "sup": [0.665, 0.862]
+    },
+    "R": {
+      "top": [0.335, 0.138],
+      "jg": [0.415, 0.162],
+      "mid": [0.5, 0.178],
+      "bot": [0.585, 0.162],
+      "sup": [0.665, 0.138]
+    }
+  },
+  "zones": [
+    {"id": "top_clash", "side": "N", "kind": "lane", "c": [0.11, 0.5], "r_px": 48, "note": "Reedrun midpoint: the neutral place of the top duel"},
+    {"id": "mid_clash", "side": "N", "kind": "lane", "c": [0.5, 0.5], "r_px": 76, "note": "Hush Causeway midpoint on the Moonhulk isle; winner shifts it along the causeway"},
+    {"id": "bot_clash", "side": "N", "kind": "lane", "c": [0.89, 0.5], "r_px": 48, "note": "Lanternway midpoint: the 2v2 duel"},
+    {"id": "mossback_clearing", "side": "N", "kind": "fight", "c": [0.215, 0.5], "r_px": 78, "note": "open ground in the Thicket, home of the shared big camp"},
+    {"id": "stoneback_pit", "side": "N", "kind": "fight", "c": [0.78, 0.5], "r_px": 70, "note": "tight ground in the Shallows around the Stoneback"},
+    {"id": "moonhulk_isle", "side": "N", "kind": "fight", "c": [0.5, 0.5], "r_px": 76, "note": "the island; the only fight ground with water on every side"},
+    {"id": "thicket.B", "side": "B", "kind": "jungle", "c": [0.225, 0.66], "r_px": 90, "note": "west pocket, own half: three camps"},
+    {"id": "thicket.R", "side": "R", "kind": "jungle", "c": [0.225, 0.34], "r_px": 90, "note": "west pocket, own half: three camps"},
+    {"id": "shallows.B", "side": "B", "kind": "jungle", "c": [0.74, 0.66], "r_px": 90, "note": "east pocket, own half: three camps"},
+    {"id": "shallows.R", "side": "R", "kind": "jungle", "c": [0.74, 0.34], "r_px": 90, "note": "east pocket, own half: three camps"},
+    {"id": "gate.B", "side": "B", "kind": "base", "c": [0.5, 0.79], "r_px": 64, "note": "plaza in front of the Cairn between the two gate towers"},
+    {"id": "gate.R", "side": "R", "kind": "base", "c": [0.5, 0.21], "r_px": 64, "note": "plaza in front of the Cairn between the two gate towers"},
+    {"id": "cairn.B", "side": "B", "kind": "base", "c": [0.5, 0.925], "r_px": 52, "note": "the Cairn itself: siege ground"},
+    {"id": "cairn.R", "side": "R", "kind": "base", "c": [0.5, 0.075], "r_px": 52, "note": "the Cairn itself: siege ground"}
+  ],
+  "stages": [
+    {"contest": "top", "order": 1, "t_frac": 0.18, "t_s": 13.5, "zone": "top_clash", "actors": ["top"], "title": "Top lane duel", "since": "start", "travel": [{"from": "B.spawn.top", "to": "N.top.mid", "speed": "walk"}]},
+    {"contest": "mid_lane", "order": 2, "t_frac": 0.21, "t_s": 15.75, "zone": "mid_clash", "actors": ["mid"], "title": "Mid lane duel on the Causeway", "since": "start", "travel": [{"from": "B.spawn.mid", "to": "N.moonhulk", "speed": "walk"}]},
+    {"contest": "bot", "order": 3, "t_frac": 0.24, "t_s": 18.0, "zone": "bot_clash", "actors": ["bot", "sup"], "title": "Bot lane 2v2", "since": "start", "travel": [{"from": "B.spawn.sup", "to": "N.bot.mid", "speed": "walk"}, {"from": "B.spawn.bot", "to": "N.bot.mid", "speed": "walk"}]},
+    {"contest": "jungle", "order": 4, "t_frac": 0.27, "t_s": 20.25, "zone": ["thicket.*", "shallows.*", "mossback_clearing"], "actors": ["jg"], "title": "Jungle control: camps and invades", "since": "start", "travel": [{"from": "B.spawn.jg", "to": "N.mossback", "speed": "walk"}], "zone_rule": "both pockets; the winning jungler is shown crossing the centre line"},
+    {"contest": "obj_mid", "order": 5, "t_frac": 0.45, "t_s": 33.75, "zone": "stoneback_pit", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Stoneback taken", "since": "start", "travel": [{"from": "B.cairn", "to": "N.stoneback", "speed": "walk"}]},
+    {"contest": "fight_mid", "order": 6, "t_frac": 0.6, "t_s": 45.0, "zone": "mossback_clearing", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Mid-game team fight", "since": "obj_mid", "travel": [{"from": "N.stoneback", "to": "N.mossback", "speed": "rotate"}]},
+    {"contest": "obj_late", "order": 7, "t_frac": 0.8, "t_s": 60.0, "zone": "moonhulk_isle", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Moonhulk taken", "since": "fight_mid", "travel": [{"from": "N.mossback", "to": "N.moonhulk", "speed": "walk"}]},
+    {"contest": "fight_late", "order": 8, "t_frac": 0.95, "t_s": 71.25, "zone": "gate.*", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Decisive fight at the Cairn Gate", "since": "obj_late", "travel": [{"from": "N.moonhulk", "to": "B.mid.gate", "speed": "walk"}], "zone_rule": "gate of the team that loses the match"},
+    {"contest": "siege", "order": 9, "t_frac": 1.0, "t_s": 75.0, "zone": "cairn.*", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Siege of the Cairn", "since": "fight_late", "travel": [{"from": "B.mid.gate", "to": "B.cairn", "speed": "walk"}], "zone_rule": "cairn of the team that loses the match"}
+  ],
+  "waves": {
+    "suggested": true,
+    "first_spawn_s": 2.0,
+    "interval_s": 10.0,
+    "size": 4,
+    "speed_u_s": 0.05
+  }
+}
