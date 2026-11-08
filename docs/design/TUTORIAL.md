@@ -1,6 +1,6 @@
 # Guided tutorial and in-context help (workstream W1)
 
-Version: spec v1.1 (wave 1b reconciliation) · Date: 2026-11-08 · Author: UI/UX Designer · Status: design for the Founder checkpoint. **Nothing here is built or run.** It answers the Founder's feedback 2 ("Game Tutorial is close to non-existent ... users will need us to explain and guide them") in `docs/ALPHA-0.7-PLAN.md`.
+Version: spec v1.2 (pass 1c, numbers aligned with the art bible; v1.1 was the wave 1b reconciliation) · Date: 2026-11-08 · Author: UI/UX Designer · Status: design for the Founder checkpoint. **Nothing here is built or run.** It answers the Founder's feedback 2 ("Game Tutorial is close to non-existent ... users will need us to explain and guide them") in `docs/ALPHA-0.7-PLAN.md`.
 
 Read with: `docs/design/UI-PASS-2.md` (the layout redesign). v1 was written 8 minutes before UI-PASS-2 was finished; v1.1 matches the final layouts. This spec points at controls by **stable ids**, not by position, so the layout can change under it. Section 8 lists the ids the programmers must add.
 
@@ -14,8 +14,10 @@ Read with: `docs/design/UI-PASS-2.md` (the layout redesign). v1 was written 8 mi
 | Report (C11) | Step 22 is now a tap on the hero stat, then Next closes the factor sheet. |
 | Standings (C2) | Three views plus a Points / Form switch. Steps 25 and 26, lesson L1 and the help row follow it. Step 26 is now a tap on the switch. |
 | Overlay | Draws **above** `BottomSheet` (own canvas layer). Sheet steps use a compact card. |
-| Numbers (C1) | Body 32, Small 26, Caption 24 (floor), card radius 24, from UI-PASS-2 2.2. Anything the Art Director may still change is marked "per ART-BIBLE token table". |
+| Numbers (C1) | Body 32, Small 26, Caption 24 (floor), card radius 24: `ART-BIBLE.md` 5.2 is the one token table (Display 64, Title 48, screen and sheet title 40, Heading 36, Body 32, Small 26, Caption 24) and this spec cites it. The "per ART-BIBLE token table" markers of v1.1 are replaced by the values. |
 | Counts | Do-steps 20 of 27 (was 18), info 5 (was 7), modal 2; first-run ids 27 (was 25); glossary 49 terms (was 48, adds Coach); tests 20 (was 18). |
+
+**v1.2 (pass 1c, review wave 1b 4.1; numbers and ids only, no step text changed):** (A4) the Draft header titles are sentence case, "Your ban", "Your pick", "Their ban", "Their pick" (5.1); (A5, A6) the Home "?" note cites the accepted 120 x 120 px clear zone (ART-BIBLE 3.7 rule 8) instead of "pending"; (A11) the spotlight ring stays 4 px and is said to be a different object from the 3 px focus ring (7.3); (A12) the Chemistry id `chem.pentagon` is now `chem.map` and the L4 step id `l4.map` (4.2 and 8); the "?" unopened dot is no longer coral (5.1). The word counts were re-run (section 9 of this file's checks, reported in the handback).
 
 What it replaces: three dismissible one-time tips (`Tips.show` for Home, Pre-match and Report). They never point at anything and cannot be replayed except as a block.
 
@@ -288,8 +290,10 @@ Note on L3: a starter whose contract ends is a lane-map token, and a token opens
 |---|---|---|---|
 | `l4.open` | `plan.tile.chem` · tap | `les.l4.open` "Bonds grow when players play together. Tap Team chemistry to see yours." | `tap:plan.tile.chem` → Chemistry |
 | `l4.summary` | `chem.summary` · info | `les.l4.summary` "Chemistry turns the bonds of your five starters into a small rating bonus for the whole team." | Next |
-| `l4.pentagon` | `chem.pentagon` · info | `les.l4.pentagon` "Each line is a bond between two starters. Thicker lines mean stronger bonds." | Next |
+| `l4.map` | `chem.map` · info | `les.l4.map` "Each line is a bond between two starters. Thicker lines mean stronger bonds." | Next |
 | `l4.scrim` | `chem.training` · info | `les.l4.scrim` "Team scrims in Training build bonds a little faster. Swapping a starter costs chemistry until the new pairs have played." | Next → end |
+
+(Pass 1c, A12: `chem.map` was `chem.pentagon`, and `l4.map` was `l4.pentagon`. ART-BIBLE 8.2 redraws Chemistry as the Squad lane-map card in UI Pass 3, so the id no longer names a shape. Today's code still draws a pentagon (`bond_pentagon.gd`); tag that picture `chem.map` now. The text is unchanged and is true of both.)
 
 **L5 Game Plan in depth** (start: the Draft complete screen of a real game, or from the Lessons list through an AI-drafted sandbox game that opens its Game Plan screen; the sandbox start is an optional small extra)
 
@@ -339,10 +343,10 @@ A small screen from Settings: one card per lesson with title, "about a minute", 
 
 ### 5.1 The "?" button and the sheet
 
-- **Button:** `help.button`, top right of every screen that has a title or a head card. It is part of the shared `Screen` frame (UI-PASS-2 `ScreenHeader`, 5.2), so one change covers every page. A 96 x 96 px corner is reserved on every screen. 88 px visible circle, 96 px hit area. A coral dot on it means "never opened on this device" (dot colour per ART-BIBLE token table; a dot is a shape, so it does not rely on colour). Two screens lay out around it specially:
-  - **Draft:** the header is back, title, timer ring, Auto-finish, "?" (UI-PASS-2 6.3 wireframe now shows the slot). The title is shortened to "YOUR BAN", "YOUR PICK", "THEIR BAN" so it fits beside the four fixed parts.
+- **Button:** `help.button`, top right of every screen that has a title or a head card. It is part of the shared `Screen` frame (UI-PASS-2 `ScreenHeader`, 5.2), so one change covers every page. A 96 x 96 px corner is reserved on every screen. 88 px visible circle, 96 px hit area. A 14 px `TEAL_HI` dot with a 2 px page-colour ring on it means "never opened on this device" (the same construction as the tab attention dot, ART-BIBLE 8.2; v1.1 said coral, but coral is reserved for the go action and "them", ART-BIBLE 9.1, so the dot is teal: the Art Director confirms the colour; a dot is a shape, so it does not rely on colour). Two screens lay out around it specially:
+  - **Draft:** the header is back, title, timer ring, Auto-finish, "?" (UI-PASS-2 6.3 wireframe now shows the slot). The title is sentence case, "Your ban", "Your pick", "Their ban" or "Their pick" (141 to 161 px in Barlow Semi Condensed Bold 40), and it fits the 200 px of room beside the four fixed parts (96 + 72 + 176 + 96 + 4 gaps of 8 leaves 200 of 672); in large text 106 px is left and the title takes two lines (UI-PASS-2 6.3). The bible's earlier 260 px figure was wrong and is deleted (ART-BIBLE 5.2).
   - **Match (arena, Alpha 0.8):** the top of the screen is the scoreboard, so "?" sits at the **right end of the controls row** (UI-PASS-2 6.7), the one place where it is not top right. The 0.7 match screen keeps the standard top-right corner.
-  - **Home:** the "?" sits over the hero art; UI-PASS-2 6.1 states its contrast (solid circle plus a ring) and asks the Art Director to keep a 120 x 120 px clear zone in the art (pending ART-BIBLE re-issue).
+  - **Home:** the "?" sits over the hero art; UI-PASS-2 6.1 states its contrast (solid circle plus a ring) and the Art Director accepted the 120 x 120 px clear zone in the art (the top-right corner holds nothing lighter than `#43536E`, ART-BIBLE 3.7 rule 8).
 - **Sheet:** a bottom sheet over a 60 percent dim (UI-PASS-2 5.5, size M, size L in large text): a title, then three short blocks, then the words on the screen, then two buttons. It scrolls inside if needed, slides up in 220 ms (the `BottomSheet` motion), closes on Got it, a tap on the dim, drag down, or Android back.
 
   1. **What you see** (one or two lines).
@@ -538,14 +542,14 @@ The design screen is 720 x 1280. On common phones 1 dp is about 1.75 to 2.0 px o
 | Part | Size |
 |---|---|
 | Card width | viewport width minus 32 px (16 px each side); never wider than 680 |
-| Card padding | 24 px (UI-PASS-2 spacing scale), radius `UI.R_CARD` (24), fill `UI.PANEL3` (the overlay surface, so it reads against dimmed screens and over sheets), 2 px border `UI.ACCENT` at 70 percent, so it reads as "the helper" (fill and border per ART-BIBLE token table) |
+| Card padding | 24 px (UI-PASS-2 spacing scale), radius `UI.R_CARD` (24), fill `UI.PANEL3` (the overlay surface, so it reads against dimmed screens and over sheets), 2 px border `UI.ACCENT` at 70 percent, so it reads as "the helper" (`PANEL3` is the bible's surface 3, the overlay, ART-BIBLE 3.1) |
 | Body text | `UI.S_BODY` (32). Never below `UI.S_CAPTION` (24) anywhere on the card (v1 said 28 and 22) |
 | Chapter label | `UI.S_SMALL` (26), `TEXT2` (the `DIM` token is not allowed on the overlay surface, ART-BIBLE 3.2); progress bar 8 px high |
 | Buttons | at least 96 px high; Next or the one-tap shortcut primary (expand, 60 percent), Skip tutorial flat (expand, 40 percent). On do-steps only Skip shows, centred, except steps 15, 17 and 22 stage A, which also show their one-tap button |
 | Card height | at most 45 percent of the screen (35 percent on compact sheet steps); the chapter row is dropped first, then the body scrolls inside, if it ever needs more |
 | Safe margins | top at least 48 + 16 px (the existing top margin plus a gap), bottom at least 24 + 16 px; use the display safe area where the phone reports one |
 | Card side | below the hole if the hole's centre is in the top half, above it otherwise; never covers the hole |
-| Ring | 4 px outline (`TEAL_HI` is the art bible's focus ring; per ART-BIBLE token table), corner radius equal to the target's own (about 20 to 24) plus 6, plus a 10 px glow at 25 percent. A shape, not just a colour |
+| Ring | 4 px outline in `TEAL_HI`. This is the **spotlight ring**, a different object from the 3 px `TEAL_HI` keyboard focus ring of ART-BIBLE 4.2 (the sizes differ on purpose and the two never show together), corner radius equal to the target's own (about 20 to 24) plus 6, plus a 10 px glow at 25 percent. A shape, not just a colour |
 | Pointer | 36 px triangle on the card-facing edge of the hole; hidden when the hole is larger than 40 percent of the screen |
 | Dim | `UI.BG` at 80 percent (full) or 45 percent (light); none for step 19 |
 
@@ -624,7 +628,7 @@ Steps are data, not code (one JSON file, `game/data/tutorial_v1.json`, read by a
 | Plan | ★`plan.tile.practice`, `plan.tile.training`, `plan.tile.chem` |
 | Practice | ★`practice.quick` |
 | Training | `training.preview`, `training.row.0`, `training.picker` |
-| Chemistry | `chem.summary`, `chem.pentagon`, `chem.training` |
+| Chemistry | `chem.summary`, `chem.map` (was `chem.pentagon`), `chem.training` |
 | Pre-match | ★`prematch.matchups`, ★`prematch.start_draft` |
 | Draft | ★`draft.choices` (Coach bar plus the hero grid, steps 12 and 13), ★`draft.slot_list` (the "Plays as" lane row in the hero sheet), ★`draft.sheet.confirm` (**new**: the sheet's Pick or Ban button), ★`draft.auto_rest` (the Auto-finish text button in the header), ★`draft.game_plan`, `draft.hero_grid` (no longer a first-run target) |
 | Game Plan | ★`gp.coach`, ★`gp.coach_apply` (**new**: Apply in the Coach sheet), ★`gp.start_match`, `gp.edge`, `gp.contests`, `gp.tabs` (the phase strip), `plan.chip` (the Plan chip, lesson L5), `gp.sliders` (the detent tracks) |

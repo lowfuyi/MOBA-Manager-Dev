@@ -883,10 +883,320 @@ def check_variants(ctx):
     return errs
 
 
+# --------------------------------------------------------------------------- look, labels, walks (pass 1c)
+
+def check_look(ctx):
+    d, errs = ctx.d, []
+    lk = d["look"]
+    tk = lk.get("tokens", {})
+    for role, want in EXPECTED_TOKENS.items():
+        if tk.get(role) != want:
+            errs.append(f"look.tokens.{role} is {tk.get(role)!r}, ART-BIBLE 3.8/3.9 maps it to {want}")
+    used_unnamed = set()
+    for role, name in tk.items():
+        if not isinstance(name, str) or name.startswith("ARENA_"):
+            errs.append(f"look.tokens.{role}: {name!r} is a placeholder, only ART-BIBLE token names are allowed")
+        elif name in NEVER_ON_MAP:
+            errs.append(f"look.tokens.{role}: {name} is never a map colour (ART-BIBLE 3.8)")
+        elif name in UNNAMED_IN_BIBLE:
+            used_unnamed.add(name)
+        elif name not in BIBLE_TOKENS:
+            errs.append(f"look.tokens.{role}: {name} is not a token of ART-BIBLE 3.1 to 3.9")
+    listed = set(lk.get("tokens_not_in_bible", []))
+    if listed != used_unnamed:
+        errs.append(f"look.tokens_not_in_bible {sorted(listed)} must list exactly the tokens the bible has no constant for: {sorted(used_unnamed)}")
+    sh = lk.get("shapes", {})
+    if sh.get("hero_you") != "circle" or sh.get("hero_them") != "hexagon_flat_top":
+        errs.append("look.shapes: you are a circle and them a flat-top hexagon (ART-BIBLE 3.8)")
+    if sh.get("stoneback") != "rhombus":
+        errs.append(f"look.shapes.stoneback is {sh.get('stoneback')!r}: Stoneback is a rhombus (the hexagon means 'them')")
+    for k, v in sh.items():
+        if "hex" in str(v) and k != "hero_them":
+            errs.append(f"look.shapes.{k} is {v!r}: only the 'them' hero token may be a hexagon")
+    for o in d["objectives"]:
+        want = {"N.stoneback": sh.get("stoneback"), "N.moonhulk": sh.get("moonhulk")}.get(o["id"], sh.get("cairn"))
+        if o.get("shape") != want:
+            errs.append(f"objective {o['id']}: shape {o.get('shape')!r} but look.shapes says {want!r}")
+    if not 0.3 <= lk.get("guard_tower_opacity", 0) <= 0.7:
+        errs.append("look.guard_tower_opacity must be between 0.3 and 0.7 (scenery, dimmer than counted towers)")
+    return errs
+
+
+def rect_dist(a, b):
+    dx = max(a[0] - b[2], b[0] - a[2], 0.0)
+    dy = max(a[1] - b[3], b[1] - a[3], 0.0)
+    return math.hypot(dx, dy)
+
+
+def rect_point_dist(r, p):
+    return math.hypot(max(r[0] - p[0], 0.0, p[0] - r[2]), max(r[1] - p[1], 0.0, p[1] - r[3]))
+
+
+def rect_far_dist(r, p):
+    return max(math.hypot(x - p[0], y - p[1]) for x in (r[0], r[2]) for y in (r[1], r[3]))
+
+
+def label_box(ctx, lab):
+    cx, cy = ctx.px(lab["c"])
+    w = lab["w_px"] + LABEL_OUTLINE_PX
+    h = ctx.d["labels"].get("box_h_px", 24)
+    return (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
+
+
+def lane_poly_px(ctx, lane):
+    return [ctx.px(ctx.nodes[n]["p"]) for n in lane["nodes"]]
+
+
+def poly_gap_px(p, poly):
+    best = 1e9
+    for a, b in zip(poly, poly[1:]):
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        L2 = dx * dx + dy * dy
+        t = 0.0 if L2 == 0 else max(0.0, min(1.0, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L2))
+        best = min(best, math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy)))
+    return best
+
+
+def lane_touch_px(ctx, box, lane, grid=2.0):
+    """smallest gap (px) between a label box and the drawn road of a lane: the road is its centre line with the lane's
+    half width plus the 2 px edge line; the stretch under the island is hidden by the island, so it does not count.
+    Returns a negative number when the box overlaps the road."""
+    poly = lane_poly_px(ctx, lane)
+    half = lane["width_px"] / 2 + 2
+    ic = ctx.px(ctx.island["c"])
+    ir = float(ctx.island["r_px"])
+    best = 1e9
+    nx = max(1, int((box[2] - box[0]) / grid))
+    ny = max(1, int((box[3] - box[1]) / grid))
+    # gap = distance from the road to the box = min over box sample points of (distance to centre line - half)
+    for i in range(nx + 1):
+        x = box[0] + (box[2] - box[0]) * i / nx
+        for j in range(ny + 1):
+            y = box[1] + (box[3] - box[1]) * j / ny
+            if math.hypot(x - ic[0], y - ic[1]) < ir:
+                continue                      # that part of the box is on the island, where the road is hidden
+            best = min(best, poly_gap_px((x, y), poly) - half)
+    return best
+
+
+def label_findings(ctx, labs=None):
+    """returns (hard problems, lake or island rim crossings); one pass over every label"""
+    d = ctx.d
+    labs = d["labels"]["items"] if labs is None else labs
+    lanes = {l["id"]: l for l in d["lanes"]}
+    boxes = {lab["id"]: label_box(ctx, lab) for lab in labs}
+    circles = []
+    for c in d["camps"]:
+        circles.append((f"camp {c['id']}", ctx.px(c["p"]), icon_px_for(d, "camp", c) / 2))
+    for t in d["towers"]:
+        circles.append((f"tower {t['id']}", ctx.px(t["p"]), d["icons_px"]["tower"] / 2))
+    for o in d["objectives"]:
+        circles.append((f"objective {o['id']}", ctx.px(o["p"]), o["icon_px"] / 2))
+    for side in "BR":
+        for slot, p in d["spawns"][side].items():
+            if slot != "pad_r_px":
+                circles.append((f"spawn pad {side}.{slot}", ctx.px(p), d["spawns"]["pad_r_px"]))
+    hard, crossings = [], []
+    mc = ctx.px(ctx.mere["c"])
+    for lab in labs:
+        lid, box = lab["id"], boxes[lab["id"]]
+        if box[0] < 4 or box[1] < 4 or box[2] > ctx.w - 4 or box[3] > ctx.h - 4:
+            hard.append(f"label {lid}: box leaves the arena (4 px margin)")
+        own = lab.get("lane") if lab.get("kind") == "lane" else None
+        for lid2, lane in lanes.items():
+            if lid2 == own:
+                cx, cy = ctx.px(lab["c"])
+                if poly_gap_px((cx, cy), lane_poly_px(ctx, lane)) > lane["width_px"] / 2:
+                    hard.append(f"label {lid}: lane tag is not on its own lane {lid2}")
+                continue
+            gap = lane_touch_px(ctx, box, lane)
+            if gap < LABEL_GAP_PX:
+                hard.append(f"label {lid}: {'crosses' if gap < 0 else 'is %.1f px from' % gap} lane {lid2} (needs {LABEL_GAP_PX} px clear)")
+        for name, c, r in circles:
+            gap = rect_point_dist(box, c) - r
+            if gap < LABEL_GAP_PX:
+                hard.append(f"label {lid}: {'overlaps' if gap < 0 else 'is %.1f px from' % gap} {name} (needs {LABEL_GAP_PX} px clear)")
+        for lid2, box2 in boxes.items():
+            if lid2 > lid and rect_dist(box, box2) < LABEL_GAP_PX:
+                hard.append(f"labels {lid} and {lid2}: closer than {LABEL_GAP_PX} px")
+        for what, r_px in (("the lake shore", float(ctx.mere["r_px"])), ("the island rim", float(ctx.island["r_px"]))):
+            inside = (r_px + 1.5 + LABEL_GAP_PX) - rect_point_dist(box, mc)    # how far the box reaches inside the ring
+            outside = rect_far_dist(box, mc) - (r_px - 1.5 - LABEL_GAP_PX)     # how far it reaches outside it
+            if inside > 0 and outside > 0:
+                crossings.append({"label": lid, "what": what, "spill_px": round(min(inside, outside), 1)})
+    return hard, crossings
+
+
+def check_labels(ctx):
+    d, errs = ctx.d, []
+    lb = d["labels"]
+    f = lb.get("font", {})
+    if f.get("size_px", 0) < LABEL_MIN_PX:
+        errs.append(f"labels.font.size_px {f.get('size_px')} is under the {LABEL_MIN_PX} px floor (ART-BIBLE 5.2)")
+    if f.get("tracking_px") != 1.5 or f.get("weight") != "Bold":
+        errs.append("labels.font must be Bold with +1.5 px tracking (ART-BIBLE 5.2, 313)")
+    if f.get("colour") != "TEXT" or f.get("outline", {}).get("colour") != "VOID" or f.get("outline", {}).get("px") != LABEL_OUTLINE_PX:
+        errs.append(f"labels.font: colour TEXT with a {LABEL_OUTLINE_PX} px VOID outline (ART-BIBLE 3.9)")
+    items = lb.get("items", [])
+    if len({i["id"] for i in items}) != len(items):
+        errs.append("labels.items: duplicate id")
+    want_text = {"lane_top": "TOP", "lane_mid": "MID", "lane_bot": "BOT", "place_stoneback": "STONEBACK",
+                 "place_moonhulk": "MOONHULK", "place_mossback": "MOSSBACK"}
+    have = {i["id"]: i for i in items}
+    for k, txt in want_text.items():
+        if k not in have:
+            errs.append(f"labels.items: '{k}' is missing")
+        elif have[k].get("text") != txt:
+            errs.append(f"labels.items.{k}: text is {have[k].get('text')!r}, expected {txt!r}")
+    for i in items:
+        if not 20 <= i.get("w_px", 0) <= 200:
+            errs.append(f"label {i['id']}: w_px {i.get('w_px')} out of range")
+        elif i["w_px"] < len(i.get("text", "")) * 9:
+            errs.append(f"label {i['id']}: w_px {i['w_px']} is narrower than 9 px a letter, the 24 px Bold face is wider than that")
+        if i.get("kind") == "lane" and i.get("lane") not in {l["id"] for l in d["lanes"]}:
+            errs.append(f"label {i['id']}: unknown lane {i.get('lane')}")
+        if i.get("kind") == "place":
+            icon = next((o for o in d["objectives"] if o["id"] == i.get("anchor")), None) or next((c for c in d["camps"] if c["id"] == i.get("anchor")), None)
+            if not icon:
+                errs.append(f"label {i['id']}: unknown anchor {i.get('anchor')}")
+            else:
+                near = rect_dist(label_box(ctx, i), (ctx.px(icon["p"])[0], ctx.px(icon["p"])[1]) * 2)
+                if near > 40:
+                    errs.append(f"label {i['id']}: {near:.0f} px from its icon, the viewer cannot tell what it names (limit 40)")
+    hard, crossings = label_findings(ctx, items)
+    errs += hard
+    waived = lb.get("rim_crossing_waived", {})
+    for c in crossings:
+        w = waived.get(c["label"])
+        if not w or c["what"] not in w.get("what", []):
+            errs.append(f"label {c['label']} crosses {c['what']} by {c['spill_px']} px (ART-BIBLE 3.3: nothing sits on the shore); "
+                        f"allowed only through labels.rim_crossing_waived with a ruling")
+        elif c["spill_px"] > w.get("max_spill_px", 0):
+            errs.append(f"label {c['label']} crosses {c['what']} by {c['spill_px']} px, the waiver allows {w.get('max_spill_px')} px")
+    for k, w in waived.items():
+        if not w.get("ruling_needed_from") or not w.get("max_spill_px"):
+            errs.append(f"labels.rim_crossing_waived.{k}: a waiver names who must rule and the largest spill allowed")
+    return errs
+
+
+def lane_point_need_u(ctx, lane_id, s, target, cache):
+    lane = next(l for l in ctx.d["lanes"] if l["id"] == lane_id)
+    ns = lane["nodes"]
+    seg = [ctx.dist_u(ctx.nodes[ns[i]]["p"], ctx.nodes[ns[i + 1]]["p"]) for i in range(len(ns) - 1)]
+    t, acc = s * sum(seg), 0.0
+    for i, sl in enumerate(seg):
+        if acc + sl >= t - 1e-12:
+            f = (t - acc) / sl if sl else 0.0
+            da, db = [cache.setdefault(n, ctx.shortest(n)).get(target) for n in (ns[i], ns[i + 1])]
+            return None if da is None or db is None else min(f * sl + da, (1 - f) * sl + db)
+        acc += sl
+    return None
+
+
+def leg_origins(ctx, leg):
+    """[(label, distance in u)] for every origin a leg covers; worst case is what must fit"""
+    out, cache = [], {}
+    target = leg["to"]
+    if "from_lane" in leg:
+        fl = leg["from_lane"]
+        for s in fl["s"]:
+            out.append((f"{fl['lane']} lane at s={s:g}", lane_point_need_u(ctx, fl["lane"], s, target, cache)))
+    else:
+        for side in leg.get("sides", [None]):
+            node = leg["from"].replace("{S}", side) if side else leg["from"]
+            out.append((node, ctx.shortest(node).get(target) if node in ctx.nodes else None))
+    return out
+
+
+def walk_leg_result(ctx, leg, default_margin):
+    """(worst need s, have s, margin, worst label) or None when the leg cannot be evaluated"""
+    d = ctx.d
+    mult = _speed_mult(d, leg.get("speed"))
+    origins = leg_origins(ctx, leg)
+    if mult is None or any(u is None for _, u in origins) or leg["to"] not in ctx.nodes:
+        return None
+    worst = max(origins, key=lambda x: x[1])
+    need = worst[1] / (float(d["speeds"]["walk_u_s"]) * mult)
+    return need, leg["due_s"] - leg["leave_s"], float(leg.get("margin_s", default_margin)), worst[0]
+
+
+def check_walks(ctx):
+    d, errs = ctx.d, []
+    wl = d["walk_legs"]
+    margin = float(wl.get("margin_s", TRAVEL_MARGIN_S))
+    by = {s["contest"]: s for s in d["stages"]}
+    lanes = {l["id"]: l for l in d["lanes"]}
+    seen = set()
+    for group in ("required", "rejected"):
+        for leg in wl.get(group, []):
+            lid = leg.get("id", "?")
+            if lid in seen:
+                errs.append(f"walk leg {lid}: duplicate id")
+            seen.add(lid)
+            for k in ("id", "to", "speed", "leave_s", "due_s", "source"):
+                if k not in leg:
+                    errs.append(f"walk leg {lid}: missing '{k}'")
+            if "from" not in leg and "from_lane" not in leg:
+                errs.append(f"walk leg {lid}: needs 'from' or 'from_lane'")
+            if group == "rejected" and not leg.get("why"):
+                errs.append(f"walk leg {lid}: a rejected leg needs a 'why'")
+            if errs and any(e.startswith(f"walk leg {lid}") for e in errs):
+                continue
+            if "from_lane" in leg:
+                fl = leg["from_lane"]
+                lane = lanes.get(fl.get("lane"))
+                if not lane:
+                    errs.append(f"walk leg {lid}: unknown lane {fl.get('lane')}")
+                    continue
+                ms = lane["clash"]["max_shift_s"]
+                lo, hi = 0.5 - ms, 0.5 + ms
+                if any(not (lo - 1e-9 <= x <= hi + 1e-9) for x in fl["s"]):
+                    errs.append(f"walk leg {lid}: s values {fl['s']} leave the clash range {lo:.2f} to {hi:.2f}")
+                if not (min(fl["s"]) <= lo + 1e-9 and max(fl["s"]) >= hi - 1e-9):
+                    errs.append(f"walk leg {lid}: s values must include both ends of the clash range ({lo:.2f} and {hi:.2f}), the worst case")
+            if leg["due_s"] <= leg["leave_s"]:
+                errs.append(f"walk leg {lid}: due {leg['due_s']} is not after leave {leg['leave_s']}")
+            if leg.get("contest") in by and group == "required" and leg["due_s"] > by[leg["contest"]]["t_s"] + 1e-9:
+                errs.append(f"walk leg {lid}: due {leg['due_s']} s is after its contest {leg['contest']} ({by[leg['contest']]['t_s']} s)")
+            res = walk_leg_result(ctx, leg, margin)
+            if res is None:
+                errs.append(f"walk leg {lid}: unknown node, no walk, or unknown speed")
+                continue
+            need, have, mg, where = res
+            fits = need <= have - mg
+            if group == "required" and not fits:
+                errs.append(f"walk leg {lid}: from {where} takes {need:.1f} s at {leg['speed']} speed, only {have:.2f} s available (margin {mg:g} s)")
+            if group == "rejected" and fits:
+                errs.append(f"rejected walk leg {lid} now fits ({need:.1f} s of {have:.2f} s): the finding is stale, move it to 'required' or delete it")
+    for need_id in ("stone_top", "stone_mid", "stone_bot", "stone_jungle"):
+        if need_id not in seen:
+            errs.append(f"walk_legs.required needs the lane-origin leg '{need_id}' (ACTION-VOCABULARY rotate_stone)")
+    if not any(l.get("id", "").startswith("reset_") for l in wl.get("required", [])):
+        errs.append("walk_legs.required needs the tower-site to island legs (ACTION-VOCABULARY reset)")
+    return errs
+
+
+def check_clash_rule(ctx):
+    d, errs = ctx.d, []
+    cr = d["clash_rule"]
+    if cr.get("front_max") != 0.60:
+        errs.append("clash_rule.front_max must be 0.60 (ACTION-VOCABULARY 2.2)")
+    if cr.get("formula") != "shift_s = (front / 0.60) * max_shift_s":
+        errs.append("clash_rule.formula must be 'shift_s = (front / 0.60) * max_shift_s' (the vocabulary's wave-front formula)")
+    if cr.get("direction") != "from neutral_s towards the loser":
+        errs.append("clash_rule.direction must be 'from neutral_s towards the loser'")
+    for lane in d["lanes"]:
+        outer = [t for t in d["towers"] if t["lane"] == lane["id"] and t["tier"] == "outer" and t["side"] == "B"][0]
+        if 0.5 - lane["clash"]["max_shift_s"] <= outer["s"]:
+            errs.append(f"lane {lane['id']}: the clash at front_max would pass the outer tower")
+    return errs
+
+
 CHECKS = [("structure", check_structure), ("ids", check_ids), ("range", check_range), ("mirror", check_mirror),
           ("lanes", check_lanes), ("spawns", check_spawns), ("towers", check_towers), ("camps", check_camps),
           ("water", check_water), ("spacing", check_spacing), ("stages", check_stages),
-          ("units", check_units), ("tally", check_tally), ("variants", check_variants)]
+          ("units", check_units), ("tally", check_tally), ("variants", check_variants),
+          ("look", check_look), ("labels", check_labels), ("walks", check_walks), ("clash", check_clash_rule)]
 
 
 def report(ctx):

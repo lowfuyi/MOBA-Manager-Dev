@@ -1,18 +1,20 @@
 # UI Pass 2: layout redesign spec (workstream W3)
 
-Date: 2026-11-08 (revised the same day, wave 1b) - Author: UI/UX Designer - Status: spec for review (Art Director, Lead Game Designer, QA Manager), then the Founder checkpoint. No game code was changed.
+Date: 2026-11-08 (revised the same day, wave 1b; pass 1c numbers alignment) - Author: UI/UX Designer - Status: spec for review (Art Director, Lead Game Designer, QA Manager), then the Founder checkpoint. No game code was changed.
 Answers Founder feedback 3: "everything is displayed linearly, the design is boring" (see `docs/ALPHA-0.7-PLAN.md`).
 Scope: Home, Squad, Draft, Game Plan, Standings, Match Report, and (new in the wave 1b revision) the **Match screen HUD for the Alpha 0.8 arena** (section 6.7). Alpha 0.7 keeps today's match screen. Visual styling (colour, gradients, type, glow, illustration) is the art bible's job; here it is only referenced ("see the art bible"). This document fixes structure, hierarchy, sizes and interaction. The tutorial spec (W1) and the art bible (W2) were written in parallel; section 7 lists the hooks they need from this spec.
 
 **Wave 1b revision (review `company/reviews/2026-11-08-wave1.md`; Producer rulings, which the Founder may overrule at the checkpoint):**
-1. **Type scale (C1):** the sizes of 2.2 stand (Body 32, Small 26, Caption 24 floor). The Art Director is re-issuing the token table in parallel; anything I am unsure of is marked "per ART-BIBLE token table".
+1. **Type scale (C1):** the sizes of 2.2 stand (Body 32, Small 26, Caption 24 floor). `ART-BIBLE.md` 5.2 (pass 2b and 2c) is now the one token table and this spec cites it: Display 64, Title 48, Value and screen or sheet title 40, Heading 36, Body 32, Small 26, Caption 24.
 2. **Standings (C2):** three views (Table with a Points / Form switch, Playoffs, History). Unchanged from 6.5.
 3. **Squad (C3):** lane map plus bench grid; five avatar cards is the fallback. Unchanged; a gap is closed (a starter's player sheet, 6.2).
 4. **One helper name (C11):** **Coach** everywhere. "Advisor" is gone from this spec; the game strings that change are listed in `TUTORIAL.md` section 13.
 5. **In-arena and side colours (C4):** you = circle in the accent colour, them = hexagon in the coral colour. Blue / Red side is a **word plus a flag glyph** on Home and the draft board only (never in the arena, never colour alone).
 6. **"?" slot (C12):** the Draft header wireframe now shows it (6.3), and the Home hero states its contrast (6.1).
-7. **Club colour and needs-attention (C13):** club colour follows the art bible's strength rule; needs-attention follows the Art Director's re-issue. Marked "pending ART-BIBLE re-issue" where it matters (6.1).
+7. **Club colour and needs-attention (C13):** club colour follows the art bible's strength rule (a flat 10 percent wash behind the 248 px header block, `VOID` skyline at 55 to 70 percent, ART-BIBLE 3.7 rule 8); needs-attention items are **attention cards** (96 px high, 6 px `WARN` left rail, Body 32 label, chevron, no gold fill, two side by side at 330 px, ART-BIBLE 3.7 rule 9). Both are fixed numbers now, not "pending".
 8. **Match HUD (C9):** new section 6.7, with a text-channel budget, the scoreboard strip, controls and large-text behaviour, and a list of things in `ACTION-VOCABULARY.md` and `ARENA-MAP.md` that do not fit, with proposed cuts.
+
+**Pass 1c (review `company/reviews/2026-11-08-wave1b.md` sections 4.1 to 4.3; numbers only, no new content):** A1 to A3 and A5 to A12 of the review's list and B15 are done here; A4 is done in both documents. What changed: `S_BIG` 40 and `S_HEAD` 36 (A1); section labels are Caption 24 px `TEAL_HI` capitals and card titles are Heading 36 (A2); the Squad token is 96 px at the bible's six anchors and the backdrop is code-drawn, so its asset row is gone (A3); Draft titles are sentence case, "Your ban", "Your pick", "Their ban", "Their pick", 141 to 161 px in a 200 px room (A4, Producer ruling); Home attention cards and the 10 percent wash use the bible's numbers (A5); the top-right 120 x 120 px request was accepted in ART-BIBLE 3.7 rule 8 (A6); role icons and the 40 px icon size are gone, the Home tile has a 32 px icon slot (A7); map labels 24 px with a 5 px `VOID` outline (A9); `SIDE_RED` is `#F58080` (A10); `[v]` and `[^]` in the wireframes are icon slots (the font has no arrows). **Producer rulings on 6.7.1 (review 4.3):** P1 accepted (text strip 198, controls 132); P2 **rejected** (label limit stays 28, tag limit 24: a measurement with the real font found 0 of 19,881 label pairs overflowing at normal size), so D8 now reads "both coaches' labels shown, no shortening" with the large-text "show only yours" fallback kept; P3, P4, P6 to P13 accepted as written; P5 **not accepted** (the mid push window is not moved to 47.5 s; the scheduler may drop that pill). B15 is settled by P5, and the scheduler model was re-run and saved (6.7.4). `ACTION-VOCABULARY.md` pass 1c already carries the accepted Gameplay items.
 
 ## 0. Summary for the Founder (read this first)
 
@@ -54,14 +56,14 @@ Limits (honest): nothing here was built or run. Heights and positions are paper 
 
 ### 2.2 Token changes this spec assumes (one global change, then re-shoot all screens)
 
-**Status (Producer ruling C1, 2026-11-08):** these UI-PASS-2 sizes are adopted: Body 32, Small 26, Caption 24 (the floor). The Art Director is re-issuing the art bible token table; where this section and the re-issue differ on anything other than those three sizes, the re-issue wins ("per ART-BIBLE token table"). Open points I cannot settle: (1) with Body 32, the art bible's Heading (32) is the same size as body, so the Heading is expected to rise to about 36 in the re-issue; (2) the 40 px ScreenHeader and BottomSheet title are not in the bible's scale (48 / 38 / 32) and need a decided token; (3) section titles: this spec said "accent colour", the bible says `TEXT` with teal only for the Caption group label; the bible's rule is used here until the re-issue; (4) map labels in ARENA-MAP are 20 px and must be 24 (6.7).
+**Status (Producer ruling C1, 2026-11-08; closed in pass 1c):** these sizes are adopted and `ART-BIBLE.md` 5.2 is the single token table: Display 64, Title 48, Value and screen or sheet title 40 (`S_BIG`), Heading 36 (`S_HEAD`, new), Body 32, Small 26, Caption 24 (the floor). Where this section and the bible differ, the bible wins. Two rules from the bible that this spec follows: (1) a **card title** is Heading 36 in `TEXT`, never teal; a **section label** (the row above a group) is Caption 24 px SemiBold, upper case, +8 percent tracking, `TEAL_HI`; (2) every arrow, tick, cross and star is a drawn icon, never a typed character (the font has none).
 
 | Token | Now | Pass 2 | Reason |
 |---|---|---|---|
 | `S_BODY` (anything the player reads to decide) | 28 | **32** | 16 sp |
 | `S_SMALL` (secondary lines, units, hints) | 22 | **26** | 13 sp; same as the art bible; never the only place a key fact lives |
-| `S_CAPTION` (chips, tab labels; the floor) | 20 to 22 | **24** | 12 sp; the art bible says 22, I ask 24 so a chip stays readable on a 360 dp phone; nothing is smaller |
-| `S_BIG` / `S_TITLE` | 38 / 46 | **38 / 48** | art bible: Value 38 stays, Title 48 |
+| `S_CAPTION` (chips, tab labels, section labels; the floor) | 20 to 22 | **24** | 12 sp; the art bible now says 24 as well (5.2); nothing is smaller |
+| `S_BIG` / `S_HEAD` (new) / `S_TITLE` | 38 / none / 46 | **40 / 36 / 48** | ART-BIBLE 5.2: Value and screen or sheet title 40, Heading 36 (card titles, the go button label), Title 48 (the hero name of a screen) |
 | `S_DISPLAY` (new: result word, hero stat, score line) | 64 ad hoc | **64** | one display size, the art bible's Display |
 | Button height (`BTN_H`) and minimum hit area | 92 / 64+ | **96 / 96** | 48 dp |
 | Header height and header icon buttons | 80 | **96** | 48 dp |
@@ -88,8 +90,8 @@ Design rules that follow:
 
 ### 2.4 Colour-blind and colour-meaning rules (apply to every screen)
 
-The colour-blind palette swaps good/bad to sky blue (`56b4e9`) and vermillion (`d55e00`). Problems the current code has, and the rules that fix them:
-- In colour-blind mode, "good" (sky blue) is nearly the same as the Blue-side colour (`5aa9ff`), and "bad" (vermillion) is close to the Red-side colour (`ff7a7a`). **Rule: a side is never told by colour alone.** In every board, "You" is always on the left and "Them" on the right (whichever side you play). The side itself is a **word plus a flag glyph** ("Blue side", "Red side") on Home and on the draft board header; it is never shown in the arena, where you are a circle and they are a hexagon.
+The colour-blind palette swaps good/bad to sky blue `GOOD_CB` (`#7FD0FF`) and orange `BAD_CB` (`#F2924A`). Problems the current code has, and the rules that fix them:
+- In colour-blind mode, "good" (`GOOD_CB`, sky blue) is close in feel to the Blue-side flag cloth (`SIDE_BLUE` `#5AA9FF`), and the Red-side cloth (`SIDE_RED` `#F58080`) now has the value of the default `BAD` and is not swapped by the colour-blind switch (ART-BIBLE 3.3). **Rule: a side is never told by colour alone.** In every board, "You" is always on the left and "Them" on the right (whichever side you play). The side itself is a **word plus a flag glyph** ("Blue side", "Red side") on Home and on the draft board header; it is never shown in the arena, where you are a circle and they are a hexagon.
 - **Rule: good/bad is never colour alone.** Every green or red value carries a sign (+ or -), an arrow glyph (up, down, flat), or a tick or cross shape. Row tints and fills are reinforcement only.
 - **Rule: selected is never hue alone.** Selected = filled background + ring + check or thumb notch.
 - **Rule: role identity = icon + short code (TOP, JG, MID, BOT, SUP), colour second.** Role colours must come from a colour-blind-safe set and must not reuse the good/bad or coral/teal hues (see the art bible for the values).
@@ -102,13 +104,13 @@ The colour-blind palette swaps good/bad to sky blue (`56b4e9`) and vermillion (`
 
 | Topic | Art bible / W1 says | This spec | Result |
 |---|---|---|---|
-| Body size | Body 30 px (15 sp) | Body 32 px (16 sp), because the brief and the UI reference say 16 sp | **Settled by Producer ruling C1 (D7): 32.** The font is narrower, so line length is about the same. Art Director re-issues the table with this |
+| Body size | Body 30 px (15 sp) | Body 32 px (16 sp), because the brief and the UI reference say 16 sp | **Settled by Producer ruling C1 (D7): 32.** The font is narrower, so line length is about the same. Adopted in ART-BIBLE 5.2 |
 | Small and caption | Small 26, Caption 22 | Small 26 (same), Caption 24 | **Settled by ruling C1:** Caption 24 is the floor everywhere (also the tutorial and the arena) |
-| Display, Value, Title | 64 / 38 / 48 | Same | Adopted |
+| Display, Value, Heading, Title | 64 / 40 / 36 / 48 | Same | Adopted from ART-BIBLE 5.2 |
 | Hero tiles | 3 per row, 96 px circular silhouette | Same (216 px cards) | Adopted; my earlier 4-column grid is dropped |
 | Players | Initial avatar, no faces | Avatar everywhere in this spec | Adopted; "portrait kit" dropped |
 | Badges | Generated from the club id, 40 to 112 px | Hero 112, Next card 96 (large text 80), podium 88 / 72 / 72, rows 56, chips 44 | Adopted; all within the art bible's range |
-| Squad | Five role rows | Lane map plus avatar bench grid | **Settled by ruling C3 (D3):** lane map plus bench grid; five avatar cards in a row is the fallback. The art bible's row component serves the picker. Art Director updates its 8.2 Roster row |
+| Squad | Five role rows | Lane map plus avatar bench grid | **Settled by ruling C3 (D3):** lane map plus bench grid; five avatar cards in a row is the fallback. The art bible's row component serves the picker. Done: ART-BIBLE 8.2 Squad row and 6.4 (anchors) |
 | Chemistry | Lane-map layout | Squad map is the same idea | Compatible; UI Pass 3 can share the component |
 | Help "?" | 96 x 96 corner on every screen | Reserved in `ScreenHeader` (5.2) | Met. The Draft header now shows the slot (6.3), Home states its contrast over the hero art (6.1), and the arena puts it at the right end of the controls row (6.7.6) |
 | Colour never the only cue | Rule (W1 contract 5) | Section 2.4 and every screen's (e) | Met |
@@ -140,14 +142,14 @@ The colour-blind palette swaps good/bad to sky blue (`56b4e9`) and vermillion (`
 ## 4. Global pattern list
 
 1. **Card with depth.** Three elevations: flat (inside lists and grids), raised (hero cards: Next match, Report hero), sheet. Recipe in 5.1; the look (gradients, colour) is the art bible's. Performance rule: grids and long lists use the cheap flat card (1 px highlight, 2 px bottom edge, baked 9-slice, no live blur); only hero surfaces and sheets get a real soft shadow. At most 8 shadowed nodes on screen.
-2. **Section header.** Title (32 px; colour per ART-BIBLE token table, pending re-issue: the bible says `TEXT`, teal only for the Caption group label) + optional count chip + optional action on the right ("See all", a mini segmented control). 56 px high, action hit area 96 px. Always the same, so the eye learns it. A "?" help slot (96 x 96) lives in the screen header for W1.
-3. **Screen header.** 96 px: back (96 x 96), title, up to two icon actions (96 x 96 each), help "?". Title may wrap to two lines.
+2. **Section header.** A Caption section label (24 px SemiBold, upper case, +8 percent tracking, `TEAL_HI`, ART-BIBLE 5.2) + optional count chip + optional action on the right ("See all", a mini segmented control). 56 px high, action hit area 96 px. Always the same, so the eye learns it. Card titles are not section headers: they are Heading 36 in `TEXT`. A "?" help slot (96 x 96) lives in the screen header for W1.
+3. **Screen header.** 96 px: back (96 x 96), title (40 px Bold, `TEXT`), up to two icon actions (96 x 96 each), help "?". Title may wrap to two lines.
 4. **Chip.** Passive status tag (44 px high, 24 px text, icon + word). Tappable chips are `Segmented` options or buttons, not chips. Status chips always have an icon so the meaning does not hang on colour.
 5. **Segmented control.** 2 to 4 options, equal width, 96 px high, never wraps inside a word. If any label does not fit its slot (large text), it becomes a horizontally scrolling strip with the selected item scrolled into view. 5 or 6 options (role filter) are stacked icon over a three-letter code.
 6. **Bottom sheet.** The only way to pick, confirm or inspect. Close by: drag down, tap the scrim, a close button, or Android Back (Back closes the sheet before it leaves the screen). Primary action pinned in the footer, 104 px.
 7. **Empty state.** Illustration slot (384 x 288), one line of what is empty, one line of why or what to do, one action button. Never a blank screen (today's `17_standings_results` and `09_draft_start`).
 8. **Preview, then commit.** Any change that moves a number shows the change (+3, -1.8, arrow) before the tap; reversible commits show an Undo toast (`Main.toast` already supports an action button); irreversible ones (release player, leave draft) use a confirm sheet.
-9. **One coral.** Coral is reserved for the one "go" action of a screen (Play, Pick, Start the match, Continue). Nothing else on the same screen is coral.
+9. **One coral.** Coral is reserved for the one "go" action of a screen (Play, Pick, Start the match, Continue). Nothing else tappable on the same screen is coral (coral as the "them" hexagon or bar half is allowed, ART-BIBLE 3.8). A Ban is the outlined `ban` button (ART-BIBLE 8.1), so a ban step has no coral action.
 10. **Reveal, don't dump.** Primary content first (the hero), details one tap down in a sheet or "Dig deeper" tab. Expanders use a real chevron icon, not the "+ " and "- " text prefixes the code has now.
 11. **In-place updates.** A tap changes the component's value; it does not delete and rebuild the whole page (today `_rebuild()` runs on every tap in Roster, Draft and Game Plan; with richer cards this will stutter on low-end phones).
 12. **Scroll hints.** 24 px fade at the top and bottom edge of any scroll area that has more content; carousels show a 48 px peek of the next card.
@@ -174,7 +176,7 @@ Existing helpers in `ui.gd` (`card`, `chip`, `chips`, `tile`, `section`, `kv_row
 ```
 
 ### 5.2 SectionHeader and ScreenHeader
-- SectionHeader: 56 px; title 32 px; optional count chip; optional right action (hit 96). ScreenHeader: 96 px; back 96; title 40 px (a size outside the bible's scale; per ART-BIBLE token table, pending re-issue); up to two 96 px icon buttons; "?" 96 px. The Draft header and the arena do not use the standard ScreenHeader (6.3 and 6.7 place the "?" themselves).
+- SectionHeader: 56 px; label Caption 24 px SemiBold, upper case, +8 percent tracking, `TEAL_HI`; optional count chip; optional right action (hit 96). ScreenHeader: 96 px; back 96; title 40 px Bold `TEXT` (the bible's Value and screen title size, 5.2); up to two 96 px icon buttons; "?" 96 px. The Draft header and the arena do not use the standard ScreenHeader (6.3 and 6.7 place the "?" themselves).
 - States: action pressed/disabled. Title wraps to two lines before it ever clips.
 
 ### 5.3 Chip (extends `UI.chip`)
@@ -204,13 +206,13 @@ Existing helpers in `ui.gd` (`card`, `chip`, `chips`, `tile`, `section`, `kv_row
 ```
 
 ### 5.6 PlayerCard (avatar card)
-- Variants: `Tall` 330 x 264 (grid cell, 2 columns; reflows to 283 wide at 626 px), `Row` 672 x 112 (picker and report rows), `Token` 128 (lane map), `Mini` 56 (draft board: hero silhouette or avatar).
+- Variants: `Tall` 330 x 264 (grid cell, 2 columns; reflows to 283 wide at 626 px), `Row` 672 x 112 (picker and report rows), `Token` 96 (lane map, ART-BIBLE 6.4: the 96 px outer diameter is itself the 96 px hit area), `Mini` 56 (draft board: hero silhouette or avatar).
 - Anatomy (Tall): initial avatar 120 (letter on a role ring, art bible 6.2), name (32, up to 2 lines), role pill (icon + code), age, big "rating here" number (40) with caption, status chips (max 2 + "+n"), role colour as an 8 px bar on the left edge.
 - States: normal; selected (ring); starter (small "starts" tag so the bench cards are distinct); disabled (not in club); no art needed (the initial avatar is the art, drawn in code).
 - Data: name, `role_primary`, `age_of`, `slot_score`, `fatigue_of`, `form_of`, `morale_of`, `seasons_left`.
 - Sketch:
 ```text
- PlayerCard Tall 330 x 264        PlayerCard Row 672 x 112     Token 128
+ PlayerCard Tall 330 x 264        PlayerCard Row 672 x 112     Token 96
  +---------------------------+    +----------------------------+  .------.
  | .------.  Brikai          |    | .----. Brikai  [Top]  48   |  |  av  |56
  | |  av  |  [Top] age 24     |    | | av | [v tired] [final]    |  '------'
@@ -238,14 +240,14 @@ Existing helpers in `ui.gd` (`card`, `chip`, `chips`, `tile`, `section`, `kv_row
 ```
 
 ### 5.8 LaneRow and LaneBoard (draft)
-- LaneRow: 52 px compact or 72 px full; left slot (hero silhouette Mini + hero name or "Open" + player name), centre role icon (40), right slot mirrored. LaneBoard = header + 5 LaneRows + bans row.
+- LaneRow: 52 px compact or 72 px full; left slot (hero silhouette Mini + hero name or "Open" + player name), centre role glyph 32 beside its code (TOP, JG, MID, BOT, SUP), right slot mirrored. LaneBoard = header + 5 LaneRows + bans row.
 - States per slot: empty (dashed outline, player name shown so the player sees who plays here), pulsing (this lane is the pick target), filled, banned.
 
 ### 5.9 Carousel
 - Horizontal scroller with snap and a 48 px peek of the next card; card widths 300 (free agents) or 560 (upcoming games); a page-dots line when 3 or more cards; direction lock (a drag that starts mostly vertical scrolls the page, a drag that starts mostly horizontal scrolls the carousel; threshold 12 px). Always paired with a "See all" action. Empty state when 0 cards.
 
 ### 5.10 EdgeMeter
-- A centre-zero bar 24 px high: left half = them, right half = you; fill length = the edge; the value is printed as signed text (+5.6%), 32 px. Used in Game Plan (contests) and Report (phase margin). Colour is reinforcement only (rule in 2.4).
+- A centre-zero bar 20 px high (the bible's bar height, 8.1): left half = them, right half = you; fill length = the edge; the value is printed as signed text (+5.6%), 32 px. Used in Game Plan (contests) and Report (phase margin). Colour is reinforcement only (rule in 2.4).
 
 ### 5.11 DetentTrack (replaces the "-- - 0 + ++" button row)
 - Five stops, track 8 px, thumb 56 px, hit area 96 px high by the full width. Tap a stop or drag the thumb; it snaps. Ends have 26 px labels (short words), the live effect line below is 28 px (the existing `gp.c.*.neg/pos/balanced` strings).
@@ -266,7 +268,7 @@ Existing helpers in `ui.gd` (`card`, `chip`, `chips`, `tile`, `section`, `kv_row
 
 ### 5.13 Podium and RankRow (standings)
 - Podium: 3 columns (2nd, 1st, 3rd), pedestal heights 88 / 120 / 64, badge 88 (1st) and 72 / 72 (2nd, 3rd) as the art bible sets, name 2 lines, points 40 px.
-- RankRow: 672 x 104: rank (56) + badge (56) + name (1 or 2 lines) + right column (points 36 over record 26). Own row: PANEL3 fill + 8 px accent bar + "YOU" pill (text). Playoff line: dashed divider with a label after rank 4.
+- RankRow: 672 x 104: rank (56) + badge 56 (ART-BIBLE 8.2; it was 40 in the Alpha) + name in Body 32 (1 or 2 lines) + right column (points Heading 36 over record Small 26). Own row: PANEL3 fill + 8 px accent bar + "YOU" pill (text). Playoff line: dashed divider with a label after rank 4.
 - Sketch:
 ```text
  RankRow 672 x 104 (own row: PANEL3 fill + 8 px accent bar + YOU pill)
@@ -286,7 +288,7 @@ Existing helpers in `ui.gd` (`card`, `chip`, `chips`, `tile`, `section`, `kv_row
 
 ## 6. Screen specs
 
-Wireframe key: the frame is 720 px wide (1 character is about 10 px across; heights are written beside the frame). `(b)` = club badge, `[ ]` = a tappable control, `[x]` / `(x)` = a filled state (or a cross, where the text says lost), `ok` = tick, `[v]` `[^]` = down and up arrow glyphs, `(+)` `(-)` = ahead and behind, `face` = portrait. Each frame shows the normal-text case at 720 x 1280.
+Wireframe key: the frame is 720 px wide (1 character is about 10 px across; heights are written beside the frame). `(b)` = club badge, `[ ]` = a tappable control, `[x]` / `(x)` = a filled state (or a cross, where the text says lost), `ok` = tick, `(+)` `(-)` = ahead and behind, `face` = portrait. **`[v]`, `[^]` and `(v)`, `(^)` are icon slots** (a drawn down or up arrow icon, never a typed character: the font has no arrows, ticks, crosses or stars, ART-BIBLE 5.1); `ok` and `x` are tick and cross icons. **Upper-case text inside a frame is a Caption section label** (24 px, `TEAL_HI`, +8 percent tracking); screen titles, buttons and the result word are sentence case. Each frame shows the normal-text case at 720 x 1280.
 
 ---
 
@@ -318,10 +320,10 @@ Wireframe key: the frame is 720 px wide (1 character is about 10 px across; heig
 | |                                                                |   |
 | |  You 53.5 [=========teal=====|=======coral======] Them 51.5    |   |
 | |  [short draft] [+0.9% chem] [5 tired]                          |   |
-| |  [        PLAY GAME   (coral, 104 px)                       ]  |   |  <- the one coral
+| |  [        Play game   (coral, 104 px)                       ]  |   |  <- the one coral
 | |        Auto-play this game   (text button, 96 px hit)          |   |
 | +----------------------------------------------------------------+   |  <- bottom y~850
-|  [! 5 tired starters  >]  [! 10 contracts end  >]   (swipe)          |  <- needs you 96
+|  #[!] 5 tired starters  >  #[!] 10 contracts end  >    (swipe)       |  <- cards 96
 |  UP NEXT                                            See all  >       |  <- header 56
 | - - - - - - - - - - - - - - fold at y~1132 - - - - - - - - - - -     |
 |  +--------------+ +--------------+ +--------------  (peek 48 px)     |
@@ -329,22 +331,22 @@ Wireframe key: the frame is 720 px wide (1 character is about 10 px across; heig
 |  | Blue - even  | | Red - harder | |                                 |
 |  +--------------+ +--------------+ +--------------                   |
 |  +--------------------------+ +--------------------------+           |
-|  | STANDING                 | | CASH                     |           |
+|  | STANDING            [ic] | | CASH                [ic] |           |
 |  | #9  of 10   [ladder]     | | 2,617   (^) +17 a week   |           |
 |  | 0-1 - 0 pts              | |                          |           |
 |  +--------------------------+ +--------------------------+           |
-|  | CHEMISTRY                | | SQUAD MOOD               |           |
+|  | CHEMISTRY           [ic] | | SQUAD MOOD          [ic] |           |
 |  | +0.9%  (ring gauge)      | | ( av ) fine   form 0.0   |           |
 |  +--------------------------+ +--------------------------+           |
 | [ Home ][ Squad ][ Plan ][ Club ][ More ]   tab bar, 96 px buttons   |
 +----------------------------------------------------------------------+
 ```
 Notes on the frame:
-- The hero header is 248 px, full bleed under the status bar (art and gradient from the art bible). **Club colour follows the art bible's strength rule (C13, ART-BIBLE 3.7):** club colour is identity, not status, so the hero is the normal page gradient with at most a **10 percent wash** of the club's primary behind this club's own header, plus the badge; buttons, bars, chips and the chrome stay teal and coral. My first draft said "club-colour gradient"; that is withdrawn. If the Art Director's re-issue changes the wash strength, it wins (pending ART-BIBLE re-issue). Badge 112 on the left, club name 48 px (two lines if needed), season line 26 px, rank + record + five form pips (a pip is a circle with the letter W or L inside, so it is not colour alone).
-- **The "?" over the hero art (C12).** The hero art sits behind the "?" slot. The button is a solid 88 px circle (fill `PANEL3`, glyph `TEXT`, 7.1:1) with a 2 px ring in `TEXT2`; the **ring** carries the contrast, because the circle fill alone is only 1.1 to 1.8:1 against the hero (computed from the art bible's hex values, not seen on a device). Ring against the page gradient top `BG_GLOW` is 8.6:1; against a worst-case 10 percent club wash 7.5 to 8.0:1; against a skyline shape lifted 20 percent towards white 4.6:1 (all three above the 3:1 needed for a control boundary). Request to the Art Director (pending ART-BIBLE re-issue): keep the top-right 120 x 120 px of the hero art clear of shapes lighter than the gradient top plus 20 percent. The "never opened" dot is a shape (a filled circle on the ring), so it does not rely on colour.
+- The hero header is 248 px, full bleed under the status bar. **Club colour follows the art bible's strength rule (C13, ART-BIBLE 3.7 rule 8):** club colour is identity, not status, so the hero is the normal page gradient (`BG_GLOW` `#14284A` falling to `BG`) with a flat **10 percent wash** of the club's primary behind this club's own 248 px header block only, `VOID` skyline silhouettes at 55 to 70 percent, and the badge at full colour with its rim and shadow; buttons, bars, chips and the chrome stay teal and coral. My first draft said "club-colour gradient"; that is withdrawn (white `TEXT` on the ten club primaries is only 2.2 to 3.2:1, bible 3.7). Badge 112 on the left, club name Title 48 (two lines if needed), season line 26 px, rank + record + five form pips (a pip is a circle with the letter W or L inside, so it is not colour alone).
+- **The "?" over the hero art (C12).** The hero art sits behind the "?" slot. The button is a solid 88 px circle (fill `PANEL3`, glyph `TEXT`, 7.1:1) with a 2 px ring in `TEXT2`; the **ring** carries the contrast, because the circle fill alone is only 1.1 to 1.8:1 against the hero (computed from the art bible's hex values, not seen on a device). Ring against the page gradient top `BG_GLOW` is 8.6:1; against a worst-case 10 percent club wash 7.5 to 8.0:1; against a skyline shape lifted 20 percent towards white 4.6:1 (all three above the 3:1 needed for a control boundary). **Accepted by the Art Director (ART-BIBLE 3.7 rule 8, pass 2c, review A6):** the top-right 120 x 120 px of the hero art stays clear of anything lighter than `BG_GLOW` lifted 20 percent towards white (`#43536E`); no badge, glow, coach star or lit shape is drawn in that corner. The "never opened" dot is a shape (a filled circle on the ring), so it does not rely on colour.
 - The Next match card is raised and overlaps the hero by 64 px. It is the only raised card on the screen. Play is the only coral element. Auto-play drops to a text button (still a 96 px hit area), because it is the less common path.
 - The welcome tip card disappears from the layout: W1's coach overlay replaces it. Until W1 ships, a tip renders as a one-line banner (96 px) under the hero, not a 280 px card.
-- "Needs you" appears only when something needs a decision: a horizontal strip of tappable warning chips (96 px high each), swipeable when there are more than two. **Structure is mine, treatment is the Art Director's (C13):** the art bible draws needs-attention as a gold left-rail card; this spec draws a swipe strip of chips. The structure (strip, 96 px chips, icon plus word) stays; colour, rail and card treatment follow whatever the Art Director re-issues (pending ART-BIBLE re-issue). Until then: a `WARN` icon plus the word, on a flat card chip.
+- "Needs you" appears only when something needs a decision: a horizontal strip of **attention cards** (ART-BIBLE 3.7 rule 9; the structure was mine, the card is the bible's). Each card is **96 px high** (it is tappable, so it is not a 44 px chip), a `PANEL` surface, a **6 px `WARN` rail on the left**, a drawn warning icon in `WARN`, the label in `TEXT` at **Body 32**, a chevron in `TEXT2`; no gold fill and no gold text. **Two cards fit side by side at 330 px** (2 x 330 + a 12 px gap = 672); more scroll sideways with a 48 px peek. Label room in a 330 px card is about 220 px (6 rail + 16 padding + 32 icon + 8 gap + label + 8 gap + 24 chevron + 16 padding); measured in Barlow Semi Condensed Regular 32 px, "5 tired starters" is 184 px and "10 contracts end" 204 px, so both fit with 16 px to spare, while "Debt: cash below zero" (271 px) does not and takes a full-width 672 px card. In large text a card is 530 px wide (the next one peeks 48 px). Tiles: flat `PANEL` cards with a **32 px icon slot at the top right** (ART-BIBLE 8.1 `tile()`: icon slot, delta line with an arrow icon), label Caption 24, value `S_BIG` 40.
 - Playoff state: the card shows the series ("Semi-final, best of 3") with win pips under the badges. Season over: the card becomes a "Champions" or "Season complete" card with the Season summary as its primary button. Eliminated: the "your season is over" line plus "Finish the season".
 
 #### (c) Data and functions feeding each block
@@ -361,14 +363,14 @@ Notes on the frame:
 
 #### (d) Interactions
 - Tap Play: goes to the match day screen as now. Tap the Next card body (not a button): opens a "Match preview" bottom sheet (size M) with the five lane matchups (the content of `screen_prematch.gd`'s matchup list) and "Change lineup" and "Rest tired starters" buttons. This is additive; the Match day screen stays in 0.7 (see decision D4).
-- Tap a "Needs you" chip: goes to the place that fixes it (Squad, or Finance), as now.
+- Tap an attention card: goes to the place that fixes it (Squad, or Finance), as now.
 - Swipe the "Up next" carousel; tap a card: sheet (size S) with the opponent's rating, table position, Form rank and your last result against them (no commit, read-only). "See all" opens a sheet (size L) listing every remaining fixture (round, side, opponent).
 - Tap a tile: Standing opens Standings; Cash opens Finance; Chemistry opens Team chemistry; Mood opens Squad.
 - Long-press the badge in the hero: nothing in 0.7 (reserved for club details). No long-press is required for anything on this screen.
-- Pull and swipe: vertical scroll only on the page. The needs strip and the carousel scroll sideways only.
+- Pull and swipe: vertical scroll only on the page. The attention-card strip and the carousel scroll sideways only.
 
 #### (e) Large text and colour-blind
-- Large text (626 px logical): hero badge 88, hero 220 px high; the club name may take two lines; Next card badges 80, names two lines; the chips row wraps to two lines; tiles stay two per row (283 px wide each, values 40 px, captions wrap to two lines); the carousel peek stays 48 px. Play remains above the fold (about y 840 of a 965 px fold); the carousel and tiles are below it.
+- Large text (626 px logical): hero badge 88, hero 220 px high; the club name may take two lines; Next card badges 80, names two lines; the Next card's chip row wraps to two lines; attention cards are 530 px wide; tiles stay two per row (283 px wide each, values 40 px, captions wrap to two lines); the carousel peek stays 48 px. Play remains above the fold (about y 840 of a 965 px fold); the carousel and tiles are below it.
 - Colour-blind: form pips carry the letter W or L; the versus bar uses teal vs coral (not the good/bad pair); "Favoured / Even / Underdog" is a word with an arrow; the cash trend is an arrow glyph plus a signed number; the mood word and its colour agree (neutral for "fine").
 
 #### (f) One primary decision
@@ -389,23 +391,22 @@ Notes on the frame:
 #### (b) New layout
 ```text
 +----------------------------------------------------------------------+
-| SQUAD                                    [ Auto lineup ]   [ ? ]     |  <- header 96
+| Squad                                    [ Auto lineup ]   [ ? ]     |  <- header 96
 | [Rating 53.5] [Chem +0.9% >] [Squad 10/10] [Wages 265/wk]            |  <- strip 120
 | STARTING FIVE      tap a token to change who plays the role          |  <- header 56
 | +----------------------------------------------------------------+   |  <- map 672x440
-| | lane-map backdrop (same map as the arena, see W4)              |   |
-| |  TOP                                          JUNGLE           |   |
-| |  .------.                                     .------.         |   |
-| |  |  av  | 56                                  |  av  | 50      |   |
-| |  '------' Soldor  (v)                         '------' Yorric   |  |
-| |                           MID                                  |   |
-| |                          .------.                              |   |
-| |                          |  av  | 52                           |   |
-| |                          '------' Caeldor                      |   |
-| |                                    SUP            BOT          |   |
-| |                                   .------.       .------.      |   |
-| |                                   |  av  | 52    |  av  | 58   |   |
-| |                                   '------' Lummir'------' Talfin|  |
+| |  (the top edge cuts the lake, on purpose: ART-BIBLE 6.4)       |   |
+| |                                                                |   |
+| |   .-------.                                        .-------.   |   |
+| |   | av  56|                                        | av  58|   |   |
+| |   '-------'                                        '-------'   |   |
+| |  Soldor [v] .-------.      .-------.              Talfin [^]   |   |
+| |             | av  50|      | av  52|            .-------.      |   |
+| |             '-------'      '-------'            | av  52|      |   |
+| |              Yorric         Caeldor             '-------'      |   |
+| |                                                  Lummir        |   |
+| |                                                                |   |
+| |  your base (plaza, Cairn) is at the bottom, always             |   |
 | +----------------------------------------------------------------+   |
 | BENCH (5)                                       sort: rating  v      |  <- header 56
 | +---------------------------+ +---------------------------+          |
@@ -426,7 +427,7 @@ Notes on the frame:
 +----------------------------------------------------------------------+
 ```
 Notes on the frame:
-- The **lane map** is the hero of the page: five 128 px tokens placed on a small map in the same arrangement as the arena (Top upper left, Jungle upper right, Mid centre, Bot and Support lower right; exact positions come from the W4 map; placeholder positions in percent of the map: TOP 18/20, JG 68/28, MID 45/50, BOT 80/80, SUP 58/84). The map is a 672 x 440 inset card; tokens scale with the card width. Each token: initial avatar, role code ring, rating badge (36 px) on one corner, one status icon (tired, in form, out of form, off-role) on the other, the name under it (26 px).
+- The **lane map** is the hero of the page: the player's half of Hollowmere in a 672 x 440 inset card (578 x 380 in large text), five **96 px tokens** at the anchors of ART-BIBLE 6.4 (arena x, y; then card px at 672 x 440): Top (0.110, 0.540) at 74, 114; Jungle (0.270, 0.700) at 181, 227; Mid (0.500, 0.720) at 336, 241; Support (0.840, 0.742) at 565, 257; Bot Carry (0.889, 0.540) at 597, 114. The wireframe above is to those x positions and only roughly to the y positions. The 128 px token and the placeholder percentages of my first draft are withdrawn: at 128 px the tokens touched each other and hid the roads (bible 6.4). Each token: initial avatar (inner disc 78 px, 6 px role ring, 2 px `VOID` outer ring, initial 44 px SemiBold), a 36 px `PANEL3` rating disc at the upper right (24 px Bold number), at most one 32 px status icon chip at the lower right (tired or in form), the name under it (26 px Medium `TEXT`, 5 px `VOID` outline, 76 px below the token centre, two lines in large text). **No role glyph on the map: the lane is the role** (glyphs appear on the bench cards and the picker rows). The backdrop is **drawn in code** (ART-BIBLE 6.4: `VOID`, two `MAP_LAND` pockets, the `PANEL2` plaza, the `MAP_MERE` lake with a `MAP_SHORE` rim, three `PANEL3` lanes), so the 1344 x 880 backdrop asset is cancelled. Spacing, ring to ring (bible 6.4): Support to Bot 52 px, Jungle to Mid 60, Top to Jungle 61; at 578 x 380 the smallest are 31, 39 and 39 px, and no token overlaps another or its neighbour's name.
 - The **team strip** is four stat pills (rating, chemistry, squad count, wages) instead of a text card; chemistry is tappable.
 - The **bench** is a 2-column avatar-card grid (Tall cards). The sixth cell holds a "Find a player" card that opens the free-agent market.
 - **Reinforcements** is a carousel of free agents (top six by rating) with "See all".
@@ -438,7 +439,7 @@ Lane picker sheet (opens when a token is tapped):
 | (map visible and dimmed behind the scrim; sheet is 60% of the height)|
 | +----------------------------------------------------------------+   |
 | |                         -------  (grab handle, 96 px hit)      |   |
-| | WHO PLAYS MID?                                        [ close ]|   |
+| | Who plays Mid?                                        [ close ]|   |
 | | +------------------------------------------------------------+ |   |
 | | | .----. Caeldor  [Mid]            52 here       now playing | |   |
 | | | | av | form 0.0 - morale ok                                | | | |
@@ -469,15 +470,15 @@ Lane picker sheet (opens when a token is tapped):
 
 #### (d) Interactions
 - Tap a token: lane picker sheet (size M, opened with the rows already scrolled so the current player is visible). Each row shows the change in team rating if you tap it, so the number is the preview. Tap a row: commits, closes, toast "Talfin now plays Mid" with Undo. **Tap the "now playing" row** (the current starter, a chevron on its right): it changes nothing, so it opens that starter's player sheet. This closes a gap in my first draft, where bench cards opened the player sheet but a starter had no way to (found while rewriting the tutorial's steps 5 and 6). Id `squad.picker.card`. The picker header carries id `squad.picker.head`.
-- **Placeholder token positions (C10, pending):** the percentages above are a diagonal arrangement. Hollowmere is not diagonal (Mid is a vertical causeway, Top and Bot are arcs left and right, with the player's base at the bottom), so the final positions come from the arena map after the Art Director redraws the role glyphs and the lane motif.
-- Tap a bench card: player detail sheet (size L) with a segmented control Overview | Stats | Career. Overview: avatar 160, status bars (fatigue, form, morale as three 24 px bars with signed numbers), contract line, bond line, best heroes. Footer: "Put in lineup" (opens the lane picker for this player's best role), "Renew" when the contract ends within one season, and "Release" (a second sheet asks to confirm, with the cost, exactly as the current confirm text).
+- **Token positions (C10, closed):** the anchors are the bible's (6.4, read from `arena_map.json`), which already follow Hollowmere's real arrangement: Top and Bot Carry on the two arcs, Mid on the causeway, Jungle in the left pocket, Support behind the carry. The old diagonal placeholders are gone. If the Level Designer moves a node, the bible table is re-read, not this spec.
+- Tap a bench card: player detail sheet (size L) with a segmented control Overview | Stats | Career. Overview: avatar 160, status bars (fatigue, form, morale as three 20 px bars with signed numbers), contract line, bond line, best heroes. Footer: "Put in lineup" (opens the lane picker for this player's best role), "Renew" when the contract ends within one season, and "Release" (a second sheet asks to confirm, with the cost, exactly as the current confirm text).
 - Long-press a bench card (400 ms): lifts it; drag it onto a token to swap. This is an accelerator only; the tap path always works. (Untested on touch: see risks.)
 - Swipe the Reinforcements carousel; tap a card to negotiate; "See all" opens the full Free agents screen.
 - "Auto lineup" (header): applies the best rested lineup, with Undo. Tapping the chemistry pill opens Team chemistry.
 - Back: inside a sheet, closes the sheet. On the Match day variant, returns to Match day.
 
 #### (e) Large text and colour-blind
-- Large text: the map card is 578 x 380 and tokens are 112 px; names may wrap to two lines under tokens; the team strip becomes 2 x 2 pills; the bench grid keeps two columns (283 px cards, avatar 100, name two lines, only one status chip shown plus "+n"); Reinforcements cards 280 px. The first row of the bench stays visible below the map on a 1113 px canvas only if the strip collapses to one row; if not, the bench starts below the fold, which is acceptable because the lineup (the decision) is fully visible.
+- Large text: the map card is 578 x 380 and **tokens stay 96 px, only their centres move** (anchors at 578 x 380 in ART-BIBLE 6.4); names may wrap to two lines under tokens; the team strip becomes 2 x 2 pills; the bench grid keeps two columns (283 px cards, avatar 100, name two lines, only one status chip shown plus "+n"); Reinforcements cards 280 px. The first row of the bench stays visible below the map on a 1113 px canvas only if the strip collapses to one row; if not, the bench starts below the fold, which is acceptable because the lineup (the decision) is fully visible.
 - Colour-blind: status is an icon plus a word (in the sheet and on cards) and the picker delta is a signed number with an arrow; off-role is an icon plus the words "off-role"; the role ring has the role code letters; the selected token has a ring and a check, not just a colour.
 
 #### (f) One primary decision
@@ -499,7 +500,7 @@ Lane picker sheet (opens when a token is tapped):
 #### (b) New layout (compact board, the 1280 px case)
 ```text
 +----------------------------------------------------------------------+
-| [<]  YOUR BAN        ( 8 )  [ Auto-finish ]  [ ? ]                   |  <- header 104
+| [<]  Your ban        ( 8 )  [ Auto-finish ]  [ ? ]                   |  <- header 104
 | steps: [x][x][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]   ban short, pick tall   |
 | YOU [flag] Blue              ROLE              Red [flag] THEM       |  <- board 330
 | +--------------------------+ ( top ) +--------------------------+    |  <- rows 52
@@ -517,7 +518,7 @@ Lane picker sheet (opens when a token is tapped):
 | Needs [x Frontline] [ Initiator] [ Wave clear]                       |  <- 56
 | [ All ][ Top ][ Jg ][ Mid ][ Bot ][ Sup ]   (segmented, 96 px)       |  <- 96
 | +----------------------------------------------------------------+   |  <- grid area
-| | * COACH SUGGESTS   Veshra  (Shade)                    [ Take ] |   |  <- scrolls
+| | * Coach suggests   Veshra  (Shade)                    [ Take ] |   |  <- scrolls
 | +----------------------------------------------------------------+   |
 | +----------------+ +----------------+ +----------------+             |
 | |  (*)  .----.   | |       .----.   | |       .----.   |             |
@@ -531,7 +532,7 @@ Lane picker sheet (opens when a token is tapped):
 +----------------------------------------------------------------------+
 ```
 Notes on the frame:
-- **Header (104 px) with the "?" slot (C12).** Five parts, left to right: back (96 x 96), title (40 px: "YOUR BAN", "YOUR PICK", "THEIR BAN", "THEIR PICK"; it wraps to two lines in large text), timer ring (72 px circle that drains; digits inside; at 3 s or less it turns the warning colour, shows a "!" and pulses), **Auto-finish** (text button, 26 px label, 176 x 96 hit), and **"?" (96 x 96 hit, 88 px circle, top right, the same corner as every other screen)**. Width budget at 720 (672 usable): 96 + 72 + 176 + 96 = 440 for the four fixed parts plus 4 gaps of 8 = 32, which leaves **200 px for the title**; "YOUR PICK" is about 160 px at 40 px, so it stays on one line. At 578 px (large text) 106 px is left, so the title takes two lines ("YOUR" / "PICK"), and the header is 128 px high (as 6.3(e) already says). The v1 title "YOUR TURN: BAN" (14 characters) did not fit beside a "?" and is shortened; the AI's turn is named in the grid overlay ("Mossgate is choosing a ban..."). Contrast of the "?" on this screen: the page gradient only, same circle and ring as Home (6.1), no art behind it. The 12 (or 16) step segments underneath show the whole order: bans are short bars, picks tall, the current one is highlighted, done ones carry the side flag.
+- **Header (104 px) with the "?" slot (C12).** Five parts, left to right: back (96 x 96), title (40 px Bold, sentence case: **"Your ban", "Your pick", "Their ban", "Their pick"**, Producer ruling A4), timer ring (72 px circle that drains; digits inside; at 3 s or less it turns the warning colour, shows a "!" icon and pulses), **Auto-finish** (text button, 26 px label, 176 x 96 hit; the label is 116 px wide in SemiBold 26) and **"?" (96 x 96 hit, 88 px circle, top right, the same corner as every other screen)**. **Width budget at 720 (672 usable): 96 + 72 + 176 + 96 = 440 for the four fixed parts plus 4 gaps of 8 = 32, which leaves 200 px for the title** (the bible's 2b figure of 260 px was wrong and is deleted, ART-BIBLE 5.2 and 8.2). Measured in Barlow Semi Condensed Bold 40 (the bible's numbers, re-measured here): "Your ban" 141 px, "Your pick" 150, "Their ban" 152, "Their pick" 161, so every title fits on one line with 39 px or more to spare. At 578 px (large text) 106 px is left, so the title takes two lines ("Their" 84 px and "pick" 69 px both fit 106) and the header is 128 px high (2 lines of about 46 px). The older "YOUR TURN: BAN" is gone (229 px in sentence case, 271 in capitals: it does not fit beside the "?" at either size); the AI's turn is named in the grid overlay ("Mossgate is choosing a ban..."). Contrast of the "?" on this screen: the page gradient only, same circle and ring as Home (6.1), no art behind it. The 12 (or 16) step segments underneath show the whole order: bans are short bars, picks tall, the current one is highlighted, done ones carry the side flag.
 - **Board:** You are always on the left, Them on the right. The column headers carry the side as a **word plus a flag glyph** ("Blue" with a flag, "Red" with a flag), never colour alone and never a bare letter. Rows are 52 px compact (hero silhouette Mini 44 + hero name; open slots show "Open" and the player's name so you can see who plays the lane) or 72 px full when the available height allows (rule below). Bans sit under the lanes (one slot at short drafts, three at full).
 - **Needs strip (56 px):** the existing "Frontline / Initiator / Wave clear" checklist as ticked or empty chips; once three heroes are picked it adds the live composition style chip ("Skirmish +2.0%").
 - **Role filter (segmented, 96 px):** All, Top, Jg, Mid, Bot, Sup, with a tick on a role whose lane you have already filled. It filters by `role_primary` or `role_secondary`; "All" is the default. It never hides what the sim allows (off-role picks stay legal).
@@ -553,14 +554,14 @@ Pick or ban confirm (bottom sheet, the board stays live above):
 | | STRONG VS  (img) Dovrin   (img) Sparrowe                       |   |
 | | PLAYS AS   [Top 85%][Jg 85%][Mid 85%][ BOT 100% ][Sup 85%]     |   |
 | |            ^ best fit is preselected; filled lanes are locked   |  |
-| | [      PICK FOR BOT CARRY - TALFIN     (coral, 104 px)      ]  |   |
+| | [      Pick for Bot Carry - Talfin     (coral, 104 px)      ]  |   |
 | +----------------------------------------------------------------+   |
 +----------------------------------------------------------------------+
 ```
 Draft complete (replaces the two text cards):
 ```text
 +----------------------------------------------------------------------+
-| DRAFT COMPLETE                                           [ ? ]       |  <- header 96
+| Draft complete                                           [ ? ]       |  <- header 96
 | +----------------------------------------------------------------+   |
 | |  YOU                      VS                      THEM         |   |
 | |  [img] Brixley   Top   Ottomere [img]                          |   |
@@ -574,7 +575,7 @@ Draft complete (replaces the two text cards):
 | | Net edge for you from the draft:  -10.0% (v)    <- one number  |   |
 | +----------------------------------------------------------------+   |
 | [ Game plan: Balanced  > ]                  (secondary, 96 px)       |
-| [          START THE MATCH      (coral, 112 px)            ]         |
+| [          Start the match      (coral, 112 px)            ]         |
 +----------------------------------------------------------------------+
 ```
 
@@ -593,7 +594,7 @@ Draft complete (replaces the two text cards):
 | Draft complete | `draft.picks`, `draft.lineups`, `Comp.evaluate`; NEW one number "net edge from the draft for you" = my `ev["mod"]` minus their `ev["mod"]`, coloured from my point of view; the Game plan button label from `GamePlan.is_neutral(...)` as now; launch via `ScreenDraft.launch(game, draft)` |
 
 #### (d) Interactions
-- Tap a hero card: opens the sheet (size M, about 52 percent of the height) with hero details, "Plays as" (a 5-option segmented control, filled lanes locked, the best lane preselected so the common case is two taps: hero, confirm) and one big confirm button ("Pick for Bot Carry - Talfin", or "Ban Veshra" with the danger variant). While the sheet is open the target lane on the board shows the hero as a ghost with the fit percentage.
+- Tap a hero card: opens the sheet (size M, about 52 percent of the height) with hero details, "Plays as" (a 5-option segmented control, filled lanes locked, the best lane preselected so the common case is two taps: hero, confirm) and one big confirm button ("Pick for Bot Carry - Talfin", or "Ban Veshra" in the outlined `ban` variant: a `WARN` rim and a drawn warning icon on a `PANEL2` fill, never a pink, red or coral fill, ART-BIBLE 8.1 and 9.1; Pick is the coral go button). While the sheet is open the target lane on the board shows the hero as a ghost with the fit percentage.
 - Ban phase: no lane control; the confirm button is "Ban Veshra".
 - Tap "Take" on the coach bar: applies `ai_choice()` in one tap (this keeps the fast path for the 5-minute game).
 - Tap a role in the filter: filters the grid; tap "All" to reset. No swipe gestures in the draft (a swipe would fight the scroll under a running timer).
@@ -730,7 +731,7 @@ Notes on the frame:
 ```
 - **Three views, not five** (Table, Playoffs, History): Form becomes a switch in the Table header ("Points | Form" changes the number on the right of each row and re-sorts); Trophies and My games merge into History. Three labels fit in large text (192 px per option at 578 px) and never wrap in a word.
 - **Podium** for the top three (2nd, 1st, 3rd): badges, short names, points; pedestal heights show the order.
-- **Rows 4 to 10** use RankRow. A dashed **playoff line** after rank 4 (the top four qualify). Your row has a PANEL3 fill, an 8 px accent bar and a "YOU" pill (text, so it works without colour).
+- **Rows 4 to 10** use RankRow (104 px high, 56 px badge, ART-BIBLE 8.2). A dashed **playoff line** after rank 4 (the top four qualify). Your row has a PANEL3 fill, an 8 px accent bar and a "YOU" pill (text, so it works without colour).
 - **Pinned row:** when your row is scrolled out of view, a 96 px row pinned above the tab bar shows your rank, club and one sentence about the line ("1 win and 3 pts to the line", or "Safe: 5 pts clear of 5th"). It disappears when your own row is on screen.
 
 Playoffs view (a drawn bracket):
@@ -806,7 +807,7 @@ There is none: Standings is a read-only screen. Its single job is to answer "whe
 +----------------------------------------------------------------------+
 | [<] Match report                                          [ ? ]      |  <- header 96
 | +----------------------------------------------------------------+   |
-| |  DEFEAT                              (display 64, with a shape)|   |  <- hero ~300
+| |  Defeat                              (display 64, with a shape)|   |  <- hero ~300
 | |  (BADGE)     15  -  24     (BADGE)        team kills, display  |   |
 | |  Northreach Corsairs  vs  Mossgate Wardens                     |   |
 | |  A decisive result - 13:30         Best of 3:  (x)( )( )       |   |
@@ -830,7 +831,7 @@ There is none: Standings is a read-only screen. Its single job is to answer "whe
 | [Bonds 34 (^)] [Chemistry +1.0%] [Cash +8 (^)]                       |
 | BEFORE THE NEXT GAME   10 contracts end this season.   [ Open squad ]|
 | DIG DEEPER  v        [ Players | Moments | Draft ]                   |
-| [          CONTINUE   (coral, sticky footer 112 px)          ]       |
+| [          Continue   (coral, sticky footer 112 px)          ]       |
 +----------------------------------------------------------------------+
 ```
 Notes on the frame:
@@ -877,27 +878,29 @@ Notes on the frame:
 
 ### 6.7 Match screen HUD (arena, Alpha 0.8)
 
-Added in the wave 1b revision (review conflict C9: nobody owned this HUD, and the sources do not fit on one phone screen). **Nothing here was built or run; sizes are paper estimates, and text widths are estimates because the art bible's font is not installed.** I read `ARENA-MAP.md`, `ACTION-VOCABULARY.md` (sections 1.4, 2.4, 4, 5), `ESPORTS-NOTES.md` (2.4, 4), `game/i18n/en.json` (the `feed.*` and `match.*` strings) and the art bible tokens. I did not edit any of them; where they do not fit, section 6.7.1 says so and proposes the cut.
+Added in the wave 1b revision (review conflict C9: nobody owned this HUD, and the sources do not fit on one phone screen). **Nothing here was built or run.** Text widths in 6.7.1 are measured with the real Barlow Semi Condensed files outside Godot (the Producer's measurement; I re-ran the longest label, the longest tag and the worst pair and got the same numbers), and the font has never been loaded in Godot. I read `ARENA-MAP.md`, `ACTION-VOCABULARY.md` (sections 1.4, 2.4, 4, 5), `ESPORTS-NOTES.md` (2.4, 4), `game/i18n/en.json` (the `feed.*` and `match.*` strings) and the art bible tokens. I did not edit any of them. Section 6.7.1 now records the **Producer's ruling on each proposal** (review wave 1b, 4.3), and the Gameplay Designer's pass 1c in `ACTION-VOCABULARY.md` already carries the accepted ones (the 4-word `gp.switch.short.<id>` banner, labels hidden at x2, the `intent_ping` ring without a line, the short feed form, an "If behind" chip that says only that, the loss tone as an edge vignette plus the `BAD` Defeat glyph on the end card only).
 
 **Which release.** **Alpha 0.7 keeps today's match screen** with the 75 s watch (feed list, bar, Speed x1 / x2, Skip to the end, See the report). It only gets the global changes (new tokens, 96 px buttons, the "?" in the standard top-right corner, the ids `match.controls` and `match.report_btn`). **Alpha 0.8 replaces it with the arena** (`ARENA-MAP.md`: a 720 x 760 arena between a scoreboard strip and a text strip), and everything below is the HUD around that arena. The result, the length and every number are decided before the show starts; the HUD is playback only and never changes them (ACTION-VOCABULARY H1 to H6).
 
-#### 6.7.1 Diagnosis: what the sources ask for against the room
+#### 6.7.1 Diagnosis and rulings: what the sources ask for against the room
 
-| Source asks for | Room | Verdict and proposed cut (the cut is a proposal to the owner; I do not edit their file) |
+**Rulings (Producer, review wave 1b 4.3):** P1 accepted. **P2 rejected: label limit stays 28 and tag limit 24.** P3, P4, P6, P7, P8, P9, P10, P11, P12, P13 accepted as written. **P5 not accepted: the mid push window stays at 46.0 s;** the scheduler may drop that pill, or Gameplay deletes it.
+
+| Source asks for | Room | Ruling and what changes |
 |---|---|---|
-| Scoreboard 190 px (ARENA-MAP 4) with clock, kills, towers, two objectives, gold lead, lead graph (ACTION-VOCABULARY 5), plus two banners, a phase chip and a status tag | The 190 px starts at the top of the screen, so it **includes the 48 px status bar and notch**: 142 px of content. Three rows (44 + 46 + 44) fit, four do not | **Does not fit as listed.** Cuts: the two objectives become **markers on the lead graph** at their beats (a stone glyph and a moon glyph in the owner's shape), not a separate row; the gold lead sits beside the clock; banners show the badge and the club's last word (at most 8 characters: "Corsairs", "Wardens"), not the full name |
-| Text strip 150 px under the arena (ARENA-MAP 4, "my assumption, for UI/UX to confirm") with an intent pill per side, a plan chip, an "If behind" chip, a 3-line feed, a commentary line, banners | Plan row 44 + intent row 48 + a 2-line feed 80 + gaps is **198 px**, not 150 | **Does not fit.** Proposal: take **48 px from the controls strip** (180 to 132, which still holds a 96 px button, 12 px above it and the 24 px bottom margin). The arena stays 720 x 760 and the scoreboard stays 190. If the Level Designer refuses: plan chips move into scoreboard row A and the feed drops to one line (worse) |
-| Intent label up to 28 characters per side, both shown (R3); 26 characters is the longest | Two pills side by side at 24 px need about 2 x (26 x 10 + 52) = 630 px of the 672 available **if** the font is Barlow Semi Condensed at 0.42 em (10 px a character at 24 px); in today's font (about 0.52 em, 12.5 px) they need about 750 px. At 24 characters: 590 and 700 px | **Fits only with the narrow font.** Proposal to Gameplay: label limit **24 characters** (only one of the 156 lines is longer: "Fight now, objective later", 26; for example "Fight, then objective"); even then today's font would not fit a pair. Rule in the HUD: if the pair does not fit, show only yours |
-| `intent_ping`: "a ring on the target zone with a line to the label" (2.5 s) | The label is 200 to 760 px below the zone; the line would cross the arena | **Cut the line.** Keep the ring: a circle ring for your label, a hexagon ring for theirs (same shape as the pill's glyph), so the eye links them without a line |
-| Status tags up to 24 characters ("Still level, still tense"), "centre status tag" | Scoreboard centre slot is 348 px (280 in large text): about 20 characters at 24 px plus a glyph | **Tags over 20 characters do not fit large text.** Proposal to Gameplay: 20 characters (three of 15 tag lines are longer: "Nobody saw that coming" 22, "The lead changes hands" 22, "Still level, still tense" 24) |
-| Plan chip with up to 3 parts, "If behind" chip with its top 2 parts (ACTION-VOCABULARY 4.2) | Chip row 672 px (578 in large text): about 280 + 150 = 430 px for 2 parts plus a short chip | Three parts fit only in normal text. **Cut:** the "If behind" chip says only "If behind" (parts open in a read-only sheet on tap); the plan chip drops its last part until it fits; no ellipsis |
-| Esports: commentary line plus a 3-line feed | Feed block holds 2 lines at 26 px (80 px); 1 line in large text | **Cut to 2 lines.** The second line is the previous result, or a commentary line in a calm gap, never both |
-| Feed line text = the Report's feed text, "identical" (ACTION-VOCABULARY 1.2): "02:25  Top lane: they win it (narrowly)" is 7 words | The four lane results arrive 2.25 s apart (13.5, 15.75, 18.0, 20.25). Two 7-word lines are 14 words in 2.5 s, against a budget of about 10 | **Does not fit by itself, before anything else is shown.** Proposal: the arena uses a **short feed form** of the same event: "Top lane: they win it" (5 words, no clock stamp because the scoreboard shows the clock, the size as 1 to 3 dots plus the tick or cross glyph). The Report keeps its full line. Same events, same order, same stamps |
-| `kill_ping`: killer flash, **"+gold" text**, skull mark (ACTION-VOCABULARY 3.2) | About 20 to 30 kills in 75 s, mostly in two fights | **Cut the "+gold" text.** It is a number the ledger does not count (section 2.5 says the arena shows no per-hero gold), and floating text over 40 px tokens cannot meet the 24 px floor in a fight. Keep the skull mark |
-| Plan switch banner uses the existing `gp.switch.<id>` text, 13 words ("Early game over: you are behind, switching to your 'if behind' plan.") | A 3 s banner at 21.0 s, 0.75 s after the jungle result | **Too long.** Proposal: a short form of at most **4 words** for each (for example "Switching to If behind"); the long line stays in the Report and help |
-| Map labels 20 px bold (ARENA-MAP 9) | Floor is 24 px | **Raise to 24 px** with the 3 px outline, or hide zone labels and keep only the slot letter on tokens; the validator checks icon overlap, not label overlap, so labels need their own check |
-| Intent windows are 2.5 s, 1.25 s at x2 (R3) | A 4-word label needs about 2 s to read at the Esports rate of 2 words per second | **At Speed x2 hide both intent labels** (feed lines and tags stay). The windows are not re-timed |
-| Four pill windows start within 1.5 s of a feed line (jungle 12.5, plan check 21.2, mid push 46.0, close 71.5) | | The scheduler (6.7.4) drops the pill that would break the budget; proposal to Gameplay: start mid push at 47.5 s so it survives |
+| Scoreboard 190 px (ARENA-MAP 4) with clock, kills, towers, two objectives, gold lead, lead graph (ACTION-VOCABULARY 5), plus two banners, a phase chip and a status tag | The 190 px starts at the top of the screen, so it **includes the 48 px status bar and notch**: 142 px of content. Three rows (44 + 46 + 44) fit, four do not | **Does not fit as listed.** Cuts: the two objectives become **markers on the lead graph** at their beats (a stone glyph and a moon glyph in the owner's shape), not a separate row; the gold lead sits beside the clock; banners show the badge and the club's last word (at most 8 characters: "Corsairs", "Wardens"; **P10 accepted**, the longest last word in `clubs.json` is 8), not the full name |
+| Text strip 150 px under the arena (ARENA-MAP 4, "my assumption, for UI/UX to confirm") with an intent pill per side, a plan chip, an "If behind" chip, a 3-line feed, a commentary line, banners | Plan row 44 + gap 8 + intent row 48 + gap 8 + feed block 80 + bottom 10 = **198 px**, not 150 | **P1 accepted.** Text strip **198**, controls strip **132** (12 gap + 96 button + 24 bottom margin). The sums: 44 + 8 + 48 + 8 + 80 + 10 = 198 and 12 + 96 + 24 = 132. The arena stays 720 x 760 at y 190 to 950 and the scoreboard stays 190, so no arena redraw. Level Designer edits ARENA-MAP 4, `layout_px` (`feed_y` [950, 1148], `controls_y` [1148, 1280]) and the preview (B1) |
+| Intent label up to 28 characters per side, both shown (R3); 26 characters is the longest | Two pills side by side on a 672 px row (578 in large text). **Measured** with Barlow Semi Condensed SemiBold 24 px: longest label 239 px ("Fight now, objective later", 26 characters); a pair with 52 px of padding per pill (side glyph 16, gap 8, 14 either side: the figure the measurement used) and a 16 px gap is at most 599 of 672 px | **P2 rejected: no shortening.** Label limit stays 28 (ACTION-VOCABULARY R1). **Both coaches' labels are shown.** At normal size 0 of 19,881 label pairs overflow; in large text (578 px) 49 (0.25 percent) do, which the rule "if the pair does not fit, show only yours" already covers. The font has not been loaded in Godot (test 4 checks it there) |
+| `intent_ping`: "a ring on the target zone with a line to the label" (2.5 s) | The label is 200 to 760 px below the zone; the line would cross the arena | **P6 accepted: the ring only, no line** (ACTION-VOCABULARY 3.2 and R3 say so). A circle ring for your label, a hexagon ring for theirs (the same shape as the pill's glyph), so the eye links them without a line |
+| Status tags up to 24 characters ("Still level, still tense"), "centre status tag" | Scoreboard centre slot is 348 px (280 in large text). **Measured:** the longest tag is 234 px ("Nobody saw that coming", 22 characters). With a 32 px side glyph (the bible's inline icon size, 6.1) that is 266 of 348 px, and 266 of 280 in large text, 14 px to spare | **P2 rejected: tag limit stays 24.** Fits at both sizes. The 266 is the Producer's 274 (which used a 40 px glyph) with the 32 px glyph: my arithmetic, not a new measurement. Large text is the first place to break if the font loads wider in Godot |
+| Plan chip with up to 3 parts, "If behind" chip with its top 2 parts (ACTION-VOCABULARY 4.2) | Chip row 672 px (578 in large text) | **P12 accepted.** The "If behind" chip says only "If behind"; its parts open in a read-only size S sheet on tap. The plan chip is the only chip with parts: at most 3, it drops its last part until it fits the row, never an ellipsis (ACTION-VOCABULARY 4.2 says the same) |
+| Esports: commentary line plus a 3-line feed | Feed block holds 2 lines at 26 px (80 px); 1 line in large text | **P13 accepted: 2 lines.** The second line is the previous result, or a commentary line in a calm gap, never both. ARENA-MAP 4 and the preview change (Level Designer, B1 and B4) |
+| Feed line text = the Report's feed text, "identical" (ACTION-VOCABULARY 1.2): "02:25  Top lane: they win it (narrowly)" is 7 words | The four lane results arrive 2.25 s apart (13.5, 15.75, 18.0, 20.25). Two 7-word lines are 14 words in 2.5 s, against a budget of about 10 | **P8 accepted: the short feed form.** The arena shows "Top lane: they win it" (5 words: `feed.line.short` with `feed.win.short` and `feed.loss.short`; no clock stamp because the scoreboard shows the clock; the size as 1 to 3 dots plus the tick or cross icon). Same event, order and stamp as the Report, which keeps its full line (ACTION-VOCABULARY 1.2 and test 9 now read this way). Systems adds the three strings, Narrative sets one contest name set |
+| `kill_ping`: killer flash, **"+gold" text**, skull mark (ACTION-VOCABULARY 3.2) | About 20 to 30 kills in 75 s, mostly in two fights | **P7 accepted: no "+gold" text.** The ledger has no per-hero gold (section 2.5 of the vocabulary), and floating text over 40 px tokens cannot meet the 24 px floor in a fight. The skull mark stays |
+| Plan switch banner uses the existing `gp.switch.<id>` text, 13 words ("Early game over: you are behind, switching to your 'if behind' plan.") | A 2 s banner (ACTION-VOCABULARY plan_check) at 21.0 s, 0.75 s after the jungle result | **P3 accepted:** the arena shows a short form of at most **4 words**, `gp.switch.short.<id>` (for example "Switching to If behind"), in the amber `WARN` banner; the long `gp.switch.<id>` line stays in the Report and help. Gameplay edits `plan_check` (done in pass 1c); Narrative writes the five strings |
+| Map labels 20 px bold (ARENA-MAP 9) | Floor is 24 px | **P9 accepted (with B4 and A9):** 24 px Bold, +1.5 px tracking, `TEXT` with a **5 px `VOID` outline** (ART-BIBLE 3.9; the 3 px I first proposed is replaced). The Level Designer adds a label-overlap check with the widths of ART-BIBLE 5.2 (STONEBACK 128, MOONHULK 118, MOSSBACK 116, TOP 41, MID 37, BOT 42 px) and puts STONEBACK above or left of its icon. The validator checks icon overlap only. In large text the zone labels are hidden (6.7.7) |
+| Intent windows are 2.5 s, 1.25 s at x2 (R3) | A 4-word label needs about 2 s to read at the Esports rate of 2 words a second | **P4 accepted:** at Speed x2 both intent labels are hidden (ACTION-VOCABULARY R3 and test 6); feed lines and tags stay. The windows are not re-timed |
+| Four pill windows start within 1.5 s of a feed line: jungle 12.5 (1.0 s before the 13.5 lane line), plan check 21.2, mid push 46.0 and close 71.5 (0.95, 1.0 and 0.25 s after a line) | The scheduler (6.7.4) decides, pill by pill | **P5 not accepted: the mid push window stays at 46.0 s** (both mid-push tower falls are at 46.0 and 47.2 s, so a "Pushing the tower" label at 47.5 s would trail its own event; the commentary slot at 47.5 to 49.0 s is also kept, which settles B15: the model shows that a pill moved to 47.5 s would leave only 3 of the 4 commentary slots). Model result (6.7.4): in a game with no wipe the jungle and plan-check pills keep only your label and the mid push and close pills are dropped; when the mid fight is a wipe the mid push pill survives as yours only. **Recommendation to Gameplay (it decides): delete `push_tower` and `push_dive`**, because they are dropped in most games and the tower falls still show on the scoreboard count |
 
 #### 6.7.2 Layout
 
@@ -942,10 +945,10 @@ Vertical stack at 720 x 1280 (the design case). The arena is fixed; the strips g
 The same wireframe in words:
 
 - **Row A (44 px):** left banner (badge 40, last word of the club name at 26 px), centre (clock 32 px and the gold lead 32 px with the leader's shape glyph and a sign: "(o) +1,500" means you lead), right banner mirrored. You are always left, them right, and the player's base is always at the bottom of the arena (ARENA-MAP 4).
-- **Row B (46 px):** left: kills and towers with glyphs, numbers 32 px; right: the same for them; **centre slot 348 px: the phase chip ("Early", "Mid", "Late", 24 px) or, for 2.0 s, the status tag** (glyph plus up to 20 characters, 24 px).
+- **Row B (46 px):** left: kills and towers with glyphs, numbers 32 px; right: the same for them; **centre slot 348 px: the phase chip ("Early", "Mid", "Late", 24 px) or, for 2.0 s, the status tag** (glyph plus up to 24 characters, 24 px; the longest tag line is 234 px, 266 px with a 32 px glyph, in a 348 px slot).
 - **Row C (44 px):** the lead graph, a 20 px band across 672 px (time on x, the lead ladder of ACTION-VOCABULARY F4 on y, centre line = even, above = you), with 8 beat markers, the two **objective markers** (stone at 45 percent of the width, moon at 80 percent: an empty outline before the beat, the owner's shape glyph after it) and two ticks at the phase borders (24.0 s and 51.0 s). Markers are 28 px glyphs straddling the band. No text on the graph.
-- **Plan row (44 px):** the plan chip ("Group up, Contest them", the first two or three parts) and the "If behind" chip (dim until the plan check at 21.0 s, lit after it if that plan is in force). Both are static: they fade in at 3.0 s, after the opening labels, so the first 2.5 s are not overloaded. A tap on either opens a read-only size S sheet with the whole plan (the show pauses while it is open). No plan chip for the opponent exists (ACTION-VOCABULARY R7, request S1).
-- **Intent row (48 px):** your label left with a circle glyph, theirs right with a hexagon glyph, each a pill of at most 24 characters (proposed) at 24 px. If the pair does not fit 672 px, only yours shows.
+- **Plan row (44 px):** the plan chip ("Group up, Contest them", the first two or three parts) and the "If behind" chip (it says only "If behind", P12; dim until the plan check at 21.0 s, lit after it if that plan is in force). Both are static: they fade in at 3.0 s, after the opening labels, so the first 2.5 s are not overloaded. A tap on either opens a read-only size S sheet with the whole plan (the show pauses while it is open). No plan chip for the opponent exists (ACTION-VOCABULARY R7, request S1).
+- **Intent row (48 px):** your label left with a circle glyph, theirs right with a hexagon glyph, each a pill of at most 28 characters at 24 px (P2: no shortening). If the pair does not fit its row (672 px, 578 in large text), only yours shows.
 - **Feed block (80 px):** line 1 is the newest result, line 2 is the previous result (dim) or, in a calm gap, a commentary line. A banner takes over both lines.
 - **Controls (132 px):** Speed, Skip, "?" (6.7.6).
 
@@ -960,7 +963,7 @@ The same wireframe in words:
 | Objectives (Stoneback, Moonhulk) | row C, on the graph | 28 px glyph | F12: the sign of `obj_mid` and `obj_late`; the owner's shape (circle or hexagon) over the stone or moon glyph |
 | Lead graph | row C | 20 px band | F4 ladder, one marker per beat; a flip (F5) pops a diamond marker; the gold number also flashes (`lead_flash`) |
 | Phase chip | row B centre | 24 px | Early until 24.0 s, Mid from 24.0, Late from 51.0 (the Report's three bands; 6.7.5) |
-| Status tag | row B centre, 2.0 s | 24 px, at most 20 characters | `tag_flip`, `tag_back`, `tag_upset`, `tag_snow`, `tag_close` (2.4); replaces the phase chip meanwhile |
+| Status tag | row B centre, 2.0 s | 24 px, at most 24 characters | `tag_flip`, `tag_back`, `tag_upset`, `tag_snow`, `tag_close` (2.4); replaces the phase chip meanwhile |
 | Banners (club) | row A | badge 40, last word 26 px | `Corsairs`, `Wardens`: the longest last word in `clubs.json` is 8 characters; a data check flags a longer one |
 
 #### 6.7.4 The text budget: how many text channels at once
@@ -978,19 +981,19 @@ The 10 words is the Esports Manager's own unmeasured estimate (ESPORTS-NOTES 2.4
 | 5 | Centre status tag | row B centre | 1 / 1 | 2.0 s | 24 | dropped if the budget is full; the graph marker and gold flash still show the event |
 | 6 | Feed line | feed block, line 1 | 1 new (+1 previous, dim) / 1 | newest 4 s | 26 | **never dropped**: it is the sim's result; a banner holds it and it returns |
 | 7 | Commentary line | feed block, line 2 | 1 / 0 | 2.5 s | 24 | only in a calm gap; at most 2 per game (6.7.4 below) |
-| 8 | Banner | feed block, both lines (hides the intent row) | 1 / 1 | plan switch 3.0 s; wipe 2.0 s; end card stays | 26, end card 32 | wins over everything below it |
+| 8 | Banner | feed block, both lines (hides the intent row) | 1 / 1 | plan switch 2.0 s; wipe 2.0 s; end card stays | 26, end card 32 | wins over everything below it |
 
 **Admission order** (highest first): banner, feed line, status tag, intent pair, intent (yours only), commentary. The scheduler never delays and never shrinks text: it admits an item if no 2.5 s window then holds more than 10 new words, otherwise it drops it. A wipe banner ("Team wiped", 2 words) **replaces** the feed line of that beat (the Report's Moments list still has the full line). Both limits are one function of the show script, so QA can test it without a phone.
 
-**What the model says** (a small script run in this task, not saved in the repo; assumptions: 15 label windows from ACTION-VOCABULARY 4.1, feed stamps from 1.4, a pair of labels averages 6.9 words (the 156 labels average 3.47: 11 are 2 words, 66 are 3, 75 are 4, 3 are 5 and 1 is 6), a feed line 5 words in the short form, a status tag 3 words, a short banner 4 words, and a status tag offered at every stamp as a worst case; not measured on a phone):
+**What the model says** (re-run in pass 1c with a saved script, `docs/design/ui/hud_budget.py` (the Producer copies it into the repo; I was told to edit only two files): it counts the new words that start inside any 2.5 s span and applies the admission order above; the earlier script was not saved. Assumptions, not measurements on a phone: 15 label windows from ACTION-VOCABULARY 4.1, feed stamps from 1.4, a pair of labels averages 6.9 words (the 156 labels average 3.47: 11 are 2 words, 66 are 3, 75 are 4, 3 are 5 and 1 is 6; a yours-only label is 3.45), a feed line 5 words in the short form (7 in the long form), a status tag 3 words offered at the 8 stamps and at 62.0 s, a short banner 4 words (counted when the scheduler runs, not in the unmanaged case), a wipe banner 2 words that replaces the feed line of its beat, a commentary line 8 words):
 
 | Case | Result |
 |---|---|
-| Unmanaged: both labels in all 15 windows, 7-word feed lines (clock and size word), a tag at every stamp, a banner at 21.0 s and a wipe banner at each fight, a 7-word commentary line after each stamp | up to **7 text items at once**; more than 10 new words in 142 of 291 quarter-second span starts; the worst span has 34 words (at 13.5 s; banner words not even counted) |
+| Unmanaged: both labels in all 15 windows, 7-word feed lines (clock and size word), a tag at every stamp, a 7-word commentary line 1.0 s after each stamp | More than 10 new words in **73 of 291** quarter-second span starts; the worst span has **30.9 words** (at 19.0 s). Items on screen at once are not counted here; by hand it is up to 7. (The earlier figures, 142 of 291 and 34 words, came from the unsaved script and are not reproduced by the saved one; they are replaced.) |
 | Same, with 7-word feed lines **under the scheduler** | nothing else is admitted at all: the lane stamps (2.25 s apart) already use 14 words in 2.5 s. This is why the feed needs the 5-word short form |
-| Scheduler, 5-word feed lines, no plan switch, no wipe | **at most 3 items at once** (by construction: pair, tag, feed block); both labels shown in 11 of 15 windows, yours only in 2, none in 2 (mid push 46.0 and close 71.5, because a feed line lands within 0.25 to 1.0 s); 4 of the 9 possible tag slots keep their text (the others rely on the graph marker and the gold flash) |
-| Scheduler, 5-word feed lines, plan switch and two wipes (worst case) | at most 3 items at once; labels both in 11, yours only in 3, none in 1 (plan check 21.2, which the plan-switch banner covers anyway) |
-| Where a commentary line (8 words) still fits the budget | 26.75 to 28.5 s, 39.5 to 42.5 s, 47.5 to 49.0 s, 66.0 to 68.75 s. **At most 2 commentary lines per game**; the Narrative Designer writes for those four slots. Esports' "recap in the plan check" (ESPORTS-NOTES 2.2, item 4) has no room at 21 to 24 s, because the jungle result (20.25 s), the plan banner and the rotation labels (24.2 s) already fill the budget; move it to the first slot |
+| Scheduler, 5-word feed lines, no plan switch, no wipe | **at most 3 items at once** (by construction: pair, tag, feed block); both labels shown in **11** of 15 windows, yours only in **2** (jungle 12.5 and plan check 21.2), none in **2** (mid push 46.0 and close 71.5, because a feed line lands 1.0 and 0.25 s before them); 4 of the 9 possible tag slots keep their text (the others rely on the graph marker and the gold flash) |
+| Scheduler, 5-word feed lines, plan switch and two wipes (worst case) | at most 3 items at once; labels both in **11**, yours only in **3** (jungle 12.5, mid push 46.0, close 71.5), none in **1** (plan check 21.2, which the plan-switch banner covers anyway). Under P5 the mid push pill stays at 46.0 s: it survives only because the wipe banner replaced a 5-word feed line with a 2-word one |
+| Where a commentary line (8 words) still fits the budget | 26.75 to 28.5 s, 39.5 to 42.5 s, 47.5 to 49.0 s, 66.0 to 68.75 s (start times). In the worst case above the third slot opens only from 48.5 s, because a yours-only mid push pill is still up. **At most 2 commentary lines per game**; the Narrative Designer writes for those four slots. Esports' "recap in the plan check" (ESPORTS-NOTES 2.2, item 4) has no room at 21 to 24 s, because the jungle result (20.25 s), the plan banner and the rotation labels (24.2 s) already fill the budget; move it to the first slot |
 
 Per moment, in the Esports Manager's terms (ESPORTS-NOTES 2.4) and what the layout does with it:
 
@@ -1023,16 +1026,16 @@ The player should see the same story twice, once live and once in the report (UI
 | **Android Back** | During the show it acts as Skip (the result is decided and saved; the report is the only exit). After the show it acts as See the report. No "Leave the match?" sheet |
 | **"?"** | 96 x 96 at the **right end of the controls row** (the one place it is not top right, because the scoreboard owns the top). Opens the help sheet; **the show pauses while any sheet is open** and resumes on close (ACTION-VOCABULARY H4 keeps the 75 s as playback length, so pausing does not change it). Tutorial step 19 highlights `match.controls`; the "?" is outside that hole |
 | **Arena taps** | None in 0.8. No hero, tower or camp can be tapped, so nothing can be hit by accident while the player reaches for Speed or Skip |
-| **End of show (74 to 75 s, then stays)** | The Cairn falls at 74.0 s and holds to 75.0 s. Then the feed block becomes the **end card**: line 1 the result word at 32 px with a flag shape (a broken flag for a defeat) and the margin word and length (`Report.result_word`, `Report.game_minutes`), line 2 "Decided by:" and the Report's factor text, 26 px. Speed and Skip are replaced by one **See the report** button (coral, 96 px high, the only coral on the screen; id `match.report_btn`) and the "?" stays |
+| **End of show (74 to 75 s, then stays)** | The Cairn falls at 74.0 s and holds to 75.0 s. Then the feed block becomes the **end card**: line 1 the result word at 32 px with a flag shape (for a defeat the `BAD` Defeat glyph, the one place `BAD` appears in the arena) and the margin word and length (`Report.result_word`, `Report.game_minutes`), line 2 "Decided by:" and the Report's factor text, 26 px. Speed and Skip are replaced by one **See the report** button (coral, 96 px high, the only coral on the screen; id `match.report_btn`) and the "?" stays |
 | Quick mode (Settings) | The arena is not shown; the flow goes straight to the report as today |
 
 #### 6.7.7 Large text, tall phones, colour-blind, and the other modes
 
-- **Large text (626 x 1113 logical).** Text in the arena is drawn in screen space and takes the text scale; the map art scales with the width, so the arena is **626 x 661**. The stack becomes: safe 48, scoreboard 122 (row A 40, row B 44, row C 34, gaps 2 + 2), arena 661, text strip 150 (plan row 44, intent 48, one feed line 38, gaps 8 + 8, 4 spare), controls 132 = 1113. Changes: **one** intent label (yours), **one** feed line (no previous line), **no commentary**, the plan chip shows two parts, the centre slot is 280 px (tags of 20 characters or fewer; longer variants are skipped in favour of a shorter variant of the same tag), the arena's zone labels are hidden (token slot letters stay). The budget numbers of 6.7.4 apply with the "large" column.
+- **Large text (626 x 1113 logical).** Text in the arena is drawn in screen space and takes the text scale; the map art scales with the width, so the arena is **626 x 661**. The stack becomes: safe 48, scoreboard 122 (row A 40, row B 44, row C 34, gaps 2 + 2), arena 661, text strip 150 (plan row 44, intent 48, one feed line 38, gaps 8 + 8, 4 spare), controls 132 = 1113. Changes: **one** intent label (yours), **one** feed line (no previous line), **no commentary**, the plan chip shows two parts, the centre slot is 280 px (every tag line fits: the longest is 266 of 280 px with the 32 px glyph), the arena's zone labels are hidden (token slot letters stay). Showing only your intent label is the large-text fallback that D8 keeps; the measurement says both would fit in 99.75 percent of pairs, so revisit it once the font has been loaded in Godot. The budget numbers of 6.7.4 apply with the "large" column.
 - **Tall phone (720 x 1560).** The arena stays 720 x 760 and the controls stay at the bottom. The extra 280 px goes to the lead graph (row C grows by 40, a taller story) and the text strip (the feed block shows the last 4 results, 5 lines, +120); the rest is air above the scoreboard. No new text channel is added.
-- **Colour-blind.** You are a **circle**, they are a **hexagon** in the pills, the gold lead glyph, the objective markers and the zone rings: shape first, colour second (accent colour and coral colour, token names per ART-BIBLE token table, pending re-issue; the colour-blind palette swap does not touch these two). Feed lines carry a tick or cross shape. The lead graph has a centre line and a fill pattern, not a hue pair. `BAD` is for loss tone only (ACTION-VOCABULARY 2.2) and never marks "them". Blue / Red side does not appear in the arena at all (C4).
+- **Colour-blind.** You are a **circle**, they are a **hexagon** in the pills, the gold lead glyph, the objective markers and the zone rings: shape first, colour second (`ACCENT` for you and `CORAL` for them, ART-BIBLE 3.8; the colour-blind palette swap does not touch these two). Feed lines carry a tick or cross shape. The lead graph has a centre line and a fill pattern, not a hue pair. `BAD` appears in the arena only as the Defeat glyph on the end card; the loss tone is the cool edge vignette (ACTION-VOCABULARY 2.2); a feed line is never coloured, and `BAD` never marks "them". Blue / Red side does not appear in the arena at all (C4).
 - **Animations off.** Pills, tags and banners appear and disappear instantly; the graph updates in steps; the show still plays at its own pace (that is the 75 s, not an animation setting; ARENA-MAP 8 covers reduced camera motion).
-- **Contrast.** Pills and chips sit on the E1 strip surface, where tinted chips are allowed (art bible 3.4: 4.5 to 6.5:1). Banners are on a solid E3 fill with `TEXT`, never `DIM`. Nothing in the HUD sits on the map art; text on the map (zone labels) has a 3 px outline.
+- **Contrast.** Pills and chips sit on the E1 strip surface, where tinted chips are allowed (art bible 3.4: 4.5 to 6.5:1). Banners are on a solid E3 fill with `TEXT`, never `DIM`. Nothing in the HUD sits on the map art; text on the map (zone labels) is `TEXT` with a 5 px `VOID` outline (ART-BIBLE 3.9).
 
 #### 6.7.8 Data feeding the HUD
 
@@ -1054,8 +1057,8 @@ Speed toggles, Skip jumps, Back skips, "?" opens a sheet and pauses, the plan ro
 
 1. **Budget:** for 10,000 seeded shows, in normal and large text: at most 10 new words in any 2.5 s window, at most 3 transient items visible at once (1 under a banner), no feed line dropped, no label ellipsised.
 2. **Floor:** every `Label` in the HUD has a font size of 24 px or more; feed lines 26; numbers 32.
-3. **Geometry:** at 720 x 1280, 720 x 1560 and 626 x 1113 the arena is 720 x 760 (626 x 661 large), strips do not overlap, all buttons are at least 96 px high, the "?" is inside the controls row.
-4. **Fit:** with the theme font, a pill, tag or chip that fits is not ellipsised, and one that does not fit is dropped by the rule, not clipped (this also settles the font-width estimates that this section could not measure).
+3. **Geometry:** at 720 x 1280, 720 x 1560 and 626 x 1113 the arena is 720 x 760 (626 x 661 large), strips do not overlap (48 + 142 + 760 + 198 + 132 = 1280), all buttons are at least 96 px high, the "?" is inside the controls row.
+4. **Fit:** with the theme font, a pill, tag or chip that fits is not ellipsised, and one that does not fit is dropped by the rule, not clipped (the widths in 6.7.1 were measured outside Godot; this test checks them in the engine).
 5. **Skip and speed:** one tap each; Back acts as Skip; a sheet pauses the show clock and closing resumes it; the final scoreboard after Skip equals the one after a full play (kills, towers, objectives, gold lead).
 6. **Tie-out:** kills, towers and gold lead equal the Report's numbers (ACTION-VOCABULARY I1 to I8).
 
@@ -1065,15 +1068,15 @@ None while the show plays: it is a spectator screen, which is why Skip and Speed
 
 #### 6.7.12 What I could not check, and what I need from others
 
-I could not measure any text width (Barlow Semi Condensed is not installed; the estimates use 0.42 em for it and 0.52 em for today's font), could not see the arena (it does not exist yet), and could not test touch. The 10-word budget is an unmeasured estimate by the Esports Manager. The model in 6.7.4 shows the budget is **tight but possible only with the cuts in (a)**; without them the lane phase alone breaks it.
+The text widths in 6.7.1 are the Producer's measurement with the real font files; I re-ran the longest label (239 px), the longest tag (234 px) and the worst pair (599 of 672 px) and got the same numbers (my own count of overflowing pairs in large text, with the place names and lanes filled in differently, was 72 of 31,329, 0.23 percent, against the Producer's 49 of 19,881, 0.25 percent: the same order). Barlow has never been loaded in Godot, so in-engine widths are untested (6.7.10 test 4). I could not see the arena (it does not exist yet) and could not test touch. The 10-word budget is an unmeasured estimate by the Esports Manager. The model in 6.7.4 shows the budget is **tight but possible only with the cuts accepted in 6.7.1**, above all the short feed form; without them the lane phase alone breaks it.
 
 | To | Ask |
 |---|---|
-| Level / World Designer | Controls strip 180 to 132 and text strip 150 to 198 (or accept the worse fallback); map labels 24 px; zone label overlap check; confirm the player's base at the bottom and the 142 px scoreboard content height (the 190 px includes the status bar) |
-| Gameplay / Champion Designer | Intent label limit 24 characters (one line); tag limit 20 characters (three lines); short plan-switch banner (4 words) for each `gp.switch.<id>`; drop the `intent_ping` line and the `kill_ping` "+gold" text; start mid push at 47.5 s; hide intent labels at x2; confirm "no pronouns" is not needed for the short feed form |
+| Level / World Designer | Ruling P1: edit ARENA-MAP 4, `layout_px` and the preview to a text strip of 198 and a controls strip of 132 (B1); map labels 24 px Bold, +1.5 px tracking, `TEXT`, 5 px `VOID` outline, a label-overlap check, STONEBACK above or left of its icon (B4, P9); confirm the player's base at the bottom and the 142 px scoreboard content height (the 190 px includes the status bar) |
+| Gameplay / Champion Designer | Already in `ACTION-VOCABULARY.md` pass 1c: P3 (`gp.switch.short.<id>`, 4 words), P4, P6, P7, P8, P12, and P5 (the window is not moved). Label limit stays 28 and tag limit 24 (P2 rejected). Open for you to decide: delete the `push_tower` and `push_dive` pills (recommended, they are dropped in most games, 6.7.4); confirm "no pronouns" is not needed for the short feed form |
 | Systems Designer | `Report.story(res, my_side)` (S3) as the single source for scoreboard, end card and story tag; a short feed form `feed.line.short` ("{title}: {result}") with `feed.win.short` "you win it" and `feed.loss.short` "they win it" and the size as dots |
-| Esports Manager / Narrative Designer | Commentary: at most 2 lines per game, 8 words or fewer, for the slots 26.75 to 28.5, 39.5 to 42.5, 47.5 to 49.0 and 66.0 to 68.75 s; one contest name set for feed and Report chips |
-| Art Director | Tokens for in-arena you (circle) and them (hexagon) and for glyphs (kills, towers, stone, moon, flag); 24 px outlined map labels; the Report chip `[ MID ]` as "MID LANE" |
+| Esports Manager / Narrative Designer | P11 accepted: commentary at most 2 lines per game, 8 words or fewer, for the slots 26.75 to 28.5, 39.5 to 42.5, 47.5 to 49.0 and 66.0 to 68.75 s (the 47.5 slot stays valid because the mid push pill is not moved); one contest name set for feed and Report chips; Esports edits ESPORTS-NOTES per B11 |
+| Art Director | The tokens, 24 px outlined map labels and the Match row are done in ART-BIBLE 2b and 2c. Remaining: the Report chip `[ MID ]` as "MID LANE"; the `BAD` Defeat glyph for the end card |
 | Technical Designer | The HUD scheduler is a pure function of the show script (testable); keep text out of the show data except label ids |
 
 ## 7. Cross-cutting requirements
@@ -1120,9 +1123,9 @@ I adopt W1's mechanism (`TUTORIAL.md` section 8): a control is tagged with `UI.t
 | `help.button`, `screen.back` | `ScreenHeader` "?" slot and back button | every screen |
 | `home.next_card` (step 2) | the Next-match card | unchanged |
 | `home.play` | the coral Play button in that card | unchanged |
-| `home.attention` | the needs strip | unchanged |
+| `home.attention` | the strip of attention cards | unchanged |
 | `home.tile.standing`, `home.tile.chem` | two of the four tiles in the 2 x 2 grid | unchanged |
-| `home.offer` | an inline offer card placed under the needs strip | new slot, 0 px when empty |
+| `home.offer` | an inline offer card placed under the attention cards | new slot, 0 px when empty |
 | `roster.row.0` (v1 step 5) | **retired.** Replaced by `squad.bench.0`, the first bench card (a read-only player sheet opens; a token opens the lane picker, which can change the lineup) | TUTORIAL v1.1 step 5 uses `squad.bench.0` |
 | `roster.card.head` (step 6) | the header of the player sheet (avatar, name, status bars) | the sheet opens in place; no scrolling needed |
 | `roster.row.expiring` (L3) | **retired.** Replaced by `squad.bench.expiring`, the first bench card with the contract chip | all ten contracts end together, so a bench card with the chip exists |
@@ -1164,9 +1167,9 @@ Every `ScreenHeader` reserves the 96 x 96 "?" slot (top right) and takes a `help
 - Report: eight story tags for the phase patterns (+++, ++-, +-+, +--, -++, -+-, --+, ---), the hero-stat sentences (for a normal factor and for luck; the luck sentence must be honest, see 7.6), "Dig deeper" tab names (Players, Moments, Draft), the title of the factor sheet (Why this happened), the tip action labels (Open squad).
 - Standings: view names (Table, Playoffs, History), the cut-line sentences (above, on, below the line, and after the playoffs), "YOU", empty-state lines.
 - Squad: sheet titles and the delta line ("team +1.2"), the swap note, "Find a player".
-- Draft: header lines ("YOUR BAN", "YOUR PICK", "THEIR BAN", "THEIR PICK"), the "Leave the draft?" confirm, "Time is up: Coach picked X", "Coach suggests: X", "Take", "Auto-finish", "Sure?", filter names (All and five role codes), the side words with a flag glyph ("Blue", "Red"). The game strings that change for the **Coach** rename are in `TUTORIAL.md` section 13.
+- Draft: header lines in sentence case ("Your ban", "Your pick", "Their ban", "Their pick"), the "Leave the draft?" confirm, "Time is up: Coach picked X", "Coach suggests: X", "Take", "Auto-finish", "Sure?", filter names (All and five role codes), the side words with a flag glyph ("Blue", "Red"). The game strings that change for the **Coach** rename are in `TUTORIAL.md` section 13.
 - Standings: the Points / Form switch says "Form" while player cards say "form" (recent performance). The switch label might read "Form Rating" if it fits (about 130 px at 24 px in a two-option switch): Narrative's call.
-- Match (arena, 6.7): phase chip words (Early, Mid, Late), a short plan-switch banner of at most 4 words for each `gp.switch.<id>` line, the status tags and intent labels (Gameplay owns these), and at most two commentary lines per game (Narrative).
+- Match (arena, 6.7): phase chip words (Early, Mid, Late), a short plan-switch banner of at most 4 words for each `gp.switch.<id>` line (`gp.switch.short.<id>`), the status tags and intent labels (Gameplay owns these), and at most two commentary lines per game (Narrative).
 - Everything is plain words, short, and counted against the 24, 26 and 32 px slots in this spec.
 
 ### 7.5 Small additions to game code that these layouts need (engineering, no sim or balance change)
@@ -1234,25 +1237,23 @@ Nothing here ran. I could not check scroll feel, gesture conflicts, frame time, 
 
 ### 8.4 Assets needed from the Art department
 
-All art is original and goes to the IP & Originality Checker (the art bible sets the style). Counts and sizes are what the layouts above use; sources should be 2 times the largest display size so they stay sharp on 3x phones. Where I say "atlas", please deliver as sprite sheets so the engine can batch them.
+All art is original and goes to the IP & Originality Checker (the art bible sets the style). Counts and sizes are what the layouts above use; sources should be 2 times the largest display size so they stay sharp on 3x phones. Where I say "atlas", please deliver as sprite sheets so the engine can batch them. Not in this table because they are done or drawn in code: the five role icons (`ic_role_*.svg`, ART-BIBLE 6.1; used at 28 in a chip, 32 beside the code, 48, never alone under 32), the Squad lane-map backdrop (code-drawn, ART-BIBLE 6.4), club badges, hero silhouettes and initial avatars.
 
 | Asset | Count | Source size | Displayed at | Notes |
 |---|---|---|---|---|
 | Club badges | 10 | generated in code from the club id (art bible 6.3, no file) | 112 (Home hero), 96 (Next card; 80 large), 88 / 72 / 72 (podium), 56 (rows), 44 (chips) | Needs `colors` and `badge` ids added to `clubs.json`; art bible says all six shapes differ at 40 px |
 | Hero silhouettes | 40 | drawn in code (art bible 6.2), no file | 96 (grid), 128 (sheet), 44 (board), 40 (chips) | Cache one texture per hero and size; archetype shows in the silhouette |
-| Player avatars | 140 | drawn in code: letter on a role ring (art bible 6.2), no faces | 160 (detail), 128 (token), 120 (bench card), 72 (rows), 56 (mini) | Painted portraits postponed to pre-launch (Founder decision) |
-| Role icons | 5 (top, jungle, mid, bot, support) | 128 | 48, 40, 32 | Mono and tinted versions; with the three-letter code |
-| Archetype icons | 7 (bruiser, gunner, bulwark, shade, spellcaster, binder, mender) | 96 | 40 | Corner badge on hero cards |
-| Tag icons | 8 (frontline, engage, pick, waveclear, protect, splitpush, poke, scaling) | 80 | 40, 28 | Sheet and chips |
+| Player avatars | 140 | drawn in code: letter on a role ring (art bible 6.2), no faces | 160 (detail), 120 (bench card), 96 (lane-map token), 72 (rows), 56 (mini) | Painted portraits postponed to pre-launch (Founder decision) |
+| Archetype icons | 7 (bruiser, gunner, bulwark, shade, spellcaster, binder, mender) | 96 | 32 | Corner badge on hero cards |
+| Tag icons | 8 (frontline, engage, pick, waveclear, protect, splitpush, poke, scaling) | 80 | 32, 28 | Sheet and chips |
 | Status and UI glyphs | about 24 (tired, in form, out of form, happy, unhappy, contract ends, off-role, coach star, lock, tick, cross, ban X, arrow up, down, flat, help, back, close, chevron, coach wand, reset, branch, plus, minus) | 96 | 28 to 48 | Shapes must differ without colour |
-| Phase and contest icons | 6 (overall, early, mid, late, objective, fight) | 96 | 56, 40, 32 | Lanes reuse the role icons |
-| Game Plan control icons | 8 (fight style, tempo, mid objectives, late objectives, lane aggression, support, risk, jungle focus) | 96 | 40 | Beside each control name |
+| Phase and contest icons | 6 (overall, early, mid, late, objective, fight) | 96 | 32 inside the 56 px node, 28 in chips | Lanes reuse the role icons |
+| Game Plan control icons | 8 (fight style, tempo, mid objectives, late objectives, lane aggression, support, risk, jungle focus) | 96 | 32 | Beside each control name |
 | Mood faces | 4 (high, ok, low, poor) | 128 | 64 | Home mood tile |
 | Podium and trophy art | 3 medals, 1 crown, 3 cups (gold, silver, bronze), 1 empty slot | 256 | 96, 64 | Trophy shelf and champion |
 | Empty-state illustrations | 4 (no games yet, no free agents, no upcoming games or season over, playoffs not started) | 768 x 576 | 384 x 288 | Same style as the hero art |
-| Home hero backdrop | 1 (10 percent club wash only, ART-BIBLE 3.7; strength pending ART-BIBLE re-issue) | 1440 x 496 | 720 x 248 | Gradient plus arena skyline strip; tileable edges; the top-right 120 x 120 px clear of shapes lighter than the gradient top plus 20 percent (the "?" sits there, 6.1) |
+| Home hero backdrop | 1 (`VOID` skyline silhouettes at 55 to 70 percent over the page gradient; the flat 10 percent club wash behind the 248 px block is code, ART-BIBLE 3.7 rule 8) | 1440 x 496 | 720 x 248 | Tileable edges; the top-right 120 x 120 px has nothing lighter than `#43536E` (the "?" sits there, 6.1; accepted by the Art Director, A6) |
 | Card depth set | 1 nine-slice (flat card, raised card, sheet top, grab handle) | 96 x 96 with 32 px slices | any | Baked shadows, so grids stay cheap |
-| Squad lane-map backdrop | 1 (inset) | 1344 x 880 | 672 x 440 | Aligned with the W4 arena map (coordinate with the Level / World Designer) |
 | Fonts | as the art bible decides | n/a | n/a | Must keep numerals tabular (aligned columns in tables) and cover the characters in `en.json` |
 
 ### 8.5 Not in the six screens, left as they are for now
@@ -1274,20 +1275,20 @@ For the Founder (recommendation first, plain words):
 | D5 | Build with the art bible's code-drawn badges, hero silhouettes and initial avatars (no painted art needed), and simple code shapes for icons until the icon set lands | **Yes**, so the layouts are testable now and no step waits |
 | D6 | Home "Up next" swipe row: build it, or leave it out for now | **Build it last**; it is the least important block and the first to cut |
 | D7 | Body text at 32 px (16 sp) as the brief asks, or the art bible's 30 px (15 sp) | **32.** The brief and the UI reference both say 16 sp; the narrower font keeps the line length about the same. Fallback: 30 and accept 15 sp. **Producer ruling C1: 32 adopted by default; the Founder may overrule at the checkpoint** |
-| D8 | (new) Arena text: show **both** coaches' short labels in the live match (the scoreboard's text budget allows it only if the labels are 24 characters or fewer), or only yours | **Both, with the one long label shortened** (6.7). If the shortening is refused: yours only |
+| D8 | (new) Arena text: show **both** coaches' labels in the live match, or only yours | **Both, no shortening** (Producer ruling P2: label limit stays 28, tag limit 24; in the real font the longest label is 239 px and the worst pair 599 of 672 px). In large text only yours show (that fallback stays; 0.25 percent of pairs would not fit there). If testers find the labels hard to read: yours only |
 
 For other roles: see the findings in 7.6 (Lead Game Designer and Systems Designer on the inert plan controls and kills consistency; Narrative on copy and the 12-character name check; Art Director on the asset list and the role-colour rules; W1 on the `tut_id` table).
 
 ## 10. Hand-offs
 
-- **Art Director:** use this spec's component list and section 8.4 for the art bible: depth recipe (5.1), role colours that are colour-blind safe and not good/bad hues (2.4), the club colour fields, text sizes (2.2, now settled at 32 / 26 / 24 by ruling C1), the reconciliation table (2.5). In the re-issue please decide: the 40 px title token, the section-title colour, the club wash strength, the needs-attention treatment, the colour tokens for in-arena you (circle) and them (hexagon), and the 120 x 120 clear zone in the Home hero art. Also: art bible 8.2 Roster row (lane map), row badge 56 in Standings, map labels at 24 px. Please confirm the asset counts and sizes, or tell me what should change.
+- **Art Director:** the token table, the 40 px title token, the section-label colour, the club wash strength, the attention card, the in-arena you and them tokens, the 120 x 120 px clear zone, the Squad anchors, 56 px Standings badges and 24 px map labels are all settled in ART-BIBLE 2b and 2c and this spec now cites them. Still open for you: confirm the asset counts and sizes in 8.4 (role icons and the Squad backdrop are no longer on the list), delete the 260 px "Your turn: ban" example (A4), and say whether the Squad map needs a role code beside each name (6.2: the bible has no role glyph on the map, and rule 2.4 asks for icon plus code).
 - **Concept / Character / Environment Artists:** icons per 8.4, empty-state pictures, the Home hero backdrop, the lane-map backdrop, mood faces and trophies. Badges, hero silhouettes and initial avatars are code (art bible), so no painting is needed for them.
 - **Gameplay Programmer (Alpha 0.7 build):** steps 0 to 8 of 8.1; the small helpers in 7.5; do not rebuild whole pages on a tap.
 - **Engine / Graphics Programmer:** performance budget for the points in R1 (atlas, shadow limit, timer redraw, texture count), and a view on the spike.
 - **Level / World Designer, Gameplay / Champion Designer, Systems Designer, Esports Manager, Technical Designer:** the cuts and asks for the arena HUD are in 6.7.1 and 6.7.12 (strip heights, label and tag lengths, short feed form, commentary slots, `Report.story`).
 - **Lead Game Designer:** the helper is **Coach** and the player is the **Manager**; GDD v1 line 12 ("owner and head coach") and 7.8 ("the coach's second lever") should follow (`TUTORIAL.md` section 13).
 - **Narrative Designer:** the Coach strings in `TUTORIAL.md` section 13, the "Form" switch label (7.4), one contest name set for feed and Report chips (6.7.5).
-- **UI/UX Designer (me), next:** tutorial flow (`docs/design/TUTORIAL.md`, v1.1 matches this spec) uses the id mapping in 7.3 and the sheet contract; after the Founder checkpoint, a pixel-level pass on each screen (spacing, states) once the art bible lands.
+- **UI/UX Designer (me), next:** tutorial flow (`docs/design/TUTORIAL.md`, v1.2 matches this spec) uses the id mapping in 7.3 and the sheet contract; after the Founder checkpoint, a pixel-level pass on each screen (spacing, states) once the art bible lands.
 - **Narrative Designer:** the copy list in 7.4; display names of at most 12 characters.
 - **Lead Game Designer and Systems Designer:** decide on the inert-controls question (7.6 item 1) and the kills source (item 2).
 - **QA Manager / QA Automation:** the 72-image matrix, the fixtures and the five audits (7.1).
