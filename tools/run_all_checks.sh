@@ -5,6 +5,8 @@ set -u
 cd "$(dirname "$0")/.."
 fail=0
 python3 tools/validate_data.py || fail=1
+python3 tools/validate_arena_map.py || fail=1
+python3 tools/validate_arena_map.py --selftest >/dev/null || fail=1
 python3 tools/check_strings.py || fail=1
 python3 -m pytest -q tools || fail=1
 python3 -I tools/calibrate.py 40000 --check || fail=1

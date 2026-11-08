@@ -29,6 +29,7 @@ What it checks (each line of output is one check):
   walks          walks that start in the lanes and at the tower sites (lane position at the largest clash shift),
                  with the legs that must pass and the legs that are asserted to fail
 
+Also lints docs/design/ARENA-MAP.md (no ARENA_* placeholders, rhombus, 198 and 132 px strips).
 Other modes:  --selftest   builds broken copies in memory and checks each one trips the check it targets
               --doc PATH   the ARENA-MAP.md to lint (default docs/design/ARENA-MAP.md)
 
@@ -38,6 +39,7 @@ import heapq
 import json
 import math
 import pathlib
+import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -936,10 +938,12 @@ def rect_far_dist(r, p):
     return max(math.hypot(x - p[0], y - p[1]) for x in (r[0], r[2]) for y in (r[1], r[3]))
 
 
-def label_box(ctx, lab):
+def label_box(ctx, lab, zoom=1.0):
+    """box in map pixels. Labels are drawn in screen space at a fixed size, so at camera zoom z a label covers 1/z as
+    much of the map: (text width + outline) / z by box height / z, centred on the label point."""
     cx, cy = ctx.px(lab["c"])
-    w = lab["w_px"] + LABEL_OUTLINE_PX
-    h = ctx.d["labels"].get("box_h_px", 24)
+    w = (lab["w_px"] + LABEL_OUTLINE_PX) / zoom
+    h = ctx.d["labels"].get("box_h_px", 24) / zoom
     return (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
 
 
@@ -984,7 +988,7 @@ def label_findings(ctx, labs=None):
     d = ctx.d
     labs = d["labels"]["items"] if labs is None else labs
     lanes = {l["id"]: l for l in d["lanes"]}
-    boxes = {lab["id"]: label_box(ctx, lab) for lab in labs}
+    pairs = [(lab, z) for lab in labs for z in lab.get("zooms", [1.0])]
     circles = []
     for c in d["camps"]:
         circles.append((f"camp {c['id']}", ctx.px(c["p"]), icon_px_for(d, "camp", c) / 2))
@@ -998,8 +1002,9 @@ def label_findings(ctx, labs=None):
                 circles.append((f"spawn pad {side}.{slot}", ctx.px(p), d["spawns"]["pad_r_px"]))
     hard, crossings = [], []
     mc = ctx.px(ctx.mere["c"])
-    for lab in labs:
-        lid, box = lab["id"], boxes[lab["id"]]
+    for lab, z in pairs:
+        box = label_box(ctx, lab, z)
+        lid = lab["id"] if z == 1.0 else f"{lab['id']}@x{z:g}"
         if box[0] < 4 or box[1] < 4 or box[2] > ctx.w - 4 or box[3] > ctx.h - 4:
             hard.append(f"label {lid}: box leaves the arena (4 px margin)")
         own = lab.get("lane") if lab.get("kind") == "lane" else None
@@ -1016,9 +1021,9 @@ def label_findings(ctx, labs=None):
             gap = rect_point_dist(box, c) - r
             if gap < LABEL_GAP_PX:
                 hard.append(f"label {lid}: {'overlaps' if gap < 0 else 'is %.1f px from' % gap} {name} (needs {LABEL_GAP_PX} px clear)")
-        for lid2, box2 in boxes.items():
-            if lid2 > lid and rect_dist(box, box2) < LABEL_GAP_PX:
-                hard.append(f"labels {lid} and {lid2}: closer than {LABEL_GAP_PX} px")
+        for lab2, z2 in pairs:
+            if z2 == z and lab2["id"] > lab["id"] and rect_dist(box, label_box(ctx, lab2, z2)) < LABEL_GAP_PX:
+                hard.append(f"labels {lid} and {lab2['id']}: closer than {LABEL_GAP_PX} px")
         for what, r_px in (("the lake shore", float(ctx.mere["r_px"])), ("the island rim", float(ctx.island["r_px"]))):
             inside = (r_px + 1.5 + LABEL_GAP_PX) - rect_point_dist(box, mc)    # how far the box reaches inside the ring
             outside = rect_far_dist(box, mc) - (r_px - 1.5 - LABEL_GAP_PX)     # how far it reaches outside it
@@ -1067,7 +1072,7 @@ def check_labels(ctx):
     errs += hard
     waived = lb.get("rim_crossing_waived", {})
     for c in crossings:
-        w = waived.get(c["label"])
+        w = waived.get(c["label"].split("@")[0])
         if not w or c["what"] not in w.get("what", []):
             errs.append(f"label {c['label']} crosses {c['what']} by {c['spill_px']} px (ART-BIBLE 3.3: nothing sits on the shore); "
                         f"allowed only through labels.rim_crossing_waived with a ruling")
@@ -1199,6 +1204,32 @@ CHECKS = [("structure", check_structure), ("ids", check_ids), ("range", check_ra
           ("look", check_look), ("labels", check_labels), ("walks", check_walks), ("clash", check_clash_rule)]
 
 
+def label_report(ctx):
+    """prints the collision check for every label: the smallest clear gap to each kind of obstacle"""
+    d = ctx.d
+    print(f"  labels ({d['labels']['font']['size_px']} px Bold, +{d['labels']['font']['tracking_px']} px tracking, {LABEL_OUTLINE_PX} px outline; gap needed {LABEL_GAP_PX} px):")
+    print(f"    {'label':<17}{'w px':>5}  {'lane':>7} {'camp':>6} {'tower':>6} {'object':>7} {'pad':>6} {'label':>6} {'edge':>6}  rim crossings")
+    mc = ctx.px(ctx.mere["c"])
+    for lab in d["labels"]["items"]:
+        for z in lab.get("zooms", [1.0]):
+            box = label_box(ctx, lab, z)
+            own = lab.get("lane") if lab.get("kind") == "lane" else None
+            lane_gap = min([lane_touch_px(ctx, box, l) for l in d["lanes"] if l["id"] != own] or [999])
+            def circ(items):
+                return min([rect_point_dist(box, ctx.px(i["p"])) - r for i, r in items] or [999])
+            camp = circ([(c, icon_px_for(d, "camp", c) / 2) for c in d["camps"]])
+            tower = circ([(t, d["icons_px"]["tower"] / 2) for t in d["towers"]])
+            obj = circ([(o, o["icon_px"] / 2) for o in d["objectives"]])
+            pad = min([rect_point_dist(box, ctx.px(p)) - d["spawns"]["pad_r_px"] for sd in "BR" for k, p in d["spawns"][sd].items() if k != "pad_r_px"])
+            other = min([rect_dist(box, label_box(ctx, l2, z2)) for l2 in d["labels"]["items"] if l2["id"] != lab["id"] for z2 in l2.get("zooms", [1.0]) if z2 == z] or [999])
+            edge = min(box[0], box[1], ctx.w - box[2], ctx.h - box[3])
+            _, cr = label_findings(ctx, [lab])
+            cr = [f"{c['what'].split()[-1]} {c['spill_px']}" for c in cr if c["label"].endswith(f"@x{z:g}") or z == 1.0]
+            tag = lab["id"] + ("" if z == 1.0 else f"@x{z:g}")
+            lane_txt = "island" if lane_gap > 1e8 else f"{lane_gap:.1f}"
+            print(f"    {tag:<17}{lab['w_px']:>5}  {lane_txt:>7} {camp:6.1f} {tower:6.1f} {obj:7.1f} {pad:6.1f} {other:6.1f} {edge:6.1f}  {', '.join(cr) or 'none'}")
+
+
 def report(ctx):
     d = ctx.d
     print("\nGeometry report (u = 760 px, walk speed %.3f u/s = %.1f px/s)" % (d["speeds"]["walk_u_s"], d["speeds"]["walk_u_s"] * ctx.unit))
@@ -1213,19 +1244,144 @@ def report(ctx):
     u = d["units"]
     print(f"  units: body width {u['body_width_px']} px = {u['body_width_u']:.4f} u; range melee/mid/long = {u['range_px']['melee']}/{u['range_px']['mid']}/{u['range_px']['long']} px")
     for v in d["late_fight_variants"]["variants"]:
-        print(f"  held fight '{v['id']}'{' (default)' if v['id'] == d['late_fight_variants']['default'] else ''}:")
+        lv = d["late_fight_variants"]
+        tag = " (default)" if v["id"] in (lv["default"], lv["default_clean"]) else ""
+        print(f"  {v.get('kind', 'held')} fight '{v['id']}'{tag}:")
         for leg in v["legs"]:
             dist = ctx.shortest(leg["from"]).get(leg["to"], float("nan"))
             need = dist / (d["speeds"]["walk_u_s"] * _speed_mult(d, leg["speed"]))
             slack = leg["arrive_by_s"] - leg["start_s"] - need
             print(f"    {leg['actor']:<9} {leg['from']:<11} -> {leg['to']:<10} {dist:.3f} u {need:4.1f} s ({leg['speed']}) leaves {leg['start_s']:5.2f}, due {leg['arrive_by_s']:5.2f}, spare {slack:.1f} s")
+    print("  walk legs from the lanes and tower sites (worst origin; rule: need <= window - margin):")
+    wl = d["walk_legs"]
+    for group in ("required", "rejected"):
+        for leg in wl[group]:
+            res = walk_leg_result(ctx, leg, float(wl.get("margin_s", TRAVEL_MARGIN_S)))
+            need, have, mg, where = res
+            ok = need <= have - mg
+            verdict = ("PASS" if ok else "FAIL") if group == "required" else ("fits?!" if ok else "FAILS (asserted)")
+            print(f"    {group[:3]} {leg['id']:<24} {where:<22} -> {leg['to']:<12} {need:5.1f} s of {have:5.2f} s ({leg['speed']}, margin {mg:g}) {verdict}")
+    label_report(ctx)
     counts = {k: len(d[k]) for k in ("nodes", "edges", "towers", "camps", "zones", "stages")}
     counts["scoreboard_towers_per_side"] = d["tower_tally"]["per_side"]
     print("  counts:", counts)
 
 
+def check_doc(text):
+    """lint of ARENA-MAP.md against the pass 1c rulings (a text check, not a proof the document is right)"""
+    errs = []
+    if re.search(r"ARENA_[A-Z]", text):
+        errs.append("the document still names ARENA_* colour placeholders (ART-BIBLE 3.9 replaced them)")
+    low = text.lower()
+    for bad in ("hexagon with a shell", "gold hexagon", "20 px bold", "(my assumption, for ui/ux to confirm)"):
+        if bad in low:
+            errs.append(f"the document still says '{bad}'")
+    for need in ("rhombus", "1148", "198", "132"):
+        if need not in text:
+            errs.append(f"the document does not mention '{need}'")
+    return errs
+
+
+def selftest(base):
+    """broken copies, built in memory: each must make exactly the check it targets fail"""
+    import copy
+    def T(d, i): return next(t for t in d["towers"] if t["id"] == i)
+    def V(d, i): return next(v for v in d["late_fight_variants"]["variants"] if v["id"] == i)
+    def Lb(d, i): return next(x for x in d["labels"]["items"] if x["id"] == i)
+    def Wl(d, i): return next(x for g in ("required", "rejected") for x in d["walk_legs"][g] if x["id"] == i)
+    def set_(d, path, val):
+        o = d
+        for k in path[:-1]:
+            o = o[k]
+        o[path[-1]] = val
+    muts = [
+      ("controls strip left at 180 px (old layout)", "structure", lambda d: (set_(d, ["arena", "layout_px", "feed_y"], [950, 1100]), set_(d, ["arena", "layout_px", "controls_y"], [1100, 1280]))),
+      ("text strip 150 px, controls 132 px, gap left", "structure", lambda d: set_(d, ["arena", "layout_px", "feed_y"], [950, 1100])),
+      ("icon larger than 48 px", "structure", lambda d: set_(d, ["icons_px", "tower"], 60)),
+      ("Stoneback shape is a hexagon", "look", lambda d: set_(d, ["look", "shapes", "stoneback"], "hexagon")),
+      ("Stoneback objective shape differs from look", "look", lambda d: next(o for o in d["objectives"] if o["id"] == "N.stoneback").__setitem__("shape", "hexagon")),
+      ("an ARENA_ placeholder token", "look", lambda d: set_(d, ["look", "tokens", "lake"], "ARENA_LAKE_DEEP")),
+      ("BAD used as a map token", "look", lambda d: set_(d, ["look", "tokens", "hero_them"], "BAD")),
+      ("token not in the bible", "look", lambda d: set_(d, ["look", "tokens", "land"], "MAP_GRASS")),
+      ("JUNGLE_RING not reported as missing", "look", lambda d: set_(d, ["look", "tokens_not_in_bible"], [])),
+      ("them is a circle", "look", lambda d: set_(d, ["look", "shapes", "hero_them"], "circle")),
+      ("labels 20 px", "labels", lambda d: set_(d, ["labels", "font", "size_px"], 20)),
+      ("label outline 3 px", "labels", lambda d: set_(d, ["labels", "font", "outline", "px"], 3)),
+      ("STONEBACK label on the Bot lane", "labels", lambda d: Lb(d, "place_stoneback").__setitem__("c", [0.8869, 0.5])),
+      ("STONEBACK label at zoom 1.0 (crosses the shore and the lane)", "labels", lambda d: Lb(d, "place_stoneback").__setitem__("zooms", [1.0])),
+      ("MOSSBACK label on a camp", "labels", lambda d: Lb(d, "place_mossback").__setitem__("c", [0.2306, 0.5849])),
+      ("MOSSBACK label on the Top lane", "labels", lambda d: Lb(d, "place_mossback").__setitem__("c", [0.14, 0.5421])),
+      ("two labels overlap", "labels", lambda d: Lb(d, "place_moonhulk").__setitem__("c", [0.5, 0.6395])),
+      ("a label on a tower", "labels", lambda d: Lb(d, "lane_mid").__setitem__("c", [0.5, 0.691])),
+      ("a label off the arena", "labels", lambda d: Lb(d, "lane_top").__setitem__("c", [0.02, 0.58])),
+      ("lane tag off its own lane", "labels", lambda d: Lb(d, "lane_bot").__setitem__("c", [0.74, 0.5799])),
+      ("label width narrower than the font", "labels", lambda d: Lb(d, "place_stoneback").__setitem__("w_px", 60)),
+      ("label far from its icon", "labels", lambda d: Lb(d, "place_mossback").__setitem__("c", [0.2222, 0.80])),
+      ("lane tag deleted", "labels", lambda d: d["labels"]["items"].remove(Lb(d, "lane_top"))),
+      ("lane leg at walk speed", "walks", lambda d: Wl(d, "stone_top").__setitem__("speed", "walk")),
+      ("lane leg leaves at 24 s", "walks", lambda d: Wl(d, "stone_top").__setitem__("leave_s", 24.0)),
+      ("lane leg checked only at the neutral point", "walks", lambda d: Wl(d, "stone_top").__setitem__("from_lane", {"lane": "top", "s": [0.5]})),
+      ("lane leg beyond the clash range", "walks", lambda d: Wl(d, "stone_top").__setitem__("from_lane", {"lane": "top", "s": [0.2, 0.5, 0.8]})),
+      ("tower-site leg too late", "walks", lambda d: Wl(d, "reset_top2").__setitem__("leave_s", 54.0)),
+      ("rejected leg now fits", "walks", lambda d: Wl(d, "stone_top_walk_from_24").__setitem__("leave_s", 5.0)),
+      ("a lane-origin leg removed", "walks", lambda d: d["walk_legs"]["required"].remove(Wl(d, "stone_mid"))),
+      ("clash rule formula changed", "clash", lambda d: set_(d, ["clash_rule", "formula"], "shift_s = front * max_shift_s")),
+      ("clean_gate removed", "variants", lambda d: d["late_fight_variants"]["variants"].remove(V(d, "clean_gate"))),
+      ("clean_gate winner on a Mid tower", "variants", lambda d: V(d, "clean_gate")["formation"]["W"].__setitem__("mid", [0.5, 0.2837])),
+      ("clean_gate winners arrive after the crack", "variants", lambda d: V(d, "clean_gate")["legs"][-1].__setitem__("arrive_by_s", 73.0)),
+      ("clean_gate leg too slow", "variants", lambda d: V(d, "clean_gate")["legs"][0].__setitem__("speed", "walk") or V(d, "clean_gate")["legs"][0].__setitem__("arrive_by_s", 64.0)),
+      ("clean_gate changes the kills", "variants", lambda d: V(d, "clean_gate").__setitem__("kills_change", 0)),
+      ("clean_gate marked proven", "variants", lambda d: V(d, "clean_gate").__setitem__("proven", True)),
+      ("prototype brief deleted", "variants", lambda d: d["late_fight_variants"].pop("prototype")),
+      ("default held variant is the clean one", "variants", lambda d: set_(d, ["late_fight_variants", "default"], "clean_gate")),
+      ("held pack starts before the take", "variants", lambda d: V(d, "held_island")["legs"][0].__setitem__("start_s", 58.0)),
+      ("held token on the island rim", "variants", lambda d: V(d, "held_island")["formation"]["W"].__setitem__("bot", [0.56, 0.5711])),
+      ("a guard tower counted", "tally", lambda d: T(d, "B.guard.l").__setitem__("scoreboard", True)),
+      ("guard tower falls after the Cairn", "tally", lambda d: set_(d, ["tower_tally", "guard_fall_s"], [72.0, 74.5])),
+      ("tower moved off its lane", "towers", lambda d: T(d, "B.top.outer").__setitem__("p", [0.3, 0.6])),
+      ("tower in the lake", "water", lambda d: T(d, "B.top.outer").__setitem__("p", [0.5, 0.6316])),
+      ("coordinate outside 0..1", "range", lambda d: d["nodes"][0].__setitem__("p", [1.2, 0.5])),
+      ("a spawn deleted", "spawns", lambda d: d["spawns"]["R"].pop("sup")),
+      ("a mirror shifted", "mirror", lambda d: T(d, "R.bot.inner").__setitem__("p", [0.80, 0.2237])),
+      ("a stage walk too slow", "stages", lambda d: next(x for x in d["stages"] if x["contest"] == "obj_mid")["travel"][0].__setitem__("speed", "walk") or set_(d, ["speeds", "walk_u_s"], 0.03)),
+      ("range unit wrong", "units", lambda d: set_(d, ["units", "range_px", "long"], 150)),
+    ]
+    docs = [("document still has ARENA_ placeholders", "doc", "ARENA_LAKE_DEEP rhombus 1148 198 132"),
+            ("document draws a Stoneback hexagon", "doc", "hexagon with a shell rhombus 1148 198 132"),
+            ("document says labels 20 px bold", "doc", "20 px bold rhombus 1148 198 132"),
+            ("document keeps the 150 px strip", "doc", "rhombus 1100 150")]
+    bad = 0
+    print(f"selftest: {len(muts) + len(docs)} broken copies, each must trip the check it targets (some also trip a neighbour)")
+    for name, want, fn in muts:
+        d = copy.deepcopy(base)
+        fn(d)
+        ctx = Ctx(d)
+        failed = []
+        for cname, cfn in CHECKS:
+            try:
+                e = cfn(ctx)
+            except (KeyError, TypeError, ValueError, IndexError, StopIteration) as ex:
+                e = [f"crashed {type(ex).__name__}"]
+            if e:
+                failed.append(cname)
+        ok = want in failed
+        bad += 0 if ok else 1
+        print(f"  {'ok  ' if ok else 'BAD '} {name:<62} wants {want:<9} got {failed or 'nothing (still passes)'}{'  (also trips others)' if ok and len(failed) > 1 else ''}")
+    for name, want, text in docs:
+        ok = bool(check_doc(text))
+        bad += 0 if ok else 1
+        print(f"  {'ok  ' if ok else 'BAD '} {name:<62} wants {want:<9} got {'doc' if ok else 'nothing'}")
+    print("SELFTEST:", "OK" if bad == 0 else f"{bad} problem(s)")
+    return 0 if bad == 0 else 1
+
+
 def main(argv):
     show_report = "--report" in argv
+    doc_path = DOC_DEFAULT
+    if "--doc" in argv:
+        i = argv.index("--doc")
+        doc_path = pathlib.Path(argv[i + 1])
+        argv = argv[:i] + argv[i + 2:]
     args = [a for a in argv if not a.startswith("--")]
     path = pathlib.Path(args[0]) if args else DEFAULT
     try:
@@ -1255,6 +1411,18 @@ def main(argv):
                 print(f"     ... {len(errs) - 12} more")
         else:
             print(f"PASS {name}")
+    if doc_path.exists():
+        derrs = check_doc(doc_path.read_text(encoding="utf-8"))
+        if derrs:
+            problems_total += len(derrs)
+            print(f"FAIL doc ({len(derrs)}) {doc_path.name}")
+            for e in derrs:
+                print(f"     - {e}")
+        else:
+            print(f"PASS doc ({doc_path.name})")
+    if "--selftest" in argv:
+        rc = selftest(data)
+        problems_total += rc
     if show_report and problems_total == 0:
         report(ctx)
     print("RESULT:", "OK" if problems_total == 0 else f"{problems_total} problem(s)")

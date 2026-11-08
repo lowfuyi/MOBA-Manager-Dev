@@ -1,8 +1,8 @@
 {
   "schema": "moba-manager/arena-map",
   "schema_version": 1,
-  "map_version": "0.2.0",
-  "date": "2026-11-08",
+  "map_version": "0.3.0",
+  "date": "2026-11-09",
   "map_id": "hollowmere",
   "name": "Hollowmere",
   "note": "Canonical frame: x 0 = west edge, 1 = east edge; y 0 = north edge (Red end), 1 = south edge (Blue end). Every Blue (B) entry has a Red (R) entry at (x, 1 - y). N = neutral, always on y = 0.5. Owner: Level / World Designer. Checked by tools/validate_arena_map.py.",
@@ -15,8 +15,9 @@
       "screen": [720, 1280],
       "scoreboard_y": [0, 190],
       "arena_y": [190, 950],
-      "feed_y": [950, 1100],
-      "controls_y": [1100, 1280]
+      "feed_y": [950, 1148],
+      "controls_y": [1148, 1280],
+      "note": "P1 ruling (wave 1b review 4.3): text strip 198 px (plan row 44, gap 8, intent row 48, gap 8, feed block 80, bottom 10) and controls 132 px (12 gap, 96 button, 24 bottom margin), as in UI-PASS-2 6.7.2. The arena stays 720 x 760 at y 190 to 950."
     }
   },
   "view": {
@@ -304,10 +305,10 @@
     {"id": "N.mossback", "side": "N", "kind": "mossback", "pocket": "thicket", "node": "N.mossback", "p": [0.215, 0.5]}
   ],
   "objectives": [
-    {"id": "N.stoneback", "side": "N", "kind": "early_objective", "name": "Stoneback", "sim_contest": "obj_mid", "p": [0.78, 0.5], "node": "N.stoneback", "zone": "stoneback_pit", "icon_px": 48, "reward": "gold and a speed buff (GDD 3)"},
-    {"id": "N.moonhulk", "side": "N", "kind": "late_objective", "name": "Moonhulk", "sim_contest": "obj_late", "p": [0.5, 0.5], "node": "N.moonhulk", "zone": "moonhulk_isle", "icon_px": 48, "reward": "the decisive team buff (GDD 3)"},
-    {"id": "B.cairn", "side": "B", "kind": "base_core", "name": "The Cairn", "sim_contest": "siege", "p": [0.5, 0.925], "node": "B.cairn", "zone": "cairn.B", "icon_px": 48, "reward": "destroy it to win"},
-    {"id": "R.cairn", "side": "R", "kind": "base_core", "name": "The Cairn", "sim_contest": "siege", "p": [0.5, 0.075], "node": "R.cairn", "zone": "cairn.R", "icon_px": 48, "reward": "destroy it to win"}
+    {"id": "N.stoneback", "side": "N", "kind": "early_objective", "name": "Stoneback", "sim_contest": "obj_mid", "p": [0.78, 0.5], "node": "N.stoneback", "zone": "stoneback_pit", "icon_px": 48, "shape": "rhombus", "reward": "gold and a speed buff (GDD 3)"},
+    {"id": "N.moonhulk", "side": "N", "kind": "late_objective", "name": "Moonhulk", "sim_contest": "obj_late", "p": [0.5, 0.5], "node": "N.moonhulk", "zone": "moonhulk_isle", "icon_px": 48, "shape": "disc", "reward": "the decisive team buff (GDD 3)"},
+    {"id": "B.cairn", "side": "B", "kind": "base_core", "name": "The Cairn", "sim_contest": "siege", "p": [0.5, 0.925], "node": "B.cairn", "zone": "cairn.B", "icon_px": 48, "shape": "stacked_stones", "reward": "destroy it to win"},
+    {"id": "R.cairn", "side": "R", "kind": "base_core", "name": "The Cairn", "sim_contest": "siege", "p": [0.5, 0.075], "node": "R.cairn", "zone": "cairn.R", "icon_px": 48, "shape": "stacked_stones", "reward": "destroy it to win"}
   ],
   "spawns": {
     "pad_r_px": 26,
@@ -359,15 +360,381 @@
     "guard_fall_s": [72.0, 72.4],
     "note": "C5 ruling (wave 1 review). Window opens when fight_late resolves and closes when the Cairn falls (ACTION-VOCABULARY F13). The repair tower of F8 is a counted lane tower, not a guard tower."
   },
+  "look": {
+    "values_owned_by": "docs/design/ART-BIBLE.md 3.1 to 3.9. This file holds token names only; the preview script reads the values from the bible.",
+    "tokens": {
+      "land": "MAP_LAND",
+      "lake": "MAP_MERE",
+      "shore_stroke": "MAP_SHORE",
+      "lane": "PANEL3",
+      "plaza": "PANEL2",
+      "plate": "VOID",
+      "plate_rim_you": "ACCENT",
+      "plate_rim_them": "CORAL",
+      "camp": "JUNGLE_RING",
+      "moonhulk_disc": "TEXT2",
+      "moonhulk_crescent": "TEXT",
+      "stoneback": "WARN",
+      "label": "TEXT",
+      "label_outline": "VOID",
+      "hero_you": "ACCENT",
+      "hero_them": "CORAL",
+      "hero_rim": "TEXT",
+      "hero_ink_you": "INK_TEAL",
+      "hero_ink_them": "INK_CORAL"
+    },
+    "tokens_not_in_bible": [
+      "JUNGLE_RING"
+    ],
+    "tokens_note": "JUNGLE_RING is the Jungle role ring colour (#B7F797, ART-BIBLE 3.5); 3.9 says camps use it but no constant has that name yet. The lane edge line (white 18 percent, 2 px, 3.9) is a value, not a token. Guard towers are drawn at look.guard_tower_opacity. Nothing else on the map is new.",
+    "shapes": {
+      "hero_you": "circle",
+      "hero_them": "hexagon_flat_top",
+      "stoneback": "rhombus",
+      "moonhulk": "disc",
+      "cairn": "stacked_stones",
+      "tower": "round_plate",
+      "camp_moss": "leaf",
+      "camp_bramble": "wheel",
+      "camp_mossback": "dome"
+    },
+    "shapes_note": "The hexagon means 'them' and nothing else (ART-BIBLE 3.8, ruling B2): Stoneback is a rhombus with a shell mark.",
+    "guard_tower_opacity": 0.55
+  },
+  "labels": {
+    "font": {
+      "family": "Barlow Semi Condensed",
+      "weight": "Bold",
+      "size_px": 24,
+      "tracking_px": 1.5,
+      "colour": "TEXT",
+      "outline": {
+        "colour": "VOID",
+        "px": 5
+      }
+    },
+    "box_h_px": 24,
+    "box_note": "Collision box = text width plus the 5 px outline by 24 px high (cap height 17 plus outline), centred on c. Labels are drawn in screen space at 24 px whatever the camera does, so at camera zoom z a label covers 1/z of the map: the validator shrinks the box by z. w_px was measured with the real font file (Barlow Semi Condensed Bold, tracking 1.5 px) and equals ART-BIBLE 313.",
+    "lane_tags": "TOP, MID and BOT are always shown, on their own lane (checked at zoom 1.0 and 1.3).",
+    "place_names": "STONEBACK, MOONHULK and MOSSBACK are shown only while the camera holds a focus zoom of 1.2 or more. At zoom 1.0 none of the three fits next to its icon without crossing the lake shore, the island rim or a lane (STONEBACK needs 133 px, the gap between the shore and the Bot lane is 117 px); at 1.2 to 1.3 all three clear everything. Proposal, needs UI/UX and Art Director sign-off.",
+    "place_show_from_zoom": 1.2,
+    "rim_crossing_waived": {},
+    "items": [
+      {
+        "id": "lane_top",
+        "text": "TOP",
+        "kind": "lane",
+        "lane": "top",
+        "c": [
+          0.1103,
+          0.5833
+        ],
+        "w_px": 41,
+        "zooms": [
+          1.0,
+          1.3
+        ]
+      },
+      {
+        "id": "lane_mid",
+        "text": "MID",
+        "kind": "lane",
+        "lane": "mid",
+        "c": [
+          0.5,
+          0.6395
+        ],
+        "w_px": 37,
+        "zooms": [
+          1.0,
+          1.3
+        ]
+      },
+      {
+        "id": "lane_bot",
+        "text": "BOT",
+        "kind": "lane",
+        "lane": "bot",
+        "c": [
+          0.8869,
+          0.5799
+        ],
+        "w_px": 42,
+        "zooms": [
+          1.0,
+          1.3
+        ]
+      },
+      {
+        "id": "place_stoneback",
+        "text": "STONEBACK",
+        "kind": "place",
+        "anchor": "N.stoneback",
+        "c": [
+          0.7569,
+          0.5579
+        ],
+        "w_px": 128,
+        "zooms": [
+          1.2,
+          1.3
+        ]
+      },
+      {
+        "id": "place_moonhulk",
+        "text": "MOONHULK",
+        "kind": "place",
+        "anchor": "N.moonhulk",
+        "c": [
+          0.5,
+          0.5474
+        ],
+        "w_px": 118,
+        "zooms": [
+          1.2,
+          1.3
+        ]
+      },
+      {
+        "id": "place_mossback",
+        "text": "MOSSBACK",
+        "kind": "place",
+        "anchor": "N.mossback",
+        "c": [
+          0.2222,
+          0.5421
+        ],
+        "w_px": 116,
+        "zooms": [
+          1.2,
+          1.3
+        ]
+      }
+    ]
+  },
+  "clash_rule": {
+    "front_max": 0.6,
+    "formula": "shift_s = (front / 0.60) * max_shift_s",
+    "direction": "from neutral_s towards the loser",
+    "note": "ACTION-VOCABULARY 2.2 (wave front, review item B8): front = 0.6 * abs(c) runs 0 to 0.60, so the shift is 0 to max_shift_s of each lane (top 0.15, mid 0.29, bot 0.15) and a decisive lane beat ends just in front of the loser's outer tower."
+  },
+  "walk_legs": {
+    "margin_s": 1.0,
+    "note": "Legs that start in the lanes and at the tower sites (review items B7 and B17). A lane origin is the clash point anywhere in its shift range, so both ends are checked. 'required' legs must fit with the margin; 'rejected' legs are earlier assumptions that the validator asserts DO NOT fit, so the finding cannot go stale. Rotate speed is 1.5 x walk and rush 2 x walk (speeds block).",
+    "required": [
+      {
+        "id": "stone_top",
+        "from_lane": {
+          "lane": "top",
+          "s": [
+            0.35,
+            0.5,
+            0.65
+          ]
+        },
+        "to": "N.stoneback",
+        "speed": "rotate",
+        "leave_s": 20.25,
+        "due_s": 31.0,
+        "contest": "obj_mid",
+        "source": "ACTION-VOCABULARY rotate_stone (leave when the jungle resolves, arrive by 31.0 s)"
+      },
+      {
+        "id": "stone_mid",
+        "from_lane": {
+          "lane": "mid",
+          "s": [
+            0.21,
+            0.5,
+            0.79
+          ]
+        },
+        "to": "N.stoneback",
+        "speed": "rotate",
+        "leave_s": 20.25,
+        "due_s": 31.0,
+        "contest": "obj_mid",
+        "source": "ACTION-VOCABULARY rotate_stone"
+      },
+      {
+        "id": "stone_bot",
+        "from_lane": {
+          "lane": "bot",
+          "s": [
+            0.35,
+            0.5,
+            0.65
+          ]
+        },
+        "to": "N.stoneback",
+        "speed": "rotate",
+        "leave_s": 20.25,
+        "due_s": 31.0,
+        "contest": "obj_mid",
+        "source": "ACTION-VOCABULARY rotate_stone"
+      },
+      {
+        "id": "stone_jungle",
+        "from": "N.mossback",
+        "to": "N.stoneback",
+        "speed": "rotate",
+        "leave_s": 20.25,
+        "due_s": 31.0,
+        "contest": "obj_mid",
+        "source": "ACTION-VOCABULARY rotate_stone"
+      },
+      {
+        "id": "reset_top2",
+        "from": "{S}.top.2",
+        "sides": [
+          "B",
+          "R"
+        ],
+        "to": "N.moonhulk",
+        "speed": "rotate",
+        "leave_s": 51.0,
+        "due_s": 60.0,
+        "contest": "obj_late",
+        "source": "ACTION-VOCABULARY reset (tower sites, leave at 51.0 s, the take resolves at 60.0 s)"
+      },
+      {
+        "id": "reset_mid1",
+        "from": "{S}.mid.1",
+        "sides": [
+          "B",
+          "R"
+        ],
+        "to": "N.moonhulk",
+        "speed": "rotate",
+        "leave_s": 51.0,
+        "due_s": 60.0,
+        "contest": "obj_late",
+        "source": "ACTION-VOCABULARY reset"
+      },
+      {
+        "id": "reset_bot2",
+        "from": "{S}.bot.2",
+        "sides": [
+          "B",
+          "R"
+        ],
+        "to": "N.moonhulk",
+        "speed": "rotate",
+        "leave_s": 51.0,
+        "due_s": 60.0,
+        "contest": "obj_late",
+        "source": "ACTION-VOCABULARY reset"
+      },
+      {
+        "id": "reset_bot3",
+        "from": "{S}.bot.3",
+        "sides": [
+          "B",
+          "R"
+        ],
+        "to": "N.moonhulk",
+        "speed": "rotate",
+        "leave_s": 51.0,
+        "due_s": 60.0,
+        "contest": "obj_late",
+        "source": "ACTION-VOCABULARY reset"
+      },
+      {
+        "id": "reset_clearing",
+        "from": "N.mossback",
+        "to": "N.moonhulk",
+        "speed": "rotate",
+        "leave_s": 51.0,
+        "due_s": 60.0,
+        "contest": "obj_late",
+        "source": "ACTION-VOCABULARY reset"
+      }
+    ],
+    "rejected": [
+      {
+        "id": "stone_top_walk_from_24",
+        "from_lane": {
+          "lane": "top",
+          "s": [
+            0.35,
+            0.5,
+            0.65
+          ]
+        },
+        "to": "N.stoneback",
+        "speed": "walk",
+        "leave_s": 24.0,
+        "due_s": 31.0,
+        "source": "ACTION-VOCABULARY rotate_stone",
+        "why": "The vocabulary's first assumption (leave at 24.0 s at walk speed). The top hero needs 14.4 s at walk speed, so it would arrive at 38.4 s, after the take resolves at 33.75 s."
+      },
+      {
+        "id": "stone_top_walk_from_20",
+        "from_lane": {
+          "lane": "top",
+          "s": [
+            0.35,
+            0.5,
+            0.65
+          ]
+        },
+        "to": "N.stoneback",
+        "speed": "walk",
+        "leave_s": 20.25,
+        "due_s": 31.0,
+        "source": "ACTION-VOCABULARY rotate_stone",
+        "why": "Leaving at 20.25 s is not enough at walk speed: 14.4 s of 10.75 s. This is why the lane legs need rotate speed (1.5 x)."
+      },
+      {
+        "id": "reset_top3",
+        "from": "{S}.top.3",
+        "sides": [
+          "B",
+          "R"
+        ],
+        "to": "N.moonhulk",
+        "speed": "rotate",
+        "leave_s": 51.0,
+        "due_s": 60.0,
+        "source": "ACTION-VOCABULARY reset",
+        "why": "Open finding: the top hero at tower site top.3 needs 8.2 s at rotate speed and has 9.0 s, so it arrives at 59.2 s, 0.8 s before the take resolves (margin 1.0). It is not walked at rush speed because the vocabulary walks reset at rotate speed. Gameplay Designer to accept the late arrival or leave at 50.5 s."
+      },
+      {
+        "id": "late_island_to_cairn",
+        "from": "N.moonhulk",
+        "to": "R.cairn",
+        "speed": "rush",
+        "leave_s": 71.25,
+        "due_s": 74.0,
+        "source": "ACTION-VOCABULARY close_push (HF2)",
+        "why": "No hero walks island to gate to Cairn after the fight resolves: 7.1 s at walk speed, 3.5 s at rush speed, against 2.75 s from 71.25 to 74.0. This is why the held variants move only the reserve pack, and why clean_gate has its winners stand at the gate before the resolve."
+      }
+    ]
+  },
   "late_fight_variants": {
     "applies_when": "the match winner W loses the fight_late contest (about 19 percent of games, ACTION-VOCABULARY 2.3 close_push, variant lead_carries). When W also wins fight_late the default stage fight_late (gate of the match loser) is used unchanged.",
     "frame": "Canonical frame: W is Blue (south, y > 0.5), U (the match loser, who won the fight) is Red (north). If W is Red, mirror every point to (x, 1 - y) and swap B and R in node ids. The player's view flip is applied after that.",
     "default": "held_island",
-    "status": "DRAFT. Neither staging has been prototyped or shown to a tester. The Technical Designer builds both; the Founder's tester question 'Results felt fair' decides.",
+    "default_clean": "clean_gate",
+    "status": "DRAFT. Neither held staging has been prototyped or shown to a tester, and clean_gate has not been either. Nothing here is proven. The Technical Designer builds the prototype below; the tester question 'Results felt fair and believable' decides between the held stagings.",
+    "prototype": {
+      "status": "NOT BUILT. Every line below is a brief, not a result.",
+      "build": [
+        "One throwaway Godot scene with no simulation link that plays 60.0 s to 75.0 s from this file, for three endings: clean_gate (W wins fight_late), held_island and held_gate (W loses it). Both held endings use the same fixture: W leads, U wins the last fight, the lead number steps down and stays positive (ACTION-VOCABULARY HF3).",
+        "Tokens at 36 px (ART-BIBLE 3.8: a teal circle for the player's side, a coral hexagon for the other), the reserve pack as six 14 px dots at rush speed, guard towers falling at tower_tally.guard_fall_s, Cairn crack and fall from the variant's events. Every position, leg and event time is read from this file; none is typed into the scene.",
+        "Both seats: the player as W and the player as U, flipped as in the view block.",
+        "Print for each run: each leg's arrival time against arrive_by_s, the smallest gap between two tokens in the formation, and the frame time (budget: 10 tokens, 6 dots, 4 guard towers)."],
+      "measure": [
+        "Tester question 1, after each ending: 'The result felt fair and believable', 1 to 5.",
+        "Tester question 2: 'Who won the last fight?' (you, them, not sure).",
+        "Tester question 3: 'Why did the Cairn fall?' (the lead was bigger, the last fight, not sure)."],
+      "decision_rule": "Proposal, not a ruling. At least 5 testers who have not seen the plan; each sees clean_gate first (the control), then held_island and held_gate in random order. A staging passes if its mean on question 1 is at least 4.0 (the Alpha 0.7 acceptance bar), at least 4 of 5 name U as the last fight's winner, and at least 3 of 5 answer 'the lead was bigger'. If both pass, ship held_island (no hero walks) unless held_gate's mean is higher by 0.5 or more. If one passes, ship that one. If neither passes, the staging is not shipped as drawn; do not fix it by letting W win the last fight on screen (that breaks HF1 and invariant I9); send it back to the Gameplay and Systems Designers. What this cannot tell: touch feel, speed or heat on a phone, or whether five testers are enough (they are a screen, not a proof)."
+    },
     "icon_rule": "After obj_late resolves the Moonhulk icon fades to a 50 percent ring drawn under the tokens, so ten bodies can stand on the island.",
     "variants": [
       {
         "id": "held_island",
+        "kind": "held",
         "name": "Held on the isle",
         "proven": false,
         "ground": "island",
@@ -397,6 +764,7 @@
       },
       {
         "id": "held_gate",
+        "kind": "held",
         "name": "Held at the gate",
         "proven": false,
         "ground": "land",
@@ -424,6 +792,38 @@
           {"actor": "lead_pack", "from": "N.mossback", "to": "R.mid.1", "speed": "rush", "start_s": 66.0, "arrive_by_s": 71.25},
           {"actor": "lead_pack", "from": "R.mid.1", "to": "R.cairn", "speed": "rush", "start_s": 71.25, "arrive_by_s": 74.0}
         ]
+      },
+      {
+        "id": "clean_gate",
+        "kind": "clean",
+        "name": "Clean win at the gate",
+        "proven": false,
+        "applies_when": "the match winner W also wins fight_late (about 81 percent of games). The default stage fight_late: the fight is at the gate of the match loser U.",
+        "ground": "land",
+        "zone_U": "gate.R",
+        "u_mirrors_w": false,
+        "kills_change": "ledger",
+        "story": "U defends inside its gate plaza (five bodies fill 40 percent of the zone, ten would fill 79 percent, so W does not stand in it). W stands in one line of five at the causeway mouth, 64 px from U's front rank, with a 40 px gap on the Mid lane axis because the two Mid towers stand there (the same line as held_gate, with the same checks), and steps forward as U breaks. At the resolve W is at the gate and runs to the Cairn at rush speed inside the 1.25 s run window (ACTION-VOCABULARY close_push, clean_close). Kills, deaths and towers are the ledger's; the arena adds none.",
+        "formation": {
+          "U": {"top": [0.4444, 0.1995], "sup": [0.5, 0.1995], "jg": [0.5556, 0.1995], "mid": [0.4722, 0.1574], "bot": [0.5278, 0.1574]},
+          "W": {"top": [0.3417, 0.2837], "jg": [0.3944, 0.2837], "mid": [0.4472, 0.2837], "bot": [0.5528, 0.2837], "sup": [0.6056, 0.2837]}
+        },
+        "events": [
+          {"t_s": 63.0, "event": "formation", "what": "U inside the gate plaza, W in a line of five at the causeway mouth with a gap for the Mid towers"},
+          {"t_s": 66.0, "event": "clash", "what": "Fight cues; melee heroes step up to 28 px forward and back"},
+          {"t_s": 69.0, "event": "advance", "what": "W steps from the mouth to the gate as U breaks (tier look of the ledger's size word)"},
+          {"t_s": 71.25, "event": "resolve_clean", "what": "Fight resolves for W as the ledger says; kills and deaths are the ledger's"},
+          {"t_s": 72.0, "event": "guard_fall_1", "what": "First guard tower falls (scenery)"},
+          {"t_s": 72.4, "event": "guard_fall_2", "what": "Second guard tower falls (scenery)"},
+          {"t_s": 72.5, "event": "cairn_crack", "what": "W's survivors reach the Cairn, it cracks"},
+          {"t_s": 74.0, "event": "cairn_fall", "what": "The Cairn falls to W; end card from 74.0 to 75.0"}
+        ],
+        "legs": [
+          {"actor": "W_heroes", "from": "N.moonhulk", "to": "R.mid.1", "speed": "walk", "start_s": 61.0, "arrive_by_s": 66.0},
+          {"actor": "U_heroes", "from": "N.moonhulk", "to": "R.mid.gate", "speed": "rotate", "start_s": 61.0, "arrive_by_s": 66.0},
+          {"actor": "W_heroes", "from": "R.mid.1", "to": "R.mid.gate", "speed": "walk", "start_s": 69.0, "arrive_by_s": 71.25},
+          {"actor": "W_heroes", "from": "R.mid.gate", "to": "R.cairn", "speed": "rush", "start_s": 71.25, "arrive_by_s": 72.5, "margin_s": 0.1}
+        ]
       }
     ]
   },
@@ -435,7 +835,7 @@
     {"contest": "obj_mid", "order": 5, "t_frac": 0.45, "t_s": 33.75, "zone": "stoneback_pit", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Stoneback taken", "since": "start", "travel": [{"from": "B.cairn", "to": "N.stoneback", "speed": "walk"}]},
     {"contest": "fight_mid", "order": 6, "t_frac": 0.6, "t_s": 45.0, "zone": "mossback_clearing", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Mid-game team fight", "since": "obj_mid", "travel": [{"from": "N.stoneback", "to": "N.mossback", "speed": "rotate"}]},
     {"contest": "obj_late", "order": 7, "t_frac": 0.8, "t_s": 60.0, "zone": "moonhulk_isle", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Moonhulk taken", "since": "fight_mid", "travel": [{"from": "N.mossback", "to": "N.moonhulk", "speed": "walk"}]},
-    {"contest": "fight_late", "order": 8, "t_frac": 0.95, "t_s": 71.25, "zone": "gate.*", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Decisive fight at the Cairn Gate", "since": "obj_late", "travel": [{"from": "N.moonhulk", "to": "B.mid.gate", "speed": "walk"}], "zone_rule": "when the match winner also wins fight_late: the gate of the team that loses the match. When the match winner loses fight_late (about 19 percent of games): see late_fight_variants (default held_island), not the gate", "variant_when_winner_loses": "late_fight_variants"},
+    {"contest": "fight_late", "order": 8, "t_frac": 0.95, "t_s": 71.25, "zone": "gate.*", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Decisive fight at the Cairn Gate", "since": "obj_late", "travel": [{"from": "N.moonhulk", "to": "B.mid.gate", "speed": "walk"}], "zone_rule": "when the match winner also wins fight_late (about 81 percent of games): the gate of the team that loses the match, laid out as late_fight_variants clean_gate. When the match winner loses fight_late (about 19 percent): see late_fight_variants (default held_island), not the gate", "variant_when_winner_wins": "clean_gate", "variant_when_winner_loses": "late_fight_variants"},
     {"contest": "siege", "order": 9, "t_frac": 1.0, "t_s": 75.0, "zone": "cairn.*", "actors": ["top", "jg", "mid", "bot", "sup"], "title": "Siege of the Cairn", "since": "fight_late", "travel": [{"from": "B.mid.gate", "to": "B.cairn", "speed": "walk"}], "zone_rule": "cairn of the team that loses the match (always, in every variant)"}
   ],
   "waves": {
