@@ -656,26 +656,59 @@ Note on this table: it was produced by running the formulas in Python, not from 
 1. Same match twice gives the identical script (events, labels, times). Hash it.
 2. Replace the `show` streams with differently seeded ones: the scoreboard, kills, towers, objectives, gold and result are identical. Only wording, pairing and times may differ.
 3. `res` is unchanged by building and playing the arena (deep compare), and the arena code contains no call to `MatchSim`, `GamePlan.simulate` or `Report.attribution` for outcomes.
-4. Invariants I1 to I8 over at least 10,000 seeds.
+4. Invariants I1 to I9 over at least 10,000 seeds (I9 only has content on the 19% of games where the winner loses `fight_late`; the test must count how many such games it saw).
 5. Skip, then the final scoreboard equals the scoreboard of a full play.
 6. 2x speed gives the same event order, labels shown for 1.25 s.
 7. Every label is 28 characters or fewer with `{lane}` as Top, Mid or Bot and `{hero}` as the longest hero name.
 8. A plan label never shows for a control that is 0.
 9. The captions for the eight resolves are the same strings as the feed lines in the report's Key moments.
+10. Held fight: on a match where the game winner loses `fight_late`, the arena shows `push_lead` for W and `def_last` for U, shows no `tag_flip` or `tag_back` at 71.25 s, shows no `wipe` banner for W, and its event list has the same kills, deaths and towers per beat as the ledger.
+11. Every place, node and tower id in the choreography data exists in `game/data/arena_map.json`; the tower tally counts only the 12 `outer` and `inner` ids; no `guard` tower is counted; both guard towers of the game loser fall inside `close_push`.
+12. Rule R6: a line with "you", "your" or "we" exists only in `open_plan`. Rule R1: all 156 lines are 28 characters or fewer.
 
 ## 9. Evidence: what I ran
 
+First version (2026-11-08):
+
 - Read: the files named in the brief, plus `game_plan_v0.json`, `sim_params.json`, `heroes.json`, `pcg32.gd` and `i18n/en.json` strings for `gp.*` and `feed.*`.
 - Looked at `docs/design/art/current/12_match_mid.png` twice. Pass 1: a clock, one bar and a text feed, over half the screen empty. Pass 2 caught more: the bar shows "They are ahead" at about 22% fill but the bar is teal, the same colour as when you lead, so colour alone does not say who leads; the feed stamps (02:25, 02:50, 03:14, 03:38) are the report's own stamps; there are no hero names anywhere; the amber plan-switch line is the one place the game already explains a decision, and the arena keeps it.
-- Wrote a Python prototype of every formula in sections 1 and 5 (`/tmp/claude-0/-home-claude/f6889c24-9ce5-5465-b345-99bece397d73/scratchpad/ledger.py`, `showgen2.py`, `labels.py`; outside the repo, so nothing in game/ changed) and ran it on 40,000 matches from `tools/sim_core.py` with synthetic teams. The synthetic generator reproduces the report's own stated medians (median contest size 0.88, median final 0.30) and the tier mix (contests 27% narrow, 43% clear, 30% decisive; final 26%, 38%, 36%), but these are not real league games. All assertions held on every match: `L_8 = final`, `P_B - P_R = final`, kill sums, winner kills above loser kills, `T_W > T_U`, towers at most 6, tower sums.
-- Rates measured: repair tower 11%, fight kill repair 1.1%, gold rounds to zero 0.45%, arcs close 26% / comeback 12% / stomp 24% / steady 39%, any lead flip 55%, game winner loses the last fight 19%, loses both objectives 14%, `abs(x) >= 0.8` upset 3.0% of contests (at least once in 18% of games), winner towers mean 4.4, loser 1.7, winner kills mean 19.4, loser 10.6, total 30 (range 18 to 41), median hero with the most deaths 7.
+- Wrote a Python prototype of every formula in sections 1 and 5 (in the session scratchpad, outside the repo, so nothing in game/ changed) and ran it on 40,000 matches from `tools/sim_core.py` with synthetic teams. The synthetic generator reproduces the report's own stated medians (median contest size 0.88, median final 0.30) and the tier mix (contests 27% narrow, 43% clear, 30% decisive; final 26%, 38%, 36%), but these are not real league games.
 - Ported `Report.kda` to Python to check the per-hero tie-out; the worked example's pairing used it and the totals matched.
-- Not run: Godot (not installed here), any phone, any real save. The port of `Report.kda` and of the two-pass plan logic is by hand and is not proven identical to the GDScript. The label lengths were measured by script.
 
-## 10. Open items for review
+Wave 1b re-run (after the edits above; scratchpad files `invariants.py`, `docchecks.py`, `ledger.py`, `showgen.py`, `showgen2.py`, `labels.py`, all outside the repo):
 
-1. Chronological lane beats (this document) against the Esports notes' size order: recommendation chronological, because the report stamps must match.
-2. Early towers at 25 to 28 s instead of at the lane resolve: recommendation as written, Esports Manager to confirm.
-3. S1 to S5 in section 2.5, in this order of urgency: S1 (also a report bug), S2, S3, S4, S5.
-4. The 52 intents and the placeholder names Stoneback, Moonhulk, Cairn, Hollowmere and the hero names go to the IP & Originality Checker. The wording is generic genre vocabulary, and no line copies a title or a catchphrase that I know of.
-5. For the Level / World Designer: confirm or rename the zone ids in section 2.3. For the Technical Designer: choreography data should key on the beat ids of section 2.1 and the cue ids of section 3.2.
+- **`invariants.py` on 40,000 matches: I1 to I8 and the new I9 held on every match, no assertion failed.** It builds the kill and tower script of every match, checks per-hero kills and deaths against the `kda` port (I4), checks that every placed tower id is one of the 12 scored ids read from `arena_map.json` and that no guard id is placed (I5), and for the held case checks I9 a to e. I6 and I8 are trivially true in the prototype (the objective tally is the sign of the contest and the words are a function of it); they matter for the Godot test, not for the port. Rates reproduce the first version: arcs close 26.1%, comeback 11.7%, stomp 23.6%, steady 38.6%; game winner loses `fight_late` in 18.9% (7,547 games); tower repair 11.0%; the 1.1% fight-kill repair and the 0.45% gold sign guard are unchanged (`ledger.py`).
+- Held-fight numbers (7,547 games): 57% are close arcs (4,265), 4% stomp, 39% steady, under 1% comeback. Gold lead of W before the late fight: median +6,500, 5th percentile +2,100. At 75 s: median +2,600, 5th percentile +200, minimum +100, below +1,000 in 21%, below +2,000 in 40%. The fight's own size: median `abs(c)` 0.60. Winner-side wipe in the late fight (all five heroes of W fall): 1,046 of the 7,547 (14%). Over all matches a side is wiped in 14% of its fights (22,896 of 160,000 side-fights), so the `wipe` banner is not rare.
+- **`docchecks.py` on this file**: 52 intents, 156 lines, longest 26 characters (`Fight now, objective later`, with `{lane}` counted as 3 and `{hero}` as 11), none over 28, no duplicate line, the doc's tables equal the prototype's label set. R6 (new wording): "you", "your" or "we" occur only in `open_plan`; 14 lines still contain "their", "them", "it" or "we"/"your" and are covered by the rule text. R2: no banned prediction word is left. Map ids: 28 map-style ids in the file, none unknown to `arena_map.json`; none of the old placeholder ids remains; the 12 scored tower ids exist, and so do the four guard ids.
+- Walk checks from a shortest-path search over the map's 80 edges at 0.060 u/s (rotate 1.5 x): the numbers in `rotate_stone`, `team_fight` and `reset`. This found two walks the first version and the map's validator do not cover (lane to Stoneback, Stoneback to Mossback Clearing), and one the map itself covers only from the Cairn.
+- Not run: Godot (not installed here), any phone, any real save, the Level Designer's held-fight staging (it was being written in parallel; HF2 constrains it but I have not seen it). The port of `Report.kda` and of the two-pass plan logic is by hand and is not proven identical to the GDScript. The worked example in 5.5 and 7 was not regenerated except for the `fight_mid` kill times and the tower ids (the kill window moved to 41.2 s); its other rows are from the first run.
+
+## 10. Settled positions, open items and hand-offs
+
+### 10.1 The two questions put to the Esports Manager: my settled position
+
+The Esports addendum is asked to agree with these two, or to say which number it would change and why.
+
+**Q1. Lane beats in chronological order, or largest first? Chronological.** The four lane results play at 13.5 s (top), 15.75 s (mid), 18.0 s (bot) and 20.25 s (jungle), always in that order. Why: (1) those four stamps are `Report.FEED_ORDER` (0.18, 0.21, 0.24, 0.27 of the game clock). The feed, the report's Key moments and the arena clock must show the same stamp for the same event (H3, H4, acceptance test 9), and the same stamps are in `arena_map.json`. (2) The spotlight already visits one lane at a time (12.0 to 18.75 s), so order by size would only add a reorder that contradicts the clock. (3) Size is shown as **emphasis, not order**: the tier look (wave front, health, zoom 5% or 10%, sound, section 2.2) and the tag. If the Esports Manager wants a lane to get a closer camera hold when its result is decisive, that is welcome inside the 2.25 s spotlight, because it moves no stamp. This changes only if the Systems Designer moves the sim's feed stamps.
+
+**Q2. Early towers at 25.0 to 28.0 s, or at the lane results? At 25.0 s (top), 26.5 s (mid), 28.0 s (bot).** That is about game minute 3:40 to 4:10 of an 11-minute game, after the lane results at minute 2:00 to 3:00. Why: (1) a tower down at minute 2 reads wrong to anyone who knows the genre, and the sim has no tower fight to back it. (2) The credit is a derived scoreboard number (F8, F9); only its time is chosen, and the window 21.0 to 31.0 s holds no resolve stamp, so moving it inside that window breaks nothing. I would not move it before 21.0 s (the plan check). (3) The tower is broken by the shoved wave while the heroes walk to Stoneback (walk check in `rotate_stone`), so the picture is one the clock allows. (4) The scoreboard count never changes, only the moment a tower disappears.
+
+### 10.2 Still open
+
+1. S1 to S5 in section 2.5, in this order of urgency: S1 (also a report bug), S2, S3, S4, S5.
+2. The 52 intents and the placeholder names Stoneback, Moonhulk, Cairn, Hollowmere and the hero names go to the IP & Originality Checker. The wording is generic genre vocabulary, and no line copies a title or a catchphrase that I know of.
+3. Held-fight staging (C8): I9 and HF1 to HF6 are the contract; the staging itself is the Level Designer's. Which of the default and the alternative ships is decided by the Technical Designer's prototype and the Founder's tester question "Results felt fair".
+4. Two scenery-tower questions I cannot settle alone: whether a viewer who sees four towers fall in the closing push (a counted one at 73.0 s, the two guards, and a fight tower) will count them against a scoreboard that moves by one; and whether the closing push is too busy at 72.5 to 74.0 s (Cairn crack, two guard crumbles, up to two scored towers, a kill). UI/UX and the VFX Artist can answer from a drawn frame.
+
+### 10.3 Hand-offs from the wave 1b edit
+
+| # | To | Ask |
+|---|---|---|
+| 1 | Esports Manager | Agree with 10.1, or name the number to change. |
+| 2 | Systems Designer | S1 to S5 (2.5). Also: the `wipe` banner would show in 14% of side-fights; say whether S2's calmer kill rate lowers that. |
+| 3 | Level / World Designer, Technical Designer | Held-fight staging that satisfies HF1 to HF6 and I9. Hard constraint: the Cairn falls at 74.0 s and island to gate is 4.8 s, gate to Cairn 2.3 s (HF2). Update the `fight_late` stage data (`zone_rule` is still "gate of the team that loses the match"). |
+| 4 | Level / World Designer | (a) Confirm rotate speed on the lane-to-Stoneback leg and on the tower-site-to-island leg (`rotate_stone`, `reset`). (b) `fight_mid` at `mossback_clearing` leaves a clash of 3.8 s (41.2 to 45.0 s); say whether to keep the zone or move the fight nearer the pit. (c) Make the validator check walks that start in the lanes. |
+| 5 | Narrative Designer | Own commentary lines; write one held-fight sentence for both seats (HF6); polish intent labels under the rules in 4.1. |
+| 6 | IP & Originality Checker | The 52 intents (156 lines), names in section 4.3 and the placeholder names. |
+| 7 | Art Director | Map the roles in 2.2 (teal circle, coral hexagon, status-loss colour, amber, pale blue, warm white-gold) to tokens. |
+| 8 | Technical Designer | Key choreography data on the beat ids of 2.1, the cue ids of 3.2 and the map ids of 2.3; use acceptance tests 10 to 12. |
