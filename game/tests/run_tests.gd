@@ -4,6 +4,11 @@ extends SceneTree
 ## Exit code 0 = all passed, 1 = at least one failure.
 ## STATUS: written but NOT YET RUN in Godot (see company/TASKBOARD.md, P-001).
 
+## Files already called by name below. Once a file is renamed or its call is removed, the auto-discovery
+## loop picks it up from here on: delete its name from this list when you delete its explicit call.
+const EXPLICIT := ["pipeline_tests.gd", "game_tests.gd", "game_plan_tests.gd", "progression_tests.gd", "economy_tests.gd",
+		"bonds_tests.gd", "ui_pass_tests.gd", "alpha6_tests.gd"]
+
 var _checks := 0
 var _failures := 0
 
@@ -21,8 +26,28 @@ func _initialize() -> void:
 	BondsTests.new().run(_check)
 	UiPassTests.new().run(_check)
 	Alpha6Tests.new().run(_check)
+	_discover()
 	print("checks: %d, failures: %d" % [_checks, _failures])
 	quit(1 if _failures > 0 else 0)
+
+
+## Every res://tests/*_tests.gd that is not in EXPLICIT is loaded with load(path).new() (no class_name, so no
+## --import is needed) and must have `run(check: Callable)`. New logic tests are new files; nobody edits this file.
+func _discover() -> void:
+	var files := Array(DirAccess.get_files_at("res://tests"))
+	files.sort()
+	var n := 0
+	for f in files:
+		var name: String = f
+		if not name.ends_with("_tests.gd") or name == "run_tests.gd" or EXPLICIT.has(name):
+			continue
+		var scr = load("res://tests/" + name)
+		var inst = scr.new() if scr is GDScript else null
+		_check(inst != null and inst.has_method("run"), "auto-discovered %s has run(check)" % name)
+		if inst != null and inst.has_method("run"):
+			n += 1
+			inst.call("run", _check)
+	print("auto-discovered test files run: %d" % n)
 
 
 func _check(ok: bool, label: String) -> void:

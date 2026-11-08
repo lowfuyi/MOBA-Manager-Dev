@@ -3,6 +3,12 @@ extends Node
 ## env SHOT_DIR. Not part of the normal headless checks.
 
 var dir := "/tmp/shots"
+## Set by tests/shots/shots_baseline.gd (the screenshot matrix runs this tour as a module): no auto-start and no
+## quit in _ready, picture names get prefix and suffix, and the matrix owns the large-text and colour-blind switches.
+var as_module := false
+var prefix := ""
+var suffix := ""
+var shots_taken := 0
 
 
 func cur() -> Control:
@@ -14,7 +20,8 @@ func shot(name: String) -> void:
 		await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
-	img.save_png("%s/%s.png" % [dir, name])
+	img.save_png("%s/%s%s%s.png" % [dir, prefix, name, suffix])
+	shots_taken += 1
 
 
 func _open_section(node: Node, needle: String) -> bool:
@@ -38,6 +45,8 @@ func _tap_text(node: Node, needle: String) -> bool:
 
 
 func _ready() -> void:
+	if as_module:
+		return
 	var e := OS.get_environment("SHOT_DIR")
 	if e != "":
 		dir = e
@@ -64,7 +73,10 @@ func _tour() -> void:
 	await shot("02_about")
 	App.go(ScreenClubSelect.new())
 	await shot("03_clubselect")
-	cur()._choose(App.world.club_ids[5])
+	# the club screen's _choose seeds the save from the clock; a fixed seed keeps every run's pictures comparable
+	App.gs = GameState.new_game(App.world, App.world.club_ids[5], 20261109)
+	App.autosave()
+	App.go(ScreenHub.new())
 	await shot("04_hub")
 	(cur().body.get_parent() as ScrollContainer).scroll_vertical = 700
 	await shot("04b_hub_lower")
