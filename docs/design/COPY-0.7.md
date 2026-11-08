@@ -64,6 +64,8 @@ These are the rules behind every string (ESPORTS-NOTES 4 for commentary tone; th
 | `tools/check_strings.py` on the merged table (temp copy, repo untouched) | `strings OK` (before: `strings OK`); 588 keys not yet used by code, which is expected until the build adds them |
 | Checker negative controls | the colour check flagged "Tap the green button" and "Greener line"; the word check flagged a 30-word text; the helper check flagged "advisor" |
 
+Script saved: the checks above (limits, colour words, rename, pronouns, quoted labels, glossary ids, placeholders) now live in `tools/check_copy.py`, with tests in `tools/test_check_copy.py`. Run `python3 tools/check_copy.py` for the patch, or `python3 tools/check_copy.py game/i18n/en.json` for the merged table. Section 8 says how it is used after the merge.
+
 Rules (the code in the last column of every table):
 
 | Code | Rule |
@@ -848,4 +850,46 @@ Nothing else in the file names the helper or the player. Outside `en.json` (not 
 - **UI/UX Designer:** confirm the switch width ("Form Rating"), the role filter words, the Chemistry hint cue, the Stats and Career labels, and the four cut-line states (`standings.cut.*`, `standings.pin.*`) with `GameState.cut_gap()`.
 - **IP & Originality Checker:** the font credit line `about.licences.font`; the names Gloamline, Coach and Manager are generic. No new hero, club or place names were written.
 - **Lead Game Designer:** `gp.end.t.pos` and `tag.scaling` change the words "Scale" and "scales late"; say if the sim docs need to follow.
+
+## 8. After the merge: the route for copy edits
+
+**Problem.** Once the 540 keys are in `game/i18n/en.json`, three edits are already waiting (Form Rating fallback "Rating", "Jg" and "Sup" to "Jungle" and "Support", the Chemistry hint), and testers will find more. The plan says Narrative never edits `en.json` and `merge_copy.py` refuses duplicates, so today there is no route.
+
+**Options.**
+
+| Route | Good | Bad |
+|---|---|---|
+| A. `merge_copy.py` gets an update mode with an allow-list of keys Narrative owns | `en.json` stays a hot file with one writer tool; every edit is checked, diffed and reversible; Narrative does not need to touch JSON by hand | Needs a small feature in a tool the Gameplay Programmer is writing now |
+| B. Narrative edits `en.json` directly for its own keys | Fastest | Two agents write one hot file; a hand edit can break JSON, a placeholder or a key a screen uses; no allow-list stops a wrong key |
+| C. Narrative hands each edit to a programmer in the handback | Nothing new to build | Slow, and a programmer becomes a typist for words |
+
+**Recommendation: A.** It keeps one writer for `en.json` (the tool), keeps ownership by key rather than by file, and costs one option in a tool that is being written anyway. B is the fallback if update mode slips past Alpha 0.7 (Narrative then edits only keys in the allow-list, one batch per task, and runs `tools/check_copy.py` and `tools/check_strings.py` before handback).
+
+**What update mode must do** (requirement for `tools/merge_copy.py`; I did not create it):
+
+1. Call: `python3 tools/merge_copy.py --update FILE.json [--write]`. `FILE.json` holds only the changed keys. Without `--write` it is a dry run that prints a table of key, old text, new text.
+2. **Allow-list.** Read `docs/design/copy/owned_keys.txt` (one key per line). Add mode writes every key it adds from a Narrative patch into that file, so the 540 are owned from the first merge. Update mode refuses the **whole file**, writing nothing, if any key is not in the list or does not already exist in `en.json`. It never adds, renames or deletes a key (retiring keys, section 6.3, stays a programmer task after the code stops using them).
+3. **Placeholders.** Refuse if the set of `{placeholders}` in the new text differs from the old text, unless the call has `--allow-placeholder-change` (a programmer flag: code must change at the same time).
+4. **Checks before writing.** Run `check_copy.check()` from `tools/check_copy.py` on the result (any error stops the write) and the `check_strings` lint. Held keys (plan fix 1) are not in `en.json`, so they go through add mode later and then join the list.
+5. **Small diff.** Keep key order, indentation and line endings of `en.json`; only the changed values differ. Fail on a duplicate key or a non-ASCII character.
+6. **Report.** Print how many keys changed and the old and new text of each, so the Producer can paste it into the review.
+
+**Allow-list contents.** The 540 keys of `en_0_7.json`, plus (needs the Producer's approval, one line each in `owned_keys.txt`) 15 older keys that are copy-only and already waiting: `role.short.jg`, `role.short.sup`, `chem.pentagon_hint` (needs the UI/UX cue first), and the 12 pronoun keys in section 6.4. Changing the allow-list is a Producer or Lead Programmer edit, never Narrative's own.
+
+**Not covered.** Keys that code writes or formats (anything built from game data) stay with the programmers. A new key that a screen needs always comes from the UI/UX Designer's request and goes through add mode.
+
+## 9. Rename leftovers outside my files (not edited)
+
+Review item 13. The player is the Manager and the helper is Coach (TUTORIAL.md 13). I did not edit the GDD or game code. Line numbers are from the working tree on 2026-11-09.
+
+| File and line | Text today | Meaning | Suggested |
+|---|---|---|---|
+| `docs/design/GDD-v1.md` line 12 | "The player is the club owner and head coach." | Calls the player the coach: must change | "The player is the club owner and manager." |
+| `docs/design/GDD-v1.md` line 278 (section 7.3) | "The default is the coach's pick: ..." | Here "coach" is the helper, so the meaning is right; lower case only | "The default is the Coach's pick: ..." |
+| `docs/design/GDD-v1.md` line 340 (section 7.8 heading) | "Game Plan (the coach's second lever besides the draft)" | Calls the player the coach: must change | "Game Plan (the Manager's second lever besides the draft)" |
+| `game/src/sim/game_plan.gd` line 3 (comment) | "Game Plan (GDD 7.8): the coach's second lever besides the draft." | Calls the player the coach: must change | "the Manager's second lever besides the draft" |
+
+Same word, helper meaning, lower case (optional, comments only, nothing player-facing): GDD line 258 (7.2, "train on the coach's plan"); `game_plan.gd` lines 142 and 167; `match_runner.gd` line 30; `game_state.gd` lines 665 and 695; `progression.gd` lines 62, 81 and 94; `screen_game_plan.gd` line 4; `match_sim.gd` line 60. GDD line 293 ("Head Coach" staff level) is the staff post and is fine.
+
+The TUTORIAL.md 13 note says 7.3 names the player as the coach; in the tree I could only find line 278, and it means the helper. If the Lead Game Designer knows of another 7.3 line, it is not in this file.
 
