@@ -19,8 +19,18 @@ What it checks (each line of output is one check):
   stages         every simulated contest has a place and a time, and the walk fits in the time before it
   units          body width (hero range unit) agrees with the pixel and map-unit conversions in the doc
   tally          the scoreboard counts 6 towers per side; the 2 guard towers are scenery and fall only in the closing push
-  variants       the 'held fight' stagings for the game winner losing fight_late: tokens fit and do not overlap,
-                 walks fit their clock, the timeline ends with the Cairn falling
+  variants       the 'held fight' stagings for the game winner losing fight_late, plus the clean_gate formation for
+                 the 81 percent case (game winner also wins it): tokens fit and do not overlap, walks fit their clock,
+                 the timeline ends with the Cairn falling
+  look           ART-BIBLE token names only (no ARENA_* placeholders), the side shapes (circle you, hexagon them,
+                 never a hexagon for an objective), Stoneback is a rhombus
+  labels         map labels are 24 px; no label touches a lane (other than its own), camp, tower, objective, pad,
+                 another label or the arena edge; labels crossing the lake or island rim are reported
+  walks          walks that start in the lanes and at the tower sites (lane position at the largest clash shift),
+                 with the legs that must pass and the legs that are asserted to fail
+
+Other modes:  --selftest   builds broken copies in memory and checks each one trips the check it targets
+              --doc PATH   the ARENA-MAP.md to lint (default docs/design/ARENA-MAP.md)
 
 Standard library only. Distances use map units: 1 unit = arena.unit_px (760 px) and dx is scaled by x_scale.
 """
@@ -41,9 +51,28 @@ RANGE_BODY_WIDTHS = {"melee": 1, "mid": 3, "long": 5}   # ACTION-VOCABULARY 3.1
 SCOREBOARD_TOWERS_PER_SIDE = 6                           # ACTION-VOCABULARY 5.1 F8 (C5 ruling)
 LEG_ACTORS = ("W_heroes", "U_heroes", "lead_pack")
 
+EXPECTED_STRIPS = {"scoreboard_y": [0, 190], "arena_y": [190, 950], "feed_y": [950, 1148], "controls_y": [1148, 1280]}
+# UI-PASS-2 6.7.2 (P1 ruling): text strip 44 + 8 + 48 + 8 + 80 + 10 = 198; controls 12 + 96 + 24 = 132
+MIN_TEXT_STRIP_H, MIN_CONTROLS_H = 198, 132
+LABEL_MIN_PX = 24                                        # ART-BIBLE 5.2: the floor
+LABEL_OUTLINE_PX = 5                                     # ART-BIBLE 3.9: 5 px VOID outline
+LABEL_GAP_PX = 2                                         # clear space between a label box and anything else
+DOC_DEFAULT = ROOT / "docs/design/ARENA-MAP.md"
+# token names of ART-BIBLE 3.1 to 3.9 (values are owned by the bible, never copied here)
+BIBLE_TOKENS = {"VOID", "BG", "BG_GLOW", "PANEL", "PANEL2", "PANEL3", "LINE", "LINE_HI", "TEXT", "TEXT2", "DIM", "TEXT_OFF",
+                "INK_TEAL", "INK_CORAL", "ACCENT", "TEAL_HI", "TEAL_LO", "TEAL_DEEP", "CORAL", "CORAL_HI", "CORAL_LO", "WARN",
+                "GOOD", "BAD", "GOOD_CB", "BAD_CB", "SIDE_BLUE", "SIDE_RED", "MAP_LAND", "MAP_MERE", "MAP_SHORE"}
+UNNAMED_IN_BIBLE = {"JUNGLE_RING"}                       # the Jungle role ring colour (bible 3.5) has no constant name yet
+NEVER_ON_MAP = {"BAD", "BAD_CB", "GOOD", "GOOD_CB", "SIDE_BLUE", "SIDE_RED", "BLUE", "RED"}
+EXPECTED_TOKENS = {"land": "MAP_LAND", "lake": "MAP_MERE", "shore_stroke": "MAP_SHORE", "lane": "PANEL3", "plaza": "PANEL2",
+                   "plate": "VOID", "plate_rim_you": "ACCENT", "plate_rim_them": "CORAL", "camp": "JUNGLE_RING",
+                   "moonhulk_disc": "TEXT2", "moonhulk_crescent": "TEXT", "stoneback": "WARN", "label": "TEXT",
+                   "label_outline": "VOID", "hero_you": "ACCENT", "hero_them": "CORAL", "hero_rim": "TEXT",
+                   "hero_ink_you": "INK_TEAL", "hero_ink_them": "INK_CORAL"}
+
 REQUIRED = ["schema", "schema_version", "map_version", "arena", "view", "icons_px", "speeds", "watch_seconds", "camera",
             "terrain", "bases", "nodes", "edges", "lanes", "towers", "camps", "objectives", "spawns", "zones", "stages",
-            "units", "tower_tally", "late_fight_variants"]
+            "units", "tower_tally", "late_fight_variants", "look", "labels", "walk_legs", "clash_rule"]
 
 
 class Ctx:
@@ -185,6 +214,15 @@ def check_structure(ctx):
         if not (lay["scoreboard_y"][1] <= lay["arena_y"][0] and lay["arena_y"][1] <= lay["feed_y"][0]
                 and lay["feed_y"][1] <= lay["controls_y"][0] and lay["controls_y"][1] <= lay["screen"][1]):
             errs.append("layout strips overlap or run off the 1280 px screen")
+        for k, want in EXPECTED_STRIPS.items():
+            if lay[k] != want:
+                errs.append(f"layout_px.{k} is {lay[k]}, UI-PASS-2 6.7.2 (ruling P1) has {want}")
+        if lay["feed_y"][1] - lay["feed_y"][0] < MIN_TEXT_STRIP_H:
+            errs.append(f"text strip is {lay['feed_y'][1] - lay['feed_y'][0]} px, it needs {MIN_TEXT_STRIP_H} (44 + 8 + 48 + 8 + 80 + 10)")
+        if lay["controls_y"][1] - lay["controls_y"][0] < MIN_CONTROLS_H:
+            errs.append(f"controls strip is {lay['controls_y'][1] - lay['controls_y'][0]} px, it needs {MIN_CONTROLS_H} (12 + 96 + 24)")
+        if lay["feed_y"][1] != lay["controls_y"][0] or lay["arena_y"][1] != lay["feed_y"][0] or lay["controls_y"][1] != lay["screen"][1]:
+            errs.append("layout strips must touch: arena, text strip and controls fill the screen with no gap")
     except (KeyError, TypeError, IndexError):
         errs.append("arena.layout_px is incomplete")
     for name, v in d["icons_px"].items():
@@ -702,10 +740,24 @@ def check_variants(ctx):
     zones = {z["id"]: z for z in d["zones"]}
     variants = lv.get("variants", [])
     ids = [v["id"] for v in variants]
-    if len(variants) < 2 or len(set(ids)) != len(ids):
-        errs.append("late_fight_variants needs at least two variants with unique ids")
-    if lv.get("default") not in ids:
-        errs.append(f"late_fight_variants.default '{lv.get('default')}' is not one of {ids}")
+    kind_of = {v["id"]: v.get("kind", "held") for v in variants}
+    held_ids = [i for i in ids if kind_of[i] == "held"]
+    clean_ids = [i for i in ids if kind_of[i] == "clean"]
+    if len(held_ids) < 2 or len(set(ids)) != len(ids):
+        errs.append("late_fight_variants needs at least two held variants with unique ids")
+    if not clean_ids:
+        errs.append("late_fight_variants needs a clean variant (the 81 percent case: the game winner also wins fight_late)")
+    for i in ids:
+        if kind_of[i] not in ("held", "clean"):
+            errs.append(f"{i}: kind must be 'held' or 'clean'")
+    if lv.get("default") not in held_ids:
+        errs.append(f"late_fight_variants.default '{lv.get('default')}' is not one of the held variants {held_ids}")
+    if lv.get("default_clean") not in clean_ids:
+        errs.append(f"late_fight_variants.default_clean '{lv.get('default_clean')}' is not one of the clean variants {clean_ids}")
+    pr = lv.get("prototype", {})
+    for k in ("build", "measure", "decision_rule", "status"):
+        if not pr.get(k):
+            errs.append(f"late_fight_variants.prototype.{k} is missing (what the Technical Designer builds and what decides)")
     unproven = [v["id"] for v in variants if v.get("proven") is not False]
     if unproven:
         errs.append(f"variants {unproven}: must say proven false (nothing here has been prototyped)")
@@ -713,6 +765,8 @@ def check_variants(ctx):
     obj_t = by["obj_late"]["t_s"]
     for v in variants:
         vid = v["id"]
+        kind = v.get("kind", "held")
+        resolve_ev = "resolve_held" if kind == "held" else "resolve_clean"
         form = v.get("formation", {})
         pts = []
         for team in ("W", "U"):
@@ -761,19 +815,31 @@ def check_variants(ctx):
                 off = ctx.dist_px(form[team][slot], z["c"])
                 if off > z["r_px"] - body / 2:
                     errs.append(f"{vid}: {team}.{slot} is {off:.0f} px from the centre of {zid}, limit {z['r_px'] - body / 2:.0f}")
-        if v.get("kills_change") != 0:
+        if kind == "held" and v.get("kills_change") != 0:
             errs.append(f"{vid}: kills_change must be 0 (the ledger owns kills)")
+        if kind == "clean" and v.get("kills_change") != "ledger":
+            errs.append(f"{vid}: kills_change must be 'ledger' (the clean case shows the ledger's kills, nothing added)")
+        if kind == "clean" and not v.get("applies_when"):
+            errs.append(f"{vid}: applies_when is missing")
+        # no zone may be asked to hold more bodies than half its area
+        for zkey, team in (("zone_W", "W"), ("zone_U", "U")):
+            zid = v.get(zkey)
+            if zid in zones:
+                fill = 5 * (body / 2) ** 2 / zones[zid]["r_px"] ** 2
+                if fill > 0.5:
+                    errs.append(f"{vid}: five {body} px bodies fill {fill:.0%} of zone {zid}, the limit is 50 percent")
+
         # timeline
         ev = v.get("events", [])
         times = [e["t_s"] for e in ev]
         names = {e["event"]: e["t_s"] for e in ev}
         if times != sorted(times) or len(set(times)) != len(times):
             errs.append(f"{vid}: events must be in strictly rising time order")
-        for need_ev in ("formation", "clash", "resolve_held", "cairn_crack", "cairn_fall"):
+        for need_ev in ("formation", "clash", resolve_ev, "cairn_crack", "cairn_fall"):
             if need_ev not in names:
                 errs.append(f"{vid}: event '{need_ev}' is missing")
-        if "resolve_held" in names and abs(names["resolve_held"] - resolve_t) > 0.01:
-            errs.append(f"{vid}: resolve_held at {names['resolve_held']} s but fight_late resolves at {resolve_t} s")
+        if resolve_ev in names and abs(names[resolve_ev] - resolve_t) > 0.01:
+            errs.append(f"{vid}: {resolve_ev} at {names[resolve_ev]} s but fight_late resolves at {resolve_t} s")
         if "cairn_fall" in names and abs(names["cairn_fall"] - t["guard_fall_window_s"][1]) > 0.01:
             errs.append(f"{vid}: cairn_fall at {names['cairn_fall']} s must close the guard-tower window ({t['guard_fall_window_s'][1]} s)")
         if times and (times[0] < obj_t or times[-1] > ws):
@@ -802,14 +868,18 @@ def check_variants(ctx):
                 errs.append(f"{tag}: starts at {leg['start_s']} s, before the Moonhulk is taken ({obj_t} s)")
             if leg["arrive_by_s"] > ws:
                 errs.append(f"{tag}: must arrive by {leg['arrive_by_s']} s, after the watch ends")
-            if need_s > have_s - TRAVEL_MARGIN_S:
-                errs.append(f"{tag}: takes {need_s:.1f} s at {leg['speed']} speed, only {have_s:.1f} s available (margin {TRAVEL_MARGIN_S:g} s)")
-            if leg["actor"] == "lead_pack":
+            margin = float(leg.get("margin_s", TRAVEL_MARGIN_S))
+            if need_s > have_s - margin:
+                errs.append(f"{tag}: takes {need_s:.1f} s at {leg['speed']} speed, only {have_s:.1f} s available (margin {margin:g} s)")
+            if leg["actor"] == ("lead_pack" if kind == "held" else "W_heroes") and leg["to"] == "R.cairn":
                 pack_end = leg
+        who = "lead pack" if kind == "held" else "winning heroes"
         if not pack_end or pack_end["to"] != "R.cairn" or pack_end["arrive_by_s"] > t["guard_fall_window_s"][1]:
-            errs.append(f"{vid}: the lead pack's last leg must end at the loser's Cairn (canonical R.cairn) before it falls")
+            errs.append(f"{vid}: the {who}' last leg must end at the loser's Cairn (canonical R.cairn) before it falls")
         elif "cairn_crack" in names and pack_end["start_s"] > names["cairn_crack"]:
-            errs.append(f"{vid}: the lead pack starts its last leg after the Cairn cracks")
+            errs.append(f"{vid}: the {who} start their last leg after the Cairn cracks")
+        elif kind == "clean" and "cairn_crack" in names and pack_end["arrive_by_s"] > names["cairn_crack"] + 1e-9:
+            errs.append(f"{vid}: the winning heroes must reach the Cairn by the crack ({names['cairn_crack']} s), leg is due {pack_end['arrive_by_s']} s")
     return errs
 
 
