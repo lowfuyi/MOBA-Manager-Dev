@@ -6,9 +6,13 @@ var _open := ""
 var _hero_list := false
 
 
+func tab_id() -> String:
+	return "plan"
+
+
 func go_back() -> void:
 	App.autosave()
-	App.go(ScreenHub.new())
+	App.go_tab("plan")
 
 
 func _ready() -> void:
@@ -34,6 +38,7 @@ func _rebuild() -> void:
 	var w := App.world
 	var head := UI.card(body, UI.PANEL2)
 	head.add_child(UI.label(Strings.t("train.intro"), UI.S_SMALL, UI.DIM))
+	_preview(head)
 	head.add_child(UI.button(Strings.t("train.coach_all"), _coach_all, "normal", 76))
 	var last := UI.card(body)
 	last.add_child(UI.label(Strings.t("train.last_h"), UI.S_BODY, UI.ACCENT))
@@ -101,10 +106,50 @@ func _toggle_heroes() -> void:
 
 
 func _choose(pid: String, kind: String, value: String) -> void:
-	App.gs.set_focus(pid, kind, value)
+	var gs := App.gs
+	var prev: Variant = (gs.d["train"] as Dictionary).get(pid)
+	if prev != null:
+		prev = (prev as Dictionary).duplicate()
+	gs.set_focus(pid, kind, value)
 	_hero_list = false
 	App.autosave()
 	_rebuild()
+	var p: Dictionary = App.world.players[pid]
+	# a reversible change applies at once and can be taken back from the toast
+	App.toast(Strings.f("train.toast", {"name": p["name"], "what": _focus_text(p)}), UI.ACCENT, Strings.t("common.undo"), _undo.bind(pid, prev))
+
+
+func _undo(pid: String, prev: Variant) -> void:
+	if not is_instance_valid(self) or not is_inside_tree():
+		return
+	if prev == null:
+		(App.gs.d["train"] as Dictionary).erase(pid)
+	else:
+		App.gs.d["train"][pid] = prev
+	App.autosave()
+	_rebuild()
+
+
+## What this week's choices lead to, before the next game: how many starters will be tired after it.
+func _preview(parent: VBoxContainer) -> void:
+	var gs := App.gs
+	var w := App.world
+	var now_tired := gs.tired_starters().size()
+	var after_tired := 0
+	var rest := 0
+	for pid in (gs.d["lineup"] as Dictionary).values():
+		var p: Dictionary = w.players[pid]
+		var training: bool = gs.focus_of(p)["k"] != "rest"
+		if not training:
+			rest += 1
+		var fat := clampf(w.fatigue_of(pid) + Progression.fatigue_delta(true, training), 0.0, 100.0)
+		if fat >= 40.0:
+			after_tired += 1
+	var col := UI.WARN if after_tired > 0 else UI.GOOD
+	UI.chips(parent, [[Strings.f("train.pv.now", {"n": now_tired}), UI.delta_color(-float(now_tired))],
+			[Strings.f("train.pv.after", {"n": after_tired}), col],
+			[Strings.f("train.pv.rest", {"n": rest}), UI.DIM]])
+	parent.add_child(UI.label(Strings.f("train.pv.rates", {"train": UI.signed(Progression.fatigue_delta(true, true), 1), "rest": UI.signed(Progression.fatigue_delta(true, false), 1)}), UI.S_SMALL - 2, UI.DIM))
 
 
 func _auto_one(pid: String) -> void:

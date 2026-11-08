@@ -3,7 +3,7 @@ extends Screen
 ## Live text feed of the managed club's game (GDD 8.5 / 8.7). Pure playback of the already-decided
 ## result: the clock and the lines are cosmetic and never feed back into the outcome.
 
-const SPEED_BASE := 8.0       # game seconds per real second (about 1.5 min of watching per game)
+const WATCH_SECONDS := 75.0   # real seconds of watching per game at normal speed, whatever the game length (Alpha 0.5)
 
 var game: Dictionary
 var res: Dictionary
@@ -13,6 +13,10 @@ var _shown := 0
 var _total_min := 12.0
 var _elapsed := 0.0           # game minutes
 var _fast := false
+var _speed := 8.0             # game seconds per real second, set from the game length so every game takes WATCH_SECONDS
+var _watch_t := 0.0           # real seconds spent on the feed (pace log)
+var _skipped := false
+var _used_fast := false
 var _finished := false
 var _clock: Label
 var _edge: Label
@@ -43,6 +47,7 @@ func _ready() -> void:
 		return
 	_events = Report.feed(res, my_side)
 	_total_min = Report.game_minutes(res)
+	_speed = _total_min * 60.0 / WATCH_SECONDS
 	var sgn := 1.0 if my_side == "B" else -1.0
 	_phase_vals = {"early": float(res["sim"]["early"]) * sgn, "mid": float(res["sim"]["mid"]) * sgn, "late": float(res["sim"]["late"]) * sgn}
 	setup("", Callable(), false)
@@ -78,7 +83,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _finished or _events.is_empty():
 		return
-	_elapsed += delta * SPEED_BASE * (2.0 if _fast else 1.0) / 60.0
+	_watch_t += delta
+	_elapsed += delta * _speed * (2.0 if _fast else 1.0) / 60.0
 	_clock.text = _mmss(minf(_elapsed, _total_min))
 	while _shown < _events.size() and _events[_shown]["t"] * _total_min <= _elapsed:
 		_reveal(_events[_shown])
@@ -147,12 +153,14 @@ func _end() -> void:
 
 func _toggle_speed() -> void:
 	_fast = not _fast
+	_used_fast = _used_fast or _fast
 	_speed_btn.text = Strings.t("match.speed2" if _fast else "match.speed1")
 
 
 func _skip() -> void:
 	if _finished or _events.is_empty():
 		return
+	_skipped = true
 	while _shown < _events.size():
 		_reveal(_events[_shown])
 		_shown += 1
@@ -161,4 +169,13 @@ func _skip() -> void:
 
 
 func _continue() -> void:
+	var gs := App.gs
+	if gs.is_quick():
+		gs.pace_quick()
+	else:
+		var total := _watch_t
+		if App.pace_t0 > 0:
+			total = (Time.get_ticks_msec() - App.pace_t0) / 1000.0
+		gs.pace_add(total, _watch_t, _skipped, _used_fast)
+	App.pace_t0 = 0
 	ScreenHub._finish_game(game, res)

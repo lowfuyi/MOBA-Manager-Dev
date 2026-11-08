@@ -15,11 +15,22 @@ func _init(from: String = "hub") -> void:
 	_from = from
 
 
+func tab_id() -> String:
+	match _from:
+		"season":
+			return ""
+		"roster":
+			return "squad"
+	return "club"
+
+
 func go_back() -> void:
 	if _from == "season":
 		App.go(ScreenSeasonEnd.new())
+	elif _from == "roster":
+		App.go(ScreenRoster.new("hub"))
 	else:
-		App.go(ScreenRoster.new("hub") if _from == "roster" else ScreenHub.new())
+		App.go_tab("club")
 
 
 func _ready() -> void:

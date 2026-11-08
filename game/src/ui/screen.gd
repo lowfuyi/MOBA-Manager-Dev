@@ -6,6 +6,17 @@ var body: VBoxContainer
 var _header: HBoxContainer
 
 
+## Which bottom tab this page belongs to ("home", "squad", "plan", "club", "more"), or "" to hide the
+## tab bar (match flow, contract talks, title). Pages override this.
+func tab_id() -> String:
+	return ""
+
+
+## True on the first page of a tab (tapping the tab again does nothing there).
+func is_tab_root() -> bool:
+	return false
+
+
 func _init() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL

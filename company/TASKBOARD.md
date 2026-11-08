@@ -46,3 +46,6 @@ Scouting and training, seasons and league structure, finances, backend and onlin
 ## Phase 1 plan (Single Player edition, Android first, English text only)
 
 Order of work: P-001 project skeleton and string tables, P-002 headless simulator with golden tests, P-003 batch harness and the section 9.1 full-pipeline calibration, D-005/D-008 content data (40 heroes, player generation), then P-004 screens. Subscriptions, online play and the animated map are later phases.
+| A-008 | Alpha 0.5 (UI pass 1, UI-1 to UI-4 and UI-7 of the UI reference): Arena Dusk tokens and components, bottom tab bar with Plan and Club pages, new Home page, payoff screen after a game (`Payoff` snapshot and compare, one tip), preview panels and Undo (training, Game Plan, negotiation), fixed 75-second watch window and local pace log, Animations switch. No rule changes. Version 0.5.0 alpha, versionCode 6. Notes: `docs/ALPHA-0.5-NOTES.md` | Engineering + UI/UX | QA (independent review pending) | Done, with Founder to game test |
+| A-009 | UI pass 2 backlog: lane-based chemistry (UI-5), story-first match view (UI-6), draft redesign (UI-8), dismissible hints (UI-9), text size and colour-blind options (UI-10), sound and haptics (UI-11), real-phone usability test (UI-12) | UI/UX + Engineering | Founder | Backlog |
+

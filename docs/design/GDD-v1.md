@@ -1,6 +1,6 @@
-# Game Design Document v1.9
+# Game Design Document v1.10
 
-Status: DRAFT v1.9. v1.9 records how Team Bonds, Form and Morale were implemented in Alpha 0.4 (sections 4.2, 7.3, 7.7, 8.6, Implementation notes) and settles one conflict inside the document (the scrim bonus, below). v1.8 records how recruitment of free agents, contracts, the cash ledger and the sponsor were implemented in Alpha 0.3 (sections 7.2 and 7.6, Implementation notes). v1.7 records how training, fatigue and ageing were implemented in Alpha 0.2 (section 7.3, Implementation notes) and the Game Plan QA result (CALIBRATION-9.1 addendum). v1.6 adds the Founder's match formats and pacing rule (section 8.7). v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 to v1.9 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
+Status: DRAFT v1.10. v1.10 records the Founder-approved UI direction (Arena Dusk, bottom tab bar, payoff screen, preview-before-commit) and fixes the watch time of one game at about 75 seconds (sections 8.7 and 17; Alpha 0.5). v1.9 records how Team Bonds, Form and Morale were implemented in Alpha 0.4 (sections 4.2, 7.3, 7.7, 8.6, Implementation notes) and settles one conflict inside the document (the scrim bonus, below). v1.8 records how recruitment of free agents, contracts, the cash ledger and the sponsor were implemented in Alpha 0.3 (sections 7.2 and 7.6, Implementation notes). v1.7 records how training, fatigue and ageing were implemented in Alpha 0.2 (section 7.3, Implementation notes) and the Game Plan QA result (CALIBRATION-9.1 addendum). v1.6 adds the Founder's match formats and pacing rule (section 8.7). v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 to v1.10 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
 Next: Founder review. Done: P-001 (skeleton), P-002 (simulator with golden tests), content data, P-003 first pass (9.1). Open: paired lever tests, Phase 1 rating-scale calibration, joint Game Plan test.
 
 All numbers in this document are **v0 placeholders** unless marked otherwise. They exist so the rules can be tested. QA & Balance tunes them against the targets in section 9, using `tools/proto_sim.py` as the reference model.
@@ -472,7 +472,9 @@ Form moves toward the result (+/-2), morale +/-5 to 10 based on result and playi
 
 A best-of-3 series is therefore about 8 to 12 minutes and a best-of-5 final about 15 to 20 minutes, or seconds in Quick mode. Players can always choose to sim a series instead of watching.
 
-**Consequences to check.** (1) The short draft removes two bans, so 9.1 must be re-run with the short profile; the effect on the draft lever is expected to be small. (2) The playback target for the presentation phase is about 7 to 8 seconds of feed per game minute (the 8x clock), so a 16-minute game plays in 2 minutes. (3) Multiplayer edition (public matching): human timers apply to both drafters, and what happens when no opponent is found (a bot opponent after a short wait is the plan) is decided in that edition's design.
+**Watch window (Founder question, answered by the Producer in Alpha 0.5).** The player can do nothing while the feed plays, so its real length is fixed rather than following the game clock: **every game's feed takes about 75 seconds at normal speed, whatever its cosmetic length (9 to 16 game minutes)**, with 2x speed and Skip always available. A short game therefore plays slower per game minute and a long game faster, which removes "this one dragged" without touching the result. The game clock shown on screen and in the report still reads 9 to 16 minutes. Where the player acts (draft, Game Plan, training, contracts) is where the time goes: casual and league game about 2.5 minutes in total, tournament game about 3.5 (revised from 3 and 4.5 above). The app keeps a local pace log (Settings) of the real time from Play to the report, how often the feed is skipped or sped up and how many games are auto-played, so the first playtests can confirm or change the 75 seconds; if testers skip most feeds the next step is a shorter window, not a longer one. The fixed window lives in `ScreenMatch.WATCH_SECONDS`.
+
+**Consequences to check.** (1) The short draft removes two bans, so 9.1 must be re-run with the short profile; the effect on the draft lever is expected to be small. (2) The playback target for the presentation phase was about 7 to 8 seconds of feed per game minute (the 8x clock); since Alpha 0.5 it is the fixed 75-second window above. (3) Multiplayer edition (public matching): human timers apply to both drafters, and what happens when no opponent is found (a bot opponent after a short wait is the plan) is decided in that edition's design.
 
 ---
 
@@ -600,6 +602,8 @@ Founder questions are in `company/DECISIONS.md`. Parameters still to define are 
 
 ---
 
+---
+
 ## 16. Change log
 
 | Date | Change | By |
@@ -614,3 +618,20 @@ Founder questions are in `company/DECISIONS.md`. Parameters still to define are 
 | 2026-11-08 | v1.7 implementation notes for 7.3 (tick = match day, Coach and Facility fixed at 2, Rest focus, AI rotation rule, ageing timing, playoff ticking); Game Plan QA 9.2.1 passed (see CALIBRATION-9.1 addendum) | Systems Lead, Engineering Lead |
 | 2026-11-08 | v1.8 implementation notes for 7.2 and 7.6 (contracts, free-agent market, negotiation, cash ledger, sponsors, wage cap, dismissal); economy QA (see CALIBRATION-9.1 addendum) | Systems Lead, Engineering Lead |
 | 2026-11-08 | v1.9 implementation notes for 4.2, 7.3, 7.7 and 8.6 (Team Bonds, Form, Morale, Team scrim); scrim bonus set to +1.5 a week to satisfy the 20 percent bond-farming limit of 9.2 test 2 | Systems Lead |
+| 2026-11-08 | v1.10 Founder-approved UI direction (Arena Dusk, bottom tab bar, payoff screen, preview-before-commit, section 17); fixed 75-second watch window per game and a local pace log (8.7) | Producer, UI/UX |
+
+---
+
+## 17. UI and UX direction (Founder decisions, 2026-11-08; Alpha 0.5)
+
+Source: the two-pass analysis of the reference videos in `docs/design/UI-UX-REFERENCE-v1.md` (pain points P1 to P10, principles, backlog UI-1 to UI-12). Nothing from the reference is copied: layouts, words and colours are our own (IP rules in that document).
+
+**Principles.** (1) One next step: the Home page leads with one card for the next game and one coral button. (2) Five-minute rhythm: nothing in the core loop is deeper than two taps from a tab. (3) Zero ads, upsells or timers in the core loop. (4) Preview, then commit, then celebrate: a reversible action (training focus, Game Plan sliders) applies at once and shows an Undo toast; an irreversible one (signing, renewing) shows a preview panel of what changes before the confirm button. (5) Explain the why: the result screen says what the game did to form, morale, bonds and cash, and gives one tip. (6) Big, calm, readable: 720x1280 design size, 64 px minimum tap height for primary actions, no fake waiting, an Animations switch in Settings.
+
+**Navigation.** Bottom tab bar: Home, Squad, Plan (Training, Team chemistry, Game Plan), Club (Finance, Standings, Free agents) and More (Settings, About). Match-day screens (pre-match, draft, game plan, match, report) hide the bar so a game is one focused flow; the phone back button always goes one step up, to the tab's first page and then to Home.
+
+**Visual direction A "Arena Dusk".** Deep navy and teal surfaces, light text, warm coral reserved for the single primary action on a screen, green and red only for gains and losses, amber for warnings. All colours, sizes and radii are tokens in `src/ui/ui.gd`.
+
+**Payoff screen.** After a game: result, standout player (only when someone really decided it, 3 percent or more), a Form and Morale table for the five starters, team bonds, chemistry bonus and cash this game, one tip (rest, morale, contract, scrim or keep going), then the details (why the game went this way, key moments, draft recap) one tap below.
+
+**Still to do (backlog):** lane-based chemistry layout (UI-5), story-first match view (UI-6), draft redesign (UI-8), dismissible hints (UI-9), text size and colour-blind options (UI-10), sound and haptics (UI-11), a usability test on a real phone with the Founder (UI-12).

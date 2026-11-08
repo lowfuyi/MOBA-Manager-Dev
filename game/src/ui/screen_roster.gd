@@ -15,15 +15,23 @@ func _init(from: String = "hub", game: Dictionary = {}) -> void:
 	_game = game
 
 
+func tab_id() -> String:
+	return "" if _from == "prematch" else "squad"
+
+
+func is_tab_root() -> bool:
+	return _from != "prematch"
+
+
 func go_back() -> void:
 	if _from == "prematch" and not _game.is_empty():
 		App.go(ScreenPreMatch.new(_game))
 	else:
-		App.go(ScreenHub.new())
+		App.go_tab("home")
 
 
 func _ready() -> void:
-	setup(Strings.t("roster.title"), go_back)
+	setup(Strings.t("roster.title"), go_back if _from == "prematch" else Callable())
 	_rebuild()
 
 
@@ -37,7 +45,7 @@ func _rebuild() -> void:
 	head.add_child(UI.label(Strings.t("roster.hint"), UI.S_SMALL, UI.DIM))
 	head.add_child(UI.label(Strings.f("roster.squad_count", {"n": gs.roster_slots_used(), "max": Economy.data()["max_roster"], "cash": PlayerView.money(gs.cash()), "bill": PlayerView.money(gs.wage_bill())}), UI.S_SMALL, UI.TEXT))
 	head.add_child(UI.label(Strings.f("hub.chem", {"bonus": UI.pct(gs.chem_bonus())}), UI.S_SMALL, UI.ACCENT))
-	head.add_child(UI.button(Strings.t("hub.chemistry"), func(): App.go(ScreenChemistry.new()), "normal", 76))
+	head.add_child(UI.button(Strings.t("hub.chemistry"), func(): App.go(ScreenChemistry.new("roster")), "normal", 76))
 	head.add_child(UI.button(Strings.t("hub.free_agents"), func(): App.go(ScreenFreeAgents.new("roster")), "normal", 76))
 	var c := UI.card(body)
 	c.add_child(UI.label(Strings.t("roster.lineup"), UI.S_BODY, UI.ACCENT))

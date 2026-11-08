@@ -77,3 +77,14 @@
 - **Morale does not yet enter contract talks or the player's willingness to renew.** It affects only the rating in matches in this build.
 - **Old saves open as a new club** (every pair at 30, neutral form and morale) rather than being refused.
 - **Still open after Alpha 0.4:** multi-season run with bonds, joint Game Plan rerun with chemistry, Exhibition and Quick Match, staff bonus, the club Form Rating (GDD 10.1), the earlier open items (second GDD review, name search, monetization, rating-scale calibration, role review of Alpha, youth intake).
+
+
+## Producer decision log: Alpha 0.5, UI pass 1 (2026-11-08)
+
+- **Founder approved** (a) visual direction A "Arena Dusk" (deep navy and teal, warm coral reserved for the one primary action) and (b) the first UI pass (UI-1 tab bar and Home card, UI-2 tokens, UI-3 components, UI-4 preview panels, UI-7 payoff screen), on condition that the order of building does not hurt later parts; no steps are skipped and notes for later passes are saved in `docs/design/UI-UX-REFERENCE-v1.md`.
+- **Match length: fixed 75-second watch window per game at 1x** (answer to the Founder's question about lethargy while the player cannot act). Every game now plays in the same real time whatever its cosmetic length (9 to 16 game minutes), with 2x and Skip kept. Reason: the old design (playback at a fixed game-clock rate) gave 68 to 120 seconds, so a long game felt like a slow one; a fixed window removes that without touching results. A local pace log (Settings) records real time per game, skips, speed-ups and auto-plays so the Founder's playtest decides whether 75 seconds stays. If most feeds are skipped the window gets shorter. Founder may overrule: one constant, `ScreenMatch.WATCH_SECONDS`.
+- **Undo versus confirm.** Reversible actions (training focus, Game Plan sliders) apply at once with an Undo message; irreversible ones (signing, renewing, releasing) show a preview panel and then ask for the tap. Reason: fewer taps for the many safe actions, a pause only where a mistake costs money or a player.
+- **Tab bar hidden on match day.** Pre-match, draft, Game Plan, match and report are one focused flow without the bar; the phone back button goes one step up everywhere.
+- **No game rule changed in this build.** Tests that guard the rules (1,727 headless checks before this build) are unchanged and pass.
+- **Still open after Alpha 0.5:** UI backlog UI-5, UI-6, UI-8 to UI-12 (see the UI reference), a real-phone usability session with the Founder, plus the older open items (second independent GDD review, name search, monetization, rating-scale calibration, role review, youth intake, Exhibition and Quick Match).
+

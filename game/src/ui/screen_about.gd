@@ -2,8 +2,12 @@ class_name ScreenAbout
 extends Screen
 
 
+func tab_id() -> String:
+	return "" if App.gs == null else "more"
+
+
 func go_back() -> void:
-	App.go(ScreenTitle.new() if App.gs == null else ScreenHub.new())
+	App.go(ScreenTitle.new() if App.gs == null else ScreenSettings.new())
 
 
 func _ready() -> void:

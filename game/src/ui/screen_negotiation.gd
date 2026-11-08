@@ -71,12 +71,7 @@ func _rebuild() -> void:
 	for n in range(1, int(Economy.data()["max_length"]) + 1):
 		lens.add_child(UI.button(str(n), _set_len.bind(n), "primary" if n == _len else "normal", 80))
 	c.add_child(lens)
-	if not _renewal:
-		c.add_child(UI.label(Strings.f("neg.fee", {"fee": PlayerView.money(gs.signing_fee(_wage))}), UI.S_SMALL, UI.TEXT))
-	var cur := float(gs.contract_of(_pid).get("wage", 0.0)) if _renewal else 0.0
-	var after := gs.wage_bill() - cur + float(_wage)
-	c.add_child(UI.label(Strings.f("neg.budget", {"cash": PlayerView.money(gs.cash()), "bill": PlayerView.money(after), "cap": PlayerView.money(gs.wage_cap())}), UI.S_SMALL,
-			UI.BAD if after > gs.wage_cap() else UI.DIM))
+	_preview(c)
 	var block := gs.offer_block(_pid, _wage, _renewal)
 	if block != "":
 		c.add_child(UI.label(_block_text(block), UI.S_SMALL, UI.WARN))
@@ -88,6 +83,42 @@ func _rebuild() -> void:
 	b.disabled = block != ""
 	c.add_child(b)
 	_stats(p)
+
+
+## "If you sign / renew" panel: the numbers before and after, so nothing is a surprise after the tap.
+func _preview(parent: VBoxContainer) -> void:
+	var gs := App.gs
+	var w := App.world
+	var p: Dictionary = w.players[_pid]
+	var pv := UI.card(parent, UI.PANEL2, 16)
+	pv.add_child(UI.label(Strings.t("neg.pv.h_renew" if _renewal else "neg.pv.h_sign"), UI.S_SMALL, UI.CORAL))
+	var cur := float(gs.contract_of(_pid).get("wage", 0.0)) if _renewal else 0.0
+	var before := gs.wage_bill()
+	var after := before - cur + float(_wage)
+	UI.kv_row(pv, Strings.t("neg.pv.wages"), "%s  ->  %s" % [PlayerView.money(before), PlayerView.money(after)], UI.BAD if after > gs.wage_cap() else UI.TEXT)
+	UI.kv_row(pv, Strings.t("neg.pv.cap"), PlayerView.money(gs.wage_cap()), UI.DIM)
+	if not _renewal:
+		var fee := gs.signing_fee(_wage)
+		UI.kv_row(pv, Strings.t("neg.pv.cash"), "%s  ->  %s" % [PlayerView.money(gs.cash()), PlayerView.money(gs.cash() - fee)], UI.BAD if gs.cash() - fee < 0.0 else UI.TEXT)
+		UI.kv_row(pv, Strings.t("neg.pv.squad"), "%d  ->  %d  /  %s" % [gs.roster_slots_used(), gs.roster_slots_used() + 1, str(Economy.data()["max_roster"])], UI.TEXT)
+		# would he start? the team rating with him in the slot where he adds the most
+		var lu := gs.lineup()
+		var base := w.team_rating(lu)
+		var best_gain := 0.0
+		var best_slot := ""
+		for s in GameState.SLOTS:
+			var hyp := lu.duplicate()
+			hyp[s] = p
+			var gain := w.team_rating(hyp) - base
+			if gain > best_gain:
+				best_gain = gain
+				best_slot = s
+		if best_slot == "":
+			UI.kv_row(pv, Strings.t("neg.pv.rating"), Strings.t("neg.pv.bench"), UI.DIM)
+		else:
+			UI.kv_row(pv, Strings.t("neg.pv.rating"), Strings.f("neg.pv.starts", {"role": Strings.t("role." + best_slot), "gain": UI.signed(best_gain, 1)}), UI.GOOD)
+	else:
+		UI.kv_row(pv, Strings.t("neg.pv.length"), Strings.f("neg.pv.seasons", {"n": _len}), UI.TEXT)
 
 
 func _stats(p: Dictionary) -> void:

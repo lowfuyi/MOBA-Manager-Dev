@@ -141,3 +141,12 @@ My recommendation: **A as the default theme, with a light theme later**, because
 1. Pick a visual direction (A recommended) or ask for a different one.
 2. Approve UI-1 to UI-4 plus UI-7 as the first UI pass (Alpha 0.5 candidate), or reorder the list.
 3. Confirm that match length stays at 5 minutes or less, with a Skip button, even if the story view is richer.
+
+## 10. Founder decisions and what was built (2026-11-08, Alpha 0.5)
+
+- **Visual direction:** A "Arena Dusk" approved (the recommendation). B and C are not pursued.
+- **First UI pass approved:** UI-1 (tab bar and Home card), UI-2 (tokens), UI-3 (components), UI-4 (preview panels) and UI-7 (payoff screen) are built in Alpha 0.5. The Founder's condition: the order must not hurt later parts, nothing is skipped, and notes are carried forward. Notes carried forward: the tab ids and back targets are per-screen (`tab_id()`), so a later pass can move a page between tabs without touching the others; all colours and sizes are tokens in `src/ui/ui.gd`; all visible text is in `i18n/en.json`.
+- **Match length:** Founder was unsure; fixed 75-second watch window with a pace log (see GDD 8.7 and DECISIONS). Decided by data from the first playtest.
+- **Found while checking screenshots (lessons for the next pass):** an expanding key label next to a shrink-to-end value label squeezes the value into one character per line, so value labels now have no wrap and a minimum width (`UI.kv_row`); a pentagon canvas wider than the card interior pushed the chemistry page past the screen edge (minimum width cut to 560); "decided 0% of the result" is meaningless, so a standout line shows only at 3 percent or more.
+- **Next in the backlog:** UI-5, UI-6, UI-8 to UI-12 (section 7). UI-12 needs the Founder on a real phone.
+

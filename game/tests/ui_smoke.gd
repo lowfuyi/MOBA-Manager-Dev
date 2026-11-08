@@ -30,6 +30,7 @@ func _run() -> void:
 	var main: Control = load("res://scenes/main.tscn").instantiate()
 	add_child(main)
 	await get_tree().process_frame
+	UI.animate = false
 	ok(App.main == main, "App.main set")
 	ok(cur() is ScreenTitle, "title shown first")
 	App.go(ScreenAbout.new())
@@ -38,6 +39,19 @@ func _run() -> void:
 	ok(cur() is ScreenClubSelect, "club select")
 	cur()._choose(App.world.club_ids[5])
 	ok(cur() is ScreenHub and App.gs != null, "hub after choosing a club")
+	# Alpha 0.5: bottom tab bar, tab roots, helpers
+	ok(App.main._tabbar.visible, "tab bar shown on the home page")
+	for tab in ["squad", "plan", "club", "more", "home"]:
+		App.go_tab(tab)
+		await get_tree().process_frame
+		ok(cur().tab_id() == tab, "tab opens: " + tab)
+		ok(App.main._tabbar.visible, "tab bar visible on tab " + tab)
+	ok(UI.signed(1.04, 1) == "+1.0" and UI.signed(-0.5, 1) == "-0.5" and UI.signed(0.01, 1) == "0.0" and UI.signed(-0.01, 0) == "0", "UI.signed formats changes")
+	ok(UI.delta_color(1.0) == UI.GOOD and UI.delta_color(-1.0) == UI.BAD and UI.delta_color(0.0) == UI.DIM and UI.delta_color(1.0, false) == UI.BAD, "UI.delta_color follows the sign")
+	ok(ScreenMatch.WATCH_SECONDS == 75.0, "watch window is 75 s")
+	App.toast("test", UI.TEXT, "Undo", func(): pass)
+	await get_tree().process_frame
+	ok(App.main._toasts.get_child_count() == 1, "toast with an action shows")
 	for scr in [ScreenRoster.new("hub"), ScreenStandings.new(), ScreenSettings.new(), ScreenAbout.new(), ScreenChemistry.new()]:
 		App.go(scr)
 		await get_tree().process_frame
@@ -146,6 +160,7 @@ func _run() -> void:
 		else:
 			ScreenHub._finish_game(g, App.gs.auto_game(g))
 			ok(cur() is ScreenReport, "report after auto game")
+			ok(not App.last_payoff.is_empty() and App.last_payoff["rows"].size() == 5, "payoff data after a game")
 			cur()._leave()
 		played += 1
 	ok(App.gs.d["phase"] == "done", "season completes (%d games by me, %d via UI)" % [played, full_ui])

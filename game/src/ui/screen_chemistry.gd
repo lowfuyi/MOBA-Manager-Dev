@@ -3,8 +3,23 @@ extends Screen
 ## Team Bonds screen (GDD 7.7): the pentagon of the five starters, the 5x5 Understanding grid, languages and the bench.
 
 
+var _from := "plan"
+
+
+func _init(from: String = "plan") -> void:
+	super._init()
+	_from = from
+
+
+func tab_id() -> String:
+	return "squad" if _from == "roster" else "plan"
+
+
 func go_back() -> void:
-	App.go(ScreenHub.new())
+	if _from == "roster":
+		App.go(ScreenRoster.new("hub"))
+	else:
+		App.go_tab("plan")
 
 
 func _ready() -> void:
@@ -82,7 +97,7 @@ func _ready() -> void:
 
 func _cell(text: String, bg: Color, fg: Color) -> PanelContainer:
 	var pc := PanelContainer.new()
-	pc.custom_minimum_size = Vector2(96, 64)
+	pc.custom_minimum_size = Vector2(72, 64)
 	pc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pc.mouse_filter = Control.MOUSE_FILTER_PASS
 	pc.add_theme_stylebox_override("panel", UI.box(bg, 8, 4))

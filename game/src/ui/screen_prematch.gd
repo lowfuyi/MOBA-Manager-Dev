@@ -50,6 +50,7 @@ func _ready() -> void:
 
 
 func _quick() -> void:
+	App.gs.pace_quick()
 	ScreenHub._finish_game(game, App.gs.auto_game(game))
 
 

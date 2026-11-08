@@ -30,6 +30,7 @@ func _tour() -> void:
 	GameState.delete_save()
 	var main: Control = load("res://scenes/main.tscn").instantiate()
 	add_child(main)
+	UI.animate = false
 	await shot("01_title")
 	App.go(ScreenAbout.new())
 	await shot("02_about")
@@ -37,6 +38,13 @@ func _tour() -> void:
 	await shot("03_clubselect")
 	cur()._choose(App.world.club_ids[5])
 	await shot("04_hub")
+	(cur().body.get_parent() as ScrollContainer).scroll_vertical = 700
+	await shot("04b_hub_lower")
+	(cur().body.get_parent() as ScrollContainer).scroll_vertical = 0
+	for tab in ["plan", "club", "more"]:
+		App.go_tab(tab)
+		await shot("04c_tab_" + tab)
+	App.go_tab("home")
 	var rs := ScreenRoster.new("hub")
 	App.go(rs)
 	await shot("05_roster")

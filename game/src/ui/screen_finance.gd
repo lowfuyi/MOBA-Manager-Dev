@@ -5,9 +5,13 @@ extends Screen
 var _more := false
 
 
+func tab_id() -> String:
+	return "club"
+
+
 func go_back() -> void:
 	App.autosave()
-	App.go(ScreenHub.new())
+	App.go_tab("club")
 
 
 func _ready() -> void:

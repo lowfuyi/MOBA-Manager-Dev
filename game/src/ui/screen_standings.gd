@@ -4,8 +4,12 @@ extends Screen
 var _tab := "table"
 
 
+func tab_id() -> String:
+	return "club"
+
+
 func go_back() -> void:
-	App.go(ScreenHub.new())
+	App.go_tab("club")
 
 
 func _ready() -> void:

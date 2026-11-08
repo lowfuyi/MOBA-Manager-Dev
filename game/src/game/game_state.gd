@@ -453,6 +453,18 @@ func morale_of(pid: String) -> float:
 	return world.morale_of(pid)
 
 
+## Average bond over the ten pairs of the five starters.
+func bond_mean() -> float:
+	var ids: Array = (d["lineup"] as Dictionary).values()
+	var t := 0.0
+	var n := 0
+	for i in ids.size():
+		for j in range(i + 1, ids.size()):
+			t += bond(ids[i], ids[j])
+			n += 1
+	return t / float(maxi(1, n))
+
+
 ## Chemistry of the managed club's lineup (0 to 100) and the rating bonus it gives.
 func chem() -> float:
 	return world.chem_of(lineup())
@@ -1066,6 +1078,32 @@ func offer(pid: String, wage: int, length: int, renewal: bool = false) -> Dictio
 
 
 # ---------------------------------------------------------------- persistence
+# ---------------------------------------------------------------- pace log (local only)
+## How long games really take for this manager: whole game from tapping Play to the report, the time spent
+## watching the feed, and how often the feed is skipped or sped up. Kept in the save, never sent anywhere.
+func pace() -> Dictionary:
+	if not d.has("pace"):
+		d["pace"] = {"n": 0, "total_s": 0.0, "watch_s": 0.0, "max_total_s": 0.0, "skips": 0, "fast": 0, "quick": 0}
+	return d["pace"]
+
+
+func pace_add(total_s: float, watch_s: float, skipped: bool, fast: bool) -> void:
+	var p := pace()
+	p["n"] = int(p["n"]) + 1
+	p["total_s"] = float(p["total_s"]) + total_s
+	p["watch_s"] = float(p["watch_s"]) + watch_s
+	p["max_total_s"] = maxf(float(p["max_total_s"]), total_s)
+	if skipped:
+		p["skips"] = int(p["skips"]) + 1
+	if fast:
+		p["fast"] = int(p["fast"]) + 1
+
+
+func pace_quick() -> void:
+	var p := pace()
+	p["quick"] = int(p["quick"]) + 1
+
+
 func save() -> bool:
 	if is_dismissed():
 		return true  # the last autosave before the dismissal stays on disk

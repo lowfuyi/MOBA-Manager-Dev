@@ -73,6 +73,7 @@ func _rebuild() -> void:
 func _standing() -> void:
 	var c := UI.card(body, UI.PANEL2, 14)
 	c.add_child(UI.label(Strings.t("gp.stand_h"), UI.S_BODY, UI.ACCENT))
+	_edge_preview(c)
 	var rt := GamePlan.contest_ratings(_ta, _tb, MatchRunner.sim_params())
 	var sgn := 1.0 if my_side == "B" else -1.0
 	for k in GamePlan.CONTESTS:
@@ -87,6 +88,27 @@ func _standing() -> void:
 		var v := UI.label(UI.pct(edge), UI.S_SMALL, UI.GOOD if edge >= 0.0 else UI.BAD, HORIZONTAL_ALIGNMENT_RIGHT)
 		h.add_child(v)
 		c.add_child(h)
+
+
+## Live preview: the noise-free edge with the plan as it is now, against a balanced plan. Updates on every tap.
+func _edge_preview(parent: VBoxContainer) -> void:
+	var p := MatchRunner.sim_params()
+	var sgn := 1.0 if my_side == "B" else -1.0
+	var with_plan := sgn * GamePlan.expected_final(_ta, _tb, p, {my_side: _plan_set()})
+	var balanced := sgn * GamePlan.expected_final(_ta, _tb, p, {})
+	var add := with_plan - balanced
+	var row := UI.hbox()
+	var k := UI.label(Strings.t("gp.pv.edge"), UI.S_BODY, UI.TEXT)
+	k.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(k)
+	var v := UI.label(UI.pct(with_plan), UI.S_BIG, UI.delta_color(with_plan), HORIZONTAL_ALIGNMENT_RIGHT)
+	v.autowrap_mode = TextServer.AUTOWRAP_OFF
+	v.custom_minimum_size = Vector2(150, 0)
+	v.size_flags_horizontal = Control.SIZE_SHRINK_END
+	row.add_child(v)
+	parent.add_child(row)
+	UI.chips(parent, [[Strings.f("gp.pv.balanced", {"v": UI.pct(balanced)}), UI.DIM], [Strings.f("gp.pv.adds", {"v": UI.pct(add)}), UI.delta_color(add)]])
+	parent.add_child(UI.label(Strings.t("gp.pv.note"), UI.S_SMALL - 2, UI.DIM))
 
 
 func _slider_row(id: String, plan: Dictionary) -> void:

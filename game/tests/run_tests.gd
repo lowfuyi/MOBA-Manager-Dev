@@ -19,6 +19,7 @@ func _initialize() -> void:
 	ProgressionTests.new().run(_check)
 	EconomyTests.new().run(_check)
 	BondsTests.new().run(_check)
+	UiPassTests.new().run(_check)
 	print("checks: %d, failures: %d" % [_checks, _failures])
 	quit(1 if _failures > 0 else 0)
 
