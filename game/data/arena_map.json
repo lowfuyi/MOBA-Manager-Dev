@@ -1,7 +1,7 @@
 {
   "schema": "moba-manager/arena-map",
   "schema_version": 1,
-  "map_version": "0.1.0",
+  "map_version": "0.2.0",
   "date": "2026-11-08",
   "map_id": "hollowmere",
   "name": "Hollowmere",

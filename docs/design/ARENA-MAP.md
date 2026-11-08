@@ -147,7 +147,7 @@ Times are the sim's own feed moments (`Report.FEED_ORDER`) times the 75 s watch 
 | 5 | obj_mid | 33.8 s | **Stoneback**, Shallows | Five heroes take the early objective |
 | 6 | fight_mid | 45.0 s | **Mossback Clearing**, Thicket | Team fight in the open; the teams swung west (rotate speed) |
 | 7 | obj_late | 60.0 s | **Moonhulk**, island | Take the late objective; mid control decides who arrives first |
-| 8 | fight_late | 71.3 s | **Cairn Gate** of the team that loses the match | Decisive fight on the way in |
+| 8 | fight_late | 71.3 s | **Cairn Gate** of the team that loses the match, when the match winner also wins this fight (81 percent of games). When the match winner loses it (19 percent) see 7.1 | Decisive fight on the way in |
 | 9 | siege (end) | 75.0 s | The losing Cairn | Last push, base falls |
 
 Walking time versus the time before each contest, from the validator (walk speed unless noted):
@@ -162,6 +162,40 @@ Walking time versus the time before each contest, from the validator (walk speed
 | Gate to Cairn | 2.3 s | 3.8 s |
 
 Every walk keeps at least 1 s to spare. Tight ones: the Stoneback swing and the last push.
+
+One more limit, found while writing 7.1: the gate zone (r 64 px) cannot hold ten 36 px bodies (they fill 79 percent of its area). For the 81 percent case use the `held_gate` formation of 7.1 as a starting layout: the defenders inside the gate plaza, the attackers in a line at the causeway mouth.
+
+### 7.1 Held fight: the match winner loses `fight_late` (19 percent of games)
+
+**Problem.** The sim sums three phases, so the side that wins the match can lose the last fight. Showing the winner beaten at the loser's gate and then breaking the Cairn reads as "won the fight, lost the match", and fails the tester question "Results felt fair". **Idea for both stagings.** The fight is a stand-off that the match loser (U) holds; nobody dies beyond the kill ledger (no kill count change); the match winner's (W) lead arrives as a **reserve pack** (six 14 px dots in W's colour, running at rush speed, 91 px/s), the guard towers fall as scenery, and the Cairn breaks at 74.0 s. The default is `held_island` (the wave 1 review's recommendation: hold the fight at the island or the gate). **Neither staging has been prototyped or shown to a tester; nothing here is proven.** Data: `late_fight_variants` in `arena_map.json`; the validator checks the formations and the walks.
+
+Frame: W is drawn as Blue (south) and U as Red (north). If W is Red, mirror every point to `(x, 1 - y)` and swap B and R in node ids; the player's own flip comes after that. Tokens are 36 px bodies. W and U slots are the five hero slots.
+
+| | `held_island` (default) | `held_gate` (alternative) |
+|---|---|---|
+| Place | Moonhulk isle (`moonhulk_isle`, r 76 px), where both teams already stand after `obj_late` | U's gate (`gate.R` plaza) for U; a line of W at the causeway mouth just south of it |
+| W formation (map coordinates) | front: top (0.444, 0.526), sup (0.500, 0.526), jg (0.556, 0.526); back: mid (0.472, 0.571), bot (0.528, 0.571) | top (0.342, 0.284), jg (0.394, 0.284), mid (0.447, 0.284), bot (0.553, 0.284), sup (0.606, 0.284) |
+| U formation | mirror of W through the isle centre (y becomes 1 - y) | front: top (0.444, 0.200), sup (0.500, 0.200), jg (0.556, 0.200); back: mid (0.472, 0.157), bot (0.528, 0.157) |
+| Gaps | front ranks 40 px apart (centre to centre); the Moonhulk icon fades under the tokens | front ranks 64 px apart (melee steps up to 28 px forward and back); 40 px clear gap in W's line for the lane |
+| Heroes move | not at all (they are already there) | W walks from the isle to `R.mid.1`, U rotates back to `R.mid.gate`, both leave at 61.0 s |
+| Reserve pack | isle to `R.mid.1` at 68.0 s, waits, then to `R.cairn` at 71.25 s | Mossback to `R.mid.1` at 66.0 s (the Thicket trail), waits, then to `R.cairn` at 71.25 s |
+| Reads as | a neutral draw on the island; the push happens elsewhere | a held door; the push comes round the side |
+| Risk | ten tokens on a 152 px isle is dense; pack runs through the fight's north edge | long walk for the pack looks odd if the camera is tight; W stands among the gate towers |
+
+Shared timeline (seconds on the 75 s clock): 63.0 formation; 66.0 clash cues; 71.25 fight resolves, "held", no position change, no kill count change (the tag text is for Gameplay and Narrative to set); 72.0 and 72.4 the two guard towers fall; 72.5 the Cairn cracks; 74.0 the Cairn falls; 74.0 to 75.0 end card. In `held_gate` the pack also waits at the causeway mouth from 69.2 s.
+
+Walk checks (validator, rule: needed time at most the time available minus 1 s):
+
+| Variant | Who | Walk | Speed | Needs | Leaves, due | Spare |
+|---|---|---|---|---|---|---|
+| `held_island` | pack | `N.moonhulk` to `R.mid.1` (0.235 u) | rush | 2.0 s | 68.0, 71.25 | 1.3 s |
+| `held_island` | pack | `R.mid.1` to `R.cairn` (0.190 u) | rush | 1.6 s | 71.25, 74.0 | 1.2 s |
+| `held_gate` | W | `N.moonhulk` to `R.mid.1` (0.235 u) | walk | 3.9 s | 61.0, 66.0 | 1.1 s |
+| `held_gate` | U | `N.moonhulk` to `R.mid.gate` (0.290 u) | rotate | 3.2 s | 61.0, 66.0 | 1.8 s |
+| `held_gate` | pack | `N.mossback` to `R.mid.1` (0.384 u) | rush | 3.2 s | 66.0, 71.25 | 2.0 s |
+| `held_gate` | pack | `R.mid.1` to `R.cairn` (0.190 u) | rush | 1.6 s | 71.25, 74.0 | 1.2 s |
+
+The walks fit on paper. They say nothing about how the ten bodies look together, whether the pack reads as "the lead", or whether the viewer believes the Cairn falls; only a prototype and a tester can say. The two heroes' legs in `held_gate` start at 61.0 s, during the Moonhulk payoff (60.0 to 63.0 s); the vocabulary's approach window is 63.0 to 66.0 s, and the walk cannot fit it at walk speed (it needs 3.9 s).
 
 ## 8. Camera
 
@@ -189,7 +223,7 @@ Colours (token names only; **values owned by ART-BIBLE**): you `ACCENT`, them `C
 ## 10. How it was checked
 
 - `python3 tools/validate_arena_map.py --report`: all 14 checks pass (structure, ids, range, mirror, lanes, spawns, towers, camps, water, spacing, stages, plus three new in 0.2: units, tally, variants).
-- Wave 1b: 24 further broken copies (for units, tally, variants and a few old checks) all exit 1, each tripping the check it targets. List in the handback of that task; the copies are not kept in the repo.
+- Wave 1b: 24 further broken copies (for units, tally, variants and a few old checks) all exit 1, each tripping the check it targets (copies built by a throwaway script, not kept in the repo).
 - 11 deliberately broken copies of the file (a tower moved, a coordinate at 1.2, a spawn deleted, a lane cut, a tower in the lake, a walk that is too slow, and others) all fail with exit code 1.
 - Wave 1b: the preview was recoloured (them = coral hexagons, guard towers dimmed), re-rendered and viewed twice (full frame, then enlarged crops of both halves).
 - The preview was drawn, looked at and corrected twice: first pass found a missing moon crescent, a star icon that read as UI, tags hiding towers, clipped text and floating bases; the second found a label touching a tag and checked a flipped version.
@@ -206,3 +240,84 @@ Colours (token names only; **values owned by ART-BIBLE**): you `ACCENT`, them `C
 | Art Director | Issue the colour tokens named in section 9 (placeholders `ARENA_*`); map labels are still 20 px and the type scale wants 24 (C1), which needs a redraw of the preview |
 | Gameplay Designer | Re-key the vocabulary to the ids of section 12; confirm the wave-front reading in 12.5 and the `lead_carries` tag text |
 | IP & Originality Checker | Screen section 3 names and the layout |
+
+## 12. Id map (one page)
+
+For the Technical Designer's choreography table and the Gameplay Designer's vocabulary. Every id below is in `arena_map.json` and none was renamed in wave 1b. Notation: `{B,R}.x` means both `B.x` and `R.x`; B is Blue (south in the canonical frame), R is Red (north), N is neutral on `y = 0.5`. "Own" and "enemy" are resolved by the choreography from the side letter.
+
+### 12.1 Zones (14): where a hero is standing
+
+| Id | Hero-facing meaning | r px |
+|---|---|---|
+| `top_clash` | the Top duel place, middle of Reedrun | 48 |
+| `mid_clash` | the Mid duel place on the isle; the winner shifts the front along the causeway | 76 |
+| `bot_clash` | the Bot 2 v 2 place, middle of Lanternway | 48 |
+| `mossback_clearing` | open ground in the Thicket by the shared big camp: the mid-game team fight | 78 |
+| `stoneback_pit` | tight ground round the Stoneback: the early objective, five heroes each side | 70 |
+| `moonhulk_isle` | the island: the late objective, and the `held_island` stand-off | 76 |
+| `thicket.B`, `thicket.R` | west jungle pocket of that side: three camps; the jungler's home | 90 |
+| `shallows.B`, `shallows.R` | east jungle pocket of that side: three camps | 90 |
+| `gate.B`, `gate.R` | the plaza before that side's Cairn between its two guard towers: defenders stand here | 64 |
+| `cairn.B`, `cairn.R` | the Cairn itself: siege ground, where the game ends | 52 |
+
+### 12.2 Nodes (57): where a hero walks
+
+| Ids | Hero-facing meaning |
+|---|---|
+| `N.top.mid`, `N.bot.mid` | centre of Reedrun / Lanternway; the neutral clash points (zones `top_clash`, `bot_clash`) |
+| `N.moonhulk` | the isle centre: Moonhulk, the Mid lane centre, zone `moonhulk_isle` |
+| `N.mossback` | the shared big camp, zone `mossback_clearing`; the west waypoint of rotations |
+| `N.stoneback` | the Stoneback, zone `stoneback_pit` |
+| `{B,R}.top.gate`, `{B,R}.mid.gate`, `{B,R}.bot.gate` | where that lane leaves the plaza; `mid.gate` is the middle of zone `gate.*` |
+| `{B,R}.top.1` to `.top.4`, `{B,R}.bot.1` to `.bot.4` | lane waypoints from the gate towards the centre (1 near the gate, 4 near the centre) |
+| `{B,R}.mid.1`, `.mid.shore`, `.mid.rim` | Mid waypoints: on land before the causeway, last land before the bridge, the isle edge. Walking `shore` to `rim` crosses water on the plank bridge |
+| `{B,R}.spawn.top`, `.jg`, `.mid`, `.bot`, `.sup` | the hero's rising place at its own base, one per slot |
+| `{B,R}.w1`, `.w2`, `.w3` | Thicket camps (moss, moss, bramble) of that side |
+| `{B,R}.e1`, `.e2`, `.e3` | Shallows camps (moss, moss, bramble) of that side |
+| `{B,R}.cairn` | the Cairn, the end of every siege walk |
+
+### 12.3 Stages (9): when and where (sim contest ids; time on the 75 s clock)
+
+| Stage id | t | Zone | Vocabulary beat (ACTION-VOCABULARY 2.3) |
+|---|---|---|---|
+| `top` | 13.5 | `top_clash` | `lane_trade` (top) |
+| `mid_lane` | 15.75 | `mid_clash` | `lane_trade` (mid) |
+| `bot` | 18.0 | `bot_clash` | `lane_trade` (bot and sup) |
+| `jungle` | 20.25 | `thicket.*`, `shallows.*`, `mossback_clearing` | `jungle_play` |
+| `obj_mid` | 33.75 | `stoneback_pit` | `objective_stone` |
+| `fight_mid` | 45.0 | `mossback_clearing` | `team_fight` (mid) |
+| `obj_late` | 60.0 | `moonhulk_isle` | `objective_moon` |
+| `fight_late` | 71.25 | `gate.*` of the match loser, or a variant of 7.1 | `team_fight` (late), then `close_push` |
+| `siege` | 75.0 | `cairn.*` of the match loser | `close_push` |
+
+Other ids: lanes `top`, `mid`, `bot` (flavour names Reedrun, Hush Causeway, Lanternway); slots `top`, `jg`, `mid`, `bot`, `sup`; towers `{B,R}.{top,mid,bot}.{outer,inner}` (6 counted per side) and `{B,R}.guard.l`, `{B,R}.guard.r` (scenery); camps as in 12.2 plus `N.mossback`; objectives `N.stoneback`, `N.moonhulk`, `B.cairn`, `R.cairn`; areas `thicket`, `shallows`, `mere`; held-fight variants `held_island`, `held_gate`.
+
+### 12.4 From the vocabulary's placeholder ids to the map's ids
+
+| Vocabulary (2.3) | Map id |
+|---|---|
+| `base_B`, `base_R` | spawn pads `{B,R}.spawn.<slot>` for rising and walking out; `gate.B`, `gate.R` for defending; `cairn.B`, `cairn.R` for the siege |
+| `lane_top`, `lane_mid`, `lane_bot` | lane `top`, `mid`, `bot` (a place along it is an arc fraction `s` from Blue's gate: 0 Blue gate, 0.5 centre, 1 Red gate); the neutral clash place is `top_clash`, `mid_clash`, `bot_clash` |
+| `jungle_B`, `jungle_R` | the jungler's home is `thicket.B` / `thicket.R`; the other pocket is `shallows.B` / `shallows.R`; the shared camp is `N.mossback` |
+| `pit_stone` | `stoneback_pit` (node `N.stoneback`) |
+| `pit_moon` | `moonhulk_isle` (node `N.moonhulk`) |
+| `tw.<side>.<lane>.<outer\|inner>` | `<side>.<lane>.<tier>`, for example `B.top.outer` (side first, then lane, then tier) |
+| `cairn.<side>` | `cairn.<side>` (zone), `<side>.cairn` (node), objective `<side>.cairn` |
+
+### 12.5 Body widths, map units and pixels
+
+One **body width** is the 36 px token used in big fights (the lane token is 40 px; multiply by 1.11 if a fight is drawn at 40). One **step** in the vocabulary is one body width.
+
+| Quantity | Body widths | Pixels | Map units (u, 1 u = 760 px) |
+|---|---|---|---|
+| Body width, one step | 1 | 36 | 0.0474 |
+| Melee reach | 1 | 36 | 0.0474 |
+| Mid range | 3 | 108 | 0.1421 |
+| Long range | 5 | 180 | 0.2368 |
+| Walk speed per second | 1.27 | 45.6 | 0.060 |
+| Rotate / rush speed per second | 1.9 / 2.5 | 68 / 91 | 0.090 / 0.120 |
+| Lane width: Top / Mid / Bot | 1.1 / 1.6 / 1.8 | 40 / 56 / 64 | 0.053 / 0.074 / 0.084 |
+
+To convert in normalised arena coordinates: one body width is 0.0500 in `x` (36 / 720) and 0.0474 in `y` (36 / 760). Screen pixels in the arena are `x * 720` and `y * 760` (add 190 to `y` for the 720 x 1280 screen). Distances in `u` use `hypot(dx * 0.9474, dy)`.
+
+Things the numbers say: two bodies do not fit abreast in Bot (64 px against 72 px), so the duo staggers by one step, which the vocabulary already asks for; Top is single file. A long-range hero on the isle reaches every other token there (the isle is 152 px across against a 180 px range), so long range needs no walking in that fight. The wave front of the vocabulary ("0.6 times the margin of the lane length, from the centre towards the loser's outer tower") is ambiguous; this map reads it as 0.6 times the margin times the distance from the centre to the loser's outer tower (0.19 of the lane for Top and Bot, 0.33 for Mid), which stays inside the data's `max_shift_s` (0.15, 0.29, 0.15). The Gameplay Designer confirms or corrects this.
