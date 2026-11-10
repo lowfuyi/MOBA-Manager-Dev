@@ -122,3 +122,9 @@
 - **Approved by the Founder (items 3 to 8 of the checkpoint):** the Arena Dusk look with about 15 percent bigger text and Barlow Semi Condensed; teal circle for you and coral hexagon for them; Squad as a lane map and Standings as three views; build order Alpha 0.7 "Guide and Look" then Alpha 0.8 "Arena"; coaches' decisions shown as labels; the held-fight staging to be decided by tester scores.
 - **Founder decision, final: NO mid-match interventions.** The player never changes anything during a match; the watch is spectator-only in Alpha 0.8 and Beta unless the Founder reopens it. The match result stays decided by the simulation first.
 - Open and still owed: trademark search for "Gloamline"; Scan 2 of the IP checker (new glyphs, flags, rhombus); Content Lead re-check of names.
+
+## Producer log 2026-11-10
+- D8 (Producer, technical): Alpha 0.7 checkpoint CP2 moves to after I-18 (Home, Draft, Game Plan, Report rebuilt; tutorial cards left: steps 5, 6, 26). I-21a (tutorial tags on old screens) goes right after I-14. An optional engine-preview APK after I-16 may be built; the Founder would tap Skip tutorial. Source: ALPHA-0.7-BUILD-PLAN v1.1 section 10.1.
+- Copy edits after the merge: route A (update mode in tools/merge_copy.py with allow-list docs/design/copy/owned_keys.txt), built as I-00b.
+- Perf gates: PERF-BUDGET 3.1a (per-screen allowances with ratchet, shadows 6, font pairs 12). Technical Director may review; no Founder decision.
+- UI/UX decisions 2026-11-09 accepted (UI-PASS-2 section 11): Standings keeps "Form Rating"; role filter uses Jungle/Support; Chemistry line styles (solid/dashed/dotted) carry meaning besides colour; Player tabs Overview/Stats/Career; Squad names for Top and Bot sit above their tokens.
