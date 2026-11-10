@@ -51,7 +51,7 @@ func _ready() -> void:
 	gc.add_child(UI.label(Strings.t("chem.grid_hint"), UI.S_SMALL, UI.DIM))
 	var grid := GridContainer.new()
 	grid.columns = 6
-	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("h_separation", 4)    # six columns, "Support" (76 px) must fit a cell at large text: 85 px
 	grid.add_theme_constant_override("v_separation", 6)
 	grid.mouse_filter = Control.MOUSE_FILTER_PASS
 	gc.add_child(grid)
@@ -100,8 +100,8 @@ func _cell(text: String, bg: Color, fg: Color) -> PanelContainer:
 	pc.custom_minimum_size = Vector2(72, 64)
 	pc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pc.mouse_filter = Control.MOUSE_FILTER_PASS
-	pc.add_theme_stylebox_override("panel", UI.box(bg, 8, 2))    # slim padding and Medium weight: "Support" is 77 px, the cell has 79 at large text
-	var l := UI.label(text, UI.S_CAPTION, fg, HORIZONTAL_ALIGNMENT_CENTER, "Medium")
+	pc.add_theme_stylebox_override("panel", UI.box(bg, 8, 0))    # no padding: "Support" is 76 px (Caption 24 SemiBold), a cell is 85 px at large text
+	var l := UI.label(text, UI.S_CAPTION, fg)    # Caption weight (SemiBold), the scale's own pair
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	pc.add_child(l)
 	return pc

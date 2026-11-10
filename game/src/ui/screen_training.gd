@@ -149,7 +149,7 @@ func _preview(parent: VBoxContainer) -> void:
 	UI.chips(parent, [[Strings.f("train.pv.now", {"n": now_tired}), UI.delta_color(-float(now_tired))],
 			[Strings.f("train.pv.after", {"n": after_tired}), col],
 			[Strings.f("train.pv.rest", {"n": rest}), UI.DIM]])
-	parent.add_child(UI.label(Strings.f("train.pv.rates", {"train": UI.signed(Progression.fatigue_delta(true, true), 1), "rest": UI.signed(Progression.fatigue_delta(true, false), 1)}), UI.S_SMALL - 2, UI.DIM))
+	parent.add_child(UI.label(Strings.f("train.pv.rates", {"train": UI.signed(Progression.fatigue_delta(true, true), 1), "rest": UI.signed(Progression.fatigue_delta(true, false), 1)}), UI.S_CAPTION, UI.DIM))
 
 
 func _auto_one(pid: String) -> void:

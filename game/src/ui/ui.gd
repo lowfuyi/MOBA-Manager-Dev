@@ -203,6 +203,65 @@ static func box_cache_size() -> int:
 	return _boxes.size()
 
 
+# ---- the on/off switch (Settings): the engine's check mark is a 16 px square, far too small to see or tap -----------
+const SWITCH_W := 80
+const SWITCH_H := 44
+static var _switch_icons: Dictionary = {}
+
+
+## The icon of a CheckButton drawn as a switch (80 x 44 px, cached; ART-BIBLE 7: a white knob, a 2 px edge, teal when on,
+## the raised panel colour when off, which the old 1.06:1 track was not). On: teal track, the knob at the right with a
+## tick in it. Off: the knob at the left, plain, and a visible edge. The state reads from the knob's place and the tick,
+## not from colour alone. `disabled` fades it.
+static func switch_icon(on: bool, disabled: bool = false) -> Texture2D:
+	var key := "%s%s" % ["on" if on else "off", "-dis" if disabled else ""]
+	if _switch_icons.has(key):
+		return _switch_icons[key]
+	var img := Image.create(SWITCH_W, SWITCH_H, false, Image.FORMAT_RGBA8)
+	var half := Vector2(SWITCH_W, SWITCH_H) * 0.5
+	var track_r := SWITCH_H * 0.5 - 1.0
+	var knob_r := 15.0
+	var knob_c := Vector2(SWITCH_W - SWITCH_H * 0.5 if on else SWITCH_H * 0.5, SWITCH_H * 0.5)
+	var track_col := ACCENT if on else PANEL3
+	var knob_col := TEXT
+	var fade := 0.45 if disabled else 1.0
+	var tick: Array = [knob_c + Vector2(-6.0, 0.5), knob_c + Vector2(-1.5, 5.0), knob_c + Vector2(6.5, -5.5)]
+	for y in SWITCH_H:
+		for x in SWITCH_W:
+			var p := Vector2(x + 0.5, y + 0.5)
+			var col := Color(0, 0, 0, 0)
+			# track: a pill, its outline when off
+			var q := (p - half).abs() - (half - Vector2(track_r + 1.0, track_r + 1.0))
+			var d := Vector2(maxf(q.x, 0.0), maxf(q.y, 0.0)).length() + minf(maxf(q.x, q.y), 0.0) - track_r
+			col = _over(col, track_col, clampf(0.5 - d, 0.0, 1.0))
+			if not on:    # the 2 px edge of the off state
+				col = _over(col, DIM, clampf(0.5 - absf(d + 1.0), 0.0, 1.0) if d > -2.0 else 0.0)
+			col = _over(col, knob_col, clampf(0.5 - ((p - knob_c).length() - knob_r), 0.0, 1.0))
+			if on:
+				var dt := minf(_seg_dist(p, tick[0], tick[1]), _seg_dist(p, tick[1], tick[2])) - 2.0
+				col = _over(col, INK_TEAL, clampf(0.5 - dt, 0.0, 1.0))
+			col.a *= fade
+			img.set_pixel(x, y, col)
+	var tex := ImageTexture.create_from_image(img)
+	_switch_icons[key] = tex
+	return tex
+
+
+static func _over(dst: Color, src: Color, a: float) -> Color:
+	var sa := a * src.a
+	var out_a := sa + dst.a * (1.0 - sa)
+	if out_a <= 0.0:
+		return Color(0, 0, 0, 0)
+	var rgb := (Vector3(src.r, src.g, src.b) * sa + Vector3(dst.r, dst.g, dst.b) * dst.a * (1.0 - sa)) / out_a
+	return Color(rgb.x, rgb.y, rgb.z, out_a)
+
+
+static func _seg_dist(p: Vector2, a: Vector2, b: Vector2) -> float:
+	var ab := b - a
+	var t := clampf((p - a).dot(ab) / ab.length_squared(), 0.0, 1.0)
+	return (p - (a + ab * t)).length()
+
+
 # ---- tutorial tags (build plan I-03, TUTORIAL 7.2 and 8) ------------------------------------------------------
 ## id -> Array of WeakRef (controls). Weak, so a screen that is freed leaves nothing behind; entries are also removed
 ## when the control leaves the tree. Several controls may carry one id for a frame (a screen rebuilt while the old one
@@ -321,6 +380,13 @@ static func make_theme() -> Theme:
 		t.set_color("font_pressed_color", cls, TEXT)
 		t.set_color("font_disabled_color", cls, TEXT_OFF)
 		t.set_color("font_focus_color", cls, TEXT)
+	for icon_name in ["checked", "checked_mirrored"]:
+		t.set_icon(icon_name, "CheckButton", switch_icon(true))
+		t.set_icon(icon_name + "_disabled" if icon_name == "checked" else "checked_disabled_mirrored", "CheckButton", switch_icon(true, true))
+	for icon_name in ["unchecked", "unchecked_mirrored"]:
+		t.set_icon(icon_name, "CheckButton", switch_icon(false))
+		t.set_icon(icon_name + "_disabled" if icon_name == "unchecked" else "unchecked_disabled_mirrored", "CheckButton", switch_icon(false, true))
+	t.set_constant("h_separation", "CheckButton", 16)
 	t.set_stylebox("normal", "Button", box(PANEL2, R_BTN, 18, LINE, 1))
 	t.set_stylebox("hover", "Button", box(PANEL2.lightened(0.08), R_BTN, 18, LINE, 1))
 	t.set_stylebox("pressed", "Button", box(ACCENT.darkened(0.35), R_BTN, 18))
@@ -337,11 +403,37 @@ static func make_theme() -> Theme:
 	return t
 
 
+const NBSP := "\u00a0"            # no-break space: the engine never wraps at it
+const WORD_JOINER := "\u2060"     # zero-width, no glyph: forbids a line break at the place it stands (checked: width 0, no box)
+static var _slash_rx: RegEx
+
+
+## Keeps a wrapped text from breaking in the two ugly places the fit audit (tests/fit_audit.gd, rules 5 and 6) looks for:
+## right after a "/" that joins a number and its unit ("+17/" then "wk"), and a last line with one short word or number
+## on it ("0.", "57"): from three words on, the last two words are bound with a no-break space, so the last line always
+## has two. Both are invisible characters; the words themselves are untouched.
+static func tidy(text: String) -> String:
+	var t := text
+	if t.contains("/"):
+		if _slash_rx == null:
+			_slash_rx = RegEx.new()
+			_slash_rx.compile("/(?=[A-Za-z])")
+		t = _slash_rx.sub(t, "/" + WORD_JOINER, true)
+	var last := t.rfind(" ")
+	var nl := t.rfind("\n")
+	if last > nl and last > 0:
+		var prev := t.rfind(" ", last - 1)
+		if prev > nl and prev > 0 and t.length() - prev <= 24:
+			t = t.substr(0, last) + NBSP + t.substr(last + 1)
+	return t
+
+
 ## A label. `weight` "" takes the weight the type scale gives that size (Bold at 48 and 40, SemiBold at 36 and 24,
-## Medium at 26, Regular at 32); a size off the scale stays Regular.
-static func label(text: String, size: int = S_BODY, color: Color = TEXT, align: int = HORIZONTAL_ALIGNMENT_LEFT, weight: String = "") -> Label:
+## Medium at 26, Regular at 32); a size off the scale stays Regular. The text goes through tidy() (no wrap at "/",
+## no one-word last line); `tidy_text` false keeps it verbatim.
+static func label(text: String, size: int = S_BODY, color: Color = TEXT, align: int = HORIZONTAL_ALIGNMENT_LEFT, weight: String = "", tidy_text: bool = true) -> Label:
 	var l := Label.new()
-	l.text = text
+	l.text = tidy(text) if tidy_text else text
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", color)
 	var w := weight if weight != "" else default_weight(size)
@@ -356,7 +448,7 @@ static func label(text: String, size: int = S_BODY, color: Color = TEXT, align: 
 ## A label for a number the player reads or compares (money, rating, score, time): tabular digits, so a column of
 ## numbers lines up, and never wrapping. `weight` "" takes the number weight of that size (SemiBold at 40 and 36).
 static func num_label(text: String, size: int = S_BODY, color: Color = TEXT, align: int = HORIZONTAL_ALIGNMENT_RIGHT, weight: String = "") -> Label:
-	var l := label(text, size, color, align)
+	var l := label(text, size, color, align, "", false)
 	var w := weight if weight != "" else String(NUM_WEIGHT.get(size, default_weight(size)))
 	l.add_theme_font_override("font", font(w, true))
 	l.autowrap_mode = TextServer.AUTOWRAP_OFF

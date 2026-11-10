@@ -20,7 +20,7 @@ func _ready() -> void:
 		var club: Dictionary = App.world.clubs[cid]
 		var c := UI.card(body)
 		var tier := "club.tier.contender" if i < 3 else ("club.tier.midtable" if i < 7 else "club.tier.underdog")
-		c.add_child(UI.label(club["name"], UI.S_BODY + 4, UI.TEXT))
+		c.add_child(UI.label(club["name"], UI.S_HEAD, UI.TEXT))
 		c.add_child(UI.label(Strings.f("club.pick.line", {"rating": "%.1f" % tr, "tier": Strings.t(tier), "rank": i + 1}), UI.S_SMALL, UI.DIM))
 		c.add_child(UI.button(Strings.t("club.pick.choose"), _choose.bind(cid), "primary" if i == 3 else "normal", 76))
 

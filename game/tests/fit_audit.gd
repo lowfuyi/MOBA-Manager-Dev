@@ -14,6 +14,7 @@ extends RefCounted
 ##                word or number left alone on a line, which reads as a layout accident.
 ##   6 wrap at /  a wrapped text that breaks right after a '/' ('+17/' then 'wk'): the engine allows a break there, the
 ##                player sees a number cut from its unit.
+##   7 bar        a visible ProgressBar narrower than MIN_BAR_W (120 px): a stat bar squeezed by its neighbours into a stub.
 ##   Rules 5 and 6 are the 'hidden fit problems' (I-04): the text is not wider than its room, so rule 2 stays quiet.
 ##   They re-wrap the text the way Label and Button do (TextParagraph with the same break flags), so they need no rendering.
 ## `frame_w` is the logical canvas width: 720, or 626 in large-text mode (UI.canvas_w()).
@@ -22,6 +23,7 @@ const MIN_BTN := 96.0
 const MIN_BTN_W := 96.0
 const FLOOR_PX := 24
 const EPS := 1.5
+const MIN_BAR_W := 120.0
 ## Rule 5: a last line with fewer visible characters than this is an orphan. 4 means 'wk', 'OK' and '85%' all fail.
 ## (The I-04 brief said 'shorter than 3'; the Draft slot panel orphan it names is '85%', 3 characters, so the bar is 4.)
 const ORPHAN_MIN := 4
@@ -64,11 +66,17 @@ static func _walk(n: Node, frame_w: float, out: Array, clip: Rect2) -> void:
 			var b := c as Button
 			var sb := b.get_theme_stylebox("normal")
 			var room_w := c.size.x - (sb.get_margin(SIDE_LEFT) + sb.get_margin(SIDE_RIGHT) if sb != null else 0.0)
+			if b is CheckButton or b is CheckBox:    # the switch or box takes its own room beside the text
+				room_w -= float(b.get_theme_icon("checked").get_width() + b.get_theme_constant("h_separation"))
+			elif b.icon != null:
+				room_w -= float(b.icon.get_width() + b.get_theme_constant("h_separation"))
 			if b.text != "":
 				_check_text(c, b.text, room_w, b.autowrap_mode != TextServer.AUTOWRAP_OFF, out)
 			# 3 button size (the tile's invisible whole-card button and every real button alike)
 			if c.size.y < MIN_BTN - 0.5 or c.size.x < MIN_BTN_W - 0.5:
 				out.append("button: %s is %.0f x %.0f, minimum %.0f x %.0f" % [_name(c), c.size.x, c.size.y, MIN_BTN_W, MIN_BTN])
+		elif c is ProgressBar and c.size.x < MIN_BAR_W - 0.5:
+			out.append("bar: ProgressBar is %.0f px wide, minimum %.0f (squeezed by the controls beside it)" % [c.size.x, MIN_BAR_W])
 		if c.clip_contents or c is ScrollContainer:
 			clip = clip.intersection(r)
 	for ch in n.get_children():

@@ -60,7 +60,7 @@ func _rebuild() -> void:
 	fb.add_child(UI.button(Strings.t("settings.copy_feedback"), func(): DisplayServer.clipboard_set(App.feedback_text()); App.toast(Strings.t("settings.copied"), UI.GOOD), "primary", 76))
 	var d := UI.card(body)
 	d.add_child(UI.label(Strings.t("settings.debug_h"), UI.S_BODY, UI.ACCENT))
-	d.add_child(UI.label(App.debug_info(), UI.S_SMALL - 2, UI.DIM))
+	d.add_child(UI.label(App.debug_info(), UI.S_CAPTION, UI.DIM))
 	d.add_child(UI.button(Strings.t("settings.copy_debug"), func(): DisplayServer.clipboard_set(App.debug_info()); App.toast(Strings.t("settings.copied"), UI.GOOD), "normal", 76))
 	var r := UI.card(body)
 	if _confirm_reset:
@@ -104,7 +104,7 @@ func _pace_card() -> void:
 	UI.kv_row(c, Strings.t("pace.skips"), "%d / %d" % [int(p["skips"]), n])
 	UI.kv_row(c, Strings.t("pace.fast"), "%d / %d" % [int(p["fast"]), n])
 	UI.kv_row(c, Strings.t("pace.quick"), str(int(p["quick"])))
-	c.add_child(UI.label(Strings.t("pace.note"), UI.S_SMALL - 2, UI.DIM))
+	c.add_child(UI.label(Strings.t("pace.note"), UI.S_CAPTION, UI.DIM))
 
 
 func _reset() -> void:

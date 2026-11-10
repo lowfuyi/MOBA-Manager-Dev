@@ -12,11 +12,20 @@ const LOG_KEYS := {"signed": "career.log.signed", "released": "career.log.releas
 ## Eight stat bars with "now / potential" and, when `gains` is set, this season's change in brackets.
 ## Tap a row to read what the stat does.
 static func stat_block(parent: VBoxContainer, p: Dictionary, gains: bool = false) -> void:
-	var tip := UI.label(Strings.t("stat.help.tip"), UI.S_SMALL - 2, UI.DIM)
+	var tip := UI.label(Strings.t("stat.help.tip"), UI.S_CAPTION, UI.DIM)
 	parent.add_child(tip)
+	# Column widths come from the text, not from a fixed number: the longest stat name with its "?" and the widest
+	# "now / potential (gain)" the row can show. What is left is the bar, so it keeps at least 120 px at large text (it was 30).
+	var btn_font := UI.font("SemiBold")
+	var name_w := 0.0
+	for st0 in World.STATS:
+		name_w = maxf(name_w, btn_font.get_string_size(Strings.t("stat." + st0) + "  ?", HORIZONTAL_ALIGNMENT_LEFT, -1, UI.S_BODY).x)
+	name_w = ceilf(name_w) + 8.0 + 6.0    # the button's 4 px side margins, and a little air
+	var val_font := UI.font("Medium")
+	var val_w := ceilf(val_font.get_string_size("100 / 100 (+9.9)" if gains else "100 / 100", HORIZONTAL_ALIGNMENT_LEFT, -1, UI.S_SMALL).x) + 4.0
 	for st in World.STATS:
 		var row := UI.hbox()
-		var help := UI.label(Strings.t(STAT_HELP[st]), UI.S_SMALL - 2, UI.ACCENT)
+		var help := UI.label(Strings.t(STAT_HELP[st]), UI.S_CAPTION, UI.ACCENT)
 		help.visible = false
 		var name_b := UI.button(Strings.t("stat." + st) + "  ?", func(): help.visible = not help.visible, "flat", 44)
 		name_b.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -26,7 +35,7 @@ static func stat_block(parent: VBoxContainer, p: Dictionary, gains: bool = false
 			sb.content_margin_right = 4.0
 			name_b.add_theme_stylebox_override(sn, sb)
 		name_b.clip_text = true
-		name_b.custom_minimum_size = Vector2(250, UI.BTN_H)
+		name_b.custom_minimum_size = Vector2(name_w, UI.BTN_H)
 		name_b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		row.add_child(name_b)
 		var bar := UI.bar(float(p["stats"][st]), 100.0, UI.ACCENT, 20)
@@ -34,13 +43,13 @@ static func stat_block(parent: VBoxContainer, p: Dictionary, gains: bool = false
 		row.add_child(bar)
 		var gain := App.gs.season_gain(p["id"], st) if gains else 0.0
 		var gain_txt := "" if absf(gain) < 0.05 else " (%+.1f)" % gain
-		var val := UI.label("%d / %d%s" % [int(round(float(p["stats"][st]))), p["potential"][st], gain_txt], UI.S_SMALL, UI.GOOD if gain >= 0.05 else UI.DIM, HORIZONTAL_ALIGNMENT_RIGHT)
-		val.custom_minimum_size = Vector2(170, 0)
+		var val := UI.num_label("%d / %d%s" % [int(round(float(p["stats"][st]))), p["potential"][st], gain_txt], UI.S_SMALL, UI.GOOD if gain >= 0.05 else UI.DIM, HORIZONTAL_ALIGNMENT_RIGHT)
+		val.custom_minimum_size = Vector2(val_w, 0)
 		val.size_flags_horizontal = Control.SIZE_SHRINK_END
 		row.add_child(val)
 		parent.add_child(row)
 		parent.add_child(help)
-	parent.add_child(UI.label(Strings.t("stat.help.pot"), UI.S_SMALL - 2, UI.DIM))
+	parent.add_child(UI.label(Strings.t("stat.help.pot"), UI.S_CAPTION, UI.DIM))
 
 
 ## "Career with us": games, wins, kills/deaths/assists, best game and milestones (GDD 4.2). Collapsed by default.
@@ -71,8 +80,8 @@ static func career_section(parent: VBoxContainer, pid: String) -> void:
 			if a.has("opp"):
 				a["opp"] = gs.club_name(String(a["opp"]))
 			var text := Strings.f(LOG_KEYS[e["k"]], a)
-			box.add_child(UI.label(Strings.f("career.log_line", {"s": int(e["s"]), "text": text}), UI.S_SMALL - 2, UI.DIM))
-	box.add_child(UI.label(Strings.t("career.note"), UI.S_SMALL - 2, UI.DIM))
+			box.add_child(UI.label(Strings.f("career.log_line", {"s": int(e["s"]), "text": text}), UI.S_CAPTION, UI.DIM))
+	box.add_child(UI.label(Strings.t("career.note"), UI.S_CAPTION, UI.DIM))
 
 
 static func best_heroes_line(parent: VBoxContainer, p: Dictionary) -> void:

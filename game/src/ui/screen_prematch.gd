@@ -43,7 +43,7 @@ func _ready() -> void:
 		var col := UI.GOOD if ra > rb + 1.5 else (UI.BAD if ra < rb - 1.5 else UI.TEXT)
 		m.add_child(UI.label(Strings.f("pre.row", {"role": Strings.t("role." + s), "mine": a["name"], "rm": "%.0f" % ra, "theirs": b["name"], "rt": "%.0f" % rb}), UI.S_SMALL, col))
 		if App.world.player_fit(a, s) < 1.0:
-			m.add_child(UI.label(Strings.f("pre.offrole", {"name": a["name"]}), UI.S_SMALL - 2, UI.WARN))
+			m.add_child(UI.label(Strings.f("pre.offrole", {"name": a["name"]}), UI.S_CAPTION, UI.WARN))
 	m.add_child(UI.label(Strings.f("pre.chem", {"bonus": UI.pct(gs.chem_bonus())}), UI.S_SMALL, UI.ACCENT))
 	var tired := gs.tired_starters()
 	if not tired.is_empty():

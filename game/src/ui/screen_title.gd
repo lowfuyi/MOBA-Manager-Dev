@@ -5,7 +5,7 @@ extends Screen
 func _ready() -> void:
 	setup("", Callable(), false)
 	body.alignment = BoxContainer.ALIGNMENT_CENTER
-	body.add_child(UI.label(Strings.t("app.title"), 64, UI.ACCENT, HORIZONTAL_ALIGNMENT_CENTER))
+	body.add_child(UI.label(Strings.t("app.title"), UI.S_DISPLAY, UI.ACCENT, HORIZONTAL_ALIGNMENT_CENTER))
 	body.add_child(UI.label(Strings.t("app.edition.single_player") + " - " + Strings.f("title.alpha", {"version": App.VERSION_LABEL}), UI.S_BODY, UI.DIM, HORIZONTAL_ALIGNMENT_CENTER))
 	body.add_child(UI.spacer(40))
 	if GameState.has_save():
