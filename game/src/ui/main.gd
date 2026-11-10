@@ -1,10 +1,22 @@
 extends Control
 ## Root: dark background, safe-area margins, one screen at a time, a bottom tab bar for the five
 ## places of the club (Home, Squad, Plan, Club, More) and a small toast line for feedback.
+##
+## Layers, bottom to top (build plan I-03; instance order = draw order, CanvasLayers sit above all Controls):
+##   EventBus (a Node, App.bus) | background | content (margins, screen, tab bar) |
+##   sheet layer 20 (bottom sheets, I-08) | toast layer 30 | overlay slot 100 (the coach overlay, I-12; empty until then).
 
 const TABS := ["home", "squad", "plan", "club", "more"]
 const TAB_H := UI.TAB_H
+const LAYER_SHEET := 20
+const LAYER_TOAST := 30
+const LAYER_OVERLAY := 100
 
+var bus: EventBus
+var content: Control            # the margins, the current screen and the tab bar
+var sheet_layer: CanvasLayer    # a sheet adds itself here (scrim and panel)
+var toast_layer: CanvasLayer
+var overlay_layer: CanvasLayer  # the overlay slot: the tutorial overlay is added here by I-12
 var _margin: MarginContainer
 var _holder: Control
 var _tabbar: PanelContainer
@@ -15,6 +27,10 @@ var _current: Control
 
 func _ready() -> void:
 	theme = UI.make_theme()
+	bus = EventBus.new()
+	bus.name = "EventBus"
+	add_child(bus)
+	App.bus = bus
 	var bg := ColorRect.new()
 	bg.color = UI.BG
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -25,7 +41,12 @@ func _ready() -> void:
 	_margin.add_theme_constant_override("margin_right", 24)
 	_margin.add_theme_constant_override("margin_top", 48)
 	_margin.add_theme_constant_override("margin_bottom", 24)
+	_margin.name = "Content"
+	content = _margin
 	add_child(_margin)
+	sheet_layer = _make_layer("SheetLayer", LAYER_SHEET)
+	toast_layer = _make_layer("ToastLayer", LAYER_TOAST)
+	overlay_layer = _make_layer("OverlaySlot", LAYER_OVERLAY)
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 12)
 	_margin.add_child(col)
@@ -41,11 +62,40 @@ func _ready() -> void:
 	_toasts.offset_right = -40
 	_toasts.offset_bottom = -(TAB_H + 60)
 	_toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_toasts)
+	toast_layer.add_child(_toasts)
 	App.main = self
 	get_tree().set_auto_accept_quit(false)
 	show_screen(ScreenTitle.new())
 	App.mark_started()
+
+
+func _exit_tree() -> void:
+	if App.bus == bus:
+		App.bus = null
+
+
+func _make_layer(layer_name: String, layer_index: int) -> CanvasLayer:
+	var cl := CanvasLayer.new()
+	cl.name = layer_name
+	cl.layer = layer_index
+	add_child(cl)
+	return cl
+
+
+## One tab button: 96 px high, its label on one line at the Caption size (24 px, the floor) and never split inside a
+## word: a label wider than its button is cut with "..." instead of wrapping ("Trophi/es" is gone).
+static func make_tab_button(text: String) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.custom_minimum_size = Vector2(0, UI.BTN_H)
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.focus_mode = Control.FOCUS_NONE
+	b.mouse_filter = Control.MOUSE_FILTER_PASS
+	b.autowrap_mode = TextServer.AUTOWRAP_OFF
+	b.clip_text = true    # lets the button be narrower than its text (equal widths); the overrun mode adds the "..."
+	b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	b.add_theme_font_size_override("font_size", UI.S_CAPTION)
+	return b
 
 
 func _build_tabbar(parent: Control) -> void:
@@ -57,17 +107,13 @@ func _build_tabbar(parent: Control) -> void:
 	row.add_theme_constant_override("separation", 6)
 	_tabbar.add_child(row)
 	for id in TABS:
-		var b := Button.new()
-		b.text = Strings.t("tab." + id)
-		b.custom_minimum_size = Vector2(0, UI.BTN_H)
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.focus_mode = Control.FOCUS_NONE
-		b.mouse_filter = Control.MOUSE_FILTER_PASS
-		b.add_theme_font_size_override("font_size", UI.S_CAPTION)
+		var b := make_tab_button(Strings.t("tab." + id))
 		b.button_down.connect(UI._pulse.bind(b))
 		b.pressed.connect(_on_tab.bind(id))
+		UI.tag(b, "tab." + id)    # tutorial steps 3, 4, 7 and 24 point at these; `tap:tab.<id>` fires after _on_tab
 		row.add_child(b)
 		_tab_buttons[id] = b
+	UI.tag(_tabbar, "tabbar", false)
 	parent.add_child(_tabbar)
 
 
@@ -102,6 +148,10 @@ func show_screen(screen: Control) -> void:
 	_tabbar.visible = tab != ""
 	if tab != "":
 		_style_tabs(tab)
+	if screen.has_method("help_id"):
+		var hid: String = screen.call("help_id")
+		if hid != "":
+			bus.emit("screen:" + hid, {"help_id": hid, "tab": tab})
 
 
 ## A short message above the tab bar. `action` adds one tap button (for example Undo).

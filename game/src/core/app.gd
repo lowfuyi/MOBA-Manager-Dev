@@ -8,6 +8,7 @@ const SETTINGS_PATH := "user://settings.cfg"
 var world: World
 var gs: GameState
 var main: Control          # set by Main: shows one screen at a time
+var bus: EventBus          # set by Main (which creates it): UI events such as tap:<tag> and screen:<help id>; null before Main exists
 var last_result: Dictionary = {}    # most recent managed-club game (for the report)
 var last_game: Dictionary = {}
 var last_payoff: Dictionary = {}   # what the last game changed (Payoff.compare), for the payoff screen

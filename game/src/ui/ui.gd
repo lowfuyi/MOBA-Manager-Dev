@@ -203,6 +203,112 @@ static func box_cache_size() -> int:
 	return _boxes.size()
 
 
+# ---- tutorial tags (build plan I-03, TUTORIAL 7.2 and 8) ------------------------------------------------------
+## id -> Array of WeakRef (controls). Weak, so a screen that is freed leaves nothing behind; entries are also removed
+## when the control leaves the tree. Several controls may carry one id for a frame (a screen rebuilt while the old one
+## is still waiting to be freed): find_tag() returns the newest one that is visible.
+static var _tags: Dictionary = {}
+const TAG_META := "tag_id"
+
+
+## Name a control for the tutorial and the help system. `tap_source` (default true) makes a button raise
+## `tap:<id>` on App.bus when it is pressed (after its own handler, because the tag is applied after the button is wired).
+## Safe to call again after a rebuild, and to call twice on one control (the second id replaces the first).
+## Never tag a bare Label: the highlight needs a visible edge (TUTORIAL 8, contract item 3). Returns the control.
+static func tag(control: Control, id: String, tap_source: bool = true) -> Control:
+	if control == null or id == "":
+		return control
+	var old: String = String(control.get_meta(TAG_META, ""))
+	if old == id:
+		return control
+	if old != "":
+		_untag(control, old)
+	control.set_meta(TAG_META, id)
+	if not _tags.has(id):
+		_tags[id] = []
+	(_tags[id] as Array).append(weakref(control))
+	var gone := _on_tag_exit.bind(id, control.get_instance_id())
+	if not control.tree_exited.is_connected(gone):
+		control.tree_exited.connect(gone, CONNECT_DEFERRED)
+	if tap_source and control is BaseButton:
+		var tap := _on_tag_tap.bind(id)
+		if not (control as BaseButton).pressed.is_connected(tap):
+			(control as BaseButton).pressed.connect(tap)
+	return control
+
+
+## The live, visible control that carries `id`, or null. "Live" = valid and in the tree; "visible" = shown on screen
+## (a hidden page or a closed sheet does not count).
+static func find_tag(id: String) -> Control:
+	if not _tags.has(id):
+		return null
+	var arr: Array = _tags[id]
+	var found: Control = null
+	var i := arr.size() - 1
+	while i >= 0:
+		var c := (arr[i] as WeakRef).get_ref() as Control
+		if c == null or not is_instance_valid(c):
+			arr.remove_at(i)
+		elif found == null and c.is_inside_tree() and c.is_visible_in_tree():
+			found = c
+		i -= 1
+	if arr.is_empty():
+		_tags.erase(id)
+	return found
+
+
+## The id a control was tagged with ("" if none).
+static func tag_of(control: Control) -> String:
+	return String(control.get_meta(TAG_META, "")) if control != null else ""
+
+
+## How many live controls carry `id` (visible or not). For tests.
+static func tag_count(id: String) -> int:
+	if not _tags.has(id):
+		return 0
+	var n := 0
+	for w in _tags[id]:
+		var c := (w as WeakRef).get_ref() as Control
+		if c != null and is_instance_valid(c):
+			n += 1
+	return n
+
+
+static func _untag(control: Control, id: String) -> void:
+	if _tags.has(id):
+		var arr: Array = _tags[id]
+		for i in range(arr.size() - 1, -1, -1):
+			var c := (arr[i] as WeakRef).get_ref() as Control
+			if c == null or c == control:
+				arr.remove_at(i)
+		if arr.is_empty():
+			_tags.erase(id)
+	var gone := _on_tag_exit.bind(id, control.get_instance_id())
+	if control.tree_exited.is_connected(gone):
+		control.tree_exited.disconnect(gone)
+	var tap := _on_tag_tap.bind(id)
+	if control is BaseButton and (control as BaseButton).pressed.is_connected(tap):
+		(control as BaseButton).pressed.disconnect(tap)
+
+
+static func _on_tag_exit(id: String, instance_id: int) -> void:
+	# Runs deferred: a control that left the tree and came back in the same frame (moved to another parent) keeps its tag.
+	if not _tags.has(id):
+		return
+	var arr: Array = _tags[id]
+	for i in range(arr.size() - 1, -1, -1):
+		var c := (arr[i] as WeakRef).get_ref() as Control
+		if c == null or (c.get_instance_id() == instance_id and not c.is_inside_tree()):
+			arr.remove_at(i)
+	if arr.is_empty():
+		_tags.erase(id)
+
+
+static func _on_tag_tap(id: String) -> void:
+	if is_instance_valid(App.bus):
+		App.bus.emit("tap:" + id)
+
+
 static func make_theme() -> Theme:
 	var t := Theme.new()
 	t.default_font_size = S_BODY
