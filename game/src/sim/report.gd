@@ -156,6 +156,17 @@ static func kda(result: Dictionary) -> Dictionary:
 	return out
 
 
+## Read-only (0.7, I-06): team kills per side, {"B": int, "R": int}: the sum of the players' kills in `kda(result)`.
+## It is also kda()["team"][side]["k"] by construction; this is the score line of the Report screen.
+static func team_kills(result: Dictionary) -> Dictionary:
+	var k := kda(result)
+	var out := {"B": 0, "R": 0}
+	for side in ["B", "R"]:
+		for s in SLOTS:
+			out[side] = int(out[side]) + int(k[side][s]["k"])
+	return out
+
+
 ## Hand out `units` one at a time to indexes drawn by weight; `caps` (optional) limits each index.
 static func _draw_units(units: int, weights: Array, caps: Array, rng: Pcg32) -> Array:
 	var counts: Array = []

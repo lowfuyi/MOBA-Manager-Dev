@@ -168,6 +168,21 @@ func _ai_pick(team: String, other: String, stream: Pcg32) -> Dictionary:
 	return {"hero": best_hid, "slot": best_slot}
 
 
+## Read-only (0.7, I-06): the open slot of `team` where `hero_id` fits best, by familiarity times hero fit. The same
+## rule the Draft screen's `_actions` runs inline for its "best role" note (first open slot wins a tie).
+## {"slot": slot or "" when the team has no open slot, "score": familiarity * fit, "fam": familiarity, "fit": hero_fit}.
+func best_slot_for(team: String, hero_id: String) -> Dictionary:
+	var h: Dictionary = world.heroes[hero_id]
+	var best := {"slot": "", "score": 0.0, "fam": 0.0, "fit": 0.0}
+	for s in open_slots(team):
+		var fam := world.familiarity(lineups[team][s], hero_id)
+		var fit := world.hero_fit(h, s)
+		var f := fam * fit
+		if f > float(best["score"]) or String(best["slot"]) == "":
+			best = {"slot": s, "score": f, "fam": fam, "fit": fit}
+	return best
+
+
 ## Run every remaining step with the AI.
 func finish_with_ai() -> void:
 	while not is_done():

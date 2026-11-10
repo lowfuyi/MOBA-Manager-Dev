@@ -5,8 +5,9 @@ extends Node
 ## Also runs a save that claims a newer tutorial schema (tutorial.v = 99), which must never crash a build.
 ## Headless: godot --headless res://tests/check_save_compat.tscn  (ends with " N checks, 0 failures")
 ##
-## The "tutorial" key does not exist before I-06. Until then a missing key counts as {"state": "legacy"}; once
-## GameState writes the key, the same checks require it to be "legacy" and to survive next_season().
+## Since I-06 GameState.from_dict writes {"v": 1, "state": "legacy"} for the missing key (a 0.6 save is legacy; a
+## brand-new 0.7 save made by new_game() is "new", tested in tests/tutorial_save_tests.gd), next_season() carries the
+## key, and a key with tutorial.v = 99 is left untouched in the save and read as legacy.
 
 const FIXTURES := ["save_0_6_a.json", "save_0_6_b.json", "save_0_6_c.json", "save_0_6_d.json"]
 const TUTORIAL_STATE_SCRIPT := "res://src/tutorial/tutorial_state.gd"
@@ -40,10 +41,9 @@ func _read(name: String) -> Dictionary:
 	return data if data is Dictionary else {}
 
 
-## The tutorial state a build would act on: a missing key is a legacy save.
+## The tutorial state a build would act on (GameState.tutorial(): a missing key or an unknown higher v reads legacy).
 func _tutorial_state(gs: GameState) -> String:
-	var t = gs.d.get("tutorial", {"v": 1, "state": "legacy"})
-	return String((t as Dictionary).get("state", "legacy")) if t is Dictionary else "legacy"
+	return String(gs.tutorial().get("state", "legacy"))
 
 
 func _one(name: String, future_v: bool) -> void:
@@ -60,8 +60,12 @@ func _one(name: String, future_v: bool) -> void:
 	var gs := GameState.from_dict(w, data)
 	ok(gs.club() == String(data["club"]), label + ": club kept")
 	ok(gs.roster_players().size() == 10, label + ": roster of 10")
-	if not future_v:
-		ok(_tutorial_state(gs) == "legacy", label + ": tutorial state is legacy after load")
+	ok(_tutorial_state(gs) == "legacy", label + ": tutorial state is legacy after load")
+	ok(gs.d.has("tutorial"), label + ": from_dict wrote the tutorial key")
+	if future_v:
+		ok(int(gs.d["tutorial"]["v"]) == 99 and String(gs.d["tutorial"]["state"]) == "running", label + ": the newer build's tutorial key is left untouched")
+	else:
+		ok(int(gs.d["tutorial"]["v"]) == 1 and String(gs.d["tutorial"]["state"]) == "legacy", label + ": the missing key became {v 1, state legacy}")
 	var phase_in := String(gs.d["phase"])
 
 	# a game, if one is due
@@ -86,8 +90,7 @@ func _one(name: String, future_v: bool) -> void:
 	ok(gs2 != null and _played(gs2) == _played(gs), label + ": round trip keeps the results")
 	if gs2 == null:
 		return
-	if not future_v:
-		ok(_tutorial_state(gs2) == "legacy", label + ": tutorial state is legacy after a save and reload")
+	ok(_tutorial_state(gs2) == "legacy", label + ": tutorial state is legacy after a save and reload")
 	gs = gs2
 
 	# the rest of the season and into the next one
@@ -103,8 +106,8 @@ func _one(name: String, future_v: bool) -> void:
 	ok(String(nxt.d["phase"]) == "league" and int(nxt.d["round"]) == 0, label + ": new season opens at round 0 of the league")
 	ok(not nxt.next_game().is_empty(), label + ": the new season has a game")
 	ok(nxt.roster_players().size() >= 1 and nxt.cash() > -1.0e9, label + ": roster and cash carried")
-	if not future_v:
-		ok(_tutorial_state(nxt) == "legacy", label + ": tutorial state is legacy after next_season (carried)")
+	ok(_tutorial_state(nxt) == "legacy", label + ": tutorial state is legacy after next_season (carried)")
+	ok(int(nxt.d["tutorial"]["v"]) == (99 if future_v else 1), label + ": next_season carried the tutorial key as it was")
 	var gs3 := _roundtrip(nxt)
 	ok(gs3 != null and int(gs3.d["season"]) == prev_season + 1, label + ": reload of the new season")
 	if gs3 != null:
@@ -134,10 +137,10 @@ func _played(gs: GameState) -> int:
 	return n
 
 
-## From I-11 on: TutorialState.migrate exists, and a future schema must come back as legacy. Before that, skipped.
+## From I-06 on: TutorialState.migrate exists, and a future schema must come back as legacy.
 func _future_tutorial_state() -> void:
 	if not ResourceLoader.exists(TUTORIAL_STATE_SCRIPT):
-		print("note: ", TUTORIAL_STATE_SCRIPT, " not present yet (I-11); migrate checks skipped")
+		print("note: ", TUTORIAL_STATE_SCRIPT, " not present yet (I-06); migrate checks skipped")
 		return
 	var scr: Script = load(TUTORIAL_STATE_SCRIPT)
 	ok(scr.has_method("migrate"), "TutorialState.migrate exists")

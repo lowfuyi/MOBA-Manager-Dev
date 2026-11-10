@@ -35,6 +35,8 @@ static func new_game(w: World, club_id: String, save_seed: int, season: int = 1,
 		"form": carry.get("form", {}), "morale": carry.get("morale", {}), "bonds": carry.get("bonds", {}),
 		"ai_bond": carry.get("ai_bond", {}), "miss": carry.get("miss", {}), "was_start": carry.get("was_start", {}),
 	}
+	# 0.7: a brand-new save has not answered the guide ("new"); a carry (next season) brings its own state along
+	gs.d["tutorial"] = (carry["tutorial"] as Dictionary).duplicate(true) if carry.get("tutorial") is Dictionary else TutorialState.new_state()
 	w.fam_bonus = gs.d["fam_bonus"]
 	gs._init_bonds(not carry.has("bonds"))
 	gs._bind()
@@ -69,6 +71,14 @@ static func from_dict(w: World, data: Dictionary) -> GameState:
 		gs._init_economy({})
 	if not gs.d.has("frating"):  # saves from before Alpha 0.6: ratings start from today's team ratings
 		gs.d["frating"] = gs._initial_frating()
+	# 0.7 (build plan section 5): a missing key is a save from before the guide existed. A key from a newer build
+	# (tutorial.v above ours) is left exactly as it is in the save and read as legacy by tutorial(); every other key
+	# goes through TutorialState.migrate (malformed parts fixed, the resume rule after a kill).
+	var tut = gs.d.get("tutorial")
+	if tut == null:
+		gs.d["tutorial"] = TutorialState.legacy_state()
+	elif not gs._tutorial_is_future():
+		gs.d["tutorial"] = TutorialState.migrate(tut)
 	return gs
 
 
@@ -843,7 +853,8 @@ func next_season() -> GameState:
 			"miss": {}, "was_start": {}, "fam_bonus": d["fam_bonus"], "history": d["history"], "settings": d["settings"], "seasons_done": d["seasons_done"], "plan": plan_set(),
 			"stat_gain": (d["stat_gain"] as Dictionary).duplicate(true), "fatigue": {}, "train": d["train"],
 			"roster": roster, "fa": fa, "contracts": contracts, "cash": d["cash"], "r0": d["r0"], "ledger": d["ledger"],
-			"clock": d["clock"], "lock": d["lock"], "frating": d["frating"], "pace": pace(), "career": career_all(), "exh_n": int(d.get("exh_n", 0))}
+			"clock": d["clock"], "lock": d["lock"], "frating": d["frating"], "pace": pace(), "career": career_all(), "exh_n": int(d.get("exh_n", 0)),
+			"tutorial": (d["tutorial"] as Dictionary).duplicate(true) if d.get("tutorial") is Dictionary else TutorialState.legacy_state()}
 	var lu: Dictionary = d["lineup"]
 	var gs := GameState.new_game(world, club(), int(d["save_seed"]) + 1000 * int(d["season"]), int(d["season"]) + 1, carry)
 	gs.d["lineup"] = lu
@@ -1270,6 +1281,92 @@ func pace_add(total_s: float, watch_s: float, skipped: bool, fast: bool) -> void
 func pace_quick() -> void:
 	var p := pace()
 	p["quick"] = int(p["quick"]) + 1
+
+
+# ---------------------------------------------------------------- tutorial key, read-only helpers (0.7, I-06)
+## The tutorial state of this save (a copy; TutorialState documents the shape). A missing key, or a key written by
+## a newer build (v above TutorialState.VERSION), reads as legacy. Nothing here changes the save.
+func tutorial() -> Dictionary:
+	var t = d.get("tutorial")
+	if not (t is Dictionary) or _tutorial_is_future():
+		return TutorialState.legacy_state()
+	return (t as Dictionary).duplicate(true)
+
+
+## Store the tutorial state (a copy). Returns false, and stores nothing, when `t` is not a valid state.
+func set_tutorial(t: Dictionary) -> bool:
+	if not TutorialState.STATES.has(String(t.get("state", ""))):
+		return false
+	d["tutorial"] = t.duplicate(true)
+	return true
+
+
+func _tutorial_is_future() -> bool:
+	var t = d.get("tutorial")
+	if not (t is Dictionary):
+		return false
+	var v = (t as Dictionary).get("v", TutorialState.VERSION)
+	return (v is int or v is float) and int(v) > TutorialState.VERSION
+
+
+## The next `n` unplayed league games of the managed club, in calendar order (read-only over d["fixtures"]).
+## Each: {"id", "round", "side": "B"|"R", "opp": club id, "mine": team rating, "theirs": team rating,
+## "gap": mine - theirs, "word": "favoured"|"even"|"underdog"}. The word uses UPCOMING_EVEN rating points either way
+## (UI-PASS-2 section 6.1 suggestion; Systems Designer to confirm). Empty once the league rounds are over.
+const UPCOMING_EVEN := 2.0
+
+func upcoming(n: int) -> Array:
+	var out: Array = []
+	if n <= 0:
+		return out
+	var me := club()
+	var mine := world.team_rating(lineup())
+	for f in d["fixtures"]:   # already in calendar order
+		if out.size() >= n:
+			break
+		if f["played"] or not (f["blue"] == me or f["red"] == me):
+			continue
+		var opp: String = f["red"] if f["blue"] == me else f["blue"]
+		var theirs := world.team_rating(lineup_for(opp))
+		var gap := mine - theirs
+		out.append({"id": f["id"], "round": int(f["round"]), "side": "B" if f["blue"] == me else "R", "opp": opp,
+				"mine": mine, "theirs": theirs, "gap": gap,
+				"word": "favoured" if gap > UPCOMING_EVEN else ("underdog" if gap < -UPCOMING_EVEN else "even")})
+	return out
+
+
+## Where the managed club stands against the playoff line (the top four of the league table qualify), read-only
+## over standings(). {"state": "in"|"on"|"out"|"after", "rank", "pts", "line_pts" (pts of 4th), "gap" (points, never
+## negative), "games_left" (league games still to play)}.
+##   in    rank 1 to 4 and ahead of 5th: gap = my pts - pts of 5th
+##   on    level on points with the line (4th for ranks 5 and below, 5th for ranks 1 to 4)
+##   out   rank 5 or lower and behind 4th: gap = pts of 4th - my pts
+##   after the league rounds are over (phase is not "league")
+func cut_gap() -> Dictionary:
+	var st := standings()
+	var me := club()
+	var mine: Dictionary = {}
+	for r in st:
+		if r["club"] == me:
+			mine = r
+	var left := 0
+	for f in d["fixtures"]:
+		if not f["played"] and (f["blue"] == me or f["red"] == me):
+			left += 1
+	var p4 := int(st[3]["pts"]) if st.size() > 3 else 0
+	var p5 := int(st[4]["pts"]) if st.size() > 4 else 0
+	var rank := int(mine["rank"])
+	var pts := int(mine["pts"])
+	var out := {"state": "after", "rank": rank, "pts": pts, "line_pts": p4, "gap": 0, "games_left": left}
+	if String(d["phase"]) != "league":
+		return out
+	if rank <= 4:
+		out["gap"] = pts - p5
+		out["state"] = "in" if pts > p5 else "on"
+	else:
+		out["gap"] = p4 - pts
+		out["state"] = "out" if p4 > pts else "on"
+	return out
 
 
 func save() -> bool:
