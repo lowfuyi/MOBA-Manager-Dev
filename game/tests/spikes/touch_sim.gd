@@ -8,6 +8,8 @@ extends RefCounted
 
 var node: Node
 var vp: Viewport
+var emit_touch := true      # send the touch / drag events
+var emit_mouse := true      # send the emulated mouse events
 
 
 func _init(n: Node) -> void:
@@ -27,38 +29,44 @@ func finger(kind: String, pos: Vector2, rel: Vector2 = Vector2.ZERO) -> void:
 			t.index = 0
 			t.position = pos
 			t.pressed = true
-			vp.push_input(t, true)
+			if emit_touch:
+				vp.push_input(t, true)
 			var m := InputEventMouseButton.new()
 			m.button_index = MOUSE_BUTTON_LEFT
 			m.pressed = true
 			m.position = pos
 			m.global_position = pos
 			m.button_mask = MOUSE_BUTTON_MASK_LEFT
-			vp.push_input(m, true)
+			if emit_mouse:
+				vp.push_input(m, true)
 		"move":
 			var d := InputEventScreenDrag.new()
 			d.index = 0
 			d.position = pos
 			d.relative = rel
-			vp.push_input(d, true)
+			if emit_touch:
+				vp.push_input(d, true)
 			var mm := InputEventMouseMotion.new()
 			mm.position = pos
 			mm.global_position = pos
 			mm.relative = rel
 			mm.button_mask = MOUSE_BUTTON_MASK_LEFT
-			vp.push_input(mm, true)
+			if emit_mouse:
+				vp.push_input(mm, true)
 		"up":
 			var t2 := InputEventScreenTouch.new()
 			t2.index = 0
 			t2.position = pos
 			t2.pressed = false
-			vp.push_input(t2, true)
+			if emit_touch:
+				vp.push_input(t2, true)
 			var m2 := InputEventMouseButton.new()
 			m2.button_index = MOUSE_BUTTON_LEFT
 			m2.pressed = false
 			m2.position = pos
 			m2.global_position = pos
-			vp.push_input(m2, true)
+			if emit_mouse:
+				vp.push_input(m2, true)
 
 
 ## One drag of `delta` (total travel) from `from`, in `steps` equal moves, one frame per move, then lift.

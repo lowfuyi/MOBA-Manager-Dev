@@ -17,7 +17,8 @@ var dbg := false
 var mode := "locked"
 var card_w := 220.0
 var gap := 14.0
-var cards: Array[Button] = []
+var cards: Array = []
+var use_buttons := true
 var log_pressed: Array = []                  # card indexes whose `pressed` fired (tap detection)
 var decisions: Array = []                    # "h" / "v" per touch that reached the lock
 
@@ -28,20 +29,26 @@ var _acc := Vector2.ZERO
 var _x := 0.0
 
 
-func setup(m: String, n_cards: int, h: float) -> void:
+func setup(m: String, n_cards: int, h: float, buttons: bool = true) -> void:
 	mode = m
+	use_buttons = buttons
 	custom_minimum_size = Vector2(0, h)
 	clip_contents = true
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	_content = HBoxContainer.new()
 	_content.add_theme_constant_override("separation", int(gap))
-	_content.mouse_filter = Control.MOUSE_FILTER_PASS
+	_content.mouse_filter = Control.MOUSE_FILTER_PASS if buttons else Control.MOUSE_FILTER_IGNORE
 	for i in n_cards:
-		var b := Button.new()
-		b.text = "Card %d" % i
+		var b: Control
+		if use_buttons:
+			var bt := Button.new()
+			bt.text = "Card %d" % i
+			bt.pressed.connect(func() -> void: log_pressed.append(i))
+			b = bt
+		else:
+			b = Panel.new()
 		b.custom_minimum_size = Vector2(card_w, h)
-		b.mouse_filter = Control.MOUSE_FILTER_PASS
-		b.pressed.connect(func() -> void: log_pressed.append(i))
+		b.mouse_filter = Control.MOUSE_FILTER_PASS if use_buttons else Control.MOUSE_FILTER_IGNORE
 		_content.add_child(b)
 		cards.append(b)
 	if mode == "naive":
@@ -85,7 +92,15 @@ func _gui_input(event: InputEvent) -> void:
 			_state = 1
 			_acc = Vector2.ZERO
 		else:
+			if _state == 1 and not use_buttons:                  # released before the lock: a tap on the card under the finger
+				for i in cards.size():
+					if (cards[i] as Control).get_rect().has_point(st.position - _content.position):
+						log_pressed.append(i)
 			_state = 0
+	elif event is InputEventMouseMotion:
+		# the mouse event a phone emulates from the same drag: it must not scroll the page while the carousel owns the drag
+		if _state == 1 or _state == 2:
+			accept_event()
 	elif event is InputEventScreenDrag:
 		var sd := event as InputEventScreenDrag
 		if _state == 1:
@@ -110,7 +125,9 @@ func _gui_input(event: InputEvent) -> void:
 ## A press that turned into a drag must not become a tap on the card under the finger. Setting `disabled`
 ## clears a Button's press state (press_attempt / pressing_inside); it is set back at once, so nothing looks different.
 func _cancel_card_press() -> void:
+	if not use_buttons:
+		return
 	for b in cards:
-		b.disabled = true
+		(b as Button).disabled = true
 	for b in cards:
-		b.disabled = false
+		(b as Button).disabled = false

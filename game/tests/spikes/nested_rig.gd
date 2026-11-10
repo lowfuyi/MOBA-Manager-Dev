@@ -5,7 +5,7 @@ var page: ScrollContainer
 var carousel: Control
 
 
-func build(mode: String) -> void:
+func build(mode: String, buttons: bool = true) -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	page = ScrollContainer.new()
 	page.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -20,7 +20,7 @@ func build(mode: String) -> void:
 	top.mouse_filter = Control.MOUSE_FILTER_PASS
 	v.add_child(top)
 	carousel = load("res://tests/spikes/spike_carousel.gd").new()
-	carousel.setup(mode, 8, 200)
+	carousel.setup(mode, 8, 200, buttons)
 	v.add_child(carousel)
 	var bottom := Panel.new()
 	bottom.custom_minimum_size = Vector2(0, 2200)

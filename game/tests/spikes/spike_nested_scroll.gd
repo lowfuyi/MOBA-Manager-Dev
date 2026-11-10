@@ -10,10 +10,11 @@ func _ready() -> void:
 	await get_tree().process_frame
 	print("touchscreen available: ", DisplayServer.is_touchscreen_available())
 	var m = load("res://tests/spikes/s1_measure.gd").new(self)
-	for mode in ["naive", "locked"]:
-		var rows: Array = await m.swipe_rows(mode)
+	for cfg in [["naive", true], ["locked", true], ["locked", false]]:
+		var mode: String = cfg[0]
+		var rows: Array = await m.swipe_rows(mode, cfg[1])
 		for r in rows:
 			print("S1|", m.row_text(r))
-		var taps: Dictionary = await m.tap_rows(mode)
-		print("S1|%s taps: %s" % [mode, str(taps)])
+		var taps: Dictionary = await m.tap_rows(mode, cfg[1])
+		print("S1|%s%s taps: %s" % [mode, "+buttons" if cfg[1] else "+owned", str(taps)])
 	get_tree().quit(0)

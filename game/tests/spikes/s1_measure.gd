@@ -14,16 +14,16 @@ func _init(n: Node) -> void:
 	sim = load("res://tests/spikes/touch_sim.gd").new(n)
 
 
-func make_rig(mode: String) -> Control:
+func make_rig(mode: String, buttons: bool = true) -> Control:
 	var rig: Control = load("res://tests/spikes/nested_rig.gd").new()
 	owner_node.add_child(rig)
-	rig.build(mode)
+	rig.build(mode, buttons)
 	await sim.frames(3)
 	return rig
 
 
-func swipe_rows(mode: String) -> Array:
-	var rig: Control = await make_rig(mode)
+func swipe_rows(mode: String, buttons: bool = true) -> Array:
+	var rig: Control = await make_rig(mode, buttons)
 	var rows: Array = []
 	for dir_up in [true, false]:
 		for deg in ANGLES:
@@ -37,7 +37,7 @@ func swipe_rows(mode: String) -> Array:
 			await sim.frames(10)                          # let any inertia finish
 			var dy_exp: float = absf(cos(deg_to_rad(deg))) * DIST
 			var dx_exp: float = absf(sin(deg_to_rad(deg))) * DIST
-			rows.append({"mode": mode, "deg": deg, "dir": "up-left" if dir_up else "down-right",
+			rows.append({"mode": label(mode, buttons), "deg": deg, "dir": "up-left" if dir_up else "down-right",
 					"page_moved": absf(float(rig.page.scroll_vertical - p0)),
 					"car_moved": absf(rig.carousel.h_offset() - c0),
 					"dy_exp": dy_exp, "dx_exp": dx_exp, "vertical": deg < 45.0})
@@ -49,6 +49,10 @@ func swipe_rows(mode: String) -> Array:
 ## Pass rule for one row: a vertical swipe moves the page by at least half of its vertical travel and the carousel
 ## by no more than 2 px; a horizontal swipe moves the carousel by at least half of its horizontal travel and the
 ## page by no more than 3 px.
+static func label(mode: String, buttons: bool) -> String:
+	return mode + ("+buttons" if buttons else "+owned")
+
+
 func row_ok(r: Dictionary) -> bool:
 	if r["vertical"]:
 		return r["page_moved"] >= 0.5 * r["dy_exp"] and r["car_moved"] <= 2.0
@@ -56,20 +60,20 @@ func row_ok(r: Dictionary) -> bool:
 
 
 func row_text(r: Dictionary) -> String:
-	return "%-6s %2d deg %-10s page_moved=%5.1f (swipe dy %5.1f)  carousel_moved=%5.1f (swipe dx %5.1f)  expect=%s -> %s" % [
+	return "%-14s %2d deg %-10s page_moved=%5.1f (swipe dy %5.1f)  carousel_moved=%5.1f (swipe dx %5.1f)  expect=%s -> %s" % [
 			r["mode"], int(r["deg"]), r["dir"], r["page_moved"], r["dy_exp"], r["car_moved"], r["dx_exp"],
 			"page" if r["vertical"] else "carousel", "OK" if row_ok(r) else "FAIL"]
 
 
 ## Tap rules on the locked carousel: a plain tap, a tap with 6 px of finger jitter, and (not taps) a horizontal and
 ## a vertical swipe that start on a card. Returns {tap, jitter_tap, h_swipe, v_swipe} = list of pressed card ids.
-func tap_rows(mode: String) -> Dictionary:
-	var rig: Control = await make_rig(mode)
+func tap_rows(mode: String, buttons: bool = true) -> Dictionary:
+	var rig: Control = await make_rig(mode, buttons)
 	var out := {}
 	rig.page.scroll_vertical = 360
 	rig.carousel.set_h_offset(0.0)
 	await sim.frames(3)
-	var card: Button = rig.carousel.cards[1]
+	var card: Control = rig.carousel.cards[1]
 	var c: Vector2 = card.get_global_rect().get_center()
 	rig.carousel.log_pressed.clear()
 	await sim.tap(c)
