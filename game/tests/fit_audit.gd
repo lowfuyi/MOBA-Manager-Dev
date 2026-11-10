@@ -10,12 +10,21 @@ extends RefCounted
 ##                text room ("Playo-ffs", "Trophi/es"), a non-wrapping text wider than its room, or lines cut off.
 ##   3 button     a visible button lower than MIN_BTN (96) or narrower than MIN_BTN_W (96; the tap area).
 ##   4 text size  a Label or Button whose font is below the 24 px floor.
+##   5 orphan     a wrapped Label or Button whose last line is shorter than ORPHAN_MIN characters ('wk', '85%'): one short
+##                word or number left alone on a line, which reads as a layout accident.
+##   6 wrap at /  a wrapped text that breaks right after a '/' ('+17/' then 'wk'): the engine allows a break there, the
+##                player sees a number cut from its unit.
+##   Rules 5 and 6 are the 'hidden fit problems' (I-04): the text is not wider than its room, so rule 2 stays quiet.
+##   They re-wrap the text the way Label and Button do (TextParagraph with the same break flags), so they need no rendering.
 ## `frame_w` is the logical canvas width: 720, or 626 in large-text mode (UI.canvas_w()).
 
 const MIN_BTN := 96.0
 const MIN_BTN_W := 96.0
 const FLOOR_PX := 24
 const EPS := 1.5
+## Rule 5: a last line with fewer visible characters than this is an orphan. 4 means 'wk', 'OK' and '85%' all fail.
+## (The I-04 brief said 'shorter than 3'; the Draft slot panel orphan it names is '85%', 3 characters, so the bar is 4.)
+const ORPHAN_MIN := 4
 
 
 static func audit(root: Control, frame_w: float) -> Array:
@@ -66,6 +75,45 @@ static func _walk(n: Node, frame_w: float, out: Array, clip: Rect2) -> void:
 		_walk(ch, frame_w, out, clip)
 
 
+## The lines a wrapping Label or Button will show, as text: the same break flags the engine uses for `mode`.
+static func wrapped_lines(font: Font, size: int, text: String, room: float, mode: int) -> PackedStringArray:
+	var out := PackedStringArray()
+	if mode == TextServer.AUTOWRAP_OFF or room <= 0.0 or text == "":
+		out.append(text)
+		return out
+	var flags: int = TextServer.BREAK_MANDATORY
+	match mode:
+		TextServer.AUTOWRAP_WORD_SMART:
+			flags = TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE | TextServer.BREAK_MANDATORY
+		TextServer.AUTOWRAP_WORD:
+			flags = TextServer.BREAK_WORD_BOUND | TextServer.BREAK_MANDATORY
+		TextServer.AUTOWRAP_ARBITRARY:
+			flags = TextServer.BREAK_GRAPHEME_BOUND | TextServer.BREAK_MANDATORY
+	var tp := TextParagraph.new()
+	tp.add_string(text, font, size)
+	tp.width = room
+	tp.break_flags = flags
+	for i in tp.get_line_count():
+		var r := tp.get_line_range(i)
+		out.append(text.substr(r.x, r.y - r.x))
+	return out
+
+
+static func _check_lines(c: Control, font: Font, size: int, text: String, room: float, mode: int, out: Array) -> void:
+	var lines := wrapped_lines(font, size, text, room, mode)
+	if lines.size() < 2:
+		return
+	# 6 wrap at '/'
+	for i in lines.size() - 1:
+		if lines[i].ends_with("/"):
+			out.append("wrap at /: %s breaks after '%s' (next line '%s')" % [_name(c), lines[i].strip_edges(), lines[i + 1].strip_edges().substr(0, 12)])
+	# 5 orphan last line
+	var last := lines[lines.size() - 1].strip_edges()
+	var visible := last.replace(" ", "")
+	if visible.length() < ORPHAN_MIN:
+		out.append("orphan: %s ends with a lone '%s' on line %d of %d (room %.0f px)" % [_name(c), last, lines.size(), lines.size(), room])
+
+
 static func _check_text(c: Control, text: String, room: float, wraps: bool, out: Array) -> void:
 	if text == "":
 		return
@@ -81,6 +129,7 @@ static func _check_text(c: Control, text: String, room: float, wraps: bool, out:
 				var w := font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
 				if w > room + EPS:
 					out.append("clipped: %s word '%s' is %.0f px, room %.0f (breaks mid-word)" % [_name(c), word, w, room])
+		_check_lines(c, font, size, text, room, (c as Label).autowrap_mode if c is Label else (c as Button).autowrap_mode, out)
 	else:
 		var w := 0.0
 		for line in text.split("\n"):
