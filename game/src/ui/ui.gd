@@ -407,15 +407,18 @@ static func make_theme() -> Theme:
 
 
 const NBSP := "\u00a0"            # no-break space: the engine never wraps at it
-const WORD_JOINER := "\u2060"     # zero-width, no glyph: forbids a line break at the place it stands (checked: width 0, no box)
+const UNIT_SLASH := "\u2215"      # division slash: in Barlow, looks like "/" (a little wider), and the engine never breaks after it
+const WORD_JOINER := "\u2060"     # NOT used any more (not in Barlow: a phone's fallback font might draw a box); plain() still strips it
 static var _slash_rx: RegEx
 
 
 ## Keeps a wrapped text from breaking in the two ugly places the fit audit (tests/fit_audit.gd, rules 5 and 6) looks for:
 ## right after a "/" that joins a number and its unit ("+17/" then "wk"), and a last line with one short word or number
-## on it ("0.", "57", "85%", "-3  *"): from three words on, the last words are bound with no-break spaces until they
-## have at least TAIL_MIN visible characters (never more than 3 words or 24 characters), so the last line always has
-## something to read. Both marks are invisible; the words themselves are untouched.
+## on it ("0.", "57", "85%", "-3  *"): from three words on, the last words are bound with no-break spaces (U+00A0, in
+## Barlow, same advance as a space) until they have at least TAIL_MIN visible characters (never more than 3 words or 24
+## characters), so the last line always has something to read. A no-break space cannot bind a slash (the break is inside
+## the word), so a "/" before a letter becomes UNIT_SLASH (U+2215, also in Barlow). Every character tidy() writes is in
+## Barlow's own glyph set (tests/check_fit_legacy.gd checks every visible text against it).
 const TAIL_MIN := 6
 const TAIL_MAX := 24
 
@@ -426,7 +429,7 @@ static func tidy(text: String) -> String:
 		if _slash_rx == null:
 			_slash_rx = RegEx.new()
 			_slash_rx.compile("/(?=[A-Za-z])")
-		t = _slash_rx.sub(t, "/" + WORD_JOINER, true)
+		t = _slash_rx.sub(t, UNIT_SLASH, true)
 	var start := t.rfind("\n") + 1
 	if t.substr(start).split(" ", false).size() < 3:
 		return t    # one or two words on the last line: nothing to bind
@@ -456,10 +459,10 @@ static func tidy(text: String) -> String:
 	return t
 
 
-## The text as written: tidy()'s invisible marks taken out again (no-break spaces back to spaces, joiners removed). Use it
+## The text as written: tidy()'s marks taken out again (no-break spaces back to spaces, the unit slash back to "/"). Use it
 ## when code or a test looks for words in a Label or Button text.
 static func plain(text: String) -> String:
-	return text.replace(NBSP, " ").replace(WORD_JOINER, "")
+	return text.replace(NBSP, " ").replace(UNIT_SLASH, "/").replace(WORD_JOINER, "")
 
 
 ## A label. `weight` "" takes the weight the type scale gives that size (Bold at 48 and 40, SemiBold at 36 and 24,

@@ -20,6 +20,7 @@ var fails := 0
 var states := 0
 var variant := ""
 var only_state := ""
+var _barlow: FontFile
 
 
 func ok(cond: bool, what: String) -> void:
@@ -43,6 +44,7 @@ func look(state: String) -> void:
 		return
 	await frames(3)
 	var probs := FitAudit.audit(App.main, UI.canvas_w())
+	_missing_glyphs(App.main, probs)
 	states += 1
 	if probs.is_empty():
 		ok(true, "fit_%s_%s: clean" % [state, variant])
@@ -50,6 +52,31 @@ func look(state: String) -> void:
 		ok(false, "fit_%s_%s: %d problems" % [state, variant, probs.size()])
 		for p in probs.slice(0, 14):
 			print("     ", p)
+
+
+## Every visible Label and Button text may only use characters Barlow itself has (its own cmap, not the system fallback),
+## so tidy()'s marks cannot become boxes on a phone whose fallback font differs. "\n" is not drawn.
+func _missing_glyphs(root: Node, out: Array) -> void:
+	if _barlow == null:
+		_barlow = load("res://assets/fonts/BarlowSemiCondensed-Regular.ttf") as FontFile
+	var stack: Array = [root]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		for ch in n.get_children():
+			stack.append(ch)
+		var c := n as Control
+		if c == null or not c.is_visible_in_tree():
+			continue
+		var t := ""
+		if c is Label:
+			t = (c as Label).text
+		elif c is Button:
+			t = (c as Button).text
+		for i in t.length():
+			var u := t.unicode_at(i)
+			if u != 10 and not _barlow.has_char(u):
+				out.append("glyph: %s uses U+%04X, which Barlow does not have" % [FitAudit._name(c), u])
+				break
 
 
 func _ready() -> void:
@@ -165,9 +192,16 @@ func _controls() -> void:
 	var p12 := await _audit_of(_label_in(pace, room_pace, UI.S_SMALL, "", true))
 	ok(p12.is_empty(), "tidy: the same note through UI.tidy is clean: %s" % [p12])
 	ok(UI.tidy("Wins") == "Wins" and UI.tidy("Top lane") == "Top lane", "tidy: one or two words are left alone")
-	ok(UI.tidy("a b c").contains(UI.NBSP) and UI.tidy("+17/wk") == "+17/" + UI.WORD_JOINER + "wk", "tidy: three words bind the last two; a slash before letters gets a joiner")
+	ok(UI.tidy("a b c").contains(UI.NBSP) and UI.tidy("+17/wk") == "+17" + UI.UNIT_SLASH + "wk" and UI.plain(UI.tidy("+17/wk")) == "+17/wk", "tidy: three words bind the last two; a slash before letters becomes the unit slash, and plain() undoes it")
+	var probe: Array = []
+	var gl := Label.new()
+	gl.text = UI.tidy("Sponsor 282/wk  -  Wages 265/wk  =  +17/wk and one more line") + "\u2060"
+	add_child(gl)
+	_missing_glyphs(self, probe)
+	gl.queue_free()
+	ok(probe.size() == 1 and String(probe[0]).contains("U+2060"), "glyph check negative control: U+2060 is flagged, tidy()'s own marks are not: %s" % [probe])
 	var spaced := UI.tidy("Ratio 88 / 91 now")
-	ok(spaced.begins_with("Ratio 88 ") and not spaced.contains(UI.WORD_JOINER) and spaced.replace(UI.NBSP, " ") == "Ratio 88 / 91 now", "tidy: a spaced slash gets no joiner, and only spaces change (to no-break spaces)")
+	ok(spaced.begins_with("Ratio 88 ") and not spaced.contains(UI.UNIT_SLASH) and spaced.replace(UI.NBSP, " ") == "Ratio 88 / 91 now", "tidy: a spaced slash is left alone, and only spaces change (to no-break spaces)")
 	ok(UI.tidy("Gravenstone Bulwark  their best 77").replace(UI.NBSP, " ") == "Gravenstone Bulwark  their best 77" and UI.tidy("Gravenstone Bulwark  their best 77").contains("best" + UI.NBSP + "77"), "tidy: 'best 77' is bound so the 77 cannot stand alone")
 	ok(UI.tidy("Soldor  -  Top  -  tired -3  *").contains("-3" + UI.NBSP + UI.NBSP + "*"), "tidy: '-3  *' is bound as one tail, double space included")
 	ok(UI.tidy("line one is here\nlast words") == "line one is here\nlast words", "tidy: a last line of two words is not bound to the line before")
