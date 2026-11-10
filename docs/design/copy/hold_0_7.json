@@ -14,5 +14,9 @@
   "about.test.b": {
     "release_in": "I-24",
     "reason": "New tester questions ask about the guided first game, help on every screen, lessons and the glossary; same dependency as about.included.b."
+  },
+  "chem.pentagon_hint": {
+    "release_in": "Chemistry line styles built (UI pass)",
+    "reason": "New text names solid, dashed and dotted lines; the Chemistry screen draws them only after the UI pass. Until then the old text (Greener line) stays."
   }
 }

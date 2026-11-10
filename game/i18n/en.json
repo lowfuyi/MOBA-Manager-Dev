@@ -430,10 +430,10 @@
   "chem.training": "Open training",
   "hub.chemistry": "Team chemistry",
   "role.short.top": "Top",
-  "role.short.jg": "Jg",
+  "role.short.jg": "Jungle",
   "role.short.mid": "Mid",
   "role.short.bot": "Bot",
-  "role.short.sup": "Sup",
+  "role.short.sup": "Support",
   "train.scrim_btn": "Team scrim (builds bonds, no stat growth)",
   "train.f.scrim": "team scrim",
   "mood.hot": "in form",
@@ -1167,5 +1167,8 @@
   "tut.ch.4": "The draft",
   "tut.ch.5": "Plan and watch",
   "tut.ch.6": "The result",
-  "tut.ch.7": "The league"
+  "tut.ch.7": "The league",
+  "player.tab.overview": "Overview",
+  "player.tab.stats": "Stats",
+  "player.tab.career": "Career"
 }
