@@ -1,26 +1,30 @@
-extends Node
-## Performance probe and gate (PERF-BUDGET.md 7, build plan 3.3 and 6). Visits the six main screens of the real
-## game, waits until a frame is drawn, and prints one line per screen:
-##   PERF|<state>|screen_nodes=N|visible=N|tree_nodes=N|draw_calls=N|objects=N|tex_mem=BYTES|vid_mem=BYTES|frame_ms=F
-## It then FAILS (exit 1) when a screen is over a hard limit: nodes 200, draw calls 100, texture memory 48 MB.
-## Needs a renderer, so run under Xvfb with software OpenGL, never in the headless loop (headless draws nothing,
-## so the probe says SKIPPED there and exits 0):
+extends "res://tests/ui_shots.gd"
+## Performance probe and gate (PERF-BUDGET.md 3.1a and 7, build plan 3.3, 6 and I-00c). It IS the screenshot tour
+## (tests/ui_shots.gd, every state of the real game on a fixed-seed save: new states added to the tour appear here
+## by themselves), with shot() replaced by a measurement. It prints one line per state:
+##   PERF|<state>|screen_nodes=N|visible=N|tree_nodes=N|draw_calls=N|objects=N|tex_mem=B|vid_mem=B|shadows=N|glows=N|frame_ms=F
+## and judges each against tests/perf_allowances.json through tests/perf_gate.gd (the judging logic, tested headless
+## in tests/perf_gate_tests.gd): legacy rows are limits (ratchet), redesigned screens meet the target or a waiver,
+## a state with no row is held to the hard limits and printed NO ROW, "tighten to N" is printed when a row is 10 percent
+## or more above what the state now needs. Exit 1 on any failure.
+## Needs a renderer, so run under Xvfb with software OpenGL; headless draws nothing, so the probe says SKIPPED there:
 ##   xvfb-run -a -s "-screen 0 720x1280x24" godot --rendering-driver opengl3 res://tests/perf_baseline.tscn
+## Env PERF_ALLOWANCES=<path> reads another allowance file (used for negative controls). Env PERF_TABLE=1 also prints
+## ready-to-paste JSON rows at the measured values (for a re-baseline).
 ## Numbers are from this computer (llvmpipe). Node, draw-call and memory counts carry over to a phone; frame_ms does not.
 
-const HARD_NODES := 200
-const HARD_DRAWS := 100
-const HARD_TEX_BYTES := 48 * 1024 * 1024
-const TARGET_NODES := 120
-const TARGET_DRAWS := 60
-const TARGET_TEX_BYTES := 32 * 1024 * 1024
+const Gate = preload("res://tests/perf_gate.gd")
+const ALLOWANCES := "res://tests/perf_allowances.json"
 
+var data: Dictionary = {}
+var table_ok := false
+var table_problems: Array = []
 var rows: Array = []
-var over: Array = []
-
-
-func cur() -> Control:
-	return App.main._current
+var fails: Array = []
+var visited: Array = []
+var no_row := 0
+var over_target := 0
+var tighten := 0
 
 
 func _count(n: Node) -> Array:
@@ -33,29 +37,40 @@ func _count(n: Node) -> Array:
 	return [total, vis]
 
 
-func probe(state: String) -> void:
+func shot(name: String) -> void:
 	for i in 3:
 		await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	var sc := _count(cur())
 	var draws := int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
+	var objs := int(Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME))
 	var tex := int(Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED))
+	var vid := int(Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED))
+	var sh := Gate.count_shadows(cur())
 	var t0 := Time.get_ticks_usec()
 	for i in 10:
 		await get_tree().process_frame
 	var frame_ms := float(Time.get_ticks_usec() - t0) / 10000.0
-	var row := {"state": state, "nodes": sc[0], "visible": sc[1], "tree": get_tree().get_node_count(), "draws": draws,
-			"objects": int(Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)), "tex": tex,
-			"vid": int(Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)), "frame_ms": frame_ms}
-	rows.append(row)
-	print("PERF|%s|screen_nodes=%d|visible=%d|tree_nodes=%d|draw_calls=%d|objects=%d|tex_mem=%d|vid_mem=%d|frame_ms=%.1f" % [
-			state, row["nodes"], row["visible"], row["tree"], row["draws"], row["objects"], row["tex"], row["vid"], row["frame_ms"]])
-	if int(row["nodes"]) > HARD_NODES:
-		over.append("%s: %d nodes (hard limit %d)" % [state, row["nodes"], HARD_NODES])
-	if draws > HARD_DRAWS:
-		over.append("%s: %d draw calls (hard limit %d)" % [state, draws, HARD_DRAWS])
-	if tex > HARD_TEX_BYTES:
-		over.append("%s: %d bytes of texture memory (hard limit %d)" % [state, tex, HARD_TEX_BYTES])
+	var m := {"nodes": sc[0], "draws": draws, "canvas": objs, "tex": tex, "vid": vid, "tree": get_tree().get_node_count(),
+			"shadows": sh["shadows"], "glows": sh["glows"]}
+	var j: Dictionary = Gate.judge(name, m, data)
+	visited.append(name)
+	rows.append(m)
+	print("PERF|%s|screen_nodes=%d|visible=%d|tree_nodes=%d|draw_calls=%d|objects=%d|tex_mem=%d|vid_mem=%d|shadows=%d|glows=%d|frame_ms=%.1f" % [
+			name, sc[0], sc[1], m["tree"], draws, objs, tex, vid, sh["shadows"], sh["glows"], frame_ms])
+	for note in j["notes"]:
+		print("PERF NOTE|%s|%s" % [name, note])
+		if String(note).begins_with("NO ROW"):
+			no_row += 1
+		elif String(note).begins_with("tighten"):
+			tighten += 1
+	if j["over_target"]:
+		over_target += 1
+	for f in j["fails"]:
+		fails.append(f)
+	if OS.get_environment("PERF_TABLE") != "":
+		print("ROW|\"%s\": {\"status\": \"legacy\", \"measured\": {\"draws\": %d, \"nodes\": %d}, \"draws\": %d, \"nodes\": %d}" % [
+				name, draws, sc[0], Gate.allowance_for(draws), Gate.allowance_for(sc[0])])
 
 
 func _ready() -> void:
@@ -63,66 +78,36 @@ func _ready() -> void:
 		print("PERF|SKIPPED|headless renderer draws nothing; run under xvfb-run with --rendering-driver opengl3")
 		get_tree().quit(0)
 		return
+	as_module = true
+	var path := OS.get_environment("PERF_ALLOWANCES")
+	if path == "":
+		path = ALLOWANCES
+	var loaded: Dictionary = Gate.load_file(path)
+	data = loaded["data"]
+	table_ok = loaded["ok"]
+	table_problems = loaded["problems"]
+	for p in table_problems:
+		print("PERF TABLE|", p)
+		fails.append("allowance table: " + String(p))
 	await get_tree().process_frame
-	await _run()
-	var soft := 0
-	for r in rows:
-		if int(r["nodes"]) > TARGET_NODES or int(r["draws"]) > TARGET_DRAWS or int(r["tex"]) > TARGET_TEX_BYTES:
-			soft += 1
-	print("perf: %d screens, %d over a target (nodes %d, draw calls %d, texture %d MB), %d over a hard limit" % [
-			rows.size(), soft, TARGET_NODES, TARGET_DRAWS, TARGET_TEX_BYTES / 1048576, over.size()])
-	for o in over:
-		print("PERF FAIL: ", o)
+	await _tour()
+	var min_states := int(data.get("min_states", 6))
+	if rows.size() < min_states:
+		fails.append("only %d states visited, the allowance file expects at least %d (did the tour stop early?)" % [rows.size(), min_states])
+	for s in Gate.stale_rows(data, visited):
+		print("PERF NOTE|%s|STALE ROW (the tour no longer visits this state; delete the row or fix the name)" % s)
+	var fc := UI.font_cache_size()
+	var fj: Dictionary = Gate.judge_font_cache(fc, data)
+	print("PERF|font_cache|variations=%d" % fc)
+	if fj["fail"] != "":
+		fails.append(fj["fail"])
+	if fj["over_target"]:
+		over_target += 1
+	print("perf: %d states, %d over a target, %d without a row, %d rows to tighten, %d failures" % [
+			rows.size(), over_target, no_row, tighten, fails.size()])
+	for f in fails:
+		print("PERF FAIL: ", f)
+	App.set_large_text(false)
+	App.set_colorblind(false)
 	GameState.delete_save()
-	get_tree().quit(1 if (not over.is_empty() or rows.size() != 6) else 0)
-
-
-## The six screens of UI-PASS-2: Home, Squad, Draft, Game plan, Match report, Standings (the Alpha 0.6 versions).
-func _run() -> void:
-	GameState.delete_save()
-	var main: Control = load("res://scenes/main.tscn").instantiate()
-	add_child(main)
-	UI.animate = false
-	await get_tree().process_frame
-	# fixed seed (the club screen seeds from the clock) so every run measures the same game
-	App.gs = GameState.new_game(App.world, App.world.club_ids[5], 20261109)
-	App.autosave()
-	App.go(ScreenHub.new())
-	await probe("home")
-	var rs := ScreenRoster.new("hub")
-	App.go(rs)
-	await probe("squad")
-	var g: Dictionary = App.gs.next_game()
-	var d := ScreenDraft.new(g)
-	App.go(d)
-	# first turn of the managed club that is a ban (the "ban step" of PERF-BUDGET.md 2)
-	var n := 0
-	while not d.draft.is_done() and n < 100:
-		n += 1
-		var c: Dictionary = d.draft.current()
-		if c["team"] == d.my_side and c["kind"] == "ban":
-			break
-		if c["team"] == d.my_side:
-			d._on_hero(d.draft.avail[3], "pick")
-			d._apply({"hero": d._sel_hero, "slot": d.draft.open_slots(d.my_side)[0]})
-		else:
-			d._process(5.0)
-	await probe("draft")
-	d._auto_rest()
-	var gp := ScreenGamePlan.new(g, d.draft)
-	App.go(gp)
-	gp._coach()
-	gp._set_tab("behind_early")
-	gp._toggle_trigger()
-	gp._set_value("r", 100)
-	await probe("game_plan")
-	gp.go_back()
-	d = cur()
-	d._start_match()
-	var m: ScreenMatch = cur()
-	m._skip()
-	m._continue()
-	await probe("report")
-	cur()._leave()
-	App.go(ScreenStandings.new())
-	await probe("standings")
+	get_tree().quit(1 if not fails.is_empty() else 0)

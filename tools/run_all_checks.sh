@@ -49,12 +49,14 @@ if [ -n "$G" ] && [ -x "$G" ]; then
   want=$(grep '^GOLDEN_SHA256=' tools/check_fast.sh | cut -d= -f2)
   got=$(cd game/tests/golden && LC_ALL=C sha256sum $(ls | LC_ALL=C sort) | sha256sum | cut -d' ' -f1)
   if [ "$got" = "$want" ]; then echo "golden vectors unchanged"; else echo "FAIL: golden vectors changed ($got, recorded $want)"; fail=1; fi
-  # Perf gate (PERF-BUDGET.md): needs a renderer, so Xvfb with software OpenGL. Hard limits fail the run.
+  # Perf gate (PERF-BUDGET.md 3.1a): needs a renderer, so Xvfb with software OpenGL. Visits the 49 tour states and judges
+  # them against game/tests/perf_allowances.json (legacy rows are limits, no row = hard limits, redesigned = target or
+  # waiver). Prints NO ROW and "tighten to N" notes. Any PERF FAIL line, a missing summary line or a nonzero count fails.
   if command -v xvfb-run >/dev/null 2>&1; then
     out=$(cd game && timeout 600 xvfb-run -a -s "-screen 0 720x1280x24" "$G" --rendering-driver opengl3 res://tests/perf_baseline.tscn 2>&1)
-    echo "$out" | grep -E "^PERF\||^perf:"
+    echo "$out" | grep -E "^PERF\||^PERF NOTE|^PERF TABLE|^perf:"
     echo "$out" | grep -q "PERF FAIL" && fail=1
-    echo "$out" | grep -q "^perf: 6 screens" || fail=1
+    echo "$out" | grep -qE "^perf: [0-9]+ states, .*, 0 failures$" || fail=1
   else
     echo "SKIPPED: perf gate (no xvfb-run)"
   fi

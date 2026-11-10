@@ -1,0 +1,500 @@
+{
+ "version": 1,
+ "about": "Per-screen allowances for the perf gate (docs/design/PERF-BUDGET.md 3.1a). Read by tests/perf_baseline.gd, judged by tests/perf_gate.gd. Allowance = measured + 10 percent, rounded up to the next 5 (draws and nodes only). Fixed-seed run under Xvfb opengl3 (llvmpipe), 2026-11-10, after I-02. Rules: legacy rows only go down; the two re-baselines are after I-04 and after I-22 (reset 'measured' and the allowances, every change next to its old value in the commit); a raise outside them needs a 'raise' {reason, approved_by}. When an increment redesigns a screen, change its rows to {status: redesigned, since: I-xx} (target 60 draw calls / 120 nodes, or a 'waiver' {draws?, nodes?, reason, approved_by} never above the hard limit). A state with no row is held to the hard limits and printed NO ROW.",
+ "min_states": 49,
+ "hard": {
+  "draws": 100,
+  "nodes": 200,
+  "canvas": 1200,
+  "tex_bytes": 50331648,
+  "vid_bytes": 67108864,
+  "tree": 250,
+  "shadows": 6,
+  "glows": 2,
+  "font_cache": 16
+ },
+ "target": {
+  "draws": 60,
+  "nodes": 120,
+  "canvas": 700,
+  "tex_bytes": 33554432,
+  "vid_bytes": 50331648,
+  "font_cache": 12
+ },
+ "canvas_target_exceptions": [
+  "02_about",
+  "08f_chemistry_lower"
+ ],
+ "rows": {
+  "01_title": {
+   "status": "legacy",
+   "measured": {
+    "draws": 8,
+    "nodes": 10
+   },
+   "draws": 10,
+   "nodes": 15
+  },
+  "02_about": {
+   "status": "legacy",
+   "measured": {
+    "draws": 12,
+    "nodes": 23
+   },
+   "draws": 15,
+   "nodes": 30
+  },
+  "03_clubselect": {
+   "status": "legacy",
+   "measured": {
+    "draws": 27,
+    "nodes": 58
+   },
+   "draws": 30,
+   "nodes": 65
+  },
+  "04_hub": {
+   "status": "legacy",
+   "leaves_with": "I-15",
+   "measured": {
+    "draws": 45,
+    "nodes": 60
+   },
+   "draws": 50,
+   "nodes": 70
+  },
+  "04b_hub_lower": {
+   "status": "legacy",
+   "leaves_with": "I-15",
+   "measured": {
+    "draws": 53,
+    "nodes": 60
+   },
+   "draws": 60,
+   "nodes": 70
+  },
+  "04d_practice": {
+   "status": "legacy",
+   "measured": {
+    "draws": 40,
+    "nodes": 31
+   },
+   "draws": 45,
+   "nodes": 35
+  },
+  "04c_tab_plan": {
+   "status": "legacy",
+   "measured": {
+    "draws": 30,
+    "nodes": 31
+   },
+   "draws": 35,
+   "nodes": 35
+  },
+  "04c_tab_club": {
+   "status": "legacy",
+   "measured": {
+    "draws": 29,
+    "nodes": 30
+   },
+   "draws": 35,
+   "nodes": 35
+  },
+  "04c_tab_more": {
+   "status": "legacy",
+   "measured": {
+    "draws": 39,
+    "nodes": 44
+   },
+   "draws": 45,
+   "nodes": 50
+  },
+  "05_roster": {
+   "status": "legacy",
+   "leaves_with": "I-19",
+   "measured": {
+    "draws": 34,
+    "nodes": 36
+   },
+   "draws": 40,
+   "nodes": 40
+  },
+  "06_roster_picker": {
+   "status": "legacy",
+   "leaves_with": "I-19",
+   "measured": {
+    "draws": 36,
+    "nodes": 49
+   },
+   "draws": 40,
+   "nodes": 55
+  },
+  "07_roster_detail": {
+   "status": "legacy",
+   "leaves_with": "I-19",
+   "measured": {
+    "draws": 34,
+    "nodes": 94
+   },
+   "draws": 40,
+   "nodes": 105
+  },
+  "07b_roster_release": {
+   "status": "legacy",
+   "leaves_with": "I-19",
+   "measured": {
+    "draws": 34,
+    "nodes": 96
+   },
+   "draws": 40,
+   "nodes": 110
+  },
+  "07c_finance": {
+   "status": "legacy",
+   "measured": {
+    "draws": 31,
+    "nodes": 26
+   },
+   "draws": 35,
+   "nodes": 30
+  },
+  "07d_free_agents": {
+   "status": "legacy",
+   "measured": {
+    "draws": 36,
+    "nodes": 55
+   },
+   "draws": 40,
+   "nodes": 65
+  },
+  "07e_negotiation_full": {
+   "status": "legacy",
+   "measured": {
+    "draws": 32,
+    "nodes": 94
+   },
+   "draws": 40,
+   "nodes": 105
+  },
+  "07f_negotiation_refused": {
+   "status": "legacy",
+   "measured": {
+    "draws": 32,
+    "nodes": 94
+   },
+   "draws": 40,
+   "nodes": 105
+  },
+  "08_prematch": {
+   "status": "legacy",
+   "measured": {
+    "draws": 21,
+    "nodes": 33
+   },
+   "draws": 25,
+   "nodes": 40
+  },
+  "08b_training": {
+   "status": "legacy",
+   "measured": {
+    "draws": 42,
+    "nodes": 36
+   },
+   "draws": 50,
+   "nodes": 40
+  },
+  "08c_training_picker": {
+   "status": "legacy",
+   "measured": {
+    "draws": 42,
+    "nodes": 51
+   },
+   "draws": 50,
+   "nodes": 60
+  },
+  "08d_training_heroes": {
+   "status": "legacy",
+   "measured": {
+    "draws": 42,
+    "nodes": 82
+   },
+   "draws": 50,
+   "nodes": 95
+  },
+  "08e_chemistry": {
+   "status": "legacy",
+   "measured": {
+    "draws": 77,
+    "nodes": 114
+   },
+   "draws": 85,
+   "nodes": 130
+  },
+  "08f_chemistry_lower": {
+   "status": "legacy",
+   "measured": {
+    "draws": 149,
+    "nodes": 114
+   },
+   "draws": 165,
+   "nodes": 130
+  },
+  "09_draft_start": {
+   "status": "legacy",
+   "leaves_with": "I-16",
+   "measured": {
+    "draws": 10,
+    "nodes": 35
+   },
+   "draws": 15,
+   "nodes": 40
+  },
+  "10_draft_ban_2": {
+   "status": "legacy",
+   "leaves_with": "I-16",
+   "measured": {
+    "draws": 38,
+    "nodes": 81
+   },
+   "draws": 45,
+   "nodes": 90
+  },
+  "10_draft_slotpanel_4": {
+   "status": "legacy",
+   "leaves_with": "I-16",
+   "measured": {
+    "draws": 26,
+    "nodes": 26
+   },
+   "draws": 30,
+   "nodes": 30
+  },
+  "10_draft_slotpanel_5": {
+   "status": "legacy",
+   "leaves_with": "I-16",
+   "measured": {
+    "draws": 22,
+    "nodes": 25
+   },
+   "draws": 25,
+   "nodes": 30
+  },
+  "10_draft_slotpanel_8": {
+   "status": "legacy",
+   "leaves_with": "I-16",
+   "measured": {
+    "draws": 20,
+    "nodes": 24
+   },
+   "draws": 25,
+   "nodes": 30
+  },
+  "10_draft_slotpanel_9": {
+   "status": "legacy",
+   "leaves_with": "I-16",
+   "measured": {
+    "draws": 18,
+    "nodes": 23
+   },
+   "draws": 20,
+   "nodes": 30
+  },
+  "11_draft_done": {
+   "status": "legacy",
+   "leaves_with": "I-16",
+   "measured": {
+    "draws": 13,
+    "nodes": 19
+   },
+   "draws": 15,
+   "nodes": 25
+  },
+  "11b_gameplan": {
+   "status": "legacy",
+   "leaves_with": "I-17",
+   "measured": {
+    "draws": 34,
+    "nodes": 131
+   },
+   "draws": 40,
+   "nodes": 145
+  },
+  "11c_gameplan_trigger": {
+   "status": "legacy",
+   "leaves_with": "I-17",
+   "measured": {
+    "draws": 26,
+    "nodes": 133
+   },
+   "draws": 30,
+   "nodes": 150
+  },
+  "12_match_mid": {
+   "status": "legacy",
+   "leaves_with": "arena 0.8",
+   "measured": {
+    "draws": 12,
+    "nodes": 21
+   },
+   "draws": 15,
+   "nodes": 25
+  },
+  "13_match_end": {
+   "status": "legacy",
+   "leaves_with": "arena 0.8",
+   "measured": {
+    "draws": 10,
+    "nodes": 26
+   },
+   "draws": 15,
+   "nodes": 30
+  },
+  "14_report_top": {
+   "status": "legacy",
+   "leaves_with": "I-18",
+   "measured": {
+    "draws": 20,
+    "nodes": 153
+   },
+   "draws": 25,
+   "nodes": 170
+  },
+  "15_report_mid": {
+   "status": "legacy",
+   "leaves_with": "I-18",
+   "measured": {
+    "draws": 44,
+    "nodes": 153
+   },
+   "draws": 50,
+   "nodes": 170
+  },
+  "15b_report_lines": {
+   "status": "legacy",
+   "leaves_with": "I-18",
+   "measured": {
+    "draws": 49,
+    "nodes": 153
+   },
+   "draws": 55,
+   "nodes": 170
+  },
+  "16_standings": {
+   "status": "legacy",
+   "leaves_with": "I-20",
+   "measured": {
+    "draws": 29,
+    "nodes": 82
+   },
+   "draws": 35,
+   "nodes": 95
+  },
+  "16b_standings_form": {
+   "status": "legacy",
+   "leaves_with": "I-20",
+   "measured": {
+    "draws": 31,
+    "nodes": 61
+   },
+   "draws": 35,
+   "nodes": 70
+  },
+  "17_standings_results": {
+   "status": "legacy",
+   "leaves_with": "I-20",
+   "measured": {
+    "draws": 27,
+    "nodes": 16
+   },
+   "draws": 30,
+   "nodes": 20
+  },
+  "18_settings": {
+   "status": "legacy",
+   "measured": {
+    "draws": 39,
+    "nodes": 65
+   },
+   "draws": 45,
+   "nodes": 75
+  },
+  "19_hub_after": {
+   "status": "legacy",
+   "leaves_with": "I-15",
+   "measured": {
+    "draws": 45,
+    "nodes": 45
+   },
+   "draws": 50,
+   "nodes": 50
+  },
+  "19b_trophies": {
+   "status": "legacy",
+   "leaves_with": "I-20",
+   "measured": {
+    "draws": 32,
+    "nodes": 23
+   },
+   "draws": 40,
+   "nodes": 30
+  },
+  "19c_roster_career": {
+   "status": "legacy",
+   "leaves_with": "I-19",
+   "measured": {
+    "draws": 42,
+    "nodes": 112
+   },
+   "draws": 50,
+   "nodes": 125
+  },
+  "19d_roster_career_lower": {
+   "status": "legacy",
+   "leaves_with": "I-19",
+   "measured": {
+    "draws": 37,
+    "nodes": 112
+   },
+   "draws": 45,
+   "nodes": 125
+  },
+  "19f_roster_career_bottom": {
+   "status": "legacy",
+   "leaves_with": "I-19",
+   "measured": {
+    "draws": 50,
+    "nodes": 112
+   },
+   "draws": 55,
+   "nodes": 125
+  },
+  "19g_roster_career_log": {
+   "status": "legacy",
+   "leaves_with": "I-19",
+   "measured": {
+    "draws": 64,
+    "nodes": 112
+   },
+   "draws": 75,
+   "nodes": 125
+  },
+  "19e_practice": {
+   "status": "legacy",
+   "measured": {
+    "draws": 18,
+    "nodes": 11
+   },
+   "draws": 20,
+   "nodes": 15
+  },
+  "20_season_end": {
+   "status": "legacy",
+   "measured": {
+    "draws": 19,
+    "nodes": 50
+   },
+   "draws": 25,
+   "nodes": 55
+  }
+ }
+}

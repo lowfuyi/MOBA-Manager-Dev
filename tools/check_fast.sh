@@ -2,9 +2,10 @@
 # Fast check loop (build plan 3.3). Run after every change. Usage: tools/check_fast.sh [path-to-godot-binary]
 # Godot binary: first argument or $GODOT (required). About 2 to 3 minutes. The full 25-minute check is
 # tools/run_all_checks.sh. Renderer-only checks (perf gate, screenshots) are NOT here: they need Xvfb.
-#   1 validate_data.py, check_strings.py (0 unknown keys)
+#   1 validate_data.py, check_strings.py (0 unknown keys), pytest tools (tools/test_*.py)
 #   2 godot --headless --import (new class_name files)
-#   3 run_tests.gd: logic, golden vectors, string and data tests, every tests/*_tests.gd
+#   3 run_tests.gd: logic, golden vectors, string and data tests, every tests/*_tests.gd (this includes
+#     perf_gate_tests.gd: the perf allowance logic and tests/perf_allowances.json; the probe itself needs Xvfb)
 #   4 ui_smoke.tscn, then every tests/check_*.tscn (each ends " N checks, 0 failures", no engine errors)
 #   5 touch scenes (ui_touch.tscn and every tests/check_touch_*.tscn) with override.cfg present, then removed
 #   6 golden vectors: sha256 of game/tests/golden/* equals the value recorded below (src/sim and sim data
@@ -52,6 +53,7 @@ godot_run() {
 echo "== data and strings"
 step "validate_data.py" python3 tools/validate_data.py
 step "check_strings.py" bash -c 'python3 tools/check_strings.py | tee /dev/stderr | grep -q "^strings OK"'
+step "pytest tools" python3 -m pytest -q tools
 
 echo "== import"
 (cd game && timeout 600 "$G" --headless --import >/dev/null 2>&1) || { note "FAIL  godot --import"; fail=1; }
