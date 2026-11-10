@@ -2,7 +2,7 @@ extends Node
 ## Autoload "App": shared game objects and screen navigation.
 
 const VERSION_LABEL := "0.6.0 alpha"
-const LARGE_SCALE := 1.15
+const LARGE_SCALE := UI.LARGE_SCALE    # one number, kept in ui.gd with the other tokens
 const SETTINGS_PATH := "user://settings.cfg"
 
 var world: World
@@ -37,6 +37,7 @@ func large_text() -> bool:
 
 
 func apply_large_text(v: bool) -> void:
+	UI.set_large(v)    # so code that measures the frame knows the logical width (UI.canvas_w(): 720 or 626)
 	var win := get_window()
 	if win != null:
 		win.content_scale_factor = LARGE_SCALE if v else 1.0

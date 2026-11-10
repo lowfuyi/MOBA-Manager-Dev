@@ -78,8 +78,8 @@ func _rebuild() -> void:
 	var side_name := Strings.t("hub.side.blue" if cur["team"] == "B" else "hub.side.red")
 	var what := Strings.t("draft.kind." + cur["kind"])
 	var row := UI.hbox()
-	var back := UI.button("<", go_back, "normal", 64)
-	back.custom_minimum_size = Vector2(80, 64)
+	var back := UI.button("<", go_back, "normal", UI.BTN_H)
+	back.custom_minimum_size = Vector2(UI.BTN_H, UI.BTN_H)
 	back.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	row.add_child(back)
 	if mine:

@@ -27,7 +27,7 @@ func _rebuild() -> void:
 	var cb := CheckButton.new()
 	cb.text = Strings.t("settings.quick")
 	cb.button_pressed = App.gs.is_quick()
-	cb.custom_minimum_size = Vector2(0, 80)
+	cb.custom_minimum_size = Vector2(0, UI.BTN_H)
 	cb.focus_mode = Control.FOCUS_NONE
 	cb.mouse_filter = Control.MOUSE_FILTER_PASS
 	cb.toggled.connect(func(v): App.gs.set_quick(v); App.autosave())
@@ -37,7 +37,7 @@ func _rebuild() -> void:
 	var ab := CheckButton.new()
 	ab.text = Strings.t("settings.animate")
 	ab.button_pressed = UI.animate
-	ab.custom_minimum_size = Vector2(0, 80)
+	ab.custom_minimum_size = Vector2(0, UI.BTN_H)
 	ab.focus_mode = Control.FOCUS_NONE
 	ab.mouse_filter = Control.MOUSE_FILTER_PASS
 	ab.toggled.connect(func(v): App.set_animate(v))
@@ -76,7 +76,7 @@ func _toggle(text: String, on: bool, cb: Callable) -> CheckButton:
 	var t := CheckButton.new()
 	t.text = text
 	t.button_pressed = on
-	t.custom_minimum_size = Vector2(0, 80)
+	t.custom_minimum_size = Vector2(0, UI.BTN_H)
 	t.focus_mode = Control.FOCUS_NONE
 	t.mouse_filter = Control.MOUSE_FILTER_PASS
 	t.toggled.connect(cb)

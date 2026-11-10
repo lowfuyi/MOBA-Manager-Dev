@@ -100,8 +100,8 @@ func _cell(text: String, bg: Color, fg: Color) -> PanelContainer:
 	pc.custom_minimum_size = Vector2(72, 64)
 	pc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pc.mouse_filter = Control.MOUSE_FILTER_PASS
-	pc.add_theme_stylebox_override("panel", UI.box(bg, 8, 4))
-	var l := UI.label(text, 24, fg, HORIZONTAL_ALIGNMENT_CENTER)
+	pc.add_theme_stylebox_override("panel", UI.box(bg, 8, 2))    # slim padding and Medium weight: "Support" is 77 px, the cell has 79 at large text
+	var l := UI.label(text, UI.S_CAPTION, fg, HORIZONTAL_ALIGNMENT_CENTER, "Medium")
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	pc.add_child(l)
 	return pc

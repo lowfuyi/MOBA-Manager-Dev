@@ -13,5 +13,7 @@ static func run(ctx) -> void:
 	ctx.add_child(tour)
 	await tour._tour()
 	ctx.count += tour.shots_taken
+	for p in tour.fit_problems:
+		ctx.problems.append("fit " + String(p))
 	tour.queue_free()
 	await ctx.get_tree().process_frame

@@ -5,10 +5,13 @@ extends Node
 var dir := "/tmp/shots"
 ## Set by tests/shots/shots_baseline.gd (the screenshot matrix runs this tour as a module): no auto-start and no
 ## quit in _ready, picture names get prefix and suffix, and the matrix owns the large-text and colour-blind switches.
+const FitAudit = preload("res://tests/fit_audit.gd")
 var as_module := false
 var prefix := ""
 var suffix := ""
 var shots_taken := 0
+## Fit audit (tests/fit_audit.gd) of every state, run on the same frame as the picture: one line per problem.
+var fit_problems: Array = []
 
 
 func cur() -> Control:
@@ -19,6 +22,9 @@ func shot(name: String) -> void:
 	for i in 3:
 		await get_tree().process_frame
 	await RenderingServer.frame_post_draw
+	for p in FitAudit.audit(App.main, UI.canvas_w()):
+		fit_problems.append("%s%s%s: %s" % [prefix, name, suffix, p])
+		print("FIT|%s%s%s|%s" % [prefix, name, suffix, p])
 	var img := get_viewport().get_texture().get_image()
 	img.save_png("%s/%s%s%s.png" % [dir, prefix, name, suffix])
 	shots_taken += 1
@@ -60,7 +66,8 @@ func _ready() -> void:
 	await _tour()
 	App.set_large_text(false)
 	App.set_colorblind(false)
-	get_tree().quit(0)
+	print("fit: %d states, %d problems" % [shots_taken, fit_problems.size()])
+	get_tree().quit(1 if not fit_problems.is_empty() else 0)
 
 
 func _tour() -> void:

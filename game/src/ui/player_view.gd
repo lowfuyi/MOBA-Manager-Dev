@@ -26,7 +26,7 @@ static func stat_block(parent: VBoxContainer, p: Dictionary, gains: bool = false
 			sb.content_margin_right = 4.0
 			name_b.add_theme_stylebox_override(sn, sb)
 		name_b.clip_text = true
-		name_b.custom_minimum_size = Vector2(250, 44)
+		name_b.custom_minimum_size = Vector2(250, UI.BTN_H)
 		name_b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		row.add_child(name_b)
 		var bar := UI.bar(float(p["stats"][st]), 100.0, UI.ACCENT, 20)

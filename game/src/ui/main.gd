@@ -3,7 +3,7 @@ extends Control
 ## places of the club (Home, Squad, Plan, Club, More) and a small toast line for feedback.
 
 const TABS := ["home", "squad", "plan", "club", "more"]
-const TAB_H := 104
+const TAB_H := UI.TAB_H
 
 var _margin: MarginContainer
 var _holder: Control
@@ -59,11 +59,11 @@ func _build_tabbar(parent: Control) -> void:
 	for id in TABS:
 		var b := Button.new()
 		b.text = Strings.t("tab." + id)
-		b.custom_minimum_size = Vector2(0, TAB_H - 16)
+		b.custom_minimum_size = Vector2(0, UI.BTN_H)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.focus_mode = Control.FOCUS_NONE
 		b.mouse_filter = Control.MOUSE_FILTER_PASS
-		b.add_theme_font_size_override("font_size", UI.S_SMALL)
+		b.add_theme_font_size_override("font_size", UI.S_CAPTION)
 		b.button_down.connect(UI._pulse.bind(b))
 		b.pressed.connect(_on_tab.bind(id))
 		row.add_child(b)
@@ -116,9 +116,9 @@ func toast(text: String, color: Color = UI.TEXT, action: String = "", cb: Callab
 			cb.call()
 			if is_instance_valid(pc):
 				pc.queue_free()
-		var b := UI.button(action, on_tap, "primary", 64)
+		var b := UI.button(action, on_tap, "primary", UI.BTN_H)
 		b.size_flags_horizontal = Control.SIZE_SHRINK_END
-		b.custom_minimum_size = Vector2(150, 64)
+		b.custom_minimum_size = Vector2(150, UI.BTN_H)
 		row.add_child(b)
 	pc.add_child(row)
 	_toasts.add_child(pc)

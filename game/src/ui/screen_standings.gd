@@ -28,7 +28,10 @@ func _rebuild() -> void:
 	tabs.add_theme_constant_override("h_separation", 8)
 	tabs.add_theme_constant_override("v_separation", 8)
 	for t in ["table", "form", "playoffs", "results", "trophies"]:
-		tabs.add_child(UI.button(Strings.t("standings.tab." + t), _set_tab.bind(t), "primary" if _tab == t else "normal", 72))
+		var tb := UI.button(Strings.t("standings.tab." + t), _set_tab.bind(t), "primary" if _tab == t else "normal", 72)
+		tb.autowrap_mode = TextServer.AUTOWRAP_OFF    # a tab is as wide as its word (a wrapping button in a flow row was 92 px wide: "Trophi/es")
+		tb.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		tabs.add_child(tb)
 	body.add_child(tabs)
 	match _tab:
 		"table":

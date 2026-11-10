@@ -27,14 +27,14 @@ func _init() -> void:
 func setup(title: String, back: Callable = Callable(), scroll: bool = true) -> void:
 	var root := VBoxContainer.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.add_theme_constant_override("separation", 16)
+	root.add_theme_constant_override("separation", UI.GAP)
 	add_child(root)
 	if title != "" or back.is_valid():
 		_header = HBoxContainer.new()
-		_header.custom_minimum_size = Vector2(0, 80)
+		_header.custom_minimum_size = Vector2(0, UI.HEADER_H)
 		if back.is_valid():
-			var b := UI.button("<", back, "normal", 80)
-			b.custom_minimum_size = Vector2(90, 80)
+			var b := UI.button("<", back, "normal", UI.BTN_H)
+			b.custom_minimum_size = Vector2(UI.BTN_H, UI.BTN_H)
 			b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 			_header.add_child(b)
 		_header.add_child(UI.label(title, UI.S_BIG, UI.TEXT))
