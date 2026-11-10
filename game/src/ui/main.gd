@@ -62,6 +62,7 @@ func _ready() -> void:
 	_toasts.offset_right = -40
 	_toasts.offset_bottom = -(TAB_H + 60)
 	_toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toasts.theme = theme    # a CanvasLayer is not a Control, so the layer's children do not inherit Main's theme by themselves
 	toast_layer.add_child(_toasts)
 	App.main = self
 	get_tree().set_auto_accept_quit(false)
@@ -156,31 +157,13 @@ func show_screen(screen: Control) -> void:
 
 ## A short message above the tab bar. `action` adds one tap button (for example Undo).
 func toast(text: String, color: Color = UI.TEXT, action: String = "", cb: Callable = Callable()) -> void:
-	var pc := PanelContainer.new()
-	pc.add_theme_stylebox_override("panel", UI.box(UI.PANEL3, 20, 16, color, 2))
-	pc.mouse_filter = Control.MOUSE_FILTER_PASS
-	var row := HBoxContainer.new()
-	row.add_child(UI.label(text, UI.S_SMALL, UI.TEXT))
-	if action != "" and cb.is_valid():
-		var on_tap := func() -> void:
-			cb.call()
-			if is_instance_valid(pc):
-				pc.queue_free()
-		var b := UI.button(action, on_tap, "primary", UI.BTN_H)
-		b.size_flags_horizontal = Control.SIZE_SHRINK_END
-		b.custom_minimum_size = Vector2(150, UI.BTN_H)
-		row.add_child(b)
-	pc.add_child(row)
+	var pc := Toast.make(text, color, action, cb)    # the toast itself lives in components/toast.gd (I-07)
 	_toasts.add_child(pc)
 	while _toasts.get_child_count() > 3:
 		var old := _toasts.get_child(0)
 		_toasts.remove_child(old)
 		old.queue_free()
-	var tw := pc.create_tween()
-	tw.tween_interval(4.5 if action != "" else 3.0)
-	if UI.animate:
-		tw.tween_property(pc, "modulate:a", 0.0, UI.T_FADE)
-	tw.tween_callback(pc.queue_free)
+	Toast.start_life(pc, action != "" and cb.is_valid())
 
 
 func _notification(what: int) -> void:

@@ -31,7 +31,7 @@ const ORPHAN_MIN := 4
 
 static func audit(root: Control, frame_w: float) -> Array:
 	var out: Array = []
-	_walk(root, frame_w, out, Rect2(-100000, -100000, 200000, 200000))
+	_walk(root, frame_w, out, Rect2(-100000, -100000, 200000, 200000), false)
 	return out
 
 
@@ -47,14 +47,14 @@ static func _name(c: Control) -> String:
 	return "%s '%s'" % [c.get_class(), t] if t != "" else c.get_class()
 
 
-static func _walk(n: Node, frame_w: float, out: Array, clip: Rect2) -> void:
+static func _walk(n: Node, frame_w: float, out: Array, clip: Rect2, h_scroll: bool) -> void:
 	var c := n as Control
 	if c != null:
 		if not c.visible:
 			return
 		var r := c.get_global_rect()
 		# 1 overflow
-		if c.size.x > 0.0 and c.size.y > 0.0:
+		if c.size.x > 0.0 and c.size.y > 0.0 and not h_scroll:    # (I-07) inside a horizontal scroller (Segmented strip) the content may extend sideways
 			var room := clip.intersection(Rect2(0, -100000, frame_w, 200000))
 			if r.position.x < room.position.x - EPS or r.end.x > room.end.x + EPS:
 				out.append("overflow: %s spans x %.0f..%.0f, room %.0f..%.0f" % [_name(c), r.position.x, r.end.x, room.position.x, room.end.x])
@@ -79,8 +79,10 @@ static func _walk(n: Node, frame_w: float, out: Array, clip: Rect2) -> void:
 			out.append("bar: ProgressBar is %.0f px wide, minimum %.0f (squeezed by the controls beside it)" % [c.size.x, MIN_BAR_W])
 		if c.clip_contents or c is ScrollContainer:
 			clip = clip.intersection(r)
+		if c is ScrollContainer and (c as ScrollContainer).horizontal_scroll_mode != ScrollContainer.SCROLL_MODE_DISABLED:
+			h_scroll = true
 	for ch in n.get_children():
-		_walk(ch, frame_w, out, clip)
+		_walk(ch, frame_w, out, clip, h_scroll)
 
 
 ## The lines a wrapping Label or Button will show, as text: the same break flags the engine uses for `mode`.
