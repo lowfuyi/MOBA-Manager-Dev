@@ -232,7 +232,7 @@ Net: three new tokens (`MAP_LAND`, `MAP_MERE`, `MAP_SHORE`); everything else on 
 | Level | Used for | Fill | Shadow (offset y / blur / black alpha) | Edge | Inner highlight |
 |---|---|---|---|---|---|
 | E0 well | tracks, input wells, pressed | `VOID` flat | none | black 50 percent 1 px | black 50 percent 2 px line at the top (inset) |
-| E1 card | cards, list rows, tiles | `PANEL` gradient | 4 / 10 / 38 percent | white 7 percent 1 px | white 14 percent 1.5 px, top edge, inset 20 px from the corners |
+| E1 card | cards and tiles; rows inside a list use the flat variant (edge and highlight, no shadow) and only the card that holds them is shadowed | `PANEL` gradient | 4 / 10 / 38 percent | white 7 percent 1 px | white 14 percent 1.5 px, top edge, inset 20 px from the corners |
 | E2 raised | hero card, secondary buttons, card in card | `PANEL2` gradient | 8 / 18 / 45 percent | white 7 to 16 percent | white 16 to 20 percent |
 | E3 overlay | bottom sheets, dialogs, selected tab pill | `PANEL3` gradient | 14 / 28 / 55 percent | white 16 percent | white 20 percent |
 
@@ -315,6 +315,8 @@ The sheet and screen title is **folded into the 40 px Value size, not into Title
 **Map labels (24 px) and large text.** The arena is 720 design px wide and must be fitted to the 626 px logical canvas, so its scale is 0.869 and the map labels render at 24 design px in both modes: 12 dp, not 13.8. They do not grow with large text (a limit, stated plainly). The text audit must measure a label's size as font size times content scale times the map fit scale, not the font size alone. Widths at 24 px Bold with +1.5 px tracking: STONEBACK 128, MOONHULK 118, MOSSBACK 116, TOP 41, MID 37, BOT 42. STONEBACK centred on its icon (x 0.78, 561.6 px) spans 497.6 to 625.6 px, which crosses the Bot lane's inner edge near x 609 (the lane is 64 px wide centred on x 0.89): the Level Designer should place that label above or to the left of its icon. Never smaller than 24.
 
 Rules: numbers that the player acts on are one size up from their label (Value above Small). Money, ratings, scores, times and standings use tabular numerals (`tnum`, 5.1). Sentence case everywhere, except the Caption section label, which is upper case with tracking, and map lane and place labels; no all-caps italic extended headings (section 9). Tabs and chips are single line and never wrap mid-word: if a label does not fit, the control scrolls sideways or takes a shorter label. Minimum button height 96 px (48 dp), was 92 px; chip height 44 px (text 24); the tile's own annotation text (swatch hex codes, type labels) is documentation, not UI, and is smaller than 24 on purpose.
+
+**Font pairs (PERF-BUDGET 3.1a and 3.2, decision 2026-11-09):** this type scale uses **12 weight-and-size pairs** (the one number; 11 on the Alpha 0.7 screens, 12 with the arena's Caption Bold 24 map labels). Hard limit 16, which is the 12 plus the `tnum` variants of the number styles, counted separately. A new weight or size needs a bible edit first.
 
 ## 6. Iconography and illustration
 
