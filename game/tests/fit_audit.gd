@@ -14,7 +14,7 @@ extends RefCounted
 ##                word or number left alone on a line, which reads as a layout accident.
 ##   6 wrap at /  a wrapped text that breaks right after a '/' ('+17/' then 'wk'): the engine allows a break there, the
 ##                player sees a number cut from its unit.
-##   7 bar        a visible ProgressBar narrower than MIN_BAR_W (120 px): a stat bar squeezed by its neighbours into a stub.
+##   7 bar        a visible ProgressBar narrower than MIN_BAR_W (96 px): a stat bar squeezed by its neighbours into a stub.
 ##   Rules 5 and 6 are the 'hidden fit problems' (I-04): the text is not wider than its room, so rule 2 stays quiet.
 ##   They re-wrap the text the way Label and Button do (TextParagraph with the same break flags), so they need no rendering.
 ## `frame_w` is the logical canvas width: 720, or 626 in large-text mode (UI.canvas_w()).
@@ -23,7 +23,7 @@ const MIN_BTN := 96.0
 const MIN_BTN_W := 96.0
 const FLOOR_PX := 24
 const EPS := 1.5
-const MIN_BAR_W := 120.0
+const MIN_BAR_W := 96.0
 ## Rule 5: a last line with fewer visible characters than this is an orphan. 4 means 'wk', 'OK' and '85%' all fail.
 ## (The I-04 brief said 'shorter than 3'; the Draft slot panel orphan it names is '85%', 3 characters, so the bar is 4.)
 const ORPHAN_MIN := 4

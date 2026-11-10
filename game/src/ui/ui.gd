@@ -235,7 +235,7 @@ static func switch_icon(on: bool, disabled: bool = false) -> Texture2D:
 			var d := Vector2(maxf(q.x, 0.0), maxf(q.y, 0.0)).length() + minf(maxf(q.x, q.y), 0.0) - track_r
 			col = _over(col, track_col, clampf(0.5 - d, 0.0, 1.0))
 			if not on:    # the 2 px edge of the off state
-				col = _over(col, DIM, clampf(0.5 - absf(d + 1.0), 0.0, 1.0) if d > -2.0 else 0.0)
+				col = _over(col, DIM, clampf(1.5 - absf(d + 1.0), 0.0, 1.0))
 			col = _over(col, knob_col, clampf(0.5 - ((p - knob_c).length() - knob_r), 0.0, 1.0))
 			if on:
 				var dt := minf(_seg_dist(p, tick[0], tick[1]), _seg_dist(p, tick[1], tick[2])) - 2.0
@@ -387,6 +387,9 @@ static func make_theme() -> Theme:
 		t.set_icon(icon_name, "CheckButton", switch_icon(false))
 		t.set_icon(icon_name + "_disabled" if icon_name == "unchecked" else "unchecked_disabled_mirrored", "CheckButton", switch_icon(false, true))
 	t.set_constant("h_separation", "CheckButton", 16)
+	# the switch shows the state; the row keeps its normal fill when on (a dark-teal row made the label 3:1)
+	for st_name in ["pressed", "hover_pressed"]:
+		t.set_stylebox(st_name, "CheckButton", box(PANEL2, R_BTN, 18, LINE, 1))
 	t.set_stylebox("normal", "Button", box(PANEL2, R_BTN, 18, LINE, 1))
 	t.set_stylebox("hover", "Button", box(PANEL2.lightened(0.08), R_BTN, 18, LINE, 1))
 	t.set_stylebox("pressed", "Button", box(ACCENT.darkened(0.35), R_BTN, 18))
@@ -410,8 +413,13 @@ static var _slash_rx: RegEx
 
 ## Keeps a wrapped text from breaking in the two ugly places the fit audit (tests/fit_audit.gd, rules 5 and 6) looks for:
 ## right after a "/" that joins a number and its unit ("+17/" then "wk"), and a last line with one short word or number
-## on it ("0.", "57"): from three words on, the last two words are bound with a no-break space, so the last line always
-## has two. Both are invisible characters; the words themselves are untouched.
+## on it ("0.", "57", "85%", "-3  *"): from three words on, the last words are bound with no-break spaces until they
+## have at least TAIL_MIN visible characters (never more than 3 words or 24 characters), so the last line always has
+## something to read. Both marks are invisible; the words themselves are untouched.
+const TAIL_MIN := 6
+const TAIL_MAX := 24
+
+
 static func tidy(text: String) -> String:
 	var t := text
 	if t.contains("/"):
@@ -419,13 +427,39 @@ static func tidy(text: String) -> String:
 			_slash_rx = RegEx.new()
 			_slash_rx.compile("/(?=[A-Za-z])")
 		t = _slash_rx.sub(t, "/" + WORD_JOINER, true)
-	var last := t.rfind(" ")
-	var nl := t.rfind("\n")
-	if last > nl and last > 0:
-		var prev := t.rfind(" ", last - 1)
-		if prev > nl and prev > 0 and t.length() - prev <= 24:
-			t = t.substr(0, last) + NBSP + t.substr(last + 1)
+	var start := t.rfind("\n") + 1
+	if t.substr(start).split(" ", false).size() < 3:
+		return t    # one or two words on the last line: nothing to bind
+	var i := t.length()
+	var words := 0
+	var visible := 0
+	var runs: Array = []    # [first, end) ranges of the space runs to bind
+	var stop_at := -1
+	while i > start:
+		var j := i
+		while j > start and t.unicode_at(j - 1) != 32:
+			j -= 1
+		visible += i - j
+		words += 1
+		if words >= 3 or (words >= 2 and visible >= TAIL_MIN):
+			break
+		var k := j
+		while k > start and t.unicode_at(k - 1) == 32:
+			k -= 1
+		if k <= start or j == k or t.length() - k > TAIL_MAX:
+			break    # nothing before the run to bind to, or the tail would get long
+		runs.append([k, j])
+		i = k
+	for r in runs:
+		for n in range(int(r[0]), int(r[1])):
+			t = t.substr(0, n) + NBSP + t.substr(n + 1)
 	return t
+
+
+## The text as written: tidy()'s invisible marks taken out again (no-break spaces back to spaces, joiners removed). Use it
+## when code or a test looks for words in a Label or Button text.
+static func plain(text: String) -> String:
+	return text.replace(NBSP, " ").replace(WORD_JOINER, "")
 
 
 ## A label. `weight` "" takes the weight the type scale gives that size (Bold at 48 and 40, SemiBold at 36 and 24,
@@ -458,7 +492,7 @@ static func num_label(text: String, size: int = S_BODY, color: Color = TEXT, ali
 ## `min_h` is raised to BTN_H (96 px, 48 dp): no button is shorter, whatever a screen asks for.
 static func button(text: String, cb: Callable, kind: String = "normal", min_h: int = BTN_H) -> Button:
 	var b := Button.new()
-	b.text = text
+	b.text = tidy(text)    # a wrapped caption never ends on a lone "85%" or "77"
 	b.custom_minimum_size = Vector2(0, maxi(min_h, BTN_H))
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART    # a long caption wraps instead of widening the page (large text)

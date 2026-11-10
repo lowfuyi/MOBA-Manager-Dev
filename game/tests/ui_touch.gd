@@ -140,7 +140,7 @@ func _run() -> void:
 	find_buttons(cur(), btns)
 	var target: Button = null
 	for x in btns:
-		if x.text == Strings.t("club.pick.choose"):
+		if UI.plain(x.text) == Strings.t("club.pick.choose"):
 			target = x
 			break
 	await tap(target.get_global_rect().get_center())
@@ -185,7 +185,7 @@ func _run() -> void:
 	find_buttons(cur(), btns)
 	var hero_btn: Button = null
 	for x in btns:
-		if "their best" in x.text:
+		if "their best" in UI.plain(x.text):
 			hero_btn = x
 			break
 	var bans_before: int = d.draft.bans["B"].size() + d.draft.bans["R"].size()
@@ -207,7 +207,7 @@ func _run() -> void:
 	find_buttons(cur(), btns)
 	var row_btn: Button = null
 	for x in btns:
-		if "trains" in x.text or "practises" in x.text or "rests" in x.text:
+		if "trains" in UI.plain(x.text) or "practises" in UI.plain(x.text) or "rests" in UI.plain(x.text):
 			row_btn = x
 			break
 	await swipe(row_btn.get_global_rect().get_center(), 300)
@@ -218,7 +218,7 @@ func _run() -> void:
 	btns.clear()
 	find_buttons(cur(), btns)
 	for x in btns:
-		if "trains" in x.text or "practises" in x.text or "rests" in x.text:
+		if "trains" in UI.plain(x.text) or "practises" in UI.plain(x.text) or "rests" in UI.plain(x.text):
 			row_btn = x
 			break
 	await tap(row_btn.get_global_rect().get_center())
@@ -251,7 +251,7 @@ func _run() -> void:
 	find_buttons(cur(), btns)
 	var fa_btn: Button = null
 	for x in btns:
-		if "asks" in x.text:
+		if "asks" in UI.plain(x.text):
 			fa_btn = x
 			break
 	await swipe(fa_btn.get_global_rect().get_center(), 300)
@@ -262,7 +262,7 @@ func _run() -> void:
 	btns.clear()
 	find_buttons(cur(), btns)
 	for x in btns:
-		if "asks" in x.text:
+		if "asks" in UI.plain(x.text):
 			fa_btn = x
 			break
 	await tap(fa_btn.get_global_rect().get_center())

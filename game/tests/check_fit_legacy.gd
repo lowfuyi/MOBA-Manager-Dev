@@ -113,6 +113,7 @@ func _controls() -> void:
 	ok(_hit(p1, "orphan"), "rule 5 flags the lone 'wk' that the slash break leaves")
 	# rule 6 negative control: a Button breaks after '/' too
 	var b := UI.button("Pay +17/wk", func(): pass)
+	b.text = "Pay +17/wk"    # verbatim: UI.button's tidy() would put a joiner after the slash, which is the repair under test elsewhere
 	b.size_flags_horizontal = Control.SIZE_FILL
 	var sbn: StyleBox = b.get_theme_stylebox("normal")
 	var bfont := UI.font("SemiBold")
@@ -138,6 +139,17 @@ func _controls() -> void:
 	ok(p7.is_empty(), "rule 5 stays quiet on a short text that is one line: %s" % [p7])
 	var p8 := await _audit_of(_label_in("Chance to win 85% and more words after it to fill two lines nicely", 400.0))
 	ok(p8.is_empty(), "rules 5 and 6 stay quiet on an ordinary two-line paragraph: %s" % [p8])
+	# rule 7 negative control: a stat bar squeezed to a stub is flagged, a normal one is not
+	var stub := UI.bar(50.0, 100.0, UI.ACCENT, 20)
+	stub.custom_minimum_size = Vector2(60, 20)
+	stub.size = Vector2(60, 20)
+	var p13 := await _audit_of(stub)
+	ok(_hit(p13, "bar"), "rule 7 flags a 60 px bar: %s" % [p13])
+	var fat := UI.bar(50.0, 100.0, UI.ACCENT, 20)
+	fat.custom_minimum_size = Vector2(200, 20)
+	fat.size = Vector2(200, 20)
+	var p14 := await _audit_of(fat)
+	ok(p14.is_empty(), "rule 7 stays quiet on a 200 px bar: %s" % [p14])
 	# UI.tidy repairs both cases: the real Finance line (it broke as '+17/' and 'wk' at large text) and an orphan '0.'
 	var fin := "Sponsor 282/wk  -  Wages 265/wk  =  +17/wk"
 	var room_fin: float = float(w.call("Sponsor 282/wk  -  Wages 265/wk  =  +17/")) + 3.0
@@ -154,7 +166,10 @@ func _controls() -> void:
 	ok(p12.is_empty(), "tidy: the same note through UI.tidy is clean: %s" % [p12])
 	ok(UI.tidy("Wins") == "Wins" and UI.tidy("Top lane") == "Top lane", "tidy: one or two words are left alone")
 	ok(UI.tidy("a b c").contains(UI.NBSP) and UI.tidy("+17/wk") == "+17/" + UI.WORD_JOINER + "wk", "tidy: three words bind the last two; a slash before letters gets a joiner")
-	ok(UI.tidy("Ratio 88 / 91 now") == "Ratio 88 / 91" + UI.NBSP + "now", "tidy: a spaced slash is not touched")
+	var spaced := UI.tidy("Ratio 88 / 91 now")
+	ok(spaced.begins_with("Ratio 88 ") and not spaced.contains(UI.WORD_JOINER) and spaced.replace(UI.NBSP, " ") == "Ratio 88 / 91 now", "tidy: a spaced slash gets no joiner, and only spaces change (to no-break spaces)")
+	ok(UI.tidy("Gravenstone Bulwark  their best 77").replace(UI.NBSP, " ") == "Gravenstone Bulwark  their best 77" and UI.tidy("Gravenstone Bulwark  their best 77").contains("best" + UI.NBSP + "77"), "tidy: 'best 77' is bound so the 77 cannot stand alone")
+	ok(UI.tidy("Soldor  -  Top  -  tired -3  *").contains("-3" + UI.NBSP + UI.NBSP + "*"), "tidy: '-3  *' is bound as one tail, double space included")
 	ok(UI.tidy("line one is here\nlast words") == "line one is here\nlast words", "tidy: a last line of two words is not bound to the line before")
 
 
@@ -234,6 +249,7 @@ func _flow(v: String) -> void:
 	await _practice_and_prematch(g)
 	await _match(g)
 	await _season_end()
+	await _roster_detail()    # after the season: the stat rows then carry their "(+1.2)" gains, the widest they get
 	await _settings_with_pace()
 	main.queue_free()
 	await frames(1)
@@ -348,6 +364,40 @@ func _standings_tabs() -> void:
 	for t in ["table", "form", "playoffs", "results", "trophies"]:
 		App.go(ScreenStandings.new(t))
 		await look("standings_" + t)
+
+
+## The Squad screen is redesigned later (I-19); its player card shares PlayerView.stat_block with Negotiation, whose bars
+## were squeezed to a stub at large text, so the bars of that card are checked here (audit rule 7).
+func _roster_detail() -> void:
+	var rs := ScreenRoster.new("hub")
+	App.go(rs)
+	rs._toggle_player(App.gs.d["lineup"]["mid"])
+	await look("roster_detail")
+	_open_section_text(cur(), "Career with us")
+	await look("roster_detail_career")
+	var bars: Array = []
+	_collect_bars(cur(), bars)
+	var narrow := 100000.0
+	for b in bars:
+		narrow = minf(narrow, (b as ProgressBar).size.x)
+	ok(bars.size() >= 8 and narrow >= 96.0, "roster_%s: %d stat bars, the narrowest is %.0f px (it was about 30 at large text before I-04)" % [variant, bars.size(), narrow])
+
+
+func _collect_bars(n: Node, out: Array) -> void:
+	if n is ProgressBar and (n as ProgressBar).is_visible_in_tree():
+		out.append(n)
+	for ch in n.get_children():
+		_collect_bars(ch, out)
+
+
+func _open_section_text(node: Node, needle: String) -> bool:
+	if node is Button and UI.plain((node as Button).text).begins_with("+ ") and UI.plain((node as Button).text).contains(needle):
+		(node as Button).pressed.emit()
+		return true
+	for ch in node.get_children():
+		if _open_section_text(ch, needle):
+			return true
+	return false
 
 
 func _practice_and_prematch(g: Dictionary) -> void:

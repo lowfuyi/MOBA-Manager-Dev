@@ -31,7 +31,7 @@ func shot(name: String) -> void:
 
 
 func _open_section(node: Node, needle: String) -> bool:
-	if node is Button and (node as Button).text.begins_with("+ ") and (node as Button).text.contains(needle):
+	if node is Button and UI.plain((node as Button).text).begins_with("+ ") and UI.plain((node as Button).text).contains(needle):
 		(node as Button).pressed.emit()
 		return true
 	for ch in node.get_children():
@@ -41,7 +41,7 @@ func _open_section(node: Node, needle: String) -> bool:
 
 
 func _tap_text(node: Node, needle: String) -> bool:
-	if node is Button and (node as Button).text.contains(needle):
+	if node is Button and UI.plain((node as Button).text).contains(needle):
 		(node as Button).pressed.emit()
 		return true
 	for ch in node.get_children():

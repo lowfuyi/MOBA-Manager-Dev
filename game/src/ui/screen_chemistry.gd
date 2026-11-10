@@ -101,7 +101,7 @@ func _cell(text: String, bg: Color, fg: Color) -> PanelContainer:
 	pc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pc.mouse_filter = Control.MOUSE_FILTER_PASS
 	pc.add_theme_stylebox_override("panel", UI.box(bg, 8, 0))    # no padding: "Support" is 76 px (Caption 24 SemiBold), a cell is 85 px at large text
-	var l := UI.label(text, UI.S_CAPTION, fg)    # Caption weight (SemiBold), the scale's own pair
+	var l := UI.label(text, UI.S_CAPTION, fg, HORIZONTAL_ALIGNMENT_CENTER)    # Caption weight (SemiBold), the scale's own pair
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	pc.add_child(l)
 	return pc

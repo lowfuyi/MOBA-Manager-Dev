@@ -15,16 +15,24 @@ static func stat_block(parent: VBoxContainer, p: Dictionary, gains: bool = false
 	var tip := UI.label(Strings.t("stat.help.tip"), UI.S_CAPTION, UI.DIM)
 	parent.add_child(tip)
 	# Column widths come from the text, not from a fixed number: the longest stat name with its "?" and the widest
-	# "now / potential (gain)" the row can show. What is left is the bar, so it keeps at least 120 px at large text (it was 30).
+	# "now / potential (gain)" of this player's rows. What is left is the bar (it was 30 px at large text; the audit's floor is 96).
 	var btn_font := UI.font("SemiBold")
 	var name_w := 0.0
 	for st0 in World.STATS:
 		name_w = maxf(name_w, btn_font.get_string_size(Strings.t("stat." + st0) + "  ?", HORIZONTAL_ALIGNMENT_LEFT, -1, UI.S_BODY).x)
-	name_w = ceilf(name_w) + 8.0 + 6.0    # the button's 4 px side margins, and a little air
+	name_w = ceilf(name_w) + 8.0 + 2.0    # the button's 4 px side margins, and a little air
 	var val_font := UI.font("Medium")
-	var val_w := ceilf(val_font.get_string_size("100 / 100 (+9.9)" if gains else "100 / 100", HORIZONTAL_ALIGNMENT_LEFT, -1, UI.S_SMALL).x) + 4.0
+	var val_texts := {}
+	var val_w := 0.0
+	for st1 in World.STATS:
+		var gain1 := App.gs.season_gain(p["id"], st1) if gains else 0.0
+		var txt1 := "%d / %d%s" % [int(round(float(p["stats"][st1]))), p["potential"][st1], "" if absf(gain1) < 0.05 else " (%+.1f)" % gain1]
+		val_texts[st1] = txt1
+		val_w = maxf(val_w, val_font.get_string_size(txt1, HORIZONTAL_ALIGNMENT_LEFT, -1, UI.S_SMALL).x)
+	val_w = ceilf(val_w) + 4.0    # the widest of this player's eight rows, not a worst case that nobody has
 	for st in World.STATS:
 		var row := UI.hbox()
+		row.add_theme_constant_override("separation", 8)
 		var help := UI.label(Strings.t(STAT_HELP[st]), UI.S_CAPTION, UI.ACCENT)
 		help.visible = false
 		var name_b := UI.button(Strings.t("stat." + st) + "  ?", func(): help.visible = not help.visible, "flat", 44)
@@ -42,8 +50,7 @@ static func stat_block(parent: VBoxContainer, p: Dictionary, gains: bool = false
 		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(bar)
 		var gain := App.gs.season_gain(p["id"], st) if gains else 0.0
-		var gain_txt := "" if absf(gain) < 0.05 else " (%+.1f)" % gain
-		var val := UI.num_label("%d / %d%s" % [int(round(float(p["stats"][st]))), p["potential"][st], gain_txt], UI.S_SMALL, UI.GOOD if gain >= 0.05 else UI.DIM, HORIZONTAL_ALIGNMENT_RIGHT)
+		var val := UI.num_label(String(val_texts[st]), UI.S_SMALL, UI.GOOD if gain >= 0.05 else UI.DIM, HORIZONTAL_ALIGNMENT_RIGHT)
 		val.custom_minimum_size = Vector2(val_w, 0)
 		val.size_flags_horizontal = Control.SIZE_SHRINK_END
 		row.add_child(val)
