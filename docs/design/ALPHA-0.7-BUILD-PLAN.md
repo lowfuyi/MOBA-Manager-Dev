@@ -1,6 +1,19 @@
 # Alpha 0.7 "Guide and Look": Build Plan
 
-Version 1.1 · Date 2026-11-09 · Author: Lead Programmer · Status: v1.1 patch after the Studio Manager review of wave 2a; for the Producer to hand to the Gameplay Programmer (I-00 is built, review pending, and is recorded as amended, not redone; the next dispatch is I-00b, then I-01).
+Version 1.2 · Date 2026-11-10 · Author: Lead Programmer · Status: v1.2 patch after the I-01 spike results and the Producer decisions of 2026-11-10; for the Producer to hand to the Gameplay Programmer (I-00, I-00b and I-01 are built; I-00 review pending; the next dispatch is I-00c, then I-02).
+
+**Change log, v1.1 to v1.2** (sources: `docs/design/SPIKE-RESULTS-0.7.md`, the Producer log of 2026-11-10 in `company/DECISIONS.md`)
+
+| # | Change | Where |
+|---|---|---|
+| 1 | **I-01 recorded as built and accepted.** All four spikes pass their conditions; two designs change (S1 and S4). The three result tables (S1, S3, S4) and the S2 rows are copied into the new section 9.5. `check_gestures` keeps that name (27 checks); the real-component touch checks of I-08 are `check_touch_gestures`. | 3.2, I-01, 9.5 |
+| 2 | **I-08 Carousel:** one `Control` that owns hit-testing; cards are non-interactive (`MOUSE_FILTER_IGNORE`); direction lock after 12 px; 12 px tap slop; emits `card_tapped(i)`. The plain-row fallback is no longer needed on this evidence (kept as phone-test insurance and cut-list item 1). I-08 and I-12 re-run the S1 and S2 rows on the real components. | I-08, I-12, I-15, I-19, K2, 9.2, 10 |
+| 3 | **I-09 hero grid is design C:** one `HeroGrid` `Control` draws all 40 cards in three passes and owns hit-testing; per-hero drawing is a static helper (`HeroCard.draw`) the hero sheet preview and the lane tokens reuse. Measured: 40 `PanelContainer`s = 281 nodes, one `Control` per card = 107 draw calls (hard limit 100). The "virtualise 12 to 16 cards" fallback and the "240 nodes" estimate are replaced by the measured numbers; B3 (one font size, one waiver) is the alternative. | 2.1, 2.7, I-09, I-16, K5, 9.2, 11 |
+| 4 | **I-00b recorded as built** (update mode in `tools/merge_copy.py`, `patch2` applied). The allow-list is `docs/design/copy/owned_keys.txt` (the Producer log), not `update_allow.json` as v1.1 wrote. The perf allowance data file was not part of what was built: **new small increment I-00c** (10 to 20 calls): `tests/perf_allowances.json`, read by `perf_baseline.gd` per `PERF-BUDGET.md` 3.1a. | I-00b, I-00c, 3.3, 4.2, 4.3, 6, 13 |
+| 5 | `tools/check_fast.sh` should also run `pytest tools` (it runs none today; `tools/test_merge_copy.py` and the other `tools/test_*.py` only run in the full check). | 3.3, 13 |
+| 6 | Effort re-added by script after the new I-00c: base 1,470 to 2,130 (was 1,460 to 2,110), with allowance about 1,760 to 2,770 (was 1,750 to 2,740). Dispatches 29. Checkpoint call counts moved by the same 10 to 20. | 0, 8, K13 |
+
+Not part of this patch: section 12.1 (U1 to U5) still lists the UI/UX answers as owed, although `company/DECISIONS.md` (2026-11-10) records them as accepted (UI-PASS-2 section 11); to be closed with the next patch.
 
 **Change log, v1.0 to v1.1** (source: `company/reviews/2026-11-09-wave2a.md` section 4; the number in brackets is that review's fix number)
 
@@ -18,7 +31,7 @@ Version 1.1 · Date 2026-11-09 · Author: Lead Programmer · Status: v1.1 patch 
 
 Not part of this patch (owners named by the review, still open): B11 / nested / SVG outputs [11], GDD "coach" lines [13], and the one-word addition of the state `new` to `TUTORIAL.md` 6.1. See section 13. (Review fixes 5, 7 and 8 are now covered by section 6, I-00b and `tools/check_copy.py`.)
 
-Inputs: `ALPHA-0.7-PLAN.md`, `UI-PASS-2.md`, `TUTORIAL.md`, `ART-BIBLE.md`, `PERF-BUDGET.md`, `COPY-0.7.md` and `copy/en_0_7.json`, the last section of `company/DECISIONS.md`, `company/reviews/2026-11-08-wave1b.md`, `company/reviews/2026-11-09-wave2a.md`, and the code in `game/src/core`, `game/src/ui`, `game/src/game`, `game/src/sim` and `game/tests` as it stands today (version label 0.6.0 alpha).
+Inputs: `ALPHA-0.7-PLAN.md`, `SPIKE-RESULTS-0.7.md`, `UI-PASS-2.md`, `TUTORIAL.md`, `ART-BIBLE.md`, `PERF-BUDGET.md`, `COPY-0.7.md` and `copy/en_0_7.json`, the last section of `company/DECISIONS.md`, `company/reviews/2026-11-08-wave1b.md`, `company/reviews/2026-11-09-wave2a.md`, and the code in `game/src/core`, `game/src/ui`, `game/src/game`, `game/src/sim` and `game/tests` as it stands today (version label 0.6.0 alpha).
 
 **Every effort number in this document is an estimate** (tool calls for one agent, including its own testing and redo). Nobody has built any of this yet. The measured numbers (section 2) were taken on this build computer, headless or under a software renderer, and say nothing about a phone.
 
@@ -27,7 +40,7 @@ Inputs: `ALPHA-0.7-PLAN.md`, `UI-PASS-2.md`, `TUTORIAL.md`, `ART-BIBLE.md`, `PER
 ## 0. Summary (phone-length)
 
 - **Founder decision, final (company/DECISIONS.md):** "NO mid-match interventions. The player never changes anything during a match." Nothing in this plan adds one: `screen_match.gd` stays spectator-only (only its Speed, Skip and See-the-report buttons are tagged), and the tutorial and help never write a match result.
-- **What this is.** 26 build steps (I-00 to I-25; I-21 is split in two and the small follow-up I-00b is added, so 28 dispatches). Each is small enough to build, test and screenshot in one sitting (about 15 to 140 tool calls, estimate). The base total is about 1,460 to 2,110 tool calls (estimate). With a 20 to 30 percent allowance for rework and review (5 of the 13 earlier dispatches needed a second round) it is **about 1,750 to 2,740 tool calls**. In days that is roughly 24 to 38 working days for one builder and 17 to 26 with two lanes. **The day figures are a guess**: nothing converts tool calls to days yet (the design documents' own figure is 57 developer days). Section 8.
+- **What this is.** 26 build steps (I-00 to I-25; I-21 is split in two and the small follow-ups I-00b and I-00c are added, so 29 dispatches). Each is small enough to build, test and screenshot in one sitting (about 15 to 140 tool calls, estimate). The base total is about 1,470 to 2,130 tool calls (estimate). With a 20 to 30 percent allowance for rework and review (5 of the 13 earlier dispatches needed a second round) it is **about 1,760 to 2,770 tool calls**. In days that is roughly 24 to 38 working days for one builder and 17 to 26 with two lanes. **The day figures are a guess**: nothing converts tool calls to days yet (the design documents' own figure is 57 developer days). Section 8.
 - **Order.** Safety net and spikes first, then look foundations (type sizes, colours, font, frame), then shared components, then the tutorial engine, then the six screens (Home, Draft, Game Plan, Report, Squad, Standings), then help sheets, lessons and acceptance. The screen order is the one in UI-PASS-2 8.1 (Home, Draft, Game Plan, Report, Squad, Standings), unchanged. What this plan adds to 8.1: the tutorial plumbing (tags and events) lands before the first screen, so no screen is built twice; the nested-scroll spike of 8.1 step 0 grows into four spikes, including surface cost (S3) and the 40-hero grid (S4); and the tag-only work for screens that are not redesigned (I-21a) is done before the Founder sees the tutorial.
 - **Three checkpoints** where the Founder can see something real: CP1 after I-04 (same game, new type, colours and font), **CP2 after I-18** (Home, Draft, Game Plan and Report redesigned, so the whole match-day loop is new; the guided first game is playable with 3 of 27 steps still showing a "cannot find that" card: first APK for the phone test), CP3 after I-25 (everything, full check). An optional **engine-preview APK** after I-16 is for scrolling, warmth and text only: the guide on it has 8 fallback steps and the Founder should tap Skip tutorial. Exact lists in section 10.
 - **Biggest findings from the code** (measured, section 2): every tap on Game Plan, Squad and Draft deletes and rebuilds the whole page (22 ms, 16 ms and 22 ms on this computer; 131 nodes on Game Plan). This is the pattern the plan replaces with build once and update in place. A tutorial that points at a button cannot survive a page that deletes the button on every tap, so this is a hard dependency, not a nicety.
@@ -83,7 +96,7 @@ A phone is probably 3 to 6 times slower per CPU operation than this computer (my
 
 1. `_build()` runs once in `_ready`: it creates the nodes and keeps references.
 2. `_refresh()` only sets values: `Label.text`, `value`, `visible`, `modulate`, StyleBox variants. Every component setter ignores a value equal to the one it holds (`set_value(v)` returns early if `v == _v`).
-3. Lists that change length (hero grid filtered by role, bench, rows) use one `ListSync.sync(container, keys, make_fn)` helper: keyed reconcile with `move_child` for order, creation for new keys, `visible = false` (not free) for filtered-out keys in the 40-hero grid.
+3. Lists that change length (hero grid filtered by role, bench, rows) use one `ListSync.sync(container, keys, make_fn)` helper: keyed reconcile with `move_child` for order, creation for new keys, `visible = false` (not free) for filtered-out keys. The 40-hero grid does not use it (v1.2): `HeroGrid` (I-09) is one `Control` and a role filter is data plus one `queue_redraw`.
 4. Pages and views inside one screen (Game Plan phases, Standings tabs, Squad variants) are children toggled with `visible`, not rebuilt.
 5. Sheets close with `call_deferred("queue_free")` after their button's signal has finished (the studio rule: never free a screen inside its own signal). The page behind a sheet is never rebuilt while it is open.
 6. Timers and counters redraw only when the displayed text changes (the Draft timer string changes once a second, not every frame).
@@ -144,7 +157,7 @@ String-matching tests: `ui_shots` finds section buttons by the "+ " text prefix 
 
 Baseline (Engine/Graphics, `PERF-BUDGET.md`, and my node counts above): the current screens are small (36 to 131 nodes). Proposed budgets from `PERF-BUDGET.md`: draw calls per screen target 60, hard 100; nodes per screen target 120, hard 200; texture memory target 32 MB, hard 48 MB; at most 6 shadowed and 2 glowing surfaces visible; shadow and glow size at or under 18 px; no blur shaders; at most two full-screen layers; timers redraw only when the displayed value changes. The budgets are still a proposal; this plan treats them as gates that fail a check (I-00 builds the check) and asks the Technical Director to confirm them (section 12).
 
-**The 40-hero draft grid is the cliff.** If a hero card is a `PanelContainer` with 5 child nodes, 40 cards cost 240 nodes, over the 200 hard limit before anything else is on screen. HeroCard must therefore be **one `Control` that draws itself in `_draw`** (portrait, name, tag, state marks). Spike S4 (I-01) measures the alternatives and settles it.
+**The 40-hero draft grid is the cliff, and S4 measured it (v1.2).** 40 `PanelContainer`s with children are **281 nodes** (the v1.0 estimate of 240 was low), over the 200 hard limit before anything else is on screen. One self-drawing `Control` per card fixes the nodes (41) but **not the draw calls: 107 on screen, against a hard limit of 100 for the whole screen**, because each card switches between three glyph textures and untextured shapes. What works: **one `HeroGrid` `Control` that draws all 40 cards in three passes, 1 node and 7 draw calls** (design C, I-09). Virtualising the grid would not help, because the 107 calls are already only for the visible cards. Numbers in 9.5; computer-side counts, nothing measured on a phone.
 
 ---
 
@@ -165,7 +178,7 @@ Baseline (Engine/Graphics, `PERF-BUDGET.md`, and my node counts above): the curr
 The existing big files (`ui_smoke.gd` 403 lines, `ui_touch.gd` 291, `ui_shots.gd` 204, `run_tests.gd` 138) are single files that every lane would edit. I-00 changes the structure so lanes can add tests without sharing a file:
 
 - **`run_tests.gd` auto-discovers `res://tests/*_tests.gd`** (each file has `run(check: Callable)`), loaded with `load(path).new()` so no `class_name` or `--import` is needed. New logic tests are new files.
-- **Screen tests are per-area scenes** named `res://tests/check_<area>.tscn` (headless, ends with " N checks, 0 failures"), and touch ones `check_touch_<area>.tscn` (need `override.cfg` with `pointing/emulate_touch_from_mouse=true`). `tools/run_all_checks.sh` and the new `tools/check_fast.sh` loop over `tests/check_*.tscn`. The old `ui_smoke`, `ui_touch` and `ui_shots` stay and keep running; only the UI lane edits them.
+- **Screen tests are per-area scenes** named `res://tests/check_<area>.tscn` (headless, ends with " N checks, 0 failures"), and touch ones `check_touch_<area>.tscn` (need `override.cfg` with `pointing/emulate_touch_from_mouse=true`). `tools/run_all_checks.sh` and the new `tools/check_fast.sh` loop over `tests/check_*.tscn`. **(v1.2)** `check_gestures` (built in I-01, 27 checks) keeps that name although it is a touch test: it relaunches itself with touch emulation, so the headless loop runs it like any `check_*`. The touch checks of the real `BottomSheet` and `Carousel` (I-08) are `check_touch_gestures`, run by the touch loop with `override.cfg`. The old `ui_smoke`, `ui_touch` and `ui_shots` stay and keep running; only the UI lane edits them.
 - **Screenshot matrix.** `tests/shots_matrix.tscn` runs under Xvfb and discovers modules `tests/shots/shots_<screen>.gd`, each with `static func run(ctx)`. A run takes env `SCREENS=home,draft` and `VARIANTS=normal,large,cb,tall` to select a subset. Variants: **normal** (720 x 1280), **large** (content scale 1.15), **cb** (colour-blind mode on), **tall** (720 x 1560). Output PNG name: `<screen>_<state>_<variant>.png`. The full UI-PASS-2 7.1 matrix is 6 screens x several states x 4 variants (72 images); each screen step takes only its own screen's subset, the full set runs in I-25.
 
 The T-std set every screen increment adds (names are the check labels):
@@ -189,6 +202,7 @@ The T-std set every screen increment adds (names are the check labels):
 ```
 python3 tools/validate_data.py
 python3 tools/check_strings.py
+python3 -m pytest tools -q                                                # v1.2: to be added to check_fast.sh (not there today)
 cd game && timeout 600 $GODOT --headless --import                          # after any new class_name file
 timeout 600 $GODOT --headless --script res://tests/run_tests.gd            # logic, golden vectors, string and data tests, all *_tests.gd
 timeout 600 $GODOT --headless res://tests/ui_smoke.tscn                    # must end " 0 failures"
@@ -196,6 +210,8 @@ for each tests/check_*.tscn: timeout 600 $GODOT --headless res://tests/<name>.ts
 touch scenes with override.cfg present, then removed (as run_all_checks.sh does)
 sha256 of game/tests/golden/* equals the value recorded in I-00
 ```
+
+**(v1.2) `pytest tools` belongs in the fast loop.** `tools/check_fast.sh` as built in I-00 runs `validate_data.py` and `check_strings.py` but no `pytest`; `tools/test_merge_copy.py` (I-00b), `tools/test_check_copy.py` and the other `tools/test_*.py` therefore only run in the full check at the end. The Lead Programmer adds one step (`python3 -m pytest tools -q`, which needs `pytest` installed) to `check_fast.sh` in the next Lead Programmer slot; until then run it by hand after any change under `tools/`.
 
 **Per-screen screenshot run** (under Xvfb, software OpenGL; never in the headless loop):
 
@@ -205,7 +221,7 @@ SHOT_DIR=<dir> SCREENS=<screen> VARIANTS=normal,large,cb,tall \
 SHOT_DIR=<dir> xvfb-run -a -s "-screen 0 720x1280x24" $GODOT --rendering-driver opengl3 res://tests/ui_shots.tscn   # old tour, 49 images
 ```
 
-**Perf gates** (`tests/perf_baseline.gd` and its scene, built in I-00 from `PERF-BUDGET.md` 7; run under Xvfb opengl3; prints `PERF|` lines): the limits are those of section 6, i.e. per-screen allowances for legacy screens and target / hard limits for redesigned ones (`PERF-BUDGET.md` 3.1a). Until I-00b adds the allowance data file the probe applies only the flat hard limits (draw calls 100, nodes 200, texture memory 48 MB), which passes on the six screens the probe visits today but does not ratchet.
+**Perf gates** (`tests/perf_baseline.gd` and its scene, built in I-00 from `PERF-BUDGET.md` 7; run under Xvfb opengl3; prints `PERF|` lines): the limits are those of section 6, i.e. per-screen allowances for legacy screens and target / hard limits for redesigned ones (`PERF-BUDGET.md` 3.1a). Until I-00c adds the allowance data file the probe applies only the flat hard limits (draw calls 100, nodes 200, texture memory 48 MB), which passes on the six screens the probe visits today but does not ratchet.
 
 **Full check** (`bash tools/run_all_checks.sh $GODOT`, about 25 minutes, run in the background): **only at the end of 0.7 (I-25)**, and once at CP2 before the APK. It adds `calibrate.py 40000 --check`, `pytest`, the soak run and everything above. Since R3 forbids simulation changes, the calibration is expected unchanged; the fast loop's golden hash is the early warning.
 
@@ -225,7 +241,7 @@ SHOT_DIR=<dir> xvfb-run -a -s "-screen 0 720x1280x24" $GODOT --rendering-driver 
 | **L (Lead Programmer)** | me | `tools/run_all_checks.sh`, `tools/check_fast.sh`, `game/export_presets.cfg`, `project.godot`, review of every handback, this plan |
 | **T (Tools Engineer)** | Tools Engineer, **on call, not active** | The Producer may call T for a tool that is more than a script of a few dozen lines (shot matrix, perf baseline, contact-sheet builder). T edits only the file it is asked to write, and L reviews it as for any other lane |
 
-**I-00 tooling ownership (v1.1).** The Gameplay Programmer builds the I-00 tooling (`tools/check_fast.sh`, `tools/merge_copy.py`, `tests/perf_baseline.gd`, `tests/shots_matrix.gd`, the fixtures and `check_save_compat`) and edits `tests/run_tests.gd` and `tools/run_all_checks.sh` **in I-00 only**; the Lead Programmer reviews every one of those files before the Producer commits. After I-00, `run_tests.gd` and `run_all_checks.sh` are L-only again and nobody else needs to touch them, because of auto-discovery. The Tools Engineer is on call if a tool turns out to be large. I-00 is already in build with the hold-list and the fresh-save fixture; **it is recorded here as amended, not as a redo**.
+**I-00 tooling ownership (v1.1).** The Gameplay Programmer builds the I-00 tooling (`tools/check_fast.sh`, `tools/merge_copy.py`, `tests/perf_baseline.gd`, `tests/shots_matrix.gd`, the fixtures and `check_save_compat`) and edits `tests/run_tests.gd` and `tools/run_all_checks.sh` **in I-00 only**; the Lead Programmer reviews every one of those files before the Producer commits. After I-00, `run_tests.gd` and `run_all_checks.sh` are L-only again and nobody else needs to touch them, because of auto-discovery. The Tools Engineer is on call if a tool turns out to be large. I-00 is already in build with the hold-list and the fresh-save fixture; **it is recorded here as amended, not as a redo**. I-00b and I-00c are built and reviewed the same way.
 
 When there is a single Gameplay Programmer, G1 and G2 run one after the other in the order given in section 4.3; the file split is the same so a later switch to two agents costs nothing.
 
@@ -236,7 +252,7 @@ When there is a single Gameplay Programmer, G1 and G2 run one after the other in
 | `src/ui/ui.gd`, `main.gd`, `screen.gd`, `app.gd` | G1 only | G2 and E send "integration lines" in their handbacks (each is a few lines: create the overlay in `Main`, forward events, add `help_id()`) |
 | `src/ui/screen_*.gd` | G1 only | G2's tags are added by G1 as each screen is rebuilt (the tag list per screen is in the increment) |
 | `src/game/game_state.gd`, `sim/draft.gd`, `sim/report.gd` | G2 in I-06 and I-13 only; **nobody else in 0.7** | G1 needs a data helper: request it in a handback; G2 adds it in the next G2 slot |
-| `i18n/en.json` | G1 (append only, one block of keys per increment, sorted by prefix); the I-00 merge and every later release of a held key go through `tools/merge_copy.py`, and G1 deletes the key from `docs/design/copy/hold_0_7.json` in the releasing increment (the one exception to "Narrative owns `docs/design/copy/`"). **Copy edits after the merge (route A, built in I-00b):** Narrative writes a patch file, `tools/merge_copy.py --update` applies it only to keys named in `docs/design/copy/update_allow.json`, G1 runs it in the increment that needs the edit | G2 and others hand G1 a key list; Narrative's patch files are the source |
+| `i18n/en.json` | G1 (append only, one block of keys per increment, sorted by prefix); the I-00 merge and every later release of a held key go through `tools/merge_copy.py`, and G1 deletes the key from `docs/design/copy/hold_0_7.json` in the releasing increment (the one exception to "Narrative owns `docs/design/copy/`"). **Copy edits after the merge (route A, built in I-00b):** Narrative writes a patch file, `tools/merge_copy.py --update` applies it only to keys named in the allow-list `docs/design/copy/owned_keys.txt` (add mode appends every key it merges; changing the list is a Producer or Lead Programmer edit, never Narrative's), G1 runs it in the increment that needs the edit | G2 and others hand G1 a key list; Narrative's patch files are the source |
 | `tests/run_tests.gd`, `tools/run_all_checks.sh` | G1 in I-00 only, reviewed by L; L afterwards | nobody, because of auto-discovery |
 | `tools/validate_data.py` | L owns; G2 may extend it in I-06 only (club fields), reviewed by L | |
 | `tests/fixtures/` | created by G1 in I-00 (`save_0_6_a` to `_d` and `gen_save_fixtures.gd`, now present); **owned by Q from now on** (every later fixture, including any new save fixture, is Q's) | the generator says "do not regenerate with later code": new fixtures are new files |
@@ -246,10 +262,10 @@ When there is a single Gameplay Programmer, G1 and G2 run one after the other in
 ### 4.3 Dependency order and what can overlap
 
 ```
-I-00 -> I-01 -> I-00b -> I-02 -> I-03 -> I-04 (CP1)
-                  |       |
-                  |       +-> I-05 (E, art code; starts after I-02) --+
-                  +-> I-06 (G2, core hooks; starts after I-00) -------+
+I-00 -> I-01 -> I-00b -> I-00c -> I-02 -> I-03 -> I-04 (CP1)
+                  |                |
+                  |                +-> I-05 (E, art code; starts after I-02) --+
+                  +-> I-06 (G2, core hooks; starts after I-00) ----------------+
 I-03 -> I-07 -> I-08 -> I-09 -> I-10    (components, G1; need I-05 for badges and silhouettes)
 I-06 -> I-11 -> I-12 -> I-13 -> I-14    (tutorial, G2; I-12 needs I-03 hooks and I-08 BottomSheet)
 I-14 -> I-21a Tag-only work on the screens that stay as they are (G1; run it directly before I-15)
@@ -260,7 +276,7 @@ I-14 + I-16 -> I-22 Help and glossary -> I-23 Lessons -> I-24 -> I-25 (CP3)
 
 Screen order is UI-PASS-2 8.1 as written (Home, Draft, Game Plan, Report, Squad, Standings, then the parallel Plan and Club restyle); the plan does not reorder it. The additions to 8.1 are the ones named in section 0.
 
-Real parallelism with two builders: G1 runs I-00b, I-02 to I-04, I-07 to I-10, I-21a, I-15 to I-21b; E runs I-05 beside them; G2 (a second Gameplay Programmer instance is permitted from I-06) runs I-06, I-11 to I-14 beside I-07 to I-10, then I-22 to I-24 beside the later screens. The screen tags that the tutorial needs arrive with each screen (G1), except the screens that are not redesigned, whose tags arrive early in I-21a; the first-run walkthrough only plays end to end when I-17, I-18, I-19 and I-20 are done, so until then the steps for screens still to come show their card without a hole ("fallback card" mode: tag missing) and G2 runs the full 20-test set in I-25. Section 10 lists which steps are fallback cards at each checkpoint.
+Real parallelism with two builders: G1 runs I-00b, I-00c, I-02 to I-04, I-07 to I-10, I-21a, I-15 to I-21b; E runs I-05 beside them; G2 (a second Gameplay Programmer instance is permitted from I-06) runs I-06, I-11 to I-14 beside I-07 to I-10, then I-22 to I-24 beside the later screens. The screen tags that the tutorial needs arrive with each screen (G1), except the screens that are not redesigned, whose tags arrive early in I-21a; the first-run walkthrough only plays end to end when I-17, I-18, I-19 and I-20 are done, so until then the steps for screens still to come show their card without a hole ("fallback card" mode: tag missing) and G2 runs the full 20-test set in I-25. Section 10 lists which steps are fallback cards at each checkpoint.
 
 ---
 
@@ -288,7 +304,7 @@ Real parallelism with two builders: G1 runs I-00b, I-02 to I-04, I-07 to I-10, I
 
 | Gate | Limit | Where checked |
 |---|---|---|
-| Draw calls and nodes, **legacy screen** (not yet redesigned) | Its **row in the allowance table** (3.1a rule 1): today's measured value plus 10 percent, rounded up to the next 5. A row may go down, never up. The check prints "tighten to N" when a row is 10 percent or more over its measurement | `perf_baseline` (flat hard limits until I-00b adds the data file), every screen step |
+| Draw calls and nodes, **legacy screen** (not yet redesigned) | Its **row in the allowance table** (3.1a rule 1): today's measured value plus 10 percent, rounded up to the next 5. A row may go down, never up. The check prints "tighten to N" when a row is 10 percent or more over its measurement | `perf_baseline` (flat hard limits until I-00c adds the data file), every screen step |
 | Draw calls, nodes, canvas items, **redesigned screen** | **Target 60 / 120 / 700, hard 100 / 200 / 1,200**, at the top and at the bottom of every scroll; one waiver line (number, reason, the Technical Director's name) between target and hard; **the screen's allowance row is deleted in the same commit as its redesign**; new sheets, overlays and components start here, measured together with the screen under them | same |
 | A visited state with **no row** | Held to the hard limits and printed "NO ROW"; it gets a row at its measured value in the commit that finds it | same |
 | Re-baselines | Exactly two: **after I-04** (token sizes final) and **after I-22** ("?" button and help hooks add nodes everywhere). Each is one commit reviewed by the Technical Director with every changed row beside its old value. Any other raise needs the Technical Director's written reason in the table | I-04, I-22 |
@@ -311,7 +327,7 @@ Format for each: **Goal · Lane · Needs · Files (create C, change M) · Helper
 
 ### I-00 Safety net, structure and the one string merge
 
-- **Status (v1.1, updated 2026-11-10).** **Built by the Gameplay Programmer; review by the Lead Programmer pending.** It was **amended, not redone**, by two v1.1 items: the merge takes a hold-list and the fixture set gains `save_0_6_d`. Facts from the I-00 handback (I have not re-run them): 536 keys merged (524 new, 12 replaced), 4 held through `docs/design/copy/hold_0_7.json`; fixtures `save_0_6_a` to `_d` exist under `game/tests/fixtures/`; `check_save_compat`, `perf_baseline`, `shots_matrix` and `tools/check_fast.sh` exist. **Fixed-seed perf "before" table** (nodes / draw calls): Home 60 / 55, Squad 36 / 40, Draft 81 / 42, Game Plan 133 / 49, Report 151 / 24, Standings 82 / 29 (the Report node count is 151 here against 153 in `PERF-BUDGET.md` section 2, a different state or seed; the fixed-seed table is the one the ratchet starts from, unless the Technical Director says otherwise). Follow-ups it leaves are in I-00b.
+- **Status (v1.1, updated 2026-11-10).** **Built by the Gameplay Programmer; review by the Lead Programmer pending.** It was **amended, not redone**, by two v1.1 items: the merge takes a hold-list and the fixture set gains `save_0_6_d`. Facts from the I-00 handback (I have not re-run them): 536 keys merged (524 new, 12 replaced), 4 held through `docs/design/copy/hold_0_7.json`; fixtures `save_0_6_a` to `_d` exist under `game/tests/fixtures/`; `check_save_compat`, `perf_baseline`, `shots_matrix` and `tools/check_fast.sh` exist. **Fixed-seed perf "before" table** (nodes / draw calls): Home 60 / 55, Squad 36 / 40, Draft 81 / 42, Game Plan 133 / 49, Report 151 / 24, Standings 82 / 29 (the Report node count is 151 here against 153 in `PERF-BUDGET.md` section 2, a different state or seed; the fixed-seed table is the one the ratchet starts from, unless the Technical Director says otherwise). Follow-ups it leaves are in I-00b (built) and I-00c.
 - **Goal.** Make everything after this measurable and conflict-free: structure for tests, fixtures, baselines, and merge Narrative's keys (536 now, 4 later).
 - **Lane / Needs.** The Gameplay Programmer (G1) builds all of it; the Lead Programmer reviews every file before it is committed (section 4.1); the Tools Engineer is on call if a tool turns out large. Nothing before it.
 - **Files.** C `tools/check_fast.sh`; C `game/tests/perf_baseline.gd` and `.tscn` (the probe from `PERF-BUDGET.md` 7); C `game/tests/shots_matrix.gd` and `.tscn`, `game/tests/shots/shots_baseline.gd` (wraps the existing 49-shot tour as one module); the fixtures `game/tests/fixtures/save_0_6_a.json` to `_d.json` with `gen_save_fixtures.gd` (already in the working tree, adopted, not recreated); C `game/tests/check_save_compat.gd/.tscn`; M `game/tests/run_tests.gd` (auto-discovery loop; keep the existing explicit calls until their files are renamed, then delete them); M `tools/run_all_checks.sh` (loop over `check_*.tscn`; add golden hash and perf gate); M `game/i18n/en.json` (merge `docs/design/copy/en_0_7.json` through `tools/merge_copy.py`, **with the hold file `docs/design/copy/hold_0_7.json` of section 2.6**: it reports the 12 replaced keys it applied and **names the 4 it held**); M `game/tests/*` where a test or `ui_shots` matches a replaced string (the review's grep found none; still confirm by running).
@@ -322,18 +338,32 @@ Format for each: **Goal · Lane · Needs · Files (create C, change M) · Helper
 - **Rollback.** Revert the commit (the merge is one commit; `en.json` is the only shared file).
 - **Effort (estimate).** 25 to 45 tool calls (was 25 to 40; the hold-list and its test add about 5).
 
-### I-00b Copy update route and perf allowance file (follow-up to I-00, small)
+### I-00b Copy update route (follow-up to I-00, small)
 
-- **Goal (v1.1, new).** Close two gaps that I-00 leaves: (1) after the one-off merge, copy edits have no route into `en.json` (the review's X9: Narrative never edits `en.json`, and `merge_copy.py` refuses duplicates), although at least three edits are already expected (the Standings switch label, the role filter labels, the Chemistry hint: rows U1 to U3 of 12.1); (2) `perf_baseline.gd` still applies flat hard limits (read from the source, not run), while `PERF-BUDGET.md` 3.1a asks for per-screen allowances with a ratchet.
-- **Lane / Needs.** The Gameplay Programmer builds, the Lead Programmer reviews, the Tools Engineer is on call (section 4.1). Needs I-00. Run it right after I-01 and before I-04 (the first copy edit, U3, lands in I-04).
-- **Files.** M `tools/merge_copy.py`: an **update mode** (route A). `--update <patch.json> --allow <allow.json>` changes the text of keys that **already exist** and are named in the allow-list (`docs/design/copy/update_allow.json`: key, who asked, reason, the increment that needs it). It refuses a key that is not in the allow-list, a key that does not exist yet, a changed `{placeholder}`, non-ASCII text or a duplicate; it prints old and new text for every change and writes only with `--write`. Narrative writes the patch file (still never edits `en.json`); G1 runs the script in the increment named and the Lead Programmer sees the printed diff in review. C `tools/test_merge_copy.py` (a scratch `en.json`: an allowed edit applies, a key outside the allow-list is refused, a held key stays held). M `game/tests/perf_baseline.gd` and C `game/tests/perf_allowances.json` (one row per state: draw calls, nodes, status, increment, waiver reason; seeded from the I-00 "before" table and `PERF-BUDGET.md` 3.1a; the check fails a legacy screen over its row, a redesigned screen over target without a waiver and any screen over a hard limit, and prints "NO ROW" and "tighten to N").
+- **Status (v1.2, 2026-11-10).** **Built** (per the Producer log; I read `tools/merge_copy.py`, `tools/test_merge_copy.py`, `docs/design/copy/owned_keys.txt` and `docs/design/copy/en_0_7_patch2.json` in the working tree, and have **not run** the script or its test). What exists: `tools/merge_copy.py --update FILE` (update mode: changes the text of keys that already exist and are on the allow-list; dry run by default, `--write` writes, `--expect-changed N`, `--allow-placeholder-change` for a programmer only, `--seed-owned` once); the allow-list is **`docs/design/copy/owned_keys.txt`** (v1.1 called it `update_allow.json`; the Producer's log of 2026-11-10 names `owned_keys.txt`); add mode appends every key it merges to the list; `tools/check_copy.py` runs on the whole result before any write and one error stops it. **`patch2` is applied** (`en_0_7_patch2.json`, six keys: `role.short.jg`, `role.short.sup`, `chem.pentagon_hint`, `player.tab.overview`, `player.tab.stats`, `player.tab.career`). **Not built here:** the perf allowance data file, now **I-00c**.
+- **Goal.** After the one-off merge, copy edits needed a route into `en.json` (the review's X9: Narrative never edits `en.json`, and `merge_copy.py` refuses duplicates).
+- **Lane / Needs.** The Gameplay Programmer built it, the Lead Programmer reviews, the Tools Engineer is on call (section 4.1). Needed I-00.
+- **Files.** M `tools/merge_copy.py` (update mode, route A: refuses a key that is not on the allow-list, a key that does not exist yet, a held key, a changed `{placeholder}`, non-ASCII text or a duplicate; prints old and new text for every change); C `docs/design/copy/owned_keys.txt`; C `tools/test_merge_copy.py`.
 - **Strings.** none.
-- **Tests.** `tools/test_merge_copy.py`; `perf_baseline` fails on a deliberately lowered row in a scratch copy of the allowance file and prints "NO ROW" for an unlisted state; fast loop green.
-- **Acceptance.** An allowed copy edit goes through the script with a visible diff; the perf check reads its limits from the data file; `docs/design/copy/update_allow.json` exists (it may start with the three expected keys once UI/UX answers 12.1 U1 to U3).
+- **Tests.** `tools/test_merge_copy.py` (runs only under `pytest tools`; see 3.3, it is not in the fast loop yet).
+- **Acceptance.** An allowed copy edit goes through the script with a visible diff.
 - **Rollback.** Revert the commit.
-- **Effort (estimate).** 15 to 25 tool calls.
+- **Effort (estimate).** 15 to 25 tool calls (the original estimate, which also covered the perf allowance file; that half moved to I-00c, so the two lines are slightly double counted, on the safe side; the spent effort was not reported).
+
+### I-00c Perf allowance data file (follow-up to I-00b, small; v1.2, new)
+
+- **Goal.** `perf_baseline.gd` applies only the flat hard limits (read from the source, not run), while `PERF-BUDGET.md` 3.1a asks for per-screen allowances with a ratchet. This is the half of the old I-00b that was not built.
+- **Lane / Needs.** The Gameplay Programmer builds, the Lead Programmer reviews. Needs I-00 (the fixed-seed table). Run it right after I-00b and before I-04, whose re-baseline no. 1 edits this file's rows.
+- **Files.** M `game/tests/perf_baseline.gd`; C `game/tests/perf_allowances.json` (one row per visited state: draw calls, nodes, status `legacy` or `redesigned`, the increment that retires it, waiver reason; seeded from the I-00 fixed-seed "before" table and `PERF-BUDGET.md` 3.1a). The check fails a legacy screen over its row, a redesigned screen over target without a waiver, and any screen over a hard limit; it prints "NO ROW" for a state without a row and "tighten to N" when a row is 10 percent or more over its measurement.
+- **Strings.** none.
+- **Tests.** `perf_baseline` (under Xvfb, as today) fails on a deliberately lowered row in a scratch copy of the file and prints "NO ROW" for an unlisted state; fast loop green.
+- **Acceptance.** The perf check reads its limits from `perf_allowances.json`; the six probed screens pass on their seeded rows.
+- **Rollback.** Revert the commit.
+- **Effort (estimate).** 10 to 20 tool calls.
 
 ### I-01 Spikes made permanent
+
+- **Status (v1.2, 2026-11-10).** **Built and accepted** (Producer log 2026-11-10). Results: `docs/design/SPIKE-RESULTS-0.7.md`, copied into section 9.5 of this plan. All four spikes pass their conditions; two designs change: **S1** (the lock only works with non-interactive cards owned by the Carousel, I-08) and **S4** (one self-drawing `Control` per card fails the draw-call gate, 107 calls; one `HeroGrid` `Control` is the design, I-09). `check_gestures.gd/.tscn` (27 checks) keeps that name. I have read the results document and have not re-run the spikes. Nothing ran on a phone.
 
 Four short spikes. Each ends as a test that stays in the repo, because the answers decide later designs.
 
@@ -342,11 +372,11 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 | **S1 Nested scroll** | A horizontal carousel inside the vertical page: does a mostly vertical diagonal swipe starting on the carousel still scroll the page? **Scratch result: it stole the swipe (fail).** | A custom direction lock in the Carousel: after 12 px of travel, a drag is horizontal only if |dx| > |dy|, otherwise it is forwarded to the parent `ScrollContainer`. Tested with simulated touch from 5 start angles | Carousel becomes a plain horizontal `HFlowContainer` with a "See all" link (Home upcoming row, Squad market row); the cut list says this feature goes first anyway |
 | **S2 B11 Hole tap** | A tap inside the coach overlay's hole reaches a button inside a `BottomSheet` on a lower layer, with the other three dim panels blocking. **Scratch result: pass on desktop in the probe (not run on a phone).** | The same test, in the repo, using the real `BottomSheet` once I-08 exists; until then, a scratch `CanvasLayer` pair | Stage-B steps become card-only (Next on the card runs the control's action; TUTORIAL 11 fallback); the sheet steps lose their ring but keep their text |
 | **S3 Surface** | `StyleBoxFlat` (one draw call per card, shadow adds fill area only) against a baked 9-slice `StyleBoxTexture` from one shared atlas (one draw call for 10 cards in `PERF-BUDGET.md` 5, but it breaks when text or icons interleave) | Measure a Draft-like screen with 8 cards in both ways, draw calls under Xvfb | Keep `StyleBoxFlat` + shared `UI.box()` cache; baked 9-slice stays the documented first fix if the phone test shows jank |
-| **S4 HeroCard nodes** | A 40-hero grid as 40 `PanelContainer`s with children against 40 single-`Control` cards that draw themselves | Node count at most 60 for the grid; frame work per filter change under 5 ms headless | Virtualise: build only the visible 12 to 16 cards and recycle them while scrolling |
+| **S4 HeroCard nodes** | A 40-hero grid as 40 `PanelContainer`s with children against 40 single-`Control` cards that draw themselves | Node count at most 60 for the grid; frame work per filter change under 5 ms headless (**and, added after the run, draw calls inside the screen's hard limit of 100**) | (v1.2) Virtualising was the v1.1 fallback and would not help (it does not touch the failing number, 9.5); the answer found is one `HeroGrid` `Control`, with B3 as the alternative |
 
 - **Files.** C `game/tests/spike_*.gd` plus scenes (kept in `tests/spikes/`, excluded from the export by the existing `tests/*` filter); C `game/tests/check_gestures.gd/.tscn` (S1 and S2 as permanent checks, with `override.cfg` touch emulation).
 - **Strings / helpers.** none.
-- **Acceptance.** Each row has a measured result written in the handback and copied into section 9 of this plan by L. The Carousel and HeroCard designs are chosen from the result.
+- **Acceptance.** Each row has a measured result written in the handback and copied into section 9 of this plan by L (done in v1.2, section 9.5). The Carousel and hero grid designs are chosen from the result (I-08, I-09).
 - **Rollback.** Delete the spike files.
 - **Effort (estimate).** 30 to 45 tool calls.
 
@@ -434,23 +464,25 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 
 - **Goal.** The two components with real touch risk, with the touch tests that guard them.
 - **Lane / Needs.** G1. Needs I-01 (S1, S2 results), I-07.
-- **Files.** C `src/ui/components/bottom_sheet.gd` (`BottomSheet.open(title, build_content, build_footer, size := "M")`, own `CanvasLayer` 20, scrim is one `ColorRect` (no blur), drag handle, tap on scrim and Android back close it, `close()` always `call_deferred`), `carousel.gd` (`Carousel.new(card_w, items, see_all)` with the S1 direction lock); C `tests/check_sheet.gd/.tscn`; C `tests/check_touch_gestures.gd/.tscn`.
+- **Files.** C `src/ui/components/bottom_sheet.gd` (`BottomSheet.open(title, build_content, build_footer, size := "M")`, own `CanvasLayer` 20, scrim is one `ColorRect` (no blur), drag handle, tap on scrim and Android back close it, `close()` always `call_deferred`); C `src/ui/components/carousel.gd` (`Carousel.new(card_w, items, see_all)`). **Carousel design (v1.2, from the S1 result):** one `Control` that **owns hit-testing**. Its cards are display items (drawn, or controls with `mouse_filter = MOUSE_FILTER_IGNORE`), **never Buttons**: with a Button or any non-IGNORE child the engine keeps routing later drags to that child and the lock fails at 60 and 90 degrees (9.5, S1). **Direction lock:** after 12 px of finger travel it decides once per touch, horizontal if |dx| > |dy|, otherwise vertical. Horizontal: it moves its own content and swallows both the drag and the emulated mouse motion (swallowing only the drag lets the page scroll from the mouse motion). Vertical: it stops swallowing, so the page scrolls. Until the decision it swallows, so the page does not twitch. **Tap:** it finds the card under the finger itself and emits `card_tapped(i)` on release if the finger has moved at most 12 px in screen distance (12 px tap slop). A button inside a card is not tappable on its own; the card taps. Items beyond 8 show "See all". No inertia in the spike; a fling is added here. Reference code: `game/tests/spikes/spike_carousel.gd` (about 90 lines). C `tests/check_sheet.gd/.tscn`; C `tests/check_touch_gestures.gd/.tscn` (the real components; not `check_gestures`, which stays the spike check).
 - **Strings.** `sheet.close` (merged copy has the keys).
-- **Tests.** Sheet: opens and closes by every route (button, scrim, back, swipe down), the page behind keeps its scroll position and its instance ids, only one sheet at a time, a sheet opened from a sheet replaces it; a button inside the sheet receives a real tap (B11 uses this in I-12); Carousel: horizontal swipe scrolls the carousel, **vertical and diagonal swipes starting on the carousel scroll the page** (5 start angles), a tap on a card taps, items beyond 8 show "See all"; both in large text.
+- **Tests.** Sheet: opens and closes by every route (button, scrim, back, swipe down), the page behind keeps its scroll position and its instance ids, only one sheet at a time, a sheet opened from a sheet replaces it; a button inside the sheet receives a real tap. **S2 re-run on the real `BottomSheet` (v1.2):** the 8 rows of the S2 table in 9.5, with `rig.sheet_btn` and the hole set to the real sheet's controls (the overlay is still the scratch four-panel pair until I-12). **S1 re-run on the real `Carousel` (v1.2):** the 10 swipe rows of 9.5 (5 start angles, 2 directions, same pass rule: under 45 degrees the page moves at least half the vertical travel and the carousel at most 2 px; 45 and over the carousel moves at least half the horizontal travel and the page at most 3 px); a tap on card 1 gives card 1, a tap with 6 px of jitter still gives card 1, a horizontal and a vertical swipe that start on a card tap nothing; a vertical swipe that starts in the gap between cards (not tested in the spike); items beyond 8 show "See all"; all in large text.
 - **Screenshots.** Gallery subset: sheets in S, M, L sizes; carousel at rest and scrolled.
-- **Acceptance.** The gesture tests pass; if S1's lock cannot be made reliable, the plain-row fallback ships and Home's carousel is cut (section 10).
+- **Acceptance.** The gesture tests pass: S1 10 of 10 rows and S2 8 of 8 rows on the real components. **The plain-row fallback is no longer needed on this evidence (v1.2)**; it stays as insurance for the phone test (a real finger, section 9.4) and as cut-list item 1 (section 10), a decision for after that test, not now.
 - **Rollback.** Revert; no screen depends on it before I-15.
 - **Effort (estimate).** 60 to 80 tool calls.
 
-### I-09 Cards: PlayerCard, HeroCard, LaneRow and LaneBoard
+### I-09 Cards: PlayerCard, HeroGrid (with the HeroCard drawing helper), LaneRow and LaneBoard
 
-- **Goal.** The three picture-led components of the draft and the squad.
-- **Lane / Needs.** G1. Needs I-05, I-07; S4 result from I-01.
-- **Files.** C `src/ui/components/player_card.gd` (`PlayerCard.make(pid, variant, opts)`: avatar card for bench, lane token, free-agent card), `hero_card.gd` (`HeroCard.make(hid, state, opts)`: **one `Control` drawing itself**, states: available, selected, banned (a drawn X and a text cue, not colour only), picked by you, picked by them (circle against hexagon)), `lane_row.gd` and `lane_board.gd` (five rows, you left and them right); C `tests/check_cards.gd/.tscn`.
+- **Goal.** The picture-led components of the draft and the squad.
+- **Lane / Needs.** G1. Needs I-05, I-07; S4 result from I-01 (design C, section 9.5).
+- **Files.** C `src/ui/components/player_card.gd` (`PlayerCard.make(pid, variant, opts)`: avatar card for bench, lane token, free-agent card); C `src/ui/components/hero_grid.gd` (`HeroGrid`, **v1.2, design C**: one `Control` that draws all 40 cards itself in **three passes** in `_draw`: all card backgrounds, then all portrait discs and state marks (one atlas run), then all text grouped by font size (one run per size); it **owns hit-testing** by the S1 rule (a release more than 12 px from the press is a drag, not a tap) and emits `hero_tapped(hero_id)` (the signal name is mine); state is plain data (`set_heroes(ids)`, `set_state(hero_id, state)` or a dictionary, `set_filter(role)`), every setter ignores an equal value, and a change ends in one `queue_redraw`; its `custom_minimum_size` follows the filtered row count; reference code `game/tests/spikes/hero_grid_probe.gd` and `s4_touch.gd`); C `src/ui/components/hero_card.gd` (`HeroCard`, **a static drawing helper, no node**: `HeroCard.draw(ci, rect, hero, state, pass := -1)`; `pass` 0, 1 or 2 draws one pass for the grid, -1 draws all three for a single card, which is what the **hero sheet preview and the lane tokens** use, so one piece of code draws a hero everywhere; the `pass` parameter is my addition to the spike's `draw(canvas, rect, hero, state)`); states: available, selected, banned (a drawn X and a text cue, not colour only), picked by you, picked by them (circle against hexagon); C `lane_row.gd` and `lane_board.gd` (five rows, you left and them right); C `tests/check_cards.gd/.tscn`; C `tests/check_touch_cards.gd/.tscn`.
+- **Costs of design C, accepted by the Producer log of 2026-11-10.** No per-card focus node (focus and accessibility are the grid's job, so a screen reader sees one control; the grid offers `cue_for(hero_id) -> String` for the colour-blind audit and for tests); one redraw repaints all 40 cards, so a change to one card costs the whole grid (0.06 ms headless in the spike, a phone is slower); off-screen cards sit in the same canvas item, so its cost does not fall when scrolled (at 7 calls this does not matter).
+- **Alternative if design C hits a wall (B3).** One `Control` per card with one atlas and **one font size** for name and tag (no initial letter): measured 65 draw calls for the grid on screen, so the Draft screen sits near 65 plus the rest of the page, which needs the one waiver line of section 6 (between target 60 and hard 100) and a UI/UX answer on the tag size, since the art bible's card has the name at Small 26 and a smaller tag. B and B2 as measured (107 calls) are **not** acceptable, and virtualising does not help.
 - **Strings.** from the merged copy (`draft.*`, `squad.*` keys); add none unless a gap is found, in which case G1 asks N.
-- **Tests.** Nodes for a 40-card grid at most 60 (S4 gate), 40 cards in under 5 ms to update a filter (headless; ratio against baseline, not an absolute claim), the longest hero name "Gravenstone" at Small 26 fits the 183 px large-text card (measured 128 to 130 px in `PERF-BUDGET.md` 6), all five state cues present, avatar for 19-character club names and 11-character player names.
+- **Tests.** The 40-hero grid is **1 node** (measured; the S4 gate of at most 60 stays as the ceiling) and **at most 15 draw calls** at the top and at the bottom of the scroll under Xvfb (7 measured with placeholder discs; the margin allows a silhouette atlas as a second texture; the 15 is my choice, to be confirmed by the Technical Director); a filter change and 8 state changes in under 5 ms headless (0.06 ms measured; ratio against baseline, not an absolute claim); **touch, re-run on the real `HeroGrid` (v1.2):** a tap on the first card gives `brannoch`, a tap with 6 px of jitter still taps, a swipe that starts on a card scrolls the page and taps nothing; the longest hero name "Gravenstone" at Small 26 fits the 183 px large-text card (measured 128 to 130 px in `PERF-BUDGET.md` 6); all five state cues present (`cue_for`); avatar for 19-character club names and 11-character player names; `HeroCard.draw` with `pass` -1 equals the three passes in sequence (same pixels in a `SubViewport`).
 - **Screenshots.** Gallery: grid in all states, lane board with two filled and three empty rows; normal, large, colour-blind (**the banned and picked states must be readable in grayscale**), tall.
-- **Acceptance.** Gate numbers recorded; colour-blind screenshot looked at twice.
+- **Acceptance.** Gate numbers recorded; colour-blind screenshot looked at twice. If real silhouettes push the grid over 15 calls, or a per-card focus turns out to be needed, the Lead Programmer decides between a second texture run and B3 before I-16 starts.
 - **Rollback.** Delete the files.
 - **Effort (estimate).** 70 to 100 tool calls.
 
@@ -484,9 +516,9 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 - **Files.** C `src/tutorial/coach_overlay.gd` (`CoachOverlay`, on `CanvasLayer` 100: **four dim panels** around a hole rectangle (no shader), an info-step blocker over the hole, a pulsing ring, a pointer, a card with Next and Skip and an optional one-tap shortcut button; it follows `UI.find_tag(id)` each frame **only while the rectangle changes** and waits for layout to settle for 2 frames; scrolls the target into view (`ensure_control_visible` in nested scrolls); clips the hole to the screen for tall targets; a fallback card when the tag is missing; at most one animation at a time; animations off when `UI.animate` is false; handles Android back (Skip with Undo)), `src/tutorial/tutorial_runner.gd` (`TutorialRunner`: owns state, overlay and the `EventBus` subscription; the only object `Main` talks to); C `tests/check_tutorial_overlay.gd/.tscn`, `check_touch_tutorial.gd/.tscn`.
 - **Integration lines for G1** (listed in the handback, a few lines in `main.gd` / `app.gd`): create the runner after the first screen, add `App.tutorial` accessor, add the debug line to `App.debug_info()`.
 - **Strings.** none new.
-- **Tests.** Hole follows a moving target; the three dim panels swallow taps while the hole passes a tap to the control under it (**B11 on the real `BottomSheet`**); a tap on the hole control fires its normal action and the event; info steps block the hole; large text at 626 px (card never covers the target where space allows, otherwise above or below); tall phone; the overlay survives `Main.show_screen` between steps; Skip then Undo; back key; no overlay node left after finish.
+- **Tests.** Hole follows a moving target; the four dim panels swallow taps while the hole passes a tap to the control under it (**B11 on the real `BottomSheet`; v1.2: re-run all 8 S2 rows of 9.5 on the real `CoachOverlay` and `BottomSheet`**, including the control row, the edge row (first pixel inside presses, 2 px outside is swallowed), the 8 px margin row, the info-step blocker, the hole moving to a second target, and a drag that starts in the hole and leaves it); a tap on the hole control fires its normal action and the event; info steps block the hole; large text at 626 px (card never covers the target where space allows, otherwise above or below); tall phone; the overlay survives `Main.show_screen` between steps; Skip then Undo; back key; no overlay node left after finish.
 - **Screenshots.** One per step type (info, tap, sheet, shortcut, fallback), normal and large.
-- **Acceptance.** B11 passes in the repo; if it fails, the card-only fallback ships and the failing steps are listed.
+- **Acceptance.** B11 passes in the repo on the real components (S2 passed on the scratch pair with 8 of 8 rows, so a failure here would be a defect in the real components, not in the idea); if it fails, the card-only fallback ships and the failing steps are listed.
 - **Rollback.** Delete `coach_overlay.gd` and `tutorial_runner.gd`; remove the integration lines.
 - **Effort (estimate).** 70 to 100 tool calls.
 
@@ -517,7 +549,7 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 - **Goal.** First redesigned screen: club header with badge, one raised Next-match card, an upcoming-games row, a 2 x 2 tile grid. It proves the whole component stack and sets the pattern for the rest.
 - **Lane / Needs.** G1. Needs I-06, I-07, I-08, I-10.
 - **Files.** M `src/ui/screen_hub.gd` (rewrite on `_build()` and `_refresh()`); M `ui_smoke.gd`, `ui_touch.gd`, `ui_shots.gd` (the lines that touch Home, rule R4); C `tests/check_ui_home.gd/.tscn`, `tests/shots/shots_home.gd`.
-- **Helpers.** `DepthCard`, `HeroStat`-style header, `Carousel` (upcoming(n) from I-06; **cut first if S1 failed**), tile grid (`UI.tile` re-skinned), Badge from `BadgeStyle`. Tags: `home.next_card`, `home.play`, `home.offer` and the rest in TUTORIAL 8 for Home (the tab ids are already tagged in I-03). The inline offer card of I-14 sits **below** the Next-match card and the Play button, never above them; UI/UX Designer to confirm the position. Needs-attention note appears only from round 9 (finding in TUTORIAL 11; Lead Game Designer to confirm, section 12).
+- **Helpers.** `DepthCard`, `HeroStat`-style header, `Carousel` (upcoming(n) from I-06; its cards are display items and the card as a whole taps, I-08; first to cut if time is short, section 10), tile grid (`UI.tile` re-skinned), Badge from `BadgeStyle`. Tags: `home.next_card`, `home.play`, `home.offer` and the rest in TUTORIAL 8 for Home (the tab ids are already tagged in I-03). The inline offer card of I-14 sits **below** the Next-match card and the Play button, never above them; UI/UX Designer to confirm the position. Needs-attention note appears only from round 9 (finding in TUTORIAL 11; Lead Game Designer to confirm, section 12).
 - **Strings.** `home.*` from the merged copy. **Old welcome tip retires here (v1.1):** the rewritten `_build()` does not carry `Tips.show(body, "hub")`, so the old welcome tip never shows together with the new offer card and the "Play without scrolling" acceptance below is measured without it. The tip's lines in `ui_smoke.gd` (156 to 173, TUTORIAL 9 test 18) are migrated to the new offer-card and "?" dot logic in this increment (rule R4); the `tip.hub*` strings stay in `en.json` until I-24 retires them. The Pre-match and Report tips are retired in I-21a and I-18.
 - **Tests.** T-std all rows; Home stays under the node target (120) with the carousel; **Home shows no `Tips` card in any state**; the play button is the only coral action; tapping Play still starts the same game path as before (smoke walks a season).
 - **Screenshots.** Home: first round, mid-season, season end, a 19-character club name, 5-digit cash; normal, large, cb, tall.
@@ -530,9 +562,9 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 - **Goal.** The biggest eyesore and the most-used screen: lane board, hero picture grid, role filter, bottom sheet to confirm, Coach bar with Take.
 - **Lane / Needs.** G1. Needs I-09, I-15 (pattern), I-08.
 - **Files.** M `src/ui/screen_draft.gd` (rewrite; keep `_on_hero`, `_apply`, `_sel_hero`, `_start_match`, `_ai_wait`, `_process` as thin wrappers, rule R4); M `ui_smoke.gd` and `ui_touch.gd` hunks; C `check_ui_draft.gd/.tscn`, `shots/shots_draft.gd`.
-- **Helpers.** `LaneBoard`, `HeroCard` grid with `ListSync` (filter by role hides cards, never frees them), `BottomSheet` (hero sheet with role fit percentage, best slot pre-chosen through `Draft.best_slot_for`), Coach bar (`Take`, `Auto-finish` then `Sure?` two-tap confirm), timer ring that redraws only when the second changes. Tags and events: `draft:sheet`, `draft:ban`, `draft:pick`, `draft:done` (TUTORIAL 7.5), all draft ids in TUTORIAL 8. Pre-existing opponent-bonus colour problem (green for them) fixed by side cue (UI-PASS-2 section 1).
+- **Helpers.** `LaneBoard`, `HeroGrid` (v1.2: one `Control`; the role filter is data plus one redraw, no `ListSync`, nothing is built or freed on a tap), `BottomSheet` (hero sheet with role fit percentage, best slot pre-chosen through `Draft.best_slot_for`), Coach bar (`Take`, `Auto-finish` then `Sure?` two-tap confirm), timer ring that redraws only when the second changes. Tags and events: `draft:sheet`, `draft:ban`, `draft:pick`, `draft:done` (TUTORIAL 7.5), all draft ids in TUTORIAL 8. Pre-existing opponent-bonus colour problem (green for them) fixed by side cue (UI-PASS-2 section 1).
 - **Strings.** `draft.*`, `coach.*`. **Release `draft.meta_hint` here (v1.1):** delete it from `docs/design/copy/hold_0_7.json` and re-run `tools/merge_copy.py --write`, in the same commit as the arrows (an up arrow means strong), so the hint is never true before the arrows exist. The six-chip role filter needs the UI/UX answer on "Jungle" and "Support" (section 12.1, fallback: the short forms "Jg" and "Sup" of the old filter).
-- **Tests.** T-std; **the draft screen shows the arrows exactly where the hint text says so** (a test reads `draft.meta_hint` and checks that the strong-hero cue is a drawn arrow, not colour only); **the 40-card grid stays under the node gate**; a full draft played by tapping through the real controls (not by calling methods) ends in the same lineup as the same sequence through the old methods (equivalence on 20 seeds); AI turn timing unchanged; ban then pick through the sheet; Auto-finish confirm; `draft:*` events fire once each; in-place audit across 6 taps.
+- **Tests.** T-std; **the draft screen shows the arrows exactly where the hint text says so** (a test reads `draft.meta_hint` and checks that the strong-hero cue is a drawn arrow, not colour only); **the 40-card grid stays within the I-09 gates (1 node, at most 15 draw calls) and the Draft screen stays at or under the draw-call target of 60, hard 100, at the top and bottom of the scroll**; a full draft played by tapping through the real controls (not by calling methods) ends in the same lineup as the same sequence through the old methods (equivalence on 20 seeds); AI turn timing unchanged; ban then pick through the sheet; Auto-finish confirm; `draft:*` events fire once each; in-place audit across 6 taps.
 - **Screenshots.** Ban step, pick step, sheet open, role filter, done state, opponent's turn; four variants (24 images, 4 contact sheets, looked at twice).
 - **Acceptance.** Gates green. **No longer CP2 (v1.1).** At this point the Producer *may* build an **engine-preview APK** for a phone test of scrolling, warmth and text on Home and Draft (PERF-BUDGET 4). It is not the first look at the guide: on it, **8 of the 27 tutorial steps are fallback cards** (list in section 10), so the Founder should tap Skip tutorial and judge speed and feel only. I run the fast loop here; the full check (background, about 25 minutes, estimate) moves to I-18.
 - **Rollback.** Revert the screen and its test hunks.
@@ -569,7 +601,7 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 - **Goal.** Your five starters on a small lane map, bench as avatar cards, a free-agent row, the lane picker and the player card sheets.
 - **Lane / Needs.** G1. Needs I-09, I-08, I-05.
 - **Files.** M `src/ui/screen_roster.gd` (rewrite; keep `_toggle_slot`, `_assign`, `_toggle_player`, `_auto`); M `player_view.gd` (becomes the player-card sheet content); M test hunks; C `check_ui_squad.gd/.tscn`, `shots/shots_squad.gd`.
-- **Helpers.** `PlayerCard`, token anchors from the Squad anchors table in ART-BIBLE (Top 0.110/0.540, Jungle 0.270/0.700, Mid 0.500/0.720, Support 0.840/0.742, Bot 0.889/0.540), `BottomSheet`, `Carousel` (market row; cut with the Home one if S1 failed), tap-to-swap (drag-to-swap is on the cut list, UI-PASS-2 8.1). Events `open:player_card`, `open:lane_picker`. Opened also from Match day with the tab bar hidden.
+- **Helpers.** `PlayerCard`, token anchors from the Squad anchors table in ART-BIBLE (Top 0.110/0.540, Jungle 0.270/0.700, Mid 0.500/0.720, Support 0.840/0.742, Bot 0.889/0.540), `BottomSheet`, `Carousel` (market row; the card as a whole taps; cut with the Home one if time is short), tap-to-swap (drag-to-swap is on the cut list, UI-PASS-2 8.1). Events `open:player_card`, `open:lane_picker`. Opened also from Match day with the tab bar hidden.
 - **Strings.** `squad.*`. Needs two UI/UX answers (section 12.1): the real Player card tab labels ("Stats", "Career") and the interim Squad anchors.
 - **Tests.** T-std; assigning, swapping and auto-fill leave the same lineup as the old methods (equivalence on 20 random rosters); the **team rating preview in the picker equals the rating after the swap**; the Match day entry still works; large text with all 5 anchors reachable.
 - **Screenshots.** Closed, picker open, player card sheet, bench with 9 players, an empty lane; four variants.
@@ -660,7 +692,7 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 
 | Block | Increments | Tool calls (estimate) |
 |---|---|---|
-| Safety net, follow-up, spikes | I-00, I-00b, I-01 | 70 to 115 |
+| Safety net, follow-ups, spikes | I-00, I-00b, I-00c, I-01 | 80 to 135 |
 | Look foundations | I-02 to I-04 | 135 to 195 |
 | Art code (E) | I-05 | 60 to 90 |
 | Core hooks (G2) | I-06 | 30 to 45 |
@@ -668,17 +700,17 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 | Tutorial engine (G2) | I-11 to I-14 | 215 to 305 |
 | Six screens and tabs | I-15 to I-21b (I-21 is now I-21a and I-21b) | 505 to 720 |
 | Help, lessons, cleanup, acceptance | I-22 to I-25 | 215 to 320 |
-| **Base total (builder's own testing and redo of its own mistakes only)** | 26 increments plus I-00b, 28 dispatches | **1,460 to 2,110** |
-| Rework and review allowance, 20 to 30 percent | | +290 to +635 |
-| **Total with allowance** | | **about 1,750 to 2,740** |
+| **Base total (builder's own testing and redo of its own mistakes only)** | 26 increments plus I-00b and I-00c, 29 dispatches | **1,470 to 2,130** |
+| Rework and review allowance, 20 to 30 percent | | +295 to +640 |
+| **Total with allowance** | | **about 1,760 to 2,770** |
 
-The v1.0 table said 1,400 to 2,050 (its blocks actually added up to 1,425 to 2,055). Two things changed: the tutorial block was added up wrongly (I-11 to I-14 sum to 210 to 300, not 210 to 290; v1.1 has 215 to 305 after the new-save and kill tests), and five increments were re-costed for the v1.1 changes (I-00 +5 high, I-03 +5, I-06 +5, I-14 +5, I-21 split from 30 to 50 into 35 to 60) and the new I-00b adds 15 to 25. I re-added every block from the "Effort" line of each increment in section 7 (the sums above are those sums, checked by script, not typed).
+The v1.0 table said 1,400 to 2,050 (its blocks actually added up to 1,425 to 2,055). Two things changed: the tutorial block was added up wrongly (I-11 to I-14 sum to 210 to 300, not 210 to 290; v1.1 has 215 to 305 after the new-save and kill tests), and five increments were re-costed for the v1.1 changes (I-00 +5 high, I-03 +5, I-06 +5, I-14 +5, I-21 split from 30 to 50 into 35 to 60) and the new I-00b adds 15 to 25. I re-added every block from the "Effort" line of each increment in section 7 (the sums above are those sums, checked by script, not typed). **v1.2:** the new I-00c adds 10 to 20, so the base moves from 1,460 to 2,110 to 1,470 to 2,130 and the allowance to +294 to +639 (shown rounded to 295 and 640), total 1,764 to 2,769, checked by script again; I-00b is kept at its original 15 to 25 although half of it moved to I-00c, so these two lines are slightly double counted, on the safe side. The day figures below do not move at their rounding (about 24 to 38 for one builder).
 
 **Why the allowance.** The base figures assume each increment is right the first time. The ledger says otherwise: 5 of the 13 earlier dispatches needed a second round. The allowance of 20 to 30 percent (a judgement, not a measurement; the Studio Manager proposed the same range) covers one rework round and one review round per increment (my review of the handback, then the fixes). It does **not** cover the Studio Manager's and the Producer's own review time, or waiting for the UI/UX answers in 12.1; those are outside this plan.
 
 **Days: a guess.** The design documents' own estimates are 38 developer days for the layouts and 19 for the tutorial (about 57), both flagged by their authors as low confidence. Nothing converts tool calls to days: no pace has been measured. v1.0's "20 to 28 days" works out to about 72 calls a day, which is itself an assumption. With that same division the allowance total is **about 24 to 38 working days for one builder, and about 17 to 26 with two lanes**. The plan's figure and the designers' 57 days differ by a factor of 1.5 to 2.4 and **cannot both be right**; I would not promise the Founder a date from either. The only safeguard is to replace the guess with the real pace: **re-estimate after I-07** (first real component increment), **after I-15** (first screen) and **after I-18** (CP2, the first complete loop); the Producer should expect the plan to move at those three points.
 
-**Where the Founder's checkpoints fall in this estimate (base calls, before the allowance).** CP1 after I-04: 205 to 310. Old CP2 (after I-16, as in v1.0): 890 to 1,280 (about 61 percent). **New CP2 (after I-18 and I-21a): 1,055 to 1,515 (about 72 percent)**. That is 165 to 235 calls later, about 3 to 4 working days at the same guessed pace with the allowance. CP3: the end.
+**Where the Founder's checkpoints fall in this estimate (base calls, before the allowance).** CP1 after I-04: 215 to 330. Old CP2 (after I-16, as in v1.0): 900 to 1,300 (about 61 percent). **New CP2 (after I-18 and I-21a): 1,065 to 1,535 (about 72 percent)**. That is 165 to 235 calls later, about 3 to 4 working days at the same guessed pace with the allowance. CP3: the end.
 
 **Screenshot counts that only fit if batched.** Two figures in the plan are only plausible with contact sheets of 6 images (R1(d)): **I-04, 196 images inside 40 to 60 calls**, and **I-25, 72 images each looked at twice inside 60 to 90 calls**. Unbatched, I-04 would need about 400 views and I-25 144. The per-screen counts of I-15 to I-20 (24 images or so per screen) fit in about 4 sheets, looked at twice, without a problem. If batching turns out to hide problems (a sheet at half size cannot show a one-pixel clip), the fit audit is the safety net and the figure for I-04 goes up, not the quality of the look.
 
@@ -688,11 +720,11 @@ The v1.0 table said 1,400 to 2,050 (its blocks actually added up to 1,425 to 2,0
 
 | # | Risk | Evidence so far | Handled by |
 |---|---|---|---|
-| K1 | **Sheet-through-hole tap (TUTORIAL B11):** a tap in the overlay hole must reach a button inside a sheet on a lower layer | Scratch probe passed on desktop; **not run on a phone, not run with the real `BottomSheet`** | I-01 S2, then I-12 on the real sheet. Fallback: card-only steps |
-| K2 | **Nested carousel steals diagonal swipes** | Scratch probe: **failed** (a mostly vertical diagonal swipe starting on the carousel moved the carousel, not the page) | I-01 S1 designs the direction lock; I-08 tests five angles; fallback plain row; cut list |
+| K1 | **Sheet-through-hole tap (TUTORIAL B11):** a tap in the overlay hole must reach a button inside a sheet on a lower layer | Scratch probe and the I-01 S2 check **passed** (8 of 8 rows, 9.5) on desktop on a scratch layer pair; **not run on a phone, not run with the real `BottomSheet`** | I-01 S2 (done), re-run in I-08 and I-12 on the real sheet and overlay. Fallback: card-only steps |
+| K2 | **Nested carousel steals diagonal swipes** | Scratch probe: **failed**; I-01 S1 reproduced it (a plain `ScrollContainer` carousel fails 4 of 10 swipe rows) and **passed 10 of 10 with the direction lock and non-interactive cards owned by the Carousel** (9.5). Not tried on a real finger | I-08 builds the lock and re-runs the 10 rows on the real component; the plain row stays as phone-test insurance and cut-list item 1 |
 | K3 | **Barlow in Godot.** Weights, `tnum`, fallback, size | Files and `default_font.tres` already in the repo; desktop: `tnum` works, widths match the art bible; APK +0.3 MB; weights not wired; the OFL text **is** in the APK (preset fixed in `d78038d`, verified by listing the APK) | I-02 wires weights; I-02 and I-25 keep the APK-listing check. **Android `tnum` unverified** (the text server in the Android template is TextServerAdvanced, so expected to work); phone-test item |
-| K4 | **Texture and draw-call budget** | Counts exact on this renderer: `StyleBoxFlat` card is one call with or without shadow; 9-slice from one atlas batches to 1; a `CPUParticles2D` is one call. Real batching with interleaved text and icons is not proven. Fill-rate cost is not measurable here | I-01 S3, gates in section 6, `perf_baseline` in every screen step; phone test |
-| K5 | **Node cliff in the hero grid** (40 cards) | Current Draft screen has 81 nodes; a 5-node card would cost 240 | I-01 S4: HeroCard is one self-drawing `Control`; fallback virtualised list |
+| K4 | **Texture and draw-call budget** | Counts exact on this renderer: `StyleBoxFlat` card is one call with or without shadow; **S3 measured: a baked 9-slice costs the same as `StyleBoxFlat` once text or icons sit on the cards (17 against 17, 25 against 25 for 8 cards)**, and wins only with a separate background layer (9.5); a `CPUParticles2D` is one call. Real batching on Android is not proven. Fill-rate cost is not measurable here | I-01 S3 (done: keep `StyleBoxFlat` and the shared `UI.box()` cache), gates in section 6, `perf_baseline` in every screen step; phone test |
+| K5 | **Node cliff in the hero grid** (40 cards) | **Measured (S4, 9.5):** 40 `PanelContainer`s = 281 nodes; one `Control` per card = 41 nodes but **107 draw calls** (hard limit 100 for the whole screen); one atlas and one font size (B3) = 65 calls; one `HeroGrid` `Control` = **1 node and 7 calls** | I-09 `HeroGrid` (design C, accepted). Alternative B3 with one waiver. Virtualising does not help (it does not touch the failing number) |
 | K6 | **Rebuild-on-tap makes overlay and sheets unstable** | 16 to 22 ms per tap measured | Section 2.1 rule; in-place audit in every screen step |
 | K7 | **Token change ripples** into the 14 unredesigned screens (UI-PASS-2 R4) | Font change alone already changed every screenshot | I-02 plus I-04 land it once with a full re-shoot; CP1 |
 | K8 | **String merge breaks tests** (12 keys replaced now, 4 held; 3 rename edits) | The Studio Manager grepped `game/tests`, `game/src` and `tools` for all 16 replaced keys and their old texts and found no test that depends on one; `ui_smoke` and `ui_touch` have **not** been re-run after the merge (no Godot on the review machine) | I-00 does the merge first, in its own commit, and runs both |
@@ -700,23 +732,90 @@ The v1.0 table said 1,400 to 2,050 (its blocks actually added up to 1,425 to 2,0
 | K10 | **Hot-file collisions between two agents** | Real: `ui.gd`, `main.gd`, `screen.gd`, `app.gd`, `en.json`, `game_state.gd`, big test files | Section 4 ownership table, auto-discovered tests, integration lines |
 | K11 | **Text widths on a phone** drift by a pixel or two at scaled sizes (the "Gravenstone" room is a few pixels) | Exact on desktop only | Margin audit in `fit_*`; phone test; hero names stay at Small 26 |
 | K12 | **Time of the first game** (4 to 6 minutes for 27 steps is unmeasured) | TUTORIAL 11 | I-14 counts taps and steps; the CP2 phone test measures minutes (with 3 fallback steps, so slightly off); cut steps 3 and 10 first |
-| K13 | **Scope.** About 1,460 to 2,110 base tool calls, 1,750 to 2,740 with the rework allowance (estimate); the day figures are a guess | 5 of 13 earlier dispatches needed a second round | Cut list (section 10), checkpoints, re-estimate after I-07, I-15 and I-18; a second Gameplay Programmer instance on G2 from I-06 |
+| K13 | **Scope.** About 1,470 to 2,130 base tool calls, 1,760 to 2,770 with the rework allowance (estimate); the day figures are a guess | 5 of 13 earlier dispatches needed a second round | Cut list (section 10), checkpoints, re-estimate after I-07, I-15 and I-18; a second Gameplay Programmer instance on G2 from I-06 |
 | K14 | **The Founder's first look at the tutorial shows cards instead of highlights** (v1.1) | In v1.0, CP2 after I-16 would have shown 15 of 27 steps as "cannot find" cards (the review counted 13; two more are the Match screen steps, which no increment tagged) | CP2 moved to I-18, tag-only I-21a pulled forward; 3 cards left at CP2 (steps 5, 6, 26), listed in section 10; the Producer tells the Founder |
 | K15 | **A new save or a killed app gets the wrong tutorial state** (v1.1) | Review X8: the plan had no state for a brand-new save and nothing for a kill mid-game | Section 5 items 3 and 10; fixture `save_0_6_d`; tests in I-06, I-11, I-14 |
 
 ### 9.2 What would make me stop and replan
 
-- S1 and S2 both fail (no reliable carousel, no hole-tap): drop the carousel, make the tutorial card-only, and the tutorial cost falls; the layouts do not change otherwise.
-- S4 shows a self-drawing card cannot hold a 40-hero grid under 200 nodes and 100 draw calls: virtualise the grid (more code in I-09 and I-16, about 20 to 30 calls more, estimate).
+- (v1.2: S1 and S2 passed on the computer, so this is now a phone-test trigger.) The carousel lock or the hole tap fails on a real finger or on the real components (no reliable carousel, no hole-tap): drop the carousel to a plain row, make the tutorial card-only, and the tutorial cost falls; the layouts do not change otherwise.
+- (v1.2, replaces "virtualise the grid", which S4 showed would not help.) `HeroGrid` on real silhouettes needs more than about 15 draw calls (7 measured with placeholder discs), or the Draft screen as a whole cannot sit under 100: switch the grid to B3 (one font size) with the one waiver line of section 6, and ask the UI/UX Designer about the tag size. The measured reference: 40 `PanelContainer`s 281 nodes; one `Control` per card 107 calls; B3 65 calls; `HeroGrid` 7 calls.
 - The `Strings` merge in I-00 breaks more than about 10 tests: pause and fix before anything else.
 
 ### 9.3 Spikes already run (scratch, not in the repo)
 
-Files under the session scratchpad (`probe07/`): node counts, rebuild timings, font widths, B11, nested scroll, SVG. They are probes, not deliverables; I-01 re-creates the ones that matter inside `game/tests/` so the result is repeatable by anyone.
+Files under the session scratchpad (`probe07/`): node counts, rebuild timings, font widths, B11, nested scroll, SVG. They are probes, not deliverables; I-01 re-created the ones that matter inside `game/tests/` (`check_gestures`, `game/tests/spikes/`), so the result is repeatable by anyone. The I-01 results are in 9.5.
 
 ### 9.4 Phone-test list (open until a phone has run a match)
 
 Scrolling stutter on Home and Draft; whether the phone warms over one full match with the draft; text that looks wrong or boxy; `tnum` columns on Android; SVG icons on Android; the hole tap through a sheet on a real touchscreen; the carousel direction lock on a real finger; overlay timing; shadow and glow cost on a low-end GPU; real draw calls and frame time (needs a debug overlay, `PERF-BUDGET.md` 9 item 3, small piece of work; propose it as part of I-02 if the Technical Director agrees).
+
+### 9.5 I-01 spike results (measured 2026-11-10, copied from `SPIKE-RESULTS-0.7.md`)
+
+Taken by the Gameplay Programmer on the build computer, Godot 4.3 stable, desktop. Touch is simulated (finger events pushed into the viewport with `emulate_touch_from_mouse` on, as `ui_touch.gd` does). Draw calls, node counts and texture memory come from Xvfb with `--rendering-driver opengl3` (software): **counts carry to a phone, milliseconds do not. Nothing here ran on a phone.** I copied the tables below; I did not re-run the spikes. How to run them is in the results document.
+
+| Spike | Result | Decision |
+|---|---|---|
+| S1 nested scroll | **Pass with the direction lock**, 10 of 10 swipe rows, taps right; plain `ScrollContainer` carousel fails 4 of 10 | Carousel with lock and owned taps (I-08); plain row not needed on this evidence |
+| S2 hole tap | **Pass**, 8 of 8 rows incl. a leak control, on a scratch `CanvasLayer` pair (sheet 20, overlay 100) | Keep four dim panels plus blocker, no shader; re-run on the real components in I-08 and I-12 |
+| S3 surface | `StyleBoxFlat` = baked 9-slice in draw calls once text or icons are on the cards; a shadow adds 0 calls | Keep `StyleBoxFlat` and the shared `UI.box()` cache |
+| S4 hero grid | One `Control` per card passes nodes (41) and **fails draw calls (107)**; one `HeroGrid` = 7 calls, 1 node | `HeroGrid`, design C (I-09); B3 with a waiver is the alternative |
+
+**S1: swipes that start on the carousel** (200 px tall, 8 cards, in a vertical page scrolled to 360; ten swipes of 240 px in 12 moves from the middle of the carousel; px moved, page scroll includes its own fling after release). Pass rule: under 45 degrees the page moves at least half the swipe's vertical travel and the carousel at most 2 px; 45 and over, the carousel moves at least half the horizontal travel and the page at most 3 px.
+
+| Angle from vertical, direction | Plain `ScrollContainer` carousel (Button cards) | Lock, Button cards | **Lock, cards owned by the Carousel (chosen)** |
+|---|---|---|---|
+| 0, up-left | page 437, carousel 0 OK | page 595 OK | page 437, carousel 0 **OK** |
+| 20, up-left | page 0, **carousel 160 FAIL** | page 559 OK | page 410, carousel 0 **OK** |
+| 40, up-left | page 0, **carousel 381 FAIL** | page 363 OK | page 334, carousel 0 **OK** |
+| 60, up-left | carousel 515 OK | page 0, **carousel 17 of 208 FAIL** | page 0, carousel 208 **OK** |
+| 90, up-left | carousel 475 OK | page 0, **carousel 20 of 240 FAIL** | page 0, carousel 240 **OK** |
+| 0, down-right | page 360 OK | page 360 OK | page 360 **OK** |
+| 20, down-right | page 0, **carousel 148 FAIL** | page 360 OK | page 360, carousel 0 **OK** |
+| 40, down-right | page 0, **carousel 281 FAIL** | page 360 OK | page 335, carousel 0 **OK** |
+| 60, down-right | carousel 300 OK | carousel 17 **FAIL** | carousel 208 **OK** |
+| 90, down-right | carousel 300 OK | carousel 20 **FAIL** | carousel 240 **OK** |
+
+Taps on the owned-cards lock: a tap on card 1 gives card 1; a tap with 6 px of finger jitter still gives card 1; a horizontal swipe and a vertical swipe that start on a card tap nothing. **The rule it forces:** with Button cards, or any child whose mouse filter is not IGNORE, the engine keeps routing later drag events to that child and the lock fails at 60 and 90 degrees (third column of the table above, middle). The lock must swallow both the drag and the emulated mouse motion when horizontal. **Not tested:** a real finger, a touch-only stream (in this engine setup it did not scroll a plain `ScrollContainer` at all, so the simulation sends touch and mouse together), large text, a swipe that starts in the gap between cards, multi-touch.
+
+**S2: hole tap** (a page button on layer 0; a sheet on layer 20 with a counting scrim and two buttons; an overlay on layer 100 of four dim `ColorRect`s around a hole, no shader, and an info-step blocker). These are the 8 rows I-08 and I-12 re-run on the real components:
+
+| Row | Result |
+|---|---|
+| Control: with the dim panels hidden, the same taps reach the scrim and the sheet panel (the leak is detectable) | OK |
+| Tap in the middle of the hole presses the sheet button; nothing else reacts | OK |
+| Taps on the four dim panels, over the scrim and over the page button are swallowed | OK |
+| Edge: first pixel inside the hole presses, 2 px outside is swallowed | OK |
+| Tap in the 8 px margin of the hole (outside the button) reaches the sheet panel, not the scrim | OK |
+| Info step: the blocker over the hole swallows the tap | OK |
+| The hole moves to a second target: it presses and the old target is blocked | OK |
+| A drag that starts in the hole and leaves it does not press the button | OK |
+
+Not tested: the real `BottomSheet` and `CoachOverlay`, a real touchscreen, a drag that starts in the hole and scrolls a `ScrollContainer` inside the sheet (TUTORIAL step 17 style), Android back during a sheet step, large text.
+
+**S3: draw calls of a Draft-like screen** (page background, title, 8 cards of 120 px in a `VBoxContainer`, 720 x 1280, software OpenGL; two runs gave identical counts).
+
+| Background | Content none | One label | Icon and two labels |
+|---|---|---|---|
+| empty page (reference) | 1 | | |
+| `flat` | 10 | 17 | 25 |
+| `flat+shadow` | 10 | 17 | 25 |
+| `baked9` (card holds its content) | 3 | 17 | 25 |
+| `baked9 layered` (backgrounds behind) | 3 | 3 | 19 |
+
+Nodes for the same rows: 12, 28, 44 for the first three kinds; the layered kind 21, 37, 53 (a second container, +9 nodes per 8 cards, every layout change done twice). Texture memory 6.69 MB for the empty page and 6.83 MB with any card kind. Reading: a shadow adds fill area, not calls; a baked 9-slice batches to one call only while nothing else is drawn between the cards; each texture switch (glyph atlas, icon, untextured shape) is one more call. The baked tile used has no shadow halo, so baked elevation was not compared. Not measured: fill rate and overdraw (the real shadow cost on a low-end GPU), milliseconds, real Android batching.
+
+**S4: 40-hero grid** (the 40 heroes of `data/heroes.json`, 3 columns of 183 px cards inside a vertical page, about 19 cards on screen; "setters plus layout" is one role filter plus 8 state changes, headless; the headless frame itself is paced at about 6.9 ms; milliseconds are this computer's).
+
+| Design | Nodes in the grid | Setters plus layout, headless | Draw calls on screen, top / bottom |
+|---|---|---|---|
+| **A** 40 `PanelContainer`s, each `VBoxContainer` plus portrait, name, tag, mark, role chip | **281** (7 per card) | 0.35 ms | 98 / 88 |
+| **B** one Control per card, draws itself (style box, disc, lines, text at 3 sizes) | 41 | 0.11 ms | **107 / 97** |
+| **B2** as B, every shape from one atlas texture | 41 | 0.13 ms | **107 / 97** |
+| **B3** as B2, name and tag at one font size, no initial letter | 41 | 0.15 ms | **65 / 59** |
+| **C** one HeroGrid Control draws all 40 in three passes, text grouped by font size, owns hit-testing | **1** | 0.06 ms | **7 / 7** |
+
+Reading: nodes at most 60 passes for B, B2, B3 and C and fails for A. **The draw-call gate is the real finding:** B and B2 emit 5 to 6 calls per visible card (text at three sizes means three glyph textures, then untextured shapes), over the screen's hard limit of 100 before any header or tab bar; B2's atlas changes nothing because text dominates; B3 halves it. C orders its draws (all backgrounds, all discs and marks, then text by font size) for 7 calls. Virtualising would not help, because the 107 calls are already for the visible cards only. Hit-testing for C and B3 needs the S1 tap rule (a release more than 12 px from the press is a drag). **Not measured:** real portraits (placeholder discs here; a silhouette atlas may add a second texture and a call), colour-blind marks beyond a text cue and a shape, millisecond cost of drawing 40 cards on a phone's CPU (C redraws all 40 when one changes), large-text names such as "Gravenstone" at 26 px, tall phone, a phone.
 
 ---
 
@@ -724,7 +823,7 @@ Scrolling stutter on Home and Draft; whether the phone warms over one full match
 
 **Cut order if time is short** (taken from UI-PASS-2 8.1 and my own risk list; each cut leaves a working app):
 
-1. Home and Squad carousels become plain rows with "See all" (also the fallback if S1 fails).
+1. Home and Squad carousels become plain rows with "See all" (v1.2: S1 passed in I-01, so this is now only for time, or if the phone test shows the direction lock failing on a real finger).
 2. Drag-to-swap on Squad (tap-to-swap stays).
 3. History mini story strips on Standings.
 4. Report "starter chips" sheet.
@@ -801,7 +900,7 @@ In plain words for the Founder at CP2: "The guided first game works from the wel
 | Overlay | `CoachOverlay` | `src/tutorial/coach_overlay.gd` |
 | Runner | `TutorialRunner` | `src/tutorial/tutorial_runner.gd` |
 | Tutorial game | `TutorialGame` | `src/game/tutorial_game.gd` |
-| Components | `DepthCard`, `SectionHeader`, `Chip`, `Segmented`, `IconButton`, `EmptyState`, `EdgeMeter`, `HeroStat`, `ListSync`, `BottomSheet`, `Carousel`, `PlayerCard`, `HeroCard`, `LaneRow`, `LaneBoard`, `PhaseStrip`, `DetentTrack`, `Podium`, `RankRow` | `src/ui/components/` |
+| Components | `DepthCard`, `SectionHeader`, `Chip`, `Segmented`, `IconButton`, `EmptyState`, `EdgeMeter`, `HeroStat`, `ListSync`, `BottomSheet`, `Carousel`, `PlayerCard`, `HeroGrid`, `HeroCard` (static drawing helper), `LaneRow`, `LaneBoard`, `PhaseStrip`, `DetentTrack`, `Podium`, `RankRow` | `src/ui/components/` |
 | Art code | `TexCache`, `Icons`, `BadgeStyle`, `Silhouette`, `Avatar`, `Surface` | `src/ui/art/` |
 | Game hooks | `GameState.upcoming`, `cut_gap`, `tutorial`, `set_tutorial`; `Report.team_kills`; `Draft.best_slot_for` | `game_state.gd`, `sim/report.gd`, `sim/draft.gd` |
 
@@ -837,10 +936,11 @@ Nobody owned these before v1.1. Each is raised by Narrative or by this plan, eac
 
 ## 13. Hand-offs
 
-- **Producer:** I-00 is built and waits for the Lead Programmer's review, then commit it as one commit; dispatch I-01, then **I-00b**, then I-02 onward in order; commit one increment at a time; **decide D8** (CP2 after I-18, I-21a first, optional engine-preview APK) and **tell the Founder the card lists of section 10.1 before each APK**; APK at CP2 and CP3; permit the second Gameplay Programmer instance on G2 from I-06 if wanted; log that the Founder's feedback supersedes the earlier "guided first game stays optional" decision; ALPHA-0.7 notes at I-25.
-- **Narrative:** the copy patch is the source; after the merge, copy edits go in a patch file applied by `merge_copy.py --update` with an allow-list (I-00b); fill `docs/design/copy/update_allow.json` when the UI/UX answers U1 to U3 arrive; re-run `tools/check_copy.py` when keys change.
-- **Engine / Graphics:** lane E (I-05), the per-screen allowance table and its ratchet (`PERF-BUDGET.md` 3.1a; I-00b moves it into `game/tests/perf_allowances.json`), ThorVG in the Android template, the debug overlay if approved. The OFL licence file is already in the APK; nothing to do. Mark section 8 of `PERF-BUDGET.md` as the review asked if not yet done.
-- **Technical Director:** D1; the two re-baselines (after I-04, after I-22); every waiver between target and hard limit.
+- **Producer:** I-00, I-00b and I-01 are built (I-00 waits for the Lead Programmer's review); commit each as its own commit; dispatch **I-00c**, then I-02 onward in order; commit one increment at a time; **decide D8** (CP2 after I-18, I-21a first, optional engine-preview APK; the Producer log of 2026-11-10 already records it) and **tell the Founder the card lists of section 10.1 before each APK**; APK at CP2 and CP3; permit the second Gameplay Programmer instance on G2 from I-06 if wanted; log that the Founder's feedback supersedes the earlier "guided first game stays optional" decision; ALPHA-0.7 notes at I-25.
+- **Narrative:** the copy patch is the source; after the merge, copy edits go in a patch file applied by `merge_copy.py --update` with an allow-list (I-00b); the allow-list is `docs/design/copy/owned_keys.txt` (v1.2; Producer or Lead Programmer edits it); `patch2` is applied; re-run `tools/check_copy.py` when keys change.
+- **Engine / Graphics:** lane E (I-05), the per-screen allowance table and its ratchet (`PERF-BUDGET.md` 3.1a; I-00c moves it into `game/tests/perf_allowances.json`), ThorVG in the Android template, the debug overlay if approved. The OFL licence file is already in the APK; nothing to do. Mark section 8 of `PERF-BUDGET.md` as the review asked if not yet done.
+- **Lead Programmer (me), small:** add the `python3 -m pytest tools -q` step to `tools/check_fast.sh` (section 3.3); review I-00, I-00b and I-00c files before the Producer commits them.
+- **Technical Director:** D1; confirm the 15 draw call ceiling for `HeroGrid` (I-09); the two re-baselines (after I-04, after I-22); every waiver between target and hard limit.
 - **QA Automation:** **owns `game/tests/fixtures/` from now on**; audits and the matrix in I-25; seed pinning for the tutorial tests; `check_save_compat` extended with new fixtures only as new files.
 - **Systems Designer:** D3 approval.
 - **IP and Originality Checker:** Barlow licence entry (already logged by Engine/Graphics; the OFL text ships, verified by APK listing); badge, silhouette and icon shapes from I-05.
