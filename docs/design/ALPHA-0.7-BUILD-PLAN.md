@@ -1,6 +1,6 @@
 # Alpha 0.7 "Guide and Look": Build Plan
 
-Version 1.1 · Date 2026-11-09 · Author: Lead Programmer · Status: v1.1 patch after the Studio Manager review of wave 2a; for the Producer to hand to the Gameplay Programmer (I-00 is already in build and is recorded as amended, not redone).
+Version 1.1 · Date 2026-11-09 · Author: Lead Programmer · Status: v1.1 patch after the Studio Manager review of wave 2a; for the Producer to hand to the Gameplay Programmer (I-00 is built, review pending, and is recorded as amended, not redone; the next dispatch is I-00b, then I-01).
 
 **Change log, v1.0 to v1.1** (source: `company/reviews/2026-11-09-wave2a.md` section 4; the number in brackets is that review's fix number)
 
@@ -12,10 +12,11 @@ Version 1.1 · Date 2026-11-09 · Author: Lead Programmer · Status: v1.1 patch 
 | 4 | Stale statements removed: the OFL licence step is done (commit `d78038d`, verified by listing the APK); "Report moves ahead of Squad" was not a change from UI-PASS-2 8.1; the dangling "explained in section 4" pointer is gone. [4] | 0, 2.2, I-02, 4.3, K3, 13 |
 | 5 | Old welcome tips against the new Home offer card and the "Play without scrolling" acceptance: **the Home tip retires in I-15, the Report tip in I-18, the Pre-match tip in I-21a**, I-24 only deletes what is left. [9] | I-15, I-18, I-21a, I-24 |
 | 6 | Effort: tutorial block sum fixed (210 to 300), small increments re-costed, a **20 to 30 percent rework and review allowance** added, the day figures labelled a guess, and the screenshot counts that only fit when batched are named. [10] | 0, 3.1 R1, 8, 9.1 K13 |
+| 6b | I-00 recorded as built (review pending) with its fixed-seed perf table; **new small increment I-00b** (copy update route with an allow-list, and the perf allowance data file); section 6 now refers to `PERF-BUDGET.md` 3.1a (per-screen allowances with a ratchet, shadows 6, font pairs 12) instead of flat gates [review fix 5, 7]; wording fixes: saves are `JSON.stringify(gs.d)` then `from_dict` (no `to_dict`), Q owns the fixtures folder, `tools/check_copy.py` is used for the I-22 and I-24 tests and there is no `check_rename.py`. | 4.2, 6, I-00, I-00b, I-04, I-22, I-24, 5 |
 | 7 | Added: the Founder's "no mid-match interventions" quoted; I-00 tooling ownership (Gameplay Programmer builds, Lead Programmer reviews, Tools Engineer on call); permission for a second Gameplay Programmer instance on the guide lane (G2) from I-06; the five UI/UX answers still owed as an open table with owners. | 0, 4.1, 4.2, 12.1 |
 | 8 | Small knock-on fixes made while patching: tab bar tags added to I-03 (steps 3, 4, 7 and 24 need them), Match screen tags assigned to I-21a (no increment had them), K8 answered by the review's grep, D7 clause about "I-04's colour-blind check" corrected. | I-03, I-21a, K8, D7 |
 
-Not part of this patch (owners named by the review, still open): gates against the baseline [5], copy script and `en.json` update route [7, 8], B11 / nested / SVG outputs [11], GDD "coach" lines [13]. See section 13.
+Not part of this patch (owners named by the review, still open): B11 / nested / SVG outputs [11], GDD "coach" lines [13], and the one-word addition of the state `new` to `TUTORIAL.md` 6.1. See section 13. (Review fixes 5, 7 and 8 are now covered by section 6, I-00b and `tools/check_copy.py`.)
 
 Inputs: `ALPHA-0.7-PLAN.md`, `UI-PASS-2.md`, `TUTORIAL.md`, `ART-BIBLE.md`, `PERF-BUDGET.md`, `COPY-0.7.md` and `copy/en_0_7.json`, the last section of `company/DECISIONS.md`, `company/reviews/2026-11-08-wave1b.md`, `company/reviews/2026-11-09-wave2a.md`, and the code in `game/src/core`, `game/src/ui`, `game/src/game`, `game/src/sim` and `game/tests` as it stands today (version label 0.6.0 alpha).
 
@@ -26,7 +27,7 @@ Inputs: `ALPHA-0.7-PLAN.md`, `UI-PASS-2.md`, `TUTORIAL.md`, `ART-BIBLE.md`, `PER
 ## 0. Summary (phone-length)
 
 - **Founder decision, final (company/DECISIONS.md):** "NO mid-match interventions. The player never changes anything during a match." Nothing in this plan adds one: `screen_match.gd` stays spectator-only (only its Speed, Skip and See-the-report buttons are tagged), and the tutorial and help never write a match result.
-- **What this is.** 26 build steps (I-00 to I-25; I-21 is split in two, so 27 dispatches). Each is small enough to build, test and screenshot in one sitting (about 15 to 140 tool calls, estimate). The base total is about 1,445 to 2,085 tool calls (estimate). With a 20 to 30 percent allowance for rework and review (5 of the 13 earlier dispatches needed a second round) it is **about 1,730 to 2,710 tool calls**. In days that is roughly 24 to 38 working days for one builder and 17 to 26 with two lanes. **The day figures are a guess**: nothing converts tool calls to days yet (the design documents' own figure is 57 developer days). Section 8.
+- **What this is.** 26 build steps (I-00 to I-25; I-21 is split in two and the small follow-up I-00b is added, so 28 dispatches). Each is small enough to build, test and screenshot in one sitting (about 15 to 140 tool calls, estimate). The base total is about 1,460 to 2,110 tool calls (estimate). With a 20 to 30 percent allowance for rework and review (5 of the 13 earlier dispatches needed a second round) it is **about 1,750 to 2,740 tool calls**. In days that is roughly 24 to 38 working days for one builder and 17 to 26 with two lanes. **The day figures are a guess**: nothing converts tool calls to days yet (the design documents' own figure is 57 developer days). Section 8.
 - **Order.** Safety net and spikes first, then look foundations (type sizes, colours, font, frame), then shared components, then the tutorial engine, then the six screens (Home, Draft, Game Plan, Report, Squad, Standings), then help sheets, lessons and acceptance. The screen order is the one in UI-PASS-2 8.1 (Home, Draft, Game Plan, Report, Squad, Standings), unchanged. What this plan adds to 8.1: the tutorial plumbing (tags and events) lands before the first screen, so no screen is built twice; the nested-scroll spike of 8.1 step 0 grows into four spikes, including surface cost (S3) and the 40-hero grid (S4); and the tag-only work for screens that are not redesigned (I-21a) is done before the Founder sees the tutorial.
 - **Three checkpoints** where the Founder can see something real: CP1 after I-04 (same game, new type, colours and font), **CP2 after I-18** (Home, Draft, Game Plan and Report redesigned, so the whole match-day loop is new; the guided first game is playable with 3 of 27 steps still showing a "cannot find that" card: first APK for the phone test), CP3 after I-25 (everything, full check). An optional **engine-preview APK** after I-16 is for scrolling, warmth and text only: the guide on it has 8 fallback steps and the Founder should tap Skip tutorial. Exact lists in section 10.
 - **Biggest findings from the code** (measured, section 2): every tap on Game Plan, Squad and Draft deletes and rebuilds the whole page (22 ms, 16 ms and 22 ms on this computer; 131 nodes on Game Plan). This is the pattern the plan replaces with build once and update in place. A tutorial that points at a button cannot survive a page that deletes the button on every tap, so this is a hard dependency, not a nicety.
@@ -88,13 +89,13 @@ A phone is probably 3 to 6 times slower per CPU operation than this computer (my
 6. Timers and counters redraw only when the displayed text changes (the Draft timer string changes once a second, not every frame).
 7. A test proves it (section 3.2, "in-place audit"): record `get_instance_id()` of the scroll container, the first control of every list and every slider before a tap, tap, and require the same ids.
 
-Screens not redesigned in 0.7 (Finance, Training, Free agents, Negotiation, Practice, Settings, Chemistry) keep `_rebuild`; the tutorial steps that touch them (the Practice matches tile on the Plan tab, the Quick Match button) are tagged in I-21. They are listed in the cut list in section 10 as the next candidates.
+Screens not redesigned in 0.7 (Finance, Training, Free agents, Negotiation, Practice, Settings, Chemistry) keep `_rebuild`; the tutorial steps that touch them (the Practice matches tile on the Plan tab, the Quick Match button) are tagged in I-21a, before the Founder's first look at the guide. They are listed in the cut list in section 10 as the next candidates.
 
 ### 2.2 Tokens, theme and font today
 
 - `ui.gd`: sizes `S_BODY` 28, `S_SMALL` 22, `S_BIG` 38, `S_TITLE` 46, `BTN_H` 92, `R_CARD` 20, `GAP` 14. Colours `BG PANEL PANEL2 PANEL3 ACCENT CORAL GOOD BAD WARN TEXT DIM BLUE RED` as `const`. `box()` builds a new `StyleBoxFlat` on every call (no cache). `make_theme()` builds the theme. Not in code yet: `S_HEAD`, `S_CAPTION`, `S_DISPLAY`, the role colours, `VOID`, `TEXT2` and the rest of the art bible 3 token table.
 - Button kinds today: `primary`, `play`, `danger`, `flat`, plus normal. The art bible wants one coral action per screen and an outlined `ban` kind; a `Section` header uses a text prefix ("+ " and "- ") that tests find by string (`ui_shots._open_section`).
-- Font: Engine/Graphics has already added Barlow Semi Condensed (five weights, OFL) and `default_font.tres` (a `FontVariation` over Regular with a system fallback), set in `project.godot` as `gui/theme/custom_font`. Result: every existing screen is already in Barlow Regular. **Weights are not wired** (no SemiBold buttons, Bold titles) and **`tnum` is not applied** to numbers. `OFL.txt` is **not in the APK** (the export preset filter lists only `*.json`); licence text must ship with the font (fix is in I-02, `export_presets.cfg` is mine).
+- Font: Engine/Graphics has already added Barlow Semi Condensed (five weights, OFL) and `default_font.tres` (a `FontVariation` over Regular with a system fallback), set in `project.godot` as `gui/theme/custom_font`. Result: every existing screen is already in Barlow Regular. **Weights are not wired** (no SemiBold buttons, Bold titles) and **`tnum` is not applied** to numbers. The font licence text **ships**: `export_presets.cfg` has `include_filter="*.json, assets/fonts/OFL.txt"` since commit `d78038d`, and the Studio Manager's listing of the repo APK shows `assets/assets/fonts/OFL.txt` (4,377 bytes). Nothing is left to do for it in 0.7 except to keep the listing check in I-02 and I-25 (the earlier "not in the APK" finding in `PERF-BUDGET.md` 8 is stale).
 - Large text is `Window.content_scale_factor = 1.15` (`App.LARGE_SCALE`), so the logical canvas becomes 626 x 1113; the design canvas is 720 x 1280, stretch `canvas_items`, aspect `expand`. A tall phone is 720 x 1560.
 
 ### 2.3 Frame
@@ -128,7 +129,16 @@ String-matching tests: `ui_shots` finds section buttons by the "+ " text prefix 
 
 ### 2.6 Strings
 
-`game/i18n/en.json` has 645 keys, ASCII only. `tools/check_strings.py` reads `en.json` only (and the code's `Strings.t("key")` uses). The word "advisor" appears at two keys and "owner and coach" at one (the Coach rename list is in `COPY-0.7.md` 6.2). Narrative has written `docs/design/copy/en_0_7.json`: 540 keys, 524 new and 16 replacing existing ones, to be **merged once** into `en.json` (Narrative did not touch `en.json`). Decision: merge once in I-00, so lanes never edit `en.json` in parallel (after the merge, only the UI lane adds keys, section 4 ownership table).
+`game/i18n/en.json` has 645 keys, ASCII only. `tools/check_strings.py` reads `en.json` only (and the code's `Strings.t("key")` uses). The word "advisor" appears at two keys and "owner and coach" at one (the Coach rename list is in `COPY-0.7.md` 6.2). Narrative has written `docs/design/copy/en_0_7.json`: 540 keys, 524 new and 16 replacing existing ones (Narrative did not touch `en.json`). Decision: merge in I-00, so lanes never edit `en.json` in parallel (after the merge, only the UI lane adds keys, section 4 ownership table). **Amended in v1.1: four keys are held out of the merge** because their new text describes things that do not exist until later, and the Founder's CP2 phone build would otherwise tell testers about features that are not in it. All four are among the 16 replaced keys, so they already exist in `en.json` with their old text, and the old text simply stays until release:
+
+| Held key | New text says | Released in |
+|---|---|---|
+| `draft.meta_hint` | "An up arrow means strong in this patch" (the Draft screen still shows green text until the arrows are drawn) | I-16 (Draft) |
+| `about.title` | "About Alpha 0.7" (the version label is 0.6.0 until I-25) | I-25, together with `App.VERSION_LABEL` 0.7.0 |
+| `about.included.b` | a guided first game, a ? button on every screen, lessons, a glossary | I-24 (help sheets exist from I-22, lessons from I-23) |
+| `about.test.b` | tester questions about the guided first game, help, lessons, glossary | I-24 |
+
+`tools/merge_copy.py` takes a hold-list (`--hold <file>`, default `docs/design/copy/hold_0_7.json`, one entry per key with its release increment and reason), copies every other key, **prints the held keys by name**, shows each replacement with old and new text, and refuses a patch with duplicate keys, non-ASCII text or a changed `{placeholder}`. A dry run writes nothing; `--write` writes, and `--expect-total 536 --expect-replaced 12 --expect-new 524 --expect-held 4` makes the run fail if the counts differ. **To release a key, the increment that owns it deletes the key's entry from the hold file and runs the script again with `--write`** (it overwrites the old text on purpose and prints that). *(As found in the working tree on 2026-11-09: the script and the hold file exist, and `en.json` has 1,169 keys with the four held keys still on their old text; I have read them but have not run the script.)* I-00 merges **536 keys: 524 new and 12 replaced**. The key set of `en.json` is the same as in the full merge (1,169 keys, so 0 unknown keys in `check_strings.py` and the same "unused" count the review found, 588, which depends on the key set and the code, not on the text). The old `about.title` text ("About Alpha 0.4") was already stale before this patch; it stays stale until I-25 and says nothing untrue about 0.7.
 
 ### 2.7 Performance baseline and gates
 
@@ -142,8 +152,8 @@ Baseline (Engine/Graphics, `PERF-BUDGET.md`, and my node counts above): the curr
 
 ### 3.1 Rules
 
-- **R1. Definition of done for any increment.** (a) Builds with no script errors; `--import` was run if a `class_name` file was added. (b) The fast check loop (3.3) is green. (c) New tests exist and pass (3.2). (d) Screenshots were taken at the matrix subset named in the increment and looked at twice (first pass layout, second pass text fit, touch size, colour dependence). (e) Strings: no hard-coded visible text; `check_strings.py` clean. (f) The in-place audit passes for a redesigned screen. (g) A handback in the studio format, with what was not tested.
-- **R2. One increment, one dispatch, one owner.** Lanes in section 4. If an increment needs a change in a file owned by another lane, it lists it as an "integration line" for the owner (at most about 5 lines) and does not edit it.
+- **R1. Definition of done for any increment.** (a) Builds with no script errors; `--import` was run if a `class_name` file was added. (b) The fast check loop (3.3) is green. (c) New tests exist and pass (3.2). (d) Screenshots were taken at the matrix subset named in the increment and looked at twice (first pass layout, second pass text fit, touch size, colour dependence). **Looking is batched**: images are joined into contact sheets of 6 (3 x 2, each image at half size) before they are viewed, and the headless fit audit, not the eye, carries the text-fit check on the unchanged ones; a single image is opened at full size only when a sheet shows a problem or a change. The tool-call figures in this plan assume this (see section 8). (e) Strings: no hard-coded visible text; `check_strings.py` clean. (f) The in-place audit passes for a redesigned screen, **and its perf allowance row is deleted and the screen is at or under target (section 6)**. (g) A handback in the studio format, with what was not tested.
+- **R2. One increment, one dispatch, one owner.** Lanes in section 4. If an increment needs a change in a file owned by another lane, it lists it as an "integration line" for the owner (at most about 5 lines) and does not edit it. The two largest increments (I-16 Draft, I-19 Squad) may each be dispatched as two halves, "build" and then "tests and shots", if the Producer sees the first half run long; the increment is only done when both halves are.
 - **R3. No simulation change.** `src/sim/*.gd` and `data/*.json` of the sim are not changed except the read-only helpers named in I-06. The golden vectors (`tests/golden`) must not change; I-00 records their hash and the fast loop checks it.
 - **R4. Test migration happens in the same increment as the screen change.** A screen increment either keeps each old private method name (thin wrapper over the new code) or edits the old test lines, in the same dispatch. Never leave a red test for the next step.
 - **R5. Explicit types for `:=` on untyped values; no method named `_set`; no screen freed inside its own signal; `--import` after adding a `class_name` file** (a script load error hangs the engine; run every Godot command with `timeout`).
@@ -167,7 +177,7 @@ The T-std set every screen increment adds (names are the check labels):
 | `inplace_<screen>` | the in-place rule: instance ids unchanged across each state-changing tap; `_rebuild` is not called (a counter on the screen) | smoke |
 | `touch_<screen>` | a vertical swipe starting on a card, a button, a carousel and a slider scrolls the page; a tap taps; Android back (`GO_BACK`) navigates | touch scene, simulated |
 | `cb_<screen>` | in colour-blind mode, no meaning is carried by colour alone: every state-bearing control has a text, shape or icon cue (checked by reading a `cue` meta set by components, plus screenshot review) | smoke plus review |
-| `nocolour_words` | no visible string uses a colour word (Narrative's script as a test) | pure logic |
+| `nocolour_words` | no visible string uses a colour word (`tools/check_copy.py`, Narrative's script, now saved in the repo, run as a test with its allow-list) | pure logic |
 | `tags_<screen>` | the tutorial ids listed for this screen in TUTORIAL 8 exist and are visible on the right state | smoke |
 
 ### 3.3 Check commands
@@ -195,7 +205,7 @@ SHOT_DIR=<dir> SCREENS=<screen> VARIANTS=normal,large,cb,tall \
 SHOT_DIR=<dir> xvfb-run -a -s "-screen 0 720x1280x24" $GODOT --rendering-driver opengl3 res://tests/ui_shots.tscn   # old tour, 49 images
 ```
 
-**Perf gates** (I-00 adds `tests/perf_baseline.gd` and a one-line scene, from `PERF-BUDGET.md` 7; run under Xvfb opengl3; prints `PERF|` lines and fails above the hard limits): draw calls 100, nodes 200, texture memory 48 MB per screen.
+**Perf gates** (`tests/perf_baseline.gd` and its scene, built in I-00 from `PERF-BUDGET.md` 7; run under Xvfb opengl3; prints `PERF|` lines): the limits are those of section 6, i.e. per-screen allowances for legacy screens and target / hard limits for redesigned ones (`PERF-BUDGET.md` 3.1a). Until I-00b adds the allowance data file the probe applies only the flat hard limits (draw calls 100, nodes 200, texture memory 48 MB), which passes on the six screens the probe visits today but does not ratchet.
 
 **Full check** (`bash tools/run_all_checks.sh $GODOT`, about 25 minutes, run in the background): **only at the end of 0.7 (I-25)**, and once at CP2 before the APK. It adds `calibrate.py 40000 --check`, `pytest`, the soak run and everything above. Since R3 forbids simulation changes, the calibration is expected unchanged; the fast loop's golden hash is the early warning.
 
@@ -208,11 +218,14 @@ SHOT_DIR=<dir> xvfb-run -a -s "-screen 0 720x1280x24" $GODOT --rendering-driver 
 | Lane | Who | Works in (only) |
 |---|---|---|
 | **G1 (UI lane)** | Gameplay Programmer | all existing files in `game/src/ui/`, `game/src/core/app.gd`, `game/i18n/en.json` (after the I-00 merge), `game/tests/ui_smoke.gd`, `ui_touch.gd`, `ui_shots.gd`, `ui_pass_tests.gd`, `alpha6_tests.gd`, new `game/src/ui/components/`, new `game/tests/check_ui_*`, `check_touch_*`, `tests/shots/` |
-| **G2 (Guide lane)** | Gameplay Programmer (second instance, or the same one after G1 reaches the gate) | new `game/src/tutorial/`, new `game/src/core/device_state.gd`, new data `game/data/tutorial_v1.json`, `help_v1.json`, `glossary_v1.json`, `lessons_v1.json`, new `game/src/game/tutorial_game.gd`, **and** the read-only game-code helpers of I-06 (`game_state.gd`, `sim/draft.gd`, `sim/report.gd`, `data/clubs.json`), `game/tests/tutorial_tests.gd`, `check_tutorial_*`, `check_save_compat` |
+| **G2 (Guide lane)** | Gameplay Programmer. **A second Gameplay Programmer instance is permitted on this lane from I-06** (the Producer decides when to start it; the file split below is what makes two instances safe). With one instance, G2 work follows G1 in the order of 4.3 | new `game/src/tutorial/`, new `game/src/core/device_state.gd`, new data `game/data/tutorial_v1.json`, `help_v1.json`, `glossary_v1.json`, `lessons_v1.json`, new `game/src/game/tutorial_game.gd`, **and** the read-only game-code helpers of I-06 (`game_state.gd`, `sim/draft.gd`, `sim/report.gd`, `data/clubs.json`), `game/tests/tutorial_tests.gd`, `check_tutorial_*`, `check_save_compat` |
 | **E (Art/Perf lane)** | Engine / Graphics Programmer | new `game/src/ui/art/` (`tex_cache.gd`, `icons.gd`, `badge_style.gd`, `silhouette.gd`, `avatar.gd`, `surface.gd`), `game/assets/`, `game/tests/perf_baseline.gd`, `art_tests.gd`, `check_art.tscn` |
 | **Q (QA)** | QA Automation | reads everything; writes the audits listed in I-25 under `game/tests/audit_*`; owns the seed fixtures in `game/tests/fixtures/` |
 | **N (Narrative)** | Narrative Designer | `docs/design/copy/*.json` only; the Producer or G1 merges; Narrative never edits `en.json` |
-| **L (Lead Programmer)** | me | `tools/run_all_checks.sh`, `tools/check_fast.sh`, `game/export_presets.cfg`, review of every handback, this plan |
+| **L (Lead Programmer)** | me | `tools/run_all_checks.sh`, `tools/check_fast.sh`, `game/export_presets.cfg`, `project.godot`, review of every handback, this plan |
+| **T (Tools Engineer)** | Tools Engineer, **on call, not active** | The Producer may call T for a tool that is more than a script of a few dozen lines (shot matrix, perf baseline, contact-sheet builder). T edits only the file it is asked to write, and L reviews it as for any other lane |
+
+**I-00 tooling ownership (v1.1).** The Gameplay Programmer builds the I-00 tooling (`tools/check_fast.sh`, `tools/merge_copy.py`, `tests/perf_baseline.gd`, `tests/shots_matrix.gd`, the fixtures and `check_save_compat`) and edits `tests/run_tests.gd` and `tools/run_all_checks.sh` **in I-00 only**; the Lead Programmer reviews every one of those files before the Producer commits. After I-00, `run_tests.gd` and `run_all_checks.sh` are L-only again and nobody else needs to touch them, because of auto-discovery. The Tools Engineer is on call if a tool turns out to be large. I-00 is already in build with the hold-list and the fresh-save fixture; **it is recorded here as amended, not as a redo**.
 
 When there is a single Gameplay Programmer, G1 and G2 run one after the other in the order given in section 4.3; the file split is the same so a later switch to two agents costs nothing.
 
@@ -223,55 +236,72 @@ When there is a single Gameplay Programmer, G1 and G2 run one after the other in
 | `src/ui/ui.gd`, `main.gd`, `screen.gd`, `app.gd` | G1 only | G2 and E send "integration lines" in their handbacks (each is a few lines: create the overlay in `Main`, forward events, add `help_id()`) |
 | `src/ui/screen_*.gd` | G1 only | G2's tags are added by G1 as each screen is rebuilt (the tag list per screen is in the increment) |
 | `src/game/game_state.gd`, `sim/draft.gd`, `sim/report.gd` | G2 in I-06 and I-13 only; **nobody else in 0.7** | G1 needs a data helper: request it in a handback; G2 adds it in the next G2 slot |
-| `i18n/en.json` | G1 (append only, one block of keys per increment, sorted by prefix) | G2 and others hand G1 a key list; Narrative's patch files are the source |
-| `tests/run_tests.gd`, `tools/run_all_checks.sh` | L (I-00 only) | nobody, because of auto-discovery |
-| `project.godot`, `export_presets.cfg` | L | any change request goes in a handback |
+| `i18n/en.json` | G1 (append only, one block of keys per increment, sorted by prefix); the I-00 merge and every later release of a held key go through `tools/merge_copy.py`, and G1 deletes the key from `docs/design/copy/hold_0_7.json` in the releasing increment (the one exception to "Narrative owns `docs/design/copy/`"). **Copy edits after the merge (route A, built in I-00b):** Narrative writes a patch file, `tools/merge_copy.py --update` applies it only to keys named in `docs/design/copy/update_allow.json`, G1 runs it in the increment that needs the edit | G2 and others hand G1 a key list; Narrative's patch files are the source |
+| `tests/run_tests.gd`, `tools/run_all_checks.sh` | G1 in I-00 only, reviewed by L; L afterwards | nobody, because of auto-discovery |
+| `tools/validate_data.py` | L owns; G2 may extend it in I-06 only (club fields), reviewed by L | |
+| `tests/fixtures/` | created by G1 in I-00 (`save_0_6_a` to `_d` and `gen_save_fixtures.gd`, now present); **owned by Q from now on** (every later fixture, including any new save fixture, is Q's) | the generator says "do not regenerate with later code": new fixtures are new files |
+| `project.godot`, `export_presets.cfg` | L | any change request goes in a handback (in wave 2a the font default and the OFL filter were edited by roles other than L; from now a change is requested in a handback) |
 | `data/clubs.json` (club `colors` and `badge` ids), `data/heroes.json` | G2 in I-06 for clubs (additive fields only); heroes are read-only | |
 
 ### 4.3 Dependency order and what can overlap
 
 ```
-I-00 -> I-01 -> I-02 -> I-03 -> I-04 (CP1)
+I-00 -> I-01 -> I-00b -> I-02 -> I-03 -> I-04 (CP1)
                   |       |
                   |       +-> I-05 (E, art code; starts after I-02) --+
                   +-> I-06 (G2, core hooks; starts after I-00) -------+
 I-03 -> I-07 -> I-08 -> I-09 -> I-10    (components, G1; need I-05 for badges and silhouettes)
 I-06 -> I-11 -> I-12 -> I-13 -> I-14    (tutorial, G2; I-12 needs I-03 hooks and I-08 BottomSheet)
-I-10 -> I-15 Home -> I-16 Draft (CP2) -> I-17 Game Plan -> I-18 Report -> I-19 Squad -> I-20 Standings -> I-21
+I-14 -> I-21a Tag-only work on the screens that stay as they are (G1; run it directly before I-15)
+I-10 + I-21a -> I-15 Home -> I-16 Draft (engine preview, optional APK) -> I-17 Game Plan -> I-18 Report (CP2)
+             -> I-19 Squad -> I-20 Standings -> I-21b Plan, Club, Match day restyle
 I-14 + I-16 -> I-22 Help and glossary -> I-23 Lessons -> I-24 -> I-25 (CP3)
 ```
 
-Real parallelism with two builders: G1 runs I-02 to I-04, I-07 to I-10, I-15 to I-21; E runs I-05 beside them; G2 runs I-06, I-11 to I-14 beside I-07 to I-10, then I-22 to I-24 beside the later screens. The screen tags that the tutorial needs arrive with each screen (G1); the first-run walkthrough only plays end to end when I-16 to I-20 are done, so G2 tests it earlier on the old screens through "fallback card" mode (tag missing, step shows its card without a hole) and runs the full 20-test set in I-25.
+Screen order is UI-PASS-2 8.1 as written (Home, Draft, Game Plan, Report, Squad, Standings, then the parallel Plan and Club restyle); the plan does not reorder it. The additions to 8.1 are the ones named in section 0.
+
+Real parallelism with two builders: G1 runs I-00b, I-02 to I-04, I-07 to I-10, I-21a, I-15 to I-21b; E runs I-05 beside them; G2 (a second Gameplay Programmer instance is permitted from I-06) runs I-06, I-11 to I-14 beside I-07 to I-10, then I-22 to I-24 beside the later screens. The screen tags that the tutorial needs arrive with each screen (G1), except the screens that are not redesigned, whose tags arrive early in I-21a; the first-run walkthrough only plays end to end when I-17, I-18, I-19 and I-20 are done, so until then the steps for screens still to come show their card without a hole ("fallback card" mode: tag missing) and G2 runs the full 20-test set in I-25. Section 10 lists which steps are fallback cards at each checkpoint.
 
 ---
 
 ## 5. Save-file compatibility plan
 
 1. **No `GameState.VERSION` bump.** (A bump makes `load_save` return `null` and drops the player's save.)
-2. **New additive key `tutorial`** (TUTORIAL 6.1): `{"v": 1, "state": "running"|"done"|"skipped"|"legacy", "step": "<id>", "game": {"live": bool, "n": int, "plan": {...}}}`. Its own `v` is the tutorial schema version.
-3. **`from_dict` default.** A missing `tutorial` key becomes `{"v": 1, "state": "legacy"}`. This is the whole migration for 0.1 to 0.6 saves.
-4. **`TutorialState.migrate(dict)`** (pure function, in I-11): `v` absent or 1 returns the dict unchanged; an **unknown higher `v`** (a save from a future build opened by an older one) is treated as `legacy` and not modified, so it never crashes; a malformed `state` string falls back to `legacy`; a `step` id that no longer exists in `tutorial_v1.json` falls back to the first step of its chapter (resume survives data edits).
-5. **Carry across seasons.** `next_season()`'s `carry` dictionary and `new_game()`'s carry handling must copy `tutorial` (otherwise it resets to `legacy` at season end; found by reading line about 842). I-06 does it and tests it.
+2. **New additive key `tutorial`** (TUTORIAL 6.1): `{"v": 1, "state": "new"|"running"|"done"|"skipped"|"legacy", "step": "<id>", "game": {"live": bool, "n": int, "plan": {...}}}`. Its own `v` is the tutorial schema version. **v1.1 adds the state `new`** to the four of TUTORIAL 6.1 (the TUTORIAL document needs the same one-word addition, section 13).
+3. **Two different defaults, two different meanings (v1.1).**
+   - **`legacy`** means "this save was made before the guide existed". `from_dict` turns a **missing** `tutorial` key into `{"v": 1, "state": "legacy"}`. This is the whole migration for 0.1 to 0.6 saves, and a player who made a new game in 0.6 and then updates is also `legacy` (one inline card on Home, no modal).
+   - **`new`** means "this save was made by 0.7 or later and the player has not yet answered the guide". **`GameState.new_game()` writes it explicitly**: `{"v": 1, "state": "new", "step": "welcome", "game": {"live": false, "n": 0, "plan": {}}}`, unless a `carry` dictionary brings its own `tutorial` (next season, below). Because the key is written, a reload never turns a brand-new save into `legacy`.
+   - **What `new` does on Home.** The first time Home is shown with state `new`: if this device has never answered the guide (`[tutorial] welcome_seen` absent), the welcome modal (step 1) shows with Start and Skip tutorial; otherwise (the device finished or skipped it before) the inline card "Welcome back" shows with Show me and No thanks (TUTORIAL 6.2). **Start** or **Show me** sets `running` (step `welcome`, resume rules below) and sets `welcome_seen`; **Skip tutorial** or **No thanks** sets `skipped` and sets `welcome_seen`. Until one of those taps, the state stays `new` and the device flag stays unset, so killing the app at the welcome modal simply shows it again. This is the difference from `legacy`: `legacy` never shows a modal and is offered once per device; `new` always asks until answered. `Delete save and start over` makes a `new` save, device flags unchanged, so the second club gets the inline card and not the modal.
+4. **`TutorialState.migrate(dict)`** (pure function, in I-11): `v` absent or 1 returns the dict unchanged apart from the resume rule in item 10; an **unknown higher `v`** (a save from a future build opened by an older one) is treated as `legacy` and not modified, so it never crashes; a malformed `state` string falls back to `legacy`; a `step` id that no longer exists in `tutorial_v1.json` falls back to the first step of its chapter (resume survives data edits).
+5. **Carry across seasons.** `next_season()`'s `carry` dictionary and `new_game()`'s carry handling must copy `tutorial` whatever its state (otherwise it resets at season end; found by reading line about 842). `new` stays `new`, `running` stays `running`. I-06 does it and tests it for all five states.
 6. **Device state** in `settings.cfg` sections `[tutorial]`, `[lessons]`, `[help]` (old `[tips]` keys map into `[help]`) via a new `DeviceState` class (I-11), so `app.gd` is not edited by G2. The existing `tip_seen/tip_mark/tips_reset` stay until I-24 retires the old tips.
-7. **Fixtures.** I-00 captures real 0.6 saves as `game/tests/fixtures/save_0_6_a.json` (new game, round 1), `_b` (mid-season with a custom plan and a hired free agent), `_c` (season end, before `next_season`). Test `check_save_compat` loads each through `GameState.from_dict`, runs `plans_for`, `next_game`, a full game, `next_season`, `to_dict`, reloads, and asserts the tutorial key is `legacy` and survives. It also runs a save written with `tutorial.v = 99`.
+7. **Fixtures.** I-00 captures real 0.6 saves (written by the 0.6 game code; never regenerate them with later code) as `game/tests/fixtures/save_0_6_a.json` (new game, round 1), `_b` (mid-season with a custom plan and a hired free agent), `_c` (season end, before `next_season`), and, added in v1.1, **`_d` (a brand-new game, first club, round 1, nothing played, written through the real `GameState.save()` so it is a file the game itself wrote, not a stringified dictionary)**. `_a` and `_d` hold the same situation; the difference is how the file was written, and `_d` is the "fresh save" the reviewer asked for. Test `check_save_compat` loads each through `GameState.from_dict`, runs `plans_for`, `next_game`, a full game, `next_season`, a save (`JSON.stringify(gs.d)`, which is what `GameState.save()` writes; there is no `to_dict`), reloads it through `JSON.parse_string` and `GameState.from_dict`, and asserts the tutorial key is `legacy` and survives. It also runs a save written with `tutorial.v = 99`. **The 0.7 fresh save is tested in I-06 without a new fixture file**: after I-06, `new_game()` then `save()` to a temporary path then `load_save()` must give state `new` with `game.n == 0`, and the same through `to_dict`/`from_dict`.
 8. **Sandbox games never touch the save.** The tutorial game writes nothing to `d["fixtures"]`, standings, Form Rating, morale, cash, pace log, fatigue or `save_seed` stream (I-13 tests all of them by deep-comparing `gs.d` before and after, except the `tutorial` key).
-9. **`Delete save and start over`** also clears the save's tutorial state (the save is gone); device flags stay (TUTORIAL 6.3).
+9. **`Delete save and start over`** also clears the save's tutorial state (the save is gone); device flags stay (TUTORIAL 6.3). The next `new_game()` writes `new` again (item 3).
+10. **Resume after the app is killed mid-tutorial (v1.1).** What is saved: the `tutorial` key, including `game.live`, is written with every autosave. What is **not** saved: a draft in progress (`draft.leave.body` already says so) and anything of the tutorial game's match; the tutorial game writes no result to the save (item 8). So after a kill the game cannot be continued, and the rule is: on load, `TutorialState.migrate()` applies the "resume at" column of TUTORIAL 3.1 and clears the sandbox: if state is `running` and `game.live` is true, or the step lies in chapters 3 to 5 (steps 7 to 20), then `step` becomes `tab_plan` (step 7), `game.live` becomes false and `game.plan` is emptied; if the step lies in chapter 6 (steps 21 to 23), it becomes `tab_club` (step 24, the game is over and nothing to review remains); chapters 1 and 2 resume at steps 2 and 4 as in the table, and chapter 7 at step 24. `game.n` is **not** changed by a resume (it rises only on Start and on Replay), so the restarted game is the same game: same seed id, same opponent, no duplicate. Home then shows the inline "Welcome back. Continue the guided first game?" card with Continue and Skip tutorial, never a modal. A pause without a kill (the app is backgrounded and comes back) keeps everything in memory and changes nothing. Tests: I-11 (pure logic, every step), I-14 (save and reload at steps 12, 18 and 21 through the real files), TUTORIAL 9 test 6.
 
 ---
 
 ## 6. Gates (budgets that fail a check)
 
+**Source of the limits: `PERF-BUDGET.md` section 3.1a (rewritten in review wave 2a), not a flat number.** v1.0 of this plan made 100 draw calls and 200 nodes a hard fail for every screen; against the baseline that fails on day one (Chemistry scrolled 150 draw calls, Report and Game Plan over 120 nodes). The rules now are:
+
 | Gate | Limit | Where checked |
 |---|---|---|
-| Nodes per screen (the whole `_current`) | target 120, hard 200 | `perf_baseline` in I-00, from I-07 on every screen step |
-| Draw calls per frame | target 60, hard 100 | same, Xvfb opengl3 |
+| Draw calls and nodes, **legacy screen** (not yet redesigned) | Its **row in the allowance table** (3.1a rule 1): today's measured value plus 10 percent, rounded up to the next 5. A row may go down, never up. The check prints "tighten to N" when a row is 10 percent or more over its measurement | `perf_baseline` (flat hard limits until I-00b adds the data file), every screen step |
+| Draw calls, nodes, canvas items, **redesigned screen** | **Target 60 / 120 / 700, hard 100 / 200 / 1,200**, at the top and at the bottom of every scroll; one waiver line (number, reason, the Technical Director's name) between target and hard; **the screen's allowance row is deleted in the same commit as its redesign**; new sheets, overlays and components start here, measured together with the screen under them | same |
+| A visited state with **no row** | Held to the hard limits and printed "NO ROW"; it gets a row at its measured value in the commit that finds it | same |
+| Re-baselines | Exactly two: **after I-04** (token sizes final) and **after I-22** ("?" button and help hooks add nodes everywhere). Each is one commit reviewed by the Technical Director with every changed row beside its old value. Any other raise needs the Technical Director's written reason in the table | I-04, I-22 |
 | Texture memory | target 32 MB, hard 48 MB | same |
-| Shadowed surfaces visible / glowing | 6 / 2 | audit in the components gallery and per screen |
+| Shadowed surfaces visible / glowing | **6 / 2, one number each** (the gate is the limit) | audit in the components gallery and per screen |
+| Font weight-and-size pairs | **12** (what the ART-BIBLE 5.2 type scale needs; 16 hard with the `tnum` variants) | font test in I-02, `PERF-BUDGET.md` 3.2 |
 | Idle redraws | none when nothing changes (`Engine.get_frames_drawn()` constant for 2 s) | I-25 with the Settings low-processor decision |
 | Tap response | no component rebuild on tap; in-place audit | each screen step |
 | `_rebuild` on a redesigned screen | zero calls on a state-changing tap | `inplace_<screen>` |
 | Touch target | 96 x 96 px hit area, text floor 24 px | `fit_<screen>` |
 | Golden vectors | unchanged hash | fast loop |
+
+The starting point of the ratchet is the I-00 fixed-seed table in the I-00 status (nodes / draw calls: Home 60 / 55, Squad 36 / 40, Draft 81 / 42, Game Plan 133 / 49, Report 151 / 24, Standings 82 / 29) and the per-state rows of `PERF-BUDGET.md` 3.1a. **Only the 6 screens the probe visits have exact fixed-seed numbers; the other states have rows from the earlier 12-state measurement or none (rule 3).** Everything here is a computer-side count; none of it has been measured on a phone.
 
 ---
 
@@ -281,15 +311,27 @@ Format for each: **Goal · Lane · Needs · Files (create C, change M) · Helper
 
 ### I-00 Safety net, structure and the one string merge
 
-- **Goal.** Make everything after this measurable and conflict-free: structure for tests, fixtures, baselines, and merge Narrative's 540 keys once.
-- **Lane / Needs.** L designs, G1 does the work; nothing before it.
-- **Files.** C `tools/check_fast.sh`; C `game/tests/perf_baseline.gd` and `.tscn` (the probe from `PERF-BUDGET.md` 7); C `game/tests/shots_matrix.gd` and `.tscn`, `game/tests/shots/shots_baseline.gd` (wraps the existing 49-shot tour as one module); C `game/tests/fixtures/save_0_6_*.json`; C `game/tests/check_save_compat.gd/.tscn`; M `game/tests/run_tests.gd` (auto-discovery loop; keep the existing explicit calls until their files are renamed, then delete them); M `tools/run_all_checks.sh` (loop over `check_*.tscn`; add golden hash and perf gate); M `game/i18n/en.json` (merge `docs/design/copy/en_0_7.json` through a one-off script kept at `tools/merge_copy.py` that refuses duplicates and reports the 16 replaced keys); M `game/tests/*` where a test or `ui_shots` matches a replaced string.
+- **Status (v1.1, updated 2026-11-10).** **Built by the Gameplay Programmer; review by the Lead Programmer pending.** It was **amended, not redone**, by two v1.1 items: the merge takes a hold-list and the fixture set gains `save_0_6_d`. Facts from the I-00 handback (I have not re-run them): 536 keys merged (524 new, 12 replaced), 4 held through `docs/design/copy/hold_0_7.json`; fixtures `save_0_6_a` to `_d` exist under `game/tests/fixtures/`; `check_save_compat`, `perf_baseline`, `shots_matrix` and `tools/check_fast.sh` exist. **Fixed-seed perf "before" table** (nodes / draw calls): Home 60 / 55, Squad 36 / 40, Draft 81 / 42, Game Plan 133 / 49, Report 151 / 24, Standings 82 / 29 (the Report node count is 151 here against 153 in `PERF-BUDGET.md` section 2, a different state or seed; the fixed-seed table is the one the ratchet starts from, unless the Technical Director says otherwise). Follow-ups it leaves are in I-00b.
+- **Goal.** Make everything after this measurable and conflict-free: structure for tests, fixtures, baselines, and merge Narrative's keys (536 now, 4 later).
+- **Lane / Needs.** The Gameplay Programmer (G1) builds all of it; the Lead Programmer reviews every file before it is committed (section 4.1); the Tools Engineer is on call if a tool turns out large. Nothing before it.
+- **Files.** C `tools/check_fast.sh`; C `game/tests/perf_baseline.gd` and `.tscn` (the probe from `PERF-BUDGET.md` 7); C `game/tests/shots_matrix.gd` and `.tscn`, `game/tests/shots/shots_baseline.gd` (wraps the existing 49-shot tour as one module); the fixtures `game/tests/fixtures/save_0_6_a.json` to `_d.json` with `gen_save_fixtures.gd` (already in the working tree, adopted, not recreated); C `game/tests/check_save_compat.gd/.tscn`; M `game/tests/run_tests.gd` (auto-discovery loop; keep the existing explicit calls until their files are renamed, then delete them); M `tools/run_all_checks.sh` (loop over `check_*.tscn`; add golden hash and perf gate); M `game/i18n/en.json` (merge `docs/design/copy/en_0_7.json` through `tools/merge_copy.py`, **with the hold file `docs/design/copy/hold_0_7.json` of section 2.6**: it reports the 12 replaced keys it applied and **names the 4 it held**); M `game/tests/*` where a test or `ui_shots` matches a replaced string (the review's grep found none; still confirm by running).
 - **Helpers.** None new in game code.
-- **Strings.** 540 keys merged (524 new, 16 replaced; the Coach and Manager rename comes with the merge, so `advisor` and `owner and coach` disappear here, not later). `check_strings.py` must show 0 unknown keys; unused-key notes are expected (the new keys are not used yet) and are informational by design.
-- **Tests.** Fast loop green before and after the merge; `check_save_compat` (fixtures A to C load, full game, next season); perf baseline printed for the 6 main screens and stored in the handback as the "before" table; golden hash recorded in `tools/check_fast.sh`.
-- **Acceptance.** Fast loop green; the 49-image tour still runs; no old test line failed because of a replaced string (all fixed); baseline numbers recorded.
+- **Strings.** **536 keys merged** (524 new, 12 replaced) and 4 held (`draft.meta_hint`, `about.title`, `about.included.b`, `about.test.b`; section 2.6 gives the release increments). The Coach and Manager rename comes with the merge, so `advisor` and `owner and coach` disappear here, not later (none of the 3 old strings is among the 4 held). `check_strings.py` must show 0 unknown keys; unused-key notes are expected (the new keys are not used yet) and are informational by design.
+- **Tests.** Fast loop green before and after the merge; `check_save_compat` (fixtures A to D load, full game, next season, each reads `legacy`; **`_d`, the brand-new 0.6 game written through `save()`, must read `legacy` too, which proves a 0.6 new game upgrades without a modal**); a merge test (a scratch copy of `en.json`: merging with the hold-list leaves the 4 old texts byte-identical and adds 524 keys; merging with an empty hold-list gives the review's 1,169 keys); perf baseline printed for the 6 main screens and stored in the handback as the "before" table; golden hash recorded in `tools/check_fast.sh`.
+- **Acceptance.** Fast loop green; the 49-image tour still runs; no old test line failed because of a replaced string (all fixed); baseline numbers recorded; the merge report lists the 4 held keys.
 - **Rollback.** Revert the commit (the merge is one commit; `en.json` is the only shared file).
-- **Effort (estimate).** 25 to 40 tool calls.
+- **Effort (estimate).** 25 to 45 tool calls (was 25 to 40; the hold-list and its test add about 5).
+
+### I-00b Copy update route and perf allowance file (follow-up to I-00, small)
+
+- **Goal (v1.1, new).** Close two gaps that I-00 leaves: (1) after the one-off merge, copy edits have no route into `en.json` (the review's X9: Narrative never edits `en.json`, and `merge_copy.py` refuses duplicates), although at least three edits are already expected (the Standings switch label, the role filter labels, the Chemistry hint: rows U1 to U3 of 12.1); (2) `perf_baseline.gd` still applies flat hard limits (read from the source, not run), while `PERF-BUDGET.md` 3.1a asks for per-screen allowances with a ratchet.
+- **Lane / Needs.** The Gameplay Programmer builds, the Lead Programmer reviews, the Tools Engineer is on call (section 4.1). Needs I-00. Run it right after I-01 and before I-04 (the first copy edit, U3, lands in I-04).
+- **Files.** M `tools/merge_copy.py`: an **update mode** (route A). `--update <patch.json> --allow <allow.json>` changes the text of keys that **already exist** and are named in the allow-list (`docs/design/copy/update_allow.json`: key, who asked, reason, the increment that needs it). It refuses a key that is not in the allow-list, a key that does not exist yet, a changed `{placeholder}`, non-ASCII text or a duplicate; it prints old and new text for every change and writes only with `--write`. Narrative writes the patch file (still never edits `en.json`); G1 runs the script in the increment named and the Lead Programmer sees the printed diff in review. C `tools/test_merge_copy.py` (a scratch `en.json`: an allowed edit applies, a key outside the allow-list is refused, a held key stays held). M `game/tests/perf_baseline.gd` and C `game/tests/perf_allowances.json` (one row per state: draw calls, nodes, status, increment, waiver reason; seeded from the I-00 "before" table and `PERF-BUDGET.md` 3.1a; the check fails a legacy screen over its row, a redesigned screen over target without a waiver and any screen over a hard limit, and prints "NO ROW" and "tighten to N").
+- **Strings.** none.
+- **Tests.** `tools/test_merge_copy.py`; `perf_baseline` fails on a deliberately lowered row in a scratch copy of the allowance file and prints "NO ROW" for an unlisted state; fast loop green.
+- **Acceptance.** An allowed copy edit goes through the script with a visible diff; the perf check reads its limits from the data file; `docs/design/copy/update_allow.json` exists (it may start with the three expected keys once UI/UX answers 12.1 U1 to U3).
+- **Rollback.** Revert the commit.
+- **Effort (estimate).** 15 to 25 tool calls.
 
 ### I-01 Spikes made permanent
 
@@ -311,13 +353,13 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 ### I-02 Tokens, theme, font weights, large text
 
 - **Goal.** One global change to the look: all type sizes, colours, radius, button height and the font weights, then the whole app re-shot and fixed. The app still plays exactly as before.
-- **Lane / Needs.** G1 (`ui.gd`, `app.gd`) plus L for `export_presets.cfg`. Needs I-00.
-- **Files.** M `src/ui/ui.gd`; M `src/core/app.gd` (large-text hook only); M `game/export_presets.cfg` (add `assets/fonts/OFL.txt` to `include_filter`; L does this); C `game/assets/fonts/font_weights.tres` set if needed.
+- **Lane / Needs.** G1 (`ui.gd`, `app.gd`). Needs I-00.
+- **Files.** M `src/ui/ui.gd`; M `src/core/app.gd` (large-text hook only); C `game/assets/fonts/font_weights.tres` set if needed. (The OFL step of v1.0 is removed: `export_presets.cfg` already ships `assets/fonts/OFL.txt`, commit `d78038d`.)
 - **Helpers.** In `ui.gd`: sizes `S_DISPLAY 64, S_TITLE 48, S_BIG 40, S_HEAD 36, S_BODY 32, S_SMALL 26, S_CAPTION 24`, `BTN_H 96`, `R_CARD 24`, `GAP 16`, `TAB_H 112`, `HEADER_H 96`; the ART-BIBLE 3 colour tokens (`VOID, TEXT2, TEAL_HI`, the five role colours, side colours) kept alongside the old names so unredesigned screens do not break (old names become aliases); `UI.font(weight: String, tnum: bool = false) -> Font` returning cached `FontVariation`s for Regular, Medium, SemiBold, Bold, ExtraBold with `opentype_features = {"tnum": 1}` for numbers; `UI.num_label(...)` that applies tnum; `UI.box()` gets a cache keyed by (colour, radius, border, shadow); `make_theme()` sets weights per control (buttons SemiBold). `UI.button` clamps `custom_minimum_size.y` to at least 96 (the quick fix for the 64 to 76 px buttons on unredesigned screens).
 - **Strings.** none new.
 - **Tests.** `check_tokens` (a pure-data test of token values against the ART-BIBLE 5.2 table, so a drifting constant fails); font test: `tnum` digits '1111' and '8888' have the same width in `UI.font("SemiBold", true)`; all five `.fontdata` resolve; the 49-image tour in normal and large text; fit audit on the six existing main screens.
 - **Screenshots.** The full old tour (49), normal and large. First look: overflow and clipped text; second look: weights, tnum columns, button heights.
-- **Acceptance.** No overflow on the old screens at 720 and 626 px; every button at least 96 px high; the OFL text in a test export listing (`--export-debug` to scratch, list the APK); smoke and touch green; node counts within 10 percent of baseline.
+- **Acceptance.** No overflow on the old screens at 720 and 626 px; every button at least 96 px high; the OFL text still in a test export listing (`--export-debug` to scratch, list the APK; a check that it has not been lost, since the fix is already done); smoke and touch green; node counts within 10 percent of baseline.
 - **Rollback.** Revert; the aliases mean no other file changed.
 - **Effort (estimate).** 40 to 60 tool calls.
 
@@ -332,12 +374,13 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
   - `EventBus.emit(name: String, data: Dictionary = {})`, `seen(name)`; a bounded ring buffer of recent events (for `skip_if event_seen`).
   - `Main.show_screen` raises `screen:<help_id>`; `Screen.help_id() -> String` (default: derived from the class name; each screen overrides).
   - `Screen` frame gets an empty slot for the "?" button (filled in I-22) and exposes `scroll_to(control)`.
+  - **Tab bar tags (v1.1; v1.0 left them unassigned):** `Main` tags the tab bar as `tabbar` and its five buttons `tab.home`, `tab.squad`, `tab.plan`, `tab.club`, `tab.more` (TUTORIAL 8). Tutorial steps 3, 4, 7 and 24 point at them, so they are real at every checkpoint.
 - **Strings.** none.
-- **Tests.** `check_frame`: the layer order (instance order and `layer` values), a tag is found only while visible, freeing a tagged node removes the entry, `tap:` events fire from a button press and from a simulated tap, `screen:` events fire on `show_screen`, back button still works (touch scene); tab label "Trophies" fits on one line at 626 px.
+- **Tests.** `check_frame` (also: all six tab ids are found while the tab bar is visible, and `tap:tab.squad` fires on a press): the layer order (instance order and `layer` values), a tag is found only while visible, freeing a tagged node removes the entry, `tap:` events fire from a button press and from a simulated tap, `screen:` events fire on `show_screen`, back button still works (touch scene); tab label "Trophies" fits on one line at 626 px.
 - **Screenshots.** Old tour subset: Home, Plan, Club, Settings (normal and large).
 - **Acceptance.** Old tests green; no screen changed except the frame.
 - **Rollback.** Revert; no data changes.
-- **Effort (estimate).** 50 to 70 tool calls.
+- **Effort (estimate).** 55 to 75 tool calls (was 50 to 70; the tab bar tags add about 5).
 
 ### I-04 Overflow sweep of the screens that are not redesigned (CP1)
 
@@ -346,8 +389,8 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 - **Files.** M the matching `screen_*.gd` and `player_view.gd` (layout fixes only: wraps, minimum sizes, `kv_row` that squeezed values to one character per line); M `ui_shots.gd` only if a name changes.
 - **Strings.** none.
 - **Tests.** `check_fit_legacy`: the fit audit runs over all of these screens in normal, large and tall.
-- **Screenshots.** The old tour in all four variants (49 images times 4; looked at by pixel diff against I-02 first, then by eye for the changed ones).
-- **Acceptance.** No overflow, no mid-word break, all targets 96 px; **CP1: the Producer can show the Founder the same game in the new type, colours and font.**
+- **Screenshots.** The old tour in all four variants (49 images times 4 = **196 images**; pixel diff against I-02 first, then the changed ones by eye). **196 images inside 40 to 60 calls only fits if looking is batched** (R1(d)): 196 images are 33 contact sheets of 6, and the range holds only if the pixel diff leaves at most about half of them to be looked at, twice, and the fit audit carries the text-fit check. Looked at one by one, two passes would be about 400 views and the increment would not be 40 to 60 calls.
+- **Acceptance.** No overflow, no mid-word break, all targets 96 px; **perf re-baseline no. 1 of 2 (section 6): every legacy row in the allowance table is reset to its measured value, one commit reviewed by the Technical Director, old and new values side by side**; **CP1: the Producer can show the Founder the same game in the new type, colours and font.**
 - **Rollback.** Per-screen revert.
 - **Effort (estimate).** 40 to 60 tool calls.
 
@@ -367,12 +410,12 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 
 - **Goal.** Everything the screens and the tutorial need from game code, in one place, with no change to results.
 - **Lane / Needs.** G2. Needs I-00. **Requires Systems Designer approval** of the helper list (they are read-only, section 12).
-- **Files.** M `src/game/game_state.gd`: `upcoming(n) -> Array` (read-only over `d["fixtures"]`), `cut_gap() -> Dictionary` (over `standings()`), `tutorial() -> Dictionary` and `set_tutorial(dict)` (read and write the `tutorial` key), default in `from_dict`, `tutorial` copied in `next_season()`'s `carry`; M `src/sim/report.gd`: `Report.team_kills(res)` (sums `Report.kda`); M `src/sim/draft.gd`: `Draft.best_slot_for(team, hero_id)` (extracted from the inline logic in the Draft screen's `_actions`; the screen is not changed yet); M `data/clubs.json`: additive `colors` and `badge` ids (validated by `tools/validate_data.py`, which G2 extends); C `game/tests/hooks_tests.gd`.
+- **Files.** M `src/game/game_state.gd`: `upcoming(n) -> Array` (read-only over `d["fixtures"]`), `cut_gap() -> Dictionary` (over `standings()`), `tutorial() -> Dictionary` and `set_tutorial(dict)` (read and write the `tutorial` key), **`new_game()` writes the `new` state of section 5 item 3**, `from_dict` defaults a missing key to `legacy`, `tutorial` copied in `next_season()`'s `carry`; M `src/sim/report.gd`: `Report.team_kills(res)` (sums `Report.kda`); M `src/sim/draft.gd`: `Draft.best_slot_for(team, hero_id)` (extracted from the inline logic in the Draft screen's `_actions`; the screen is not changed yet); M `data/clubs.json`: additive `colors` and `badge` ids (validated by `tools/validate_data.py`, which G2 extends); C `game/tests/hooks_tests.gd`.
 - **Strings.** none.
-- **Tests.** `upcoming` and `cut_gap` against hand-made fixtures; `best_slot_for` equals the old inline result over every hero in a recorded draft (so the screen can switch later with no behaviour change); `team_kills` equals the sum; `tutorial` default is `legacy`; `next_season` keeps it; golden hash unchanged; `validate_data.py` passes with the new club fields; the 3 save fixtures from I-00 still load.
+- **Tests.** `upcoming` and `cut_gap` against hand-made fixtures; `best_slot_for` equals the old inline result over every hero in a recorded draft (so the screen can switch later with no behaviour change); `team_kills` equals the sum; **tutorial state (v1.1):** a missing key (fixtures `save_0_6_a` to `_d`) reads `legacy`, **including `_d`, the 0.6 brand-new game**; `new_game()` then `save()` to a temporary path then `load_save()` gives state `new`, step `welcome`, `game.n` 0, `game.live` false, and the same through `JSON.stringify(gs.d)` then `JSON.parse_string` then `GameState.from_dict` (a reload never turns it into `legacy`); `Delete save and start over` followed by `new_game()` gives `new` again; `next_season` keeps the state for all five values; a save with `tutorial.v = 99` reads `legacy`; golden hash unchanged; `validate_data.py` passes with the new club fields; the 4 save fixtures from I-00 still load.
 - **Acceptance.** All logic tests green with unchanged golden vectors; no sim constant touched.
 - **Rollback.** Revert the commit.
-- **Effort (estimate).** 25 to 40 tool calls.
+- **Effort (estimate).** 30 to 45 tool calls (was 25 to 40; the fresh-save and five-state tests add about 5). G2 may run as a second Gameplay Programmer instance from this increment (section 4.1).
 
 ### I-07 Components A (flat, no gestures) and the gallery
 
@@ -429,7 +472,7 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 - **Lane / Needs.** G2. Needs I-06.
 - **Files.** C `src/tutorial/tutorial_state.gd` (`TutorialState`: pure; `feed(event) -> Array` of effects; stages and chapters; `skip_if event_seen`; resume; Skip with Undo; `migrate()` (section 5); **no UI classes, so it runs in `run_tests.gd`**), `src/core/device_state.gd` (`DeviceState`: typed access to `[tutorial]`, `[lessons]`, `[help]` in `settings.cfg`; reads via `ConfigFile`, old `[tips]` mapped), C `data/tutorial_v1.json` (the 27 steps of TUTORIAL 3.2 with ids and events; text keys point to the merged `tut.*` strings), C `game/tests/tutorial_tests.gd` (tests 1 to 9 of the 20-test plan in TUTORIAL 9 that need no UI: step order, events completing steps, skip rules, resume after save and load, `legacy`, unknown `v`, malformed step id, replay increments `game.n`, debug line text).
 - **Strings.** none (keys in the merged patch). A test checks every `text_key` in the JSON exists in `en.json`.
-- **Tests.** As listed; plus `validate_tutorial.py` added to `tools/` (every step id in TUTORIAL 8 appears exactly once, every event name is in the legal list of TUTORIAL 7.5, every key exists), wired into `check_fast.sh` by L.
+- **Tests.** As listed; plus (v1.1) the state `new` (Start and Show me give `running`, Skip and No thanks give `skipped`, nothing else changes it; a device that has answered before gets the inline card, not the modal), and **resume after a kill at every one of the 27 steps** (`migrate()` with `game.live` true and false: steps 7 to 20 resume at step 7 with `live` false and an empty `plan`, steps 21 to 23 at step 24, `game.n` unchanged, no duplicate game; section 5 item 10); plus `validate_tutorial.py` added to `tools/` (every step id in TUTORIAL 8 appears exactly once, every event name is in the legal list of TUTORIAL 7.5, every key exists), wired into `check_fast.sh` by L.
 - **Acceptance.** The full step table loads; the state machine walks the happy path and the skip path with a scripted event list.
 - **Rollback.** Delete `src/tutorial/` and the data file; nothing depends on it.
 - **Effort (estimate).** 50 to 70 tool calls.
@@ -462,38 +505,38 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 
 - **Goal.** The player meets the tutorial correctly in every situation of TUTORIAL 6.2 and can replay it.
 - **Lane / Needs.** G2 (new files) plus G1 integration lines. Needs I-12, I-13.
-- **Files.** C `src/tutorial/offer_card.gd` (the inline Home card), `src/tutorial/settings_help_card.gd` ("Help and learning": Replay, Lessons, Glossary, Show help hints again); **integration lines for G1**: add the card at the top of Settings, the offer card on Home, remove the old "Show the welcome tips again" button; C `tests/check_tutorial_flow.gd/.tscn`.
+- **Files.** C `src/tutorial/offer_card.gd` (the inline Home card), `src/tutorial/settings_help_card.gd` ("Help and learning": Replay, Lessons, Glossary, Show help hints again); **integration lines for G1**: add the card at the top of Settings, the offer card on Home, remove the old "Show the welcome tips again" button (the new "Show help hints again" also clears the old `[tips]` flags until I-24, so the tips still on screen can be brought back); C `tests/check_tutorial_flow.gd/.tscn`. Until I-15 retires the Home tip, the old Home shows its welcome tip and the new offer card together; that state is seen by developers only, never at a checkpoint.
 - **Strings.** merged copy (`tut.offer.*`, `settings.*`).
-- **Tests.** Tests 5 to 9 and 13 of TUTORIAL 9 on the legacy path; fresh device (modal welcome), returning device (inline card), `legacy` (one card once), `running` (resume card), `done` and `skipped` (nothing); Replay from Settings confirm sheet; Reset also clears the save's tutorial state; first-run total time measured with a scripted tapper (counts steps and taps, not minutes).
+- **Tests.** Tests 5 to 9 and 13 of TUTORIAL 9 on the legacy path; **a brand-new save from `new_game()` (state `new`, section 5 item 3) on a fresh device (modal welcome) and on a returning device (inline card)**; `legacy` (one card once; includes fixture `save_0_6_d`, which must not show the modal), `running` (resume card), `done` and `skipped` (nothing); **kill and reload at steps 12, 18 and 21 through real save files (resume per section 5 item 10: step 7, step 7, step 24; `live` false; `game.n` unchanged; the resume card, never a modal)**; Replay from Settings confirm sheet; Reset also clears the save's tutorial state; first-run total time measured with a scripted tapper (counts steps and taps, not minutes).
 - **Acceptance.** Every row of the TUTORIAL 6.2 table has a passing test.
 - **Rollback.** Revert; integration lines are listed.
-- **Effort (estimate).** 40 to 60 tool calls.
+- **Effort (estimate).** 45 to 65 tool calls (was 40 to 60; the new-save and kill tests add about 5).
 
 ### I-15 Home
 
 - **Goal.** First redesigned screen: club header with badge, one raised Next-match card, an upcoming-games row, a 2 x 2 tile grid. It proves the whole component stack and sets the pattern for the rest.
 - **Lane / Needs.** G1. Needs I-06, I-07, I-08, I-10.
 - **Files.** M `src/ui/screen_hub.gd` (rewrite on `_build()` and `_refresh()`); M `ui_smoke.gd`, `ui_touch.gd`, `ui_shots.gd` (the lines that touch Home, rule R4); C `tests/check_ui_home.gd/.tscn`, `tests/shots/shots_home.gd`.
-- **Helpers.** `DepthCard`, `HeroStat`-style header, `Carousel` (upcoming(n) from I-06; **cut first if S1 failed**), tile grid (`UI.tile` re-skinned), Badge from `BadgeStyle`. Tags: `home_card`, `home_play`, `tab_*` and the rest in TUTORIAL 8 for Home. Needs-attention note appears only from round 9 (finding in TUTORIAL 11; Lead Game Designer to confirm, section 12).
-- **Strings.** `home.*` from the merged copy; `Tips.show(body, "hub")` removed in I-24 (kept working until then).
-- **Tests.** T-std all rows; Home stays under the node target (120) with the carousel; the play button is the only coral action; tapping Play still starts the same game path as before (smoke walks a season).
+- **Helpers.** `DepthCard`, `HeroStat`-style header, `Carousel` (upcoming(n) from I-06; **cut first if S1 failed**), tile grid (`UI.tile` re-skinned), Badge from `BadgeStyle`. Tags: `home.next_card`, `home.play`, `home.offer` and the rest in TUTORIAL 8 for Home (the tab ids are already tagged in I-03). The inline offer card of I-14 sits **below** the Next-match card and the Play button, never above them; UI/UX Designer to confirm the position. Needs-attention note appears only from round 9 (finding in TUTORIAL 11; Lead Game Designer to confirm, section 12).
+- **Strings.** `home.*` from the merged copy. **Old welcome tip retires here (v1.1):** the rewritten `_build()` does not carry `Tips.show(body, "hub")`, so the old welcome tip never shows together with the new offer card and the "Play without scrolling" acceptance below is measured without it. The tip's lines in `ui_smoke.gd` (156 to 173, TUTORIAL 9 test 18) are migrated to the new offer-card and "?" dot logic in this increment (rule R4); the `tip.hub*` strings stay in `en.json` until I-24 retires them. The Pre-match and Report tips are retired in I-21a and I-18.
+- **Tests.** T-std all rows; Home stays under the node target (120) with the carousel; **Home shows no `Tips` card in any state**; the play button is the only coral action; tapping Play still starts the same game path as before (smoke walks a season).
 - **Screenshots.** Home: first round, mid-season, season end, a 19-character club name, 5-digit cash; normal, large, cb, tall.
-- **Acceptance.** Looks right on two passes; no scroll needed to see the Play button on 720 x 1280 in normal text (UI-PASS-2 space budget); old smoke and touch green.
+- **Acceptance.** Looks right on two passes; no scroll needed to see the Play button on 720 x 1280 in normal text (UI-PASS-2 space budget), **measured with the inline offer card showing (the worst case: a `legacy` or `new` save on a returning device)**; old smoke and touch green.
 - **Rollback.** Revert `screen_hub.gd` and the three test hunks.
 - **Effort (estimate).** 60 to 80 tool calls.
 
-### I-16 Draft (CP2)
+### I-16 Draft (optional engine-preview APK; CP2 moved to I-18)
 
 - **Goal.** The biggest eyesore and the most-used screen: lane board, hero picture grid, role filter, bottom sheet to confirm, Coach bar with Take.
 - **Lane / Needs.** G1. Needs I-09, I-15 (pattern), I-08.
 - **Files.** M `src/ui/screen_draft.gd` (rewrite; keep `_on_hero`, `_apply`, `_sel_hero`, `_start_match`, `_ai_wait`, `_process` as thin wrappers, rule R4); M `ui_smoke.gd` and `ui_touch.gd` hunks; C `check_ui_draft.gd/.tscn`, `shots/shots_draft.gd`.
 - **Helpers.** `LaneBoard`, `HeroCard` grid with `ListSync` (filter by role hides cards, never frees them), `BottomSheet` (hero sheet with role fit percentage, best slot pre-chosen through `Draft.best_slot_for`), Coach bar (`Take`, `Auto-finish` then `Sure?` two-tap confirm), timer ring that redraws only when the second changes. Tags and events: `draft:sheet`, `draft:ban`, `draft:pick`, `draft:done` (TUTORIAL 7.5), all draft ids in TUTORIAL 8. Pre-existing opponent-bonus colour problem (green for them) fixed by side cue (UI-PASS-2 section 1).
-- **Strings.** `draft.*`, `coach.*`.
-- **Tests.** T-std; **the 40-card grid stays under the node gate**; a full draft played by tapping through the real controls (not by calling methods) ends in the same lineup as the same sequence through the old methods (equivalence on 20 seeds); AI turn timing unchanged; ban then pick through the sheet; Auto-finish confirm; `draft:*` events fire once each; in-place audit across 6 taps.
-- **Screenshots.** Ban step, pick step, sheet open, role filter, done state, opponent's turn; four variants (24 images).
-- **Acceptance.** Gates green; **CP2: APK built by the Producer for the Founder's phone test** (Home and Draft redesigned, tutorial engine playable on the old screens, honest list of what is not done). I run the full check once here (background, about 25 minutes, estimate).
+- **Strings.** `draft.*`, `coach.*`. **Release `draft.meta_hint` here (v1.1):** delete it from `docs/design/copy/hold_0_7.json` and re-run `tools/merge_copy.py --write`, in the same commit as the arrows (an up arrow means strong), so the hint is never true before the arrows exist. The six-chip role filter needs the UI/UX answer on "Jungle" and "Support" (section 12.1, fallback: the short forms "Jg" and "Sup" of the old filter).
+- **Tests.** T-std; **the draft screen shows the arrows exactly where the hint text says so** (a test reads `draft.meta_hint` and checks that the strong-hero cue is a drawn arrow, not colour only); **the 40-card grid stays under the node gate**; a full draft played by tapping through the real controls (not by calling methods) ends in the same lineup as the same sequence through the old methods (equivalence on 20 seeds); AI turn timing unchanged; ban then pick through the sheet; Auto-finish confirm; `draft:*` events fire once each; in-place audit across 6 taps.
+- **Screenshots.** Ban step, pick step, sheet open, role filter, done state, opponent's turn; four variants (24 images, 4 contact sheets, looked at twice).
+- **Acceptance.** Gates green. **No longer CP2 (v1.1).** At this point the Producer *may* build an **engine-preview APK** for a phone test of scrolling, warmth and text on Home and Draft (PERF-BUDGET 4). It is not the first look at the guide: on it, **8 of the 27 tutorial steps are fallback cards** (list in section 10), so the Founder should tap Skip tutorial and judge speed and feel only. I run the fast loop here; the full check (background, about 25 minutes, estimate) moves to I-18.
 - **Rollback.** Revert the screen and its test hunks.
-- **Effort (estimate).** 90 to 130 tool calls.
+- **Effort (estimate).** 90 to 130 tool calls (may be dispatched as two halves, R2).
 
 ### I-17 Game Plan
 
@@ -514,10 +557,10 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 - **Lane / Needs.** G1. Needs I-06 (`team_kills`), I-10, I-08, I-13 (flag).
 - **Files.** M `src/ui/screen_report.gd`; M test hunks; C `check_ui_report.gd/.tscn`, `shots/shots_report.gd`.
 - **Helpers.** `HeroStat`, `PhaseStrip` (read-only mode), `BottomSheet` (factors; event `open:report_why`), count-up numbers use `UI.num_label` (tnum). Tags per TUTORIAL 8. Honest luck copy (Narrative and Lead Game Designer reviewed, UI-PASS-2 R8).
-- **Strings.** `report.*`; retire `report.why_h` once the new name is live.
-- **Tests.** T-std; a win, a loss, a draw, a tutorial game, and a long game fixture; the score line equals `team_kills`; the Continue button is the one coral action; the story strip texts come only from the existing `Report.story` data (no new claims).
+- **Strings.** `report.*`; retire `report.why_h` once the new name is live. **Old Report tip retires here (v1.1):** the rewrite does not carry `Tips.show(body, "report")` (the three Report tutorial steps and the first-run result card replace it); `tip.report*` strings stay until I-24.
+- **Tests.** T-std; **no `Tips` card on Report**; a win, a loss, a draw, a tutorial game, and a long game fixture; the score line equals `team_kills`; the Continue button is the one coral action; the story strip texts come only from the existing `Report.story` data (no new claims).
 - **Screenshots.** Win, loss, tutorial win, factor sheet; four variants.
-- **Acceptance.** As above.
+- **Acceptance.** As above. **CP2 (v1.1): the Home, Draft, Game Plan and Report loop is rebuilt, so the Producer builds the APK for the Founder's phone test here** (section 10 lists the 3 steps still shown as cards: 5, 6 and 26). `tags_*` tests for Home, Draft, Game Plan, Report, the tab bar and the I-21a screens all pass, and a scripted walk of the guided first game from the welcome card to the Standings card ends with `fallbacks` equal to exactly 3 (the three expected steps) and no other. I run the full check here, once, in the background (about 25 minutes, estimate).
 - **Rollback.** Revert.
 - **Effort (estimate).** 70 to 100 tool calls.
 
@@ -527,12 +570,12 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 - **Lane / Needs.** G1. Needs I-09, I-08, I-05.
 - **Files.** M `src/ui/screen_roster.gd` (rewrite; keep `_toggle_slot`, `_assign`, `_toggle_player`, `_auto`); M `player_view.gd` (becomes the player-card sheet content); M test hunks; C `check_ui_squad.gd/.tscn`, `shots/shots_squad.gd`.
 - **Helpers.** `PlayerCard`, token anchors from the Squad anchors table in ART-BIBLE (Top 0.110/0.540, Jungle 0.270/0.700, Mid 0.500/0.720, Support 0.840/0.742, Bot 0.889/0.540), `BottomSheet`, `Carousel` (market row; cut with the Home one if S1 failed), tap-to-swap (drag-to-swap is on the cut list, UI-PASS-2 8.1). Events `open:player_card`, `open:lane_picker`. Opened also from Match day with the tab bar hidden.
-- **Strings.** `squad.*`.
+- **Strings.** `squad.*`. Needs two UI/UX answers (section 12.1): the real Player card tab labels ("Stats", "Career") and the interim Squad anchors.
 - **Tests.** T-std; assigning, swapping and auto-fill leave the same lineup as the old methods (equivalence on 20 random rosters); the **team rating preview in the picker equals the rating after the swap**; the Match day entry still works; large text with all 5 anchors reachable.
 - **Screenshots.** Closed, picker open, player card sheet, bench with 9 players, an empty lane; four variants.
-- **Acceptance.** As above. Note: final token positions depend on the 0.8 arena map; the anchors table is the interim.
+- **Acceptance.** As above. Note: final token positions depend on the 0.8 arena map; the anchors table is the interim. **Tutorial steps 5 and 6 become real here** (`tags_squad`; fallbacks at the scripted walk fall from 3 to 1).
 - **Rollback.** Revert.
-- **Effort (estimate).** 100 to 140 tool calls.
+- **Effort (estimate).** 100 to 140 tool calls (may be dispatched as two halves, R2).
 
 ### I-20 Standings and History
 
@@ -540,22 +583,34 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 - **Lane / Needs.** G1. Needs I-10, I-06 (`cut_gap`).
 - **Files.** M `src/ui/screen_standings.gd` (keep `_set_tab`); M test hunks; C `check_ui_standings.gd/.tscn`, `shots/shots_standings.gd`.
 - **Helpers.** `Podium`, `RankRow` (tnum), `Segmented` (Points | Form Rating), `PhaseStrip` as tabs; event `stand:metric`; the pinned sentence from `cut_gap()`.
-- **Strings.** `standings.*`.
+- **Strings.** `standings.*`. Needs the UI/UX answer on whether "Form Rating" fits the Points / Form Rating switch at large text (section 12.1, fallback label "Rating"). **Tutorial step 26 becomes real here** (`stand.metric`; with this increment the walk has `fallbacks` 0).
 - **Tests.** T-std; the table order equals `gs.standings()` for 20 saved seasons; own row marked by a shape cue (marked YOU), not colour; 19-character club names; no tab label breaks mid-word.
 - **Screenshots.** Table, form view, bracket, history; four variants.
 - **Acceptance.** As above.
 - **Rollback.** Revert.
 - **Effort (estimate).** 70 to 100 tool calls.
 
-### I-21 Plan and Club tabs, Match day adopt the new components (parallel S)
+### I-21a Tag-only work on the screens that stay as they are (G1; run directly before I-15)
+
+- **Goal (v1.1, new).** Give the tutorial real targets on the screens that are not redesigned, **before** the Founder's first look at the guide. These tags and events stay valid when I-21b restyles the screens later, so none of this work is thrown away.
+- **Lane / Needs.** G1. Needs I-03 (tags, bus) and I-14 (the engine, so the tags can be tested against it). Runs right after I-14, before I-15. Small: a few lines per screen, no layout change.
+- **Files.** M `screen_plan.gd` (tag the three Plan tiles `plan.tile.practice`, `plan.tile.training`, `plan.tile.chem`); M `screen_practice.gd` (`practice.quick`); M `screen_prematch.gd` (`prematch.matchups`, `prematch.start_draft`; **remove `Tips.show(body, "prematch")`**, the old Pre-match tip, so it never sits under a tutorial step); M `screen_club.gd` (the existing Form Rating tile, which already opens `ScreenStandings.new("form")`: `club.tile.form`, `club.tile.finance`, `club.tile.fa`); M `screen_match.gd` (**v1.0 gave these to no increment**: `match.controls` over Speed and Skip together, `match.report_btn`, and the events `match:speed`, `match:skip`, `match:end` of TUTORIAL 7.5; the match itself is not touched, only observed); C `tests/check_tags_legacy.gd/.tscn`. Each tag is applied again after any `_rebuild()` (TUTORIAL 8).
+- **Strings.** none (the Pre-match tip strings `tip.prematch*` stay in `en.json` until I-24).
+- **Tests.** `tags_plan`, `tags_practice`, `tags_prematch`, `tags_club`, `tags_match`: each id exists and is visible in the state the step needs; the Pre-match screen shows no `Tips` card; `tap:` and `match:*` events fire; **a match played with the tags present gives the same result as without them** (R6, same seed); old smoke and touch green.
+- **Screenshots.** none needed (no layout change); one contact sheet of the five screens to prove nothing moved.
+- **Acceptance.** Tutorial steps 8, 9, 10, 11, 19, 20 and 25 find their targets on the old screens.
+- **Rollback.** Revert; the hunks are a few lines per screen.
+- **Effort (estimate).** 15 to 25 tool calls.
+
+### I-21b Plan and Club tabs and Match day adopt the new components (parallel S)
 
 - **Goal.** Tabs that are not in the six screens stop looking old next to them.
-- **Lane / Needs.** G1. Needs I-15 to I-20.
-- **Files.** M `screen_plan.gd`, `screen_club.gd`, `screen_prematch.gd`; tests as usual.
-- **Tests.** T-std (build, fit, touch); `Practice matches` and `Play a Quick Match` tags exist (tutorial steps 7 and 8).
+- **Lane / Needs.** G1. Needs I-15 to I-20 and I-21a.
+- **Files.** M `screen_plan.gd`, `screen_club.gd`, `screen_prematch.gd` (restyle only; the I-21a tags move with their controls); tests as usual.
+- **Tests.** T-std (build, fit, touch); the I-21a tag tests still pass (`Practice matches` and `Play a Quick Match` ids exist: tutorial steps 8 and 9).
 - **Acceptance.** Looks consistent; Tutorial ids found.
 - **Rollback.** Revert.
-- **Effort (estimate).** 30 to 50 tool calls.
+- **Effort (estimate).** 20 to 35 tool calls (I-21a and I-21b together: 35 to 60, against 30 to 50 for the old I-21).
 
 ### I-22 Help sheets, "?" button and glossary
 
@@ -563,9 +618,9 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 - **Lane / Needs.** G2 (new files) plus G1 integration. Needs I-14, I-16 (so the draft pause hook is real), the screens.
 - **Files.** C `src/tutorial/help_sheet.gd` (reads `data/help_v1.json`), `src/tutorial/screen_glossary.gd`, `data/help_v1.json` (20 screens, "see, do, know" lines), `data/glossary_v1.json` (49 terms); **integration lines for G1**: the "?" button in the `Screen` header slot (I-03), the dot memory, pause hooks for Draft timer and Match, replace `Tips.show` calls.
 - **Strings.** from the merged patch (`help.*`, `gl.*`; 60 help lines and 49 definitions).
-- **Tests.** Tests 11, 12, 14, 16 of TUTORIAL 9; every screen's `help_id()` has an entry; opening a sheet pauses the draft timer; the dot clears after opening; every glossary key exists; no help text is over its word limit (script from Narrative reused as `tools/check_copy_limits.py`).
+- **Tests.** Tests 11, 12, 14, 16 of TUTORIAL 9; every screen's `help_id()` has an entry; opening a sheet pauses the draft timer; the dot clears after opening; every glossary key exists; no help text is over its word limit (`tools/check_copy.py`).
 - **Screenshots.** One help sheet, the glossary list and one term; four variants.
-- **Acceptance.** Every screen has a working "?".
+- **Acceptance.** Every screen has a working "?". **Perf re-baseline no. 2 of 2 (section 6):** the "?" button and hooks add nodes to every legacy screen, so every remaining legacy row is reset to its measured value in one commit reviewed by the Technical Director, old and new side by side.
 - **Rollback.** Revert; integration lines listed.
 - **Effort (estimate).** 70 to 100 tool calls.
 
@@ -584,8 +639,8 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 
 - **Goal.** Remove what is replaced and prove the rename.
 - **Lane / Needs.** G1. Needs I-22.
-- **Files.** M `tips.gd` and the three `Tips.show` calls (removed), `screen_about.gd` (Barlow credit and a Licences entry reading the licence text), `en.json` (retire `tip.hub*`, `tip.prematch*`, `tip.report*`; the Payoff `tip.*` keys stay); C `tools/check_rename.py` (fails on "advisor", "assistant", "owner and coach", and "coach" in lower case when it means the helper) wired into `check_fast.sh` by L.
-- **Tests.** Rename script clean; the licence text is shown from a data file that is in the APK.
+- **Files.** **the three `Tips.show` calls are already gone** (hub in I-15, report in I-18, prematch in I-21a): this increment proves no call remains and removes what is dead (`tip.hub*`, `tip.prematch*`, `tip.report*` in `en.json`, and the `tip_seen`/`tip_mark` paths nothing calls; the Payoff `tip.*` keys stay); M `screen_about.gd` (Barlow credit and a Licences entry reading the licence text); **release `about.included.b` and `about.test.b` here (v1.1):** help sheets (I-22), lessons and glossary (I-23) now exist, so delete both from `docs/design/copy/hold_0_7.json` and run `tools/merge_copy.py --write`; rename check: wire `tools/check_copy.py` (it scans string values only, never the `.terms` id lists, so lower-case "coach" in glossary id lists is not a hit; seen in the working tree, not run by me) into `check_fast.sh` by L. **There is no separate `check_rename.py`** (v1.1): `check_copy.py` check 4 already covers "advisor", "assistant", "owner", a lower-case "the coach" and "AI helper" (per its header; I have not run it).
+- **Tests.** Rename check clean; no `Tips.show(` call with `hub`, `prematch` or `report` remains (grep as a test); the About screen shows the new included and tester text (not the older text that describes chemistry as the new feature); the licence text is shown from a data file that is in the APK.
 - **Acceptance.** `check_strings.py` has no unused-key warnings for the retired families.
 - **Rollback.** Revert.
 - **Effort (estimate).** 25 to 40 tool calls.
@@ -594,7 +649,7 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 
 - **Goal.** The proof that everything works together, then the handback for review.
 - **Lane / Needs.** Q runs the audits, G1 fixes, L runs the full check. Needs all.
-- **Work.** (1) The full UI-PASS-2 7.1 matrix: 6 screens, all states, 4 variants (72 images or more), each looked at twice. (2) The audits of 7.1 on every screen: fit, hit area, colour-blind cue, in-place. (3) All 20 tutorial tests (TUTORIAL 9) including the end-to-end walk of the 27 steps on the new screens, counted in steps and taps. (4) Perf gates under Xvfb for all 6 screens plus the sheets. (5) The idle-redraw check and the low-processor decision with Engine/Graphics. (6) Save-compat fixtures. (7) `bash tools/run_all_checks.sh $GODOT` in the background (about 25 minutes, estimate). (8) A debug APK export, size compared with the 24.7 MB of `PERF-BUDGET.md` 8. (9) Version label 0.7.0 alpha (`App.VERSION_LABEL`, G1), export preset version (L), `docs/ALPHA-0.7-NOTES.md` (Producer).
+- **Work.** (1) The full UI-PASS-2 7.1 matrix: 6 screens, all states, 4 variants (72 images or more), each looked at twice. (2) The audits of 7.1 on every screen: fit, hit area, colour-blind cue, in-place. (3) All 20 tutorial tests (TUTORIAL 9) including the end-to-end walk of the 27 steps on the new screens, counted in steps and taps. (4) Perf gates under Xvfb for all 6 screens plus the sheets. (5) The idle-redraw check and the low-processor decision with Engine/Graphics. (6) Save-compat fixtures. (7) `bash tools/run_all_checks.sh $GODOT` in the background (about 25 minutes, estimate). (8) A debug APK export, size compared with the 24.7 MB of `PERF-BUDGET.md` 8. (9) Version label 0.7.0 alpha (`App.VERSION_LABEL`, G1), export preset version (L), **and release `about.title` ("About Alpha 0.7") from the hold file in the same commit as the version label (v1.1); the hold file must then be empty, and the merge script's dry run reports 0 held keys**, `docs/ALPHA-0.7-NOTES.md` (Producer). (10) The OFL licence file is still in the APK listing. **Screenshots (v1.1):** 72 images looked at twice is 12 contact sheets of 6, looked at twice, which is what fits 60 to 90 calls; looked at one by one, two passes would be 144 views and the increment would not fit.
 - **Acceptance.** Full check exit 0; no `ERROR:` in logs; every gate in section 6 green or a named exception signed by the Technical Director.
 - **Rollback.** Not applicable; this step only fixes.
 - **Effort (estimate).** 60 to 90 tool calls.
@@ -605,19 +660,27 @@ Four short spikes. Each ends as a test that stays in the repo, because the answe
 
 | Block | Increments | Tool calls (estimate) |
 |---|---|---|
-| Safety net, spikes | I-00, I-01 | 55 to 85 |
-| Look foundations | I-02 to I-04 | 130 to 190 |
+| Safety net, follow-up, spikes | I-00, I-00b, I-01 | 70 to 115 |
+| Look foundations | I-02 to I-04 | 135 to 195 |
 | Art code (E) | I-05 | 60 to 90 |
-| Core hooks (G2) | I-06 | 25 to 40 |
+| Core hooks (G2) | I-06 | 30 to 45 |
 | Components | I-07 to I-10 | 230 to 320 |
-| Tutorial engine (G2) | I-11 to I-14 | 210 to 290 |
-| Six screens and tabs | I-15 to I-21 | 500 to 710 |
+| Tutorial engine (G2) | I-11 to I-14 | 215 to 305 |
+| Six screens and tabs | I-15 to I-21b (I-21 is now I-21a and I-21b) | 505 to 720 |
 | Help, lessons, cleanup, acceptance | I-22 to I-25 | 215 to 320 |
-| **Total** | 26 increments | **about 1,400 to 2,050** |
+| **Base total (builder's own testing and redo of its own mistakes only)** | 26 increments plus I-00b, 28 dispatches | **1,460 to 2,110** |
+| Rework and review allowance, 20 to 30 percent | | +290 to +635 |
+| **Total with allowance** | | **about 1,750 to 2,740** |
 
-The design documents' own estimates are 38 developer days for the layouts and 19 for the tutorial (about 57), both flagged by their authors as low confidence. I cannot convert tool calls to days with any evidence; my reading is 20 to 28 working days for one builder and about 14 to 20 with two lanes, and that is a guess to be replaced by the real pace after I-04 and I-07 are done. **Re-estimate after I-07** (first real component increment) and again after I-15 (first screen); the Producer should expect the plan to move at those two points.
+The v1.0 table said 1,400 to 2,050 (its blocks actually added up to 1,425 to 2,055). Two things changed: the tutorial block was added up wrongly (I-11 to I-14 sum to 210 to 300, not 210 to 290; v1.1 has 215 to 305 after the new-save and kill tests), and five increments were re-costed for the v1.1 changes (I-00 +5 high, I-03 +5, I-06 +5, I-14 +5, I-21 split from 30 to 50 into 35 to 60) and the new I-00b adds 15 to 25. I re-added every block from the "Effort" line of each increment in section 7 (the sums above are those sums, checked by script, not typed).
 
----
+**Why the allowance.** The base figures assume each increment is right the first time. The ledger says otherwise: 5 of the 13 earlier dispatches needed a second round. The allowance of 20 to 30 percent (a judgement, not a measurement; the Studio Manager proposed the same range) covers one rework round and one review round per increment (my review of the handback, then the fixes). It does **not** cover the Studio Manager's and the Producer's own review time, or waiting for the UI/UX answers in 12.1; those are outside this plan.
+
+**Days: a guess.** The design documents' own estimates are 38 developer days for the layouts and 19 for the tutorial (about 57), both flagged by their authors as low confidence. Nothing converts tool calls to days: no pace has been measured. v1.0's "20 to 28 days" works out to about 72 calls a day, which is itself an assumption. With that same division the allowance total is **about 24 to 38 working days for one builder, and about 17 to 26 with two lanes**. The plan's figure and the designers' 57 days differ by a factor of 1.5 to 2.4 and **cannot both be right**; I would not promise the Founder a date from either. The only safeguard is to replace the guess with the real pace: **re-estimate after I-07** (first real component increment), **after I-15** (first screen) and **after I-18** (CP2, the first complete loop); the Producer should expect the plan to move at those three points.
+
+**Where the Founder's checkpoints fall in this estimate (base calls, before the allowance).** CP1 after I-04: 205 to 310. Old CP2 (after I-16, as in v1.0): 890 to 1,280 (about 61 percent). **New CP2 (after I-18 and I-21a): 1,055 to 1,515 (about 72 percent)**. That is 165 to 235 calls later, about 3 to 4 working days at the same guessed pace with the allowance. CP3: the end.
+
+**Screenshot counts that only fit if batched.** Two figures in the plan are only plausible with contact sheets of 6 images (R1(d)): **I-04, 196 images inside 40 to 60 calls**, and **I-25, 72 images each looked at twice inside 60 to 90 calls**. Unbatched, I-04 would need about 400 views and I-25 144. The per-screen counts of I-15 to I-20 (24 images or so per screen) fit in about 4 sheets, looked at twice, without a problem. If batching turns out to hide problems (a sheet at half size cannot show a one-pixel clip), the fit audit is the safety net and the figure for I-04 goes up, not the quality of the look.
 
 ## 9. Risks and spikes
 
@@ -627,17 +690,19 @@ The design documents' own estimates are 38 developer days for the layouts and 19
 |---|---|---|---|
 | K1 | **Sheet-through-hole tap (TUTORIAL B11):** a tap in the overlay hole must reach a button inside a sheet on a lower layer | Scratch probe passed on desktop; **not run on a phone, not run with the real `BottomSheet`** | I-01 S2, then I-12 on the real sheet. Fallback: card-only steps |
 | K2 | **Nested carousel steals diagonal swipes** | Scratch probe: **failed** (a mostly vertical diagonal swipe starting on the carousel moved the carousel, not the page) | I-01 S1 designs the direction lock; I-08 tests five angles; fallback plain row; cut list |
-| K3 | **Barlow in Godot.** Weights, `tnum`, fallback, size | Files and `default_font.tres` already in the repo; desktop: `tnum` works, widths match the art bible; APK +0.3 MB; weights not wired; OFL text not in the APK | I-02 wires weights and fixes the export filter. **Android `tnum` unverified** (the text server in the Android template is TextServerAdvanced, so expected to work); phone-test item |
+| K3 | **Barlow in Godot.** Weights, `tnum`, fallback, size | Files and `default_font.tres` already in the repo; desktop: `tnum` works, widths match the art bible; APK +0.3 MB; weights not wired; the OFL text **is** in the APK (preset fixed in `d78038d`, verified by listing the APK) | I-02 wires weights; I-02 and I-25 keep the APK-listing check. **Android `tnum` unverified** (the text server in the Android template is TextServerAdvanced, so expected to work); phone-test item |
 | K4 | **Texture and draw-call budget** | Counts exact on this renderer: `StyleBoxFlat` card is one call with or without shadow; 9-slice from one atlas batches to 1; a `CPUParticles2D` is one call. Real batching with interleaved text and icons is not proven. Fill-rate cost is not measurable here | I-01 S3, gates in section 6, `perf_baseline` in every screen step; phone test |
 | K5 | **Node cliff in the hero grid** (40 cards) | Current Draft screen has 81 nodes; a 5-node card would cost 240 | I-01 S4: HeroCard is one self-drawing `Control`; fallback virtualised list |
 | K6 | **Rebuild-on-tap makes overlay and sheets unstable** | 16 to 22 ms per tap measured | Section 2.1 rule; in-place audit in every screen step |
 | K7 | **Token change ripples** into the 14 unredesigned screens (UI-PASS-2 R4) | Font change alone already changed every screenshot | I-02 plus I-04 land it once with a full re-shoot; CP1 |
-| K8 | **String merge breaks tests** (16 keys replaced, 3 rename edits) | Unknown until merged | I-00 does the merge first, in its own commit |
+| K8 | **String merge breaks tests** (12 keys replaced now, 4 held; 3 rename edits) | The Studio Manager grepped `game/tests`, `game/src` and `tools` for all 16 replaced keys and their old texts and found no test that depends on one; `ui_smoke` and `ui_touch` have **not** been re-run after the merge (no Godot on the review machine) | I-00 does the merge first, in its own commit, and runs both |
 | K9 | **SVG rasterisation on Android** (ThorVG in the Android template) | Fast on desktop at start-up; Android untested | I-05 draws everything in code where possible; SVG only for the five role icons; Engine/Graphics to confirm ThorVG in the Android export; phone-test item |
 | K10 | **Hot-file collisions between two agents** | Real: `ui.gd`, `main.gd`, `screen.gd`, `app.gd`, `en.json`, `game_state.gd`, big test files | Section 4 ownership table, auto-discovered tests, integration lines |
 | K11 | **Text widths on a phone** drift by a pixel or two at scaled sizes (the "Gravenstone" room is a few pixels) | Exact on desktop only | Margin audit in `fit_*`; phone test; hero names stay at Small 26 |
-| K12 | **Time of the first game** (4 to 6 minutes for 27 steps is unmeasured) | TUTORIAL 11 | I-14 counts taps and steps; Founder phone test measures minutes; cut steps 3 and 10 first |
-| K13 | **Scope.** About 1,400 to 2,050 tool calls (estimate) | | Cut list (section 10), checkpoints, re-estimate after I-07 and I-15 |
+| K12 | **Time of the first game** (4 to 6 minutes for 27 steps is unmeasured) | TUTORIAL 11 | I-14 counts taps and steps; the CP2 phone test measures minutes (with 3 fallback steps, so slightly off); cut steps 3 and 10 first |
+| K13 | **Scope.** About 1,460 to 2,110 base tool calls, 1,750 to 2,740 with the rework allowance (estimate); the day figures are a guess | 5 of 13 earlier dispatches needed a second round | Cut list (section 10), checkpoints, re-estimate after I-07, I-15 and I-18; a second Gameplay Programmer instance on G2 from I-06 |
+| K14 | **The Founder's first look at the tutorial shows cards instead of highlights** (v1.1) | In v1.0, CP2 after I-16 would have shown 15 of 27 steps as "cannot find" cards (the review counted 13; two more are the Match screen steps, which no increment tagged) | CP2 moved to I-18, tag-only I-21a pulled forward; 3 cards left at CP2 (steps 5, 6, 26), listed in section 10; the Producer tells the Founder |
+| K15 | **A new save or a killed app gets the wrong tutorial state** (v1.1) | Review X8: the plan had no state for a brand-new save and nothing for a kill mid-game | Section 5 items 3 and 10; fixture `save_0_6_d`; tests in I-06, I-11, I-14 |
 
 ### 9.2 What would make me stop and replan
 
@@ -664,22 +729,60 @@ Scrolling stutter on Home and Draft; whether the phone warms over one full match
 3. History mini story strips on Standings.
 4. Report "starter chips" sheet.
 5. Lessons beyond the first three (I-23).
-6. Plan and Club tab restyle (I-21) and overflow-only treatment kept from I-04.
+6. Plan and Club tab restyle (I-21b) and overflow-only treatment kept from I-04.
 
-Never cut: tokens and weights (I-02), the in-place rule on redesigned screens, the tutorial's sandbox proof (I-13), save compatibility (section 5), the colour-blind cues.
+Never cut: tokens and weights (I-02), the in-place rule on redesigned screens, the tutorial's sandbox proof (I-13), save compatibility (section 5), the colour-blind cues, and the tags of I-21a (cutting I-21b keeps them).
 
-**Checkpoints**
+**Checkpoints (v1.1)**
 
 | CP | After | What exists | For whom |
 |---|---|---|---|
-| CP1 | I-04 | Same game, new type, colours, font, 96 px targets, frame layers | Founder can look at screenshots; no phone test needed |
-| CP2 | I-16 | Home and Draft redesigned, tutorial engine and first game playable (fallback cards where the other screens are not rebuilt yet), APK, one full check | **Founder phone test** (PERF-BUDGET 4: scrolling, warmth, text) |
-| CP3 | I-25 | All six screens, help everywhere, lessons, 0.7.0 APK | Founder, then testers |
+| CP1 | I-04 | Same game, new type, colours, font, 96 px targets, frame layers. No guide yet (the tutorial engine arrives in I-11 to I-14) | Founder can look at screenshots; no phone test needed |
+| Engine preview (optional) | I-16 | Home and Draft redesigned, tutorial engine and first game playable, **8 of 27 steps are cards** (below). APK built by the Producer, no full check | A phone test of scrolling, warmth and text only (PERF-BUDGET 4). Founder taps Skip tutorial |
+| **CP2** | **I-18** (moved from I-16) | Home, Draft, Game Plan and Report redesigned: the whole match-day loop is new. Guided first game playable from the welcome card to the Standings card with **3 of 27 steps shown as cards**. APK, one full check | **Founder phone test**: the first real look at the guide |
+| CP3 | I-25 | All six screens, help everywhere, lessons, 0.7.0 APK, all 27 steps real | Founder, then testers |
+
+### 10.1 CP2 re-plan (review fix 2): the choice, the cost, the recommendation
+
+**The problem.** The guide has 27 steps (TUTORIAL 3.2: 2 modal, 5 info, 20 do-steps; 4 to 6 minutes by estimate). A step is real only when its screen carries the tag it points at. In v1.0 the first phone build came after I-16 (Home and Draft). By then only the tab bar (I-03), Home (I-15) and Draft (I-16) were tagged, so **15 of 27 steps would have shown the "We cannot find that on this screen" card**. The Studio Manager counted about 13; I count 15 because no increment tagged the Match screen (steps 19 and 20). The Founder's loudest complaint was the tutorial, and this would have been his first look at it.
+
+**Which step becomes real where** (this is the whole table; it adds up to 27):
+
+| Made real by | Steps |
+|---|---|
+| I-03 tab bar tags, and the I-14 modal cards | 1 (welcome), 3 (tabs), 4 (Squad tab), 7 (Plan tab), 24 (Club tab), 27 (finish) |
+| I-15 Home | 2 (next match card) |
+| I-16 Draft | 12 (ban), 13 (pick), 14 (role), 15 (Auto-finish), 16 (open Game Plan) |
+| I-17 Game Plan | 17 (Coach), 18 (Start the match) |
+| I-18 Report | 21 (result), 22 (why), 23 (Continue) |
+| I-19 Squad | 5 (bench player), 6 (player card) |
+| I-20 Standings | 26 (Points / Form switch) |
+| **I-21a tag-only (new)** | 8 (Practice tile), 9 (Quick Match), 10 (matchups), 11 (Start draft), 19 (watch), 20 (See the report), 25 (Form tile) |
+
+**Option A, tag the old screens early.** Put tags and events on the old Squad, Game Plan, Report and Standings inside I-11 to I-14, plus the Plan, Practice, Pre-match, Club and Match tags. Cost: the Plan, Practice, Pre-match, Club and Match tags are permanent (about 15 to 25 calls, needed under any option). The tags on the old Game Plan, Report and Squad are **thrown away** when I-17, I-18 and I-19 rewrite those screens, about 25 to 40 calls, plus the same tests again later (estimate). And it does not finish the job: steps 6, 17 stage B and 22 stage B point into a **sheet** (the old screens have none; sheets come with the rewrites), step 26 points at a switch that does not exist yet, and step 5's text says "the map" about a screen that has none. About 5 of 27 steps would still be cards or would say something untrue. CP2 would stay at about 890 to 1,280 base calls (after I-16).
+
+**Option B, move CP2 later.** CP2 after I-18, with the permanent tag-only part of A pulled forward as I-21a (right after I-14, before I-15). Nothing is thrown away. Extra cost: **0 calls** (the same I-21 work, moved earlier). Price: the first Founder look comes **165 to 235 base calls later** (I-17, I-18 and I-21a), about 3 to 4 working days at the guessed pace with the allowance. Cards left at CP2: **3 of 27** (steps 5, 6 and 26), and the steps that are real are really real (sheet steps 12 to 15, 17 and 22 included). New CP2 sits at 1,055 to 1,515 base calls, about 72 percent of the plan.
+
+**Recommendation: Option B with I-21a**, plus the optional engine-preview APK after I-16. In numbers: A pays 25 to 40 throwaway calls and still leaves about 5 cards; B pays nothing and leaves 3. The only real loss of B is that the first phone check of scrolling and heat comes 3 to 4 days later, and the engine-preview APK gives that check back at the earlier date at no build cost beyond an export (the Founder is told to tap Skip tutorial on it). Because the tutorial is the Founder's loudest complaint, I would rather he first meets it at 24 of 27.
+
+**Exactly which steps are cards, by checkpoint** (for the Producer to tell the Founder):
+
+| Build | Cards (steps) | Count | Real |
+|---|---|---|---|
+| v1.0 plan, CP2 after I-16 (dropped) | 5, 6, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22, 23, 25, 26 | 15 | 12 |
+| Engine preview after I-16 (with I-21a) | 5, 6, 17, 18, 21, 22, 23, 26 | 8 | 19 |
+| **CP2 after I-18** | **5, 6, 26** | **3** | **24** |
+| After I-19 | 26 | 1 | 26 |
+| CP3 after I-20 and later | none | 0 | 27 |
+
+In plain words for the Founder at CP2: "The guided first game works from the welcome card to the league table. Two small bits in the Squad part (tap a bench player, and the player card) and the last switch on the standings show a plain text card with a Next button instead of a glowing highlight, because those two screens are rebuilt after this build. Tap Next on them." On the engine preview: "Tap Skip tutorial. This one is for how fast it scrolls and how warm the phone gets."
+
+**What the build must guarantee at CP2** (tested in I-18): the cards are exactly steps 5, 6 and 26 and no other (the scripted walk counts `fallbacks` and fails on any other number); every card's Next works; Skip works at every step; the old Squad and Standings still do everything they did.
 
 **What waits for Alpha 0.8 (the arena), and why**
 
 - The **Match HUD** (UI-PASS-2 6.7): scoreboard strip, text strip with the scheduler, controls, end card. Depends on the arena scene, the short feed form and `Report.story`.
-- `tut.watch.arena` (tutorial step 19 text) and the match step events in arena form; 0.7 keeps `screen_match.gd` as it is and tags its Speed and Skip buttons.
+- `tut.watch.arena` (tutorial step 19 text) and the match step events in arena form; 0.7 keeps `screen_match.gd` as it is and tags its Speed, Skip and See-the-report buttons (I-21a).
 - Final lane-token positions on Squad (tied to the arena map; the anchors table is interim).
 - Arena budgets (PERF-BUDGET 3.5, 3.6): 600 canvas items, particle limits, `CPUParticles2D` only.
 - Low-processor mode, which the Technical Director should decide after an arena trial (PERF-BUDGET 9 item 1).
@@ -708,22 +811,39 @@ Never cut: tokens and weights (I-02), the in-place rule on redesigned screens, t
 
 | # | For | Decision | My recommendation |
 |---|---|---|---|
-| D1 | Technical Director | Adopt the `PERF-BUDGET.md` limits (100 draw calls, 200 nodes, 48 MB per screen) as failing checks | Yes. They are generous against the baseline and catch the 40-card cliff |
+| D1 | Technical Director | Adopt the `PERF-BUDGET.md` 3.1a limits as failing checks: per-screen allowances with a ratchet for legacy screens, target 60 / 120 / 700 and hard 100 / 200 / 1,200 for redesigned ones, 48 MB texture, shadows 6, font pairs 12; and review the two re-baselines (after I-04 and I-22) | Yes. The allowances start from the measured baseline, so the check passes on day one and still catches the 40-card cliff |
 | D2 | Technical Director | A small debug overlay (FPS, draw calls, nodes, texture memory) for the phone tests | Yes, in I-02; it is the only way to get numbers off a phone |
 | D3 | Systems Designer | Approve the read-only helpers in I-06 (`upcoming`, `cut_gap`, `team_kills`, `best_slot_for`) and the tutorial flag handling in I-13 | Approve; none changes a result, and the golden hash proves it |
-| D4 | Producer | Run the full 25-minute check at CP2 and I-25 only; use the fast loop otherwise | Yes |
+| D4 | Producer | Run the full 25-minute check at CP2 (now after I-18) and I-25 only; use the fast loop otherwise | Yes |
 | D5 | Producer | One commit per increment so rollback is a revert | Yes |
 | D6 | Lead Game Designer | Home "contracts end this season" note only from round 9 (TUTORIAL 11); and the stricter opponent rule for the first game | Yes to both |
-| D7 | Narrative, UI/UX | The three open items in `COPY-0.7.md` 2: "Mid" as lane and phase, "Jg" and "Sup" filter labels, `chem.pentagon_hint` colour-only wording | Take Narrative's recommendations; the third needs a non-colour cue before I-04's colour-blind check can pass for Chemistry |
+| D7 | Narrative, UI/UX | The three open items in `COPY-0.7.md` 2: "Mid" as lane and phase, "Jg" and "Sup" filter labels, `chem.pentagon_hint` colour-only wording | Take Narrative's recommendations. The second and third are rows 2 and 3 of the open table in 12.1. The third needs a non-colour cue before the colour-blind audit of Chemistry in I-25 can pass (v1.0 said "I-04's colour-blind check", but I-04 runs only a fit audit; the `cb_<screen>` checks exist for redesigned screens only) |
+| D8 | Producer | Move CP2 from after I-16 to after I-18, pull the tag-only part of I-21 forward as I-21a, and optionally build an engine-preview APK after I-16 (section 10.1) | Yes to all three. It costs no extra calls and delays the Founder's first look at the guide by about 3 to 4 working days (a guess), in return for 3 cards of 27 instead of 15 |
+
+### 12.1 Open answers still owed by the UI/UX Designer (five)
+
+Nobody owned these before v1.1. Each is raised by Narrative or by this plan, each blocks or shapes one increment, and each has a fallback so the build is never stuck. Owner of every answer: **UI/UX Designer**. Until the Producer decides who applies a string change after the I-00 merge (the review's fix 7 is still open), the answer goes to Narrative for the wording and G1 applies it in the increment named.
+
+| # | Question | Raised by | Needed by | Fallback if still unanswered | Lands in |
+|---|---|---|---|---|---|
+| U1 | Does "Form Rating" fit the Points / Form Rating switch in the Standings table header at large text (626 px)? | Narrative (`COPY-0.7.md` open decision) | I-20 | Label "Rating" (Narrative's fallback) | `standings.*` in I-20 |
+| U2 | Do "Jungle" and "Support" fit the six-chip role filter on the Draft screen, or do the short forms "Jg" and "Sup" stay? | Narrative | I-16 | Keep "Jg" and "Sup" | `draft.*` in I-16 |
+| U3 | What non-colour cue does the Chemistry hint (`chem.pentagon_hint`) get? Today it explains the screen by colour only | Narrative; this plan, D7 | I-04 (the sweep already touches Chemistry); latest I-25 (the colour-blind audit) | None that passes the colour-blind rule; if still open at I-25 it is a named exception signed by the Technical Director | `screen_chemistry.gd` in I-04 |
+| U4 | What are the real tab labels of the Player card sheet: "Stats" and "Career"? | Narrative | I-19 | The labels as written in the copy patch ("Stats", "Career") | `squad.*` in I-19 |
+| U5 | Are the interim Squad token anchors right (Top 0.110/0.540, Jungle 0.270/0.700, Mid 0.500/0.720, Support 0.840/0.742, Bot 0.889/0.540)? | This plan, I-19 | I-19 | Use the ART-BIBLE table as written; final positions move with the 0.8 arena map anyway | `screen_roster.gd` in I-19 |
+
 
 ---
 
 ## 13. Hand-offs
 
-- **Producer:** dispatch I-00 first; commit one increment at a time; APK at CP2 and CP3; log that the Founder's feedback supersedes the earlier "guided first game stays optional" decision; ALPHA-0.7 notes at I-25.
-- **Narrative:** copy patch is the source; nothing to write unless a screen step finds a gap (G1 asks); re-run limit scripts when keys change.
-- **Engine / Graphics:** lane E (I-05), the gates and `perf_baseline`, ThorVG in the Android template, the debug overlay if approved, `OFL.txt` in the export filter (L edits the preset).
-- **QA Automation:** audits and the matrix in I-25; `check_strings.py` extended if a split string file is ever used (not needed: one merge); seed pinning for the tutorial tests.
+- **Producer:** I-00 is built and waits for the Lead Programmer's review, then commit it as one commit; dispatch I-01, then **I-00b**, then I-02 onward in order; commit one increment at a time; **decide D8** (CP2 after I-18, I-21a first, optional engine-preview APK) and **tell the Founder the card lists of section 10.1 before each APK**; APK at CP2 and CP3; permit the second Gameplay Programmer instance on G2 from I-06 if wanted; log that the Founder's feedback supersedes the earlier "guided first game stays optional" decision; ALPHA-0.7 notes at I-25.
+- **Narrative:** the copy patch is the source; after the merge, copy edits go in a patch file applied by `merge_copy.py --update` with an allow-list (I-00b); fill `docs/design/copy/update_allow.json` when the UI/UX answers U1 to U3 arrive; re-run `tools/check_copy.py` when keys change.
+- **Engine / Graphics:** lane E (I-05), the per-screen allowance table and its ratchet (`PERF-BUDGET.md` 3.1a; I-00b moves it into `game/tests/perf_allowances.json`), ThorVG in the Android template, the debug overlay if approved. The OFL licence file is already in the APK; nothing to do. Mark section 8 of `PERF-BUDGET.md` as the review asked if not yet done.
+- **Technical Director:** D1; the two re-baselines (after I-04, after I-22); every waiver between target and hard limit.
+- **QA Automation:** **owns `game/tests/fixtures/` from now on**; audits and the matrix in I-25; seed pinning for the tutorial tests; `check_save_compat` extended with new fixtures only as new files.
 - **Systems Designer:** D3 approval.
-- **IP and Originality Checker:** Barlow licence entry (already logged by Engine/Graphics; confirm the OFL text now ships); badge, silhouette and icon shapes from I-05.
-- **UI/UX Designer:** answer D7; non-colour cue for the Chemistry hint; confirm interim Squad anchors.
+- **IP and Originality Checker:** Barlow licence entry (already logged by Engine/Graphics; the OFL text ships, verified by APK listing); badge, silhouette and icon shapes from I-05.
+- **UI/UX Designer:** the five answers of 12.1 (U1 to U5), each with the increment that needs it; confirm where the inline offer card sits on Home (below Next-match and Play, I-15).
+- **Owner of `TUTORIAL.md`:** add the state `new` to 6.1 and 6.2 (a brand-new save before the player answers the guide; section 5 item 3) and the kill-resume rule of section 5 item 10.
+- **Producer / Game Design Lead (still open from the review):** the three GDD lines and the code comment that still call the player "the coach" (fix 13); the B11, nested-scroll and SVG probe outputs are still not in the repo (fix 11, Lead Programmer or QA Automation, small).
