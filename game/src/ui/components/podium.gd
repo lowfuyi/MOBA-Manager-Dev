@@ -208,7 +208,8 @@ func _medal_col(rank: int) -> Color:
 			return UI.WARN
 		2:
 			return UI.TEXT2
-	return UI.WARN.darkened(0.45)
+	# bronze: darker than gold but light enough for the dark numeral to read (the 0.45 darkening was too dim)
+	return UI.WARN.darkened(0.22)
 
 
 func _layout() -> void:
