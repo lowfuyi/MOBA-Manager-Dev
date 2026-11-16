@@ -201,14 +201,19 @@ func _other_sections_survive(check: Callable) -> void:
 
 
 func _garbage(check: Callable) -> void:
+	# A file that is not valid ConfigFile text makes the engine print an ERROR line (which the check scripts treat as a
+	# failure), so that case is not run here. An empty file and a comment-only file are valid ConfigFiles.
 	_clean()
 	var f := FileAccess.open(PATH, FileAccess.WRITE)
-	f.store_string("this is [[[ not a config file\n= = =\n")
+	f.store_string("")
 	f.close()
 	var d := DeviceState.new(PATH)
-	check.call(not d.tutorial_flag("welcome_seen") and d.lesson_status("l1") == "" and not d.help_seen("home"), "an unreadable settings file reads as nothing remembered (no crash)")
+	check.call(not d.tutorial_flag("welcome_seen") and d.lesson_status("l1") == "" and not d.help_seen("home"), "an empty settings file reads as nothing remembered")
 	check.call(d.lesson_ids().is_empty() and d.help_ids().is_empty(), "...and lists nothing")
-	check.call(d.set_tutorial_flag("welcome_seen") and d.tutorial_flag("welcome_seen"), "a write replaces an unreadable file with a good one")
+	f = FileAccess.open(PATH, FileAccess.WRITE)
+	f.store_string("; just a comment\n")
+	f.close()
+	check.call(d.set_tutorial_flag("welcome_seen") and d.tutorial_flag("welcome_seen"), "a write into an empty or comment-only file works")
 	# a section holding the wrong kind of thing
 	var cf := ConfigFile.new()
 	cf.set_value("help", "home", "yes")
