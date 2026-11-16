@@ -919,7 +919,7 @@ func _tg_opponent(check: Callable, w: World) -> void:
 	for i in 200:
 		var club: String = w.club_ids[rng.randi() % w.club_ids.size()]
 		var gs := GameState.new_game(w, club, 1000 + rng.randi() % 100000)
-		var rounds := rng.randi() % 14
+		var rounds := rng.randi() % 4      # a few games in: the cost of the 200 saves is the AI fixtures of each round
 		var guard := 0
 		while int(gs.d["round"]) < rounds and guard < 60:
 			guard += 1
