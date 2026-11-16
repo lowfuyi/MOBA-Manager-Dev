@@ -9,6 +9,7 @@ var world: World
 var gs: GameState
 var main: Control          # set by Main: shows one screen at a time
 var bus: EventBus          # set by Main (which creates it): UI events such as tap:<tag> and screen:<help id>; null before Main exists
+var tutorial: TutorialRunner   # set by Main after the first screen (I-12): the guided first game; null before Main exists
 var last_result: Dictionary = {}    # most recent managed-club game (for the report)
 var last_game: Dictionary = {}
 var last_payoff: Dictionary = {}   # what the last game changed (Payoff.compare), for the payoff screen
@@ -139,6 +140,10 @@ func debug_info() -> String:
 	if gs != null:
 		var pc: Dictionary = gs.pace()
 		lines.append("pace n=%d total_s=%.0f watch_s=%.0f skips=%d fast=%d quick=%d" % [pc["n"], pc["total_s"], pc["watch_s"], pc["skips"], pc["fast"], pc["quick"]])
+	if tutorial != null:
+		var tl: String = tutorial.debug_line()
+		if tl != "":
+			lines.append(tl)
 	lines.append("startup=%d ms  mem=%.0f MB  text=%s  colours=%s" % [startup_ms, float(Performance.get_monitor(Performance.MEMORY_STATIC)) / 1048576.0,
 			"large" if large_text() else "normal", "colour-blind" if UI.colorblind else "default"])
 	if not last_game.is_empty():
