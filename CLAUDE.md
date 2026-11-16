@@ -1,0 +1,69 @@
+# Gloamline: handover for Claude Code
+
+Read this first. Last updated 2026-11-16 (SGT) at the move from the claude.ai session to Claude Code. Verify "current state" against `git log` and `company/DECISIONS.md`; they are the source of truth.
+
+## The project and the person
+
+- **Gloamline** is an original, IP-safe, MOBA-only esports manager mobile game (Godot 4.3, GDScript, Android first, English strings, single player first, inspired by ESMO but with original names, heroes, items and art).
+- Founder: **Fuyi (Low Fu Yi)**, Singapore entrepreneur, no game-development experience. You act as producer and lead developer. He decides scope, direction and anything he must approve; everything else you decide and log.
+- Repo: https://github.com/lowfuyi/MOBA-Manager-Dev (branch `main`). The game is in `game/`, tooling in `tools/`, design docs in `docs/` and `docs/design/`, team and decision log in `company/`.
+- Be honest about limits: you can build and test logic and screens on a computer (headless tests, simulated touch, screenshots). **Nothing has ever run on a physical phone**: Android SVG loading, real touch feel, fill rate and frame time are unmeasured. Say so whenever it matters.
+
+## Standing rules from the Founder
+
+- Proceed with development on your own; stop and ask only when you need his decision or intervention.
+- Customer satisfaction and ease of use matter most; UI/UX should have our own flair, better than the references.
+- For any image or video he provides, always do **two analysis passes**.
+- Founder decisions on record: about 5 minutes per game; sudden death for quick/casual/league games; tournaments Bo3 (finals Bo5); subscriptions postponed; Game Plan and Team Bonds approved; Arena Dusk look with about 15% bigger text and Barlow Semi Condensed; teal circle = you, coral hexagon = them (Blue/Red only as a word plus flag glyph); Squad as a lane map; Standings in three views; build order Alpha 0.7 "Guide and Look" then Alpha 0.8 "Arena"; coaches' decisions shown as labels; **no mid-match interventions** (spectator only; the simulation decides the result first); held-fight staging decided later by tester scores. Alpha scope is the Founder's call.
+- He delegated the game name (Gloamline), the placeholder renames and similar choices to you. Trademark search for the name is still owed before any public release.
+
+## Build rules (from `docs/design/ALPHA-0.7-BUILD-PLAN.md`, v1.2)
+
+- R1 no change to the simulation (`game/src/sim/`); golden hash must stay `0b81a41be2144263c06c2b54c047ceb1c743314ba0400016ab7d87218888ee3c`. R2 one increment = one commit, explicit paths. R3 migrate affected tests in the same change. R4/R5 explicit types for `:=`; no function names starting `_set`. R6 a save is only changed by additive keys; `GameState.VERSION` is unchanged. R7 presentation never feeds results.
+- Never `git add -A`. Commit explicit paths per reviewed increment, with the attribution lines the harness asks for.
+- Perf budget in `docs/design/PERF-BUDGET.md` 3.1a (redesigned screens: target 60 draw calls and 120 nodes, hard 100/200). In Godot 4.3 GL Compatibility every `draw_colored_polygon/circle/arc` is its own draw call, so art is baked to atlases.
+- Type scale floor is 24 px (Display 64, Title 48, Big 40, Heading 36, Body 32, Small 26, Caption 24). Buttons 96 px high, tab bar 112, header 96.
+- `UI.tidy` inserts NBSP (U+00A0) and a division slash (U+2215): tests must match text with `UI.plain`.
+- CanvasLayer children need `x.theme = Main.theme` and explicit button font sizes. A `Screen` subclass `_init(args)` must call `super()`.
+- Copy lives in `game/i18n/en.json` and is changed only through `tools/merge_copy.py` (add mode, or update mode with `docs/design/copy/owned_keys.txt`; held keys in `docs/design/copy/hold_0_7.json`). `tools/check_copy.py` and `tools/check_strings.py` guard it.
+
+## How to run things
+
+- Godot 4.3 stable is not on PATH. Download `Godot_v4.3-stable_linux.x86_64` from https://github.com/godotengine/godot/releases/tag/4.3-stable and set `GODOT=/path/to/it`. Always run from `game/` with `timeout`; run `--headless --import` after adding a `class_name`. A parse error can hang the engine, so never run without `timeout`.
+- Fast gate (about 5 min, run before every commit): `bash tools/check_fast.sh`. It runs validate_data, check_strings, pytest on `tools/`, `tests/run_tests.gd` (auto-discovers `tests/*_tests.gd`), ui_smoke, every `tests/check_*.tscn`, touch scenes, and the golden hash. It must print `ALL GREEN`.
+- Full gate (about 25 min): `tools/run_all_checks.sh`, only at checkpoint CP2 (after I-18) and at I-25.
+- Perf probe: `tests/perf_baseline.tscn` under Xvfb opengl3 against `tests/perf_allowances.json`. Screenshots: `tests/shots_matrix.tscn` (env `SCREENS`, `VARIANTS`: normal, large, cb, tall).
+- Renders and touch scenes must run **one at a time** (they share `user://` settings and a temporary `game/override.cfg` that enables touch emulation; never commit that file). Wait with `while pgrep -x Godot_v4.3-stab >/dev/null; do sleep 5; done`.
+- The headless window is 100x100; tests that fit to 720x1280 must set `get_window().size = Vector2i(720,1280)`.
+
+## Current state (as of the move)
+
+Alpha 0.7 "Guide and Look", driven by `docs/design/ALPHA-0.7-BUILD-PLAN.md` (read sections 9 to 12 first). It answers the Founder's Alpha 0.6 feedback: UI far from pleasing, tutorial near non-existent, everything linear, match playback lacks action. Reviewed and committed: I-00 to I-08 (tokens, fit audit, perf gates, copy merge, art code, helpers, components, BottomSheet, Carousel), **I-09** cards and hero grid, **I-11** tutorial state and data, **I-12** CoachOverlay and TutorialRunner.
+
+Work in flight when this was written (check `git status`; WIP commits are labelled "unreviewed"):
+- **I-10** PhaseStrip, DetentTrack, Podium, RankRow (files `src/ui/components/{phase_strip,detent_track,plan_kit,podium,rank_row}.gd`, `tests/check_plan_components*`, `check_touch_plan*`).
+- **I-13** tutorial sandbox game (`src/game/tutorial_game.gd`, a small hunk in `game_state.gd` approved on three conditions: golden hash unchanged, deep compare of `gs.d` before/after passes, hunk stays small).
+If either looks half-done, finish it per its plan section, or revert to the last reviewed commit.
+
+Remaining plan, in order: I-14 first-run flow (offer card, Skip, resume, Settings card; call `App.tutorial.bind(true)` before `App.go` after load), I-15 Home, I-16 Draft (use HeroGrid, LaneBoard, PlayerCard.data_for; must send `kind` ban/pick in `draft:sheet`; release `draft.meta_hint`), I-17 Game Plan, I-18 Report (**CP2**: build an APK, run the full gate, tell the Founder which tutorial steps remain fallback cards: 5, 6, 26), I-19 Squad, I-20 Standings, I-21/I-21a tags and old-screen adoption, I-22 help and glossary, I-23 lessons, I-24 cleanup (about keys, retire old tips), I-25 acceptance (APK, full gate, 72-image screenshot matrix, About/Licences, version label 0.7). Flip perf rows in `perf_allowances.json` to `status: redesigned` as screens are rebuilt. Alpha 0.8 "Arena" (live match view) follows.
+
+## Open items and owed work
+
+- Not run on a phone: touch, SVG/ThorVG on Android, fill rate, frame time, overlay draw cost.
+- Trademark search for "Gloamline"; IP Scan 2 (new glyphs, badges, silhouettes, icons listed by I-05).
+- Re-baseline `perf_allowances.json` after I-04 (QA owns it). Add an Xvfb step for `check_art` picture checks to `run_all_checks.sh`.
+- Copy: dedicated keys for card age, "rating here", banned/picked words; the "dot" icon for the All filter; `chem.pentagon_hint` release after Chemistry line styles; held keys listed in `hold_0_7.json` (draft.meta_hint at I-16, about.* at I-24/I-25).
+- GDD still says "coach" in lines 12, 340, 278 and a comment in `game_plan.gd` line 3 (Lead Game Designer to rename); TUTORIAL 6.1 needs a `new` state row; PERF-BUDGET 3.1a rule 2 to be reworded for the `redesigned` status.
+- Not applied: kill-rate retune (`docs/design/KILL-RATE-PROPOSAL.md`); held-fight staging and closing-push density wait for tester scores.
+- Squad: names above Top/Bot tokens; show about 10 PlayerCards or fewer (about 8 draw calls each).
+- Testers: two testers have the Alpha 0.6 link; the Founder is looking for more. Feedback form: `docs/ALPHA-FEEDBACK-FORM.md`.
+
+## The "company" of roles
+
+`company/TEAM.md` lists 43 role definitions (producer, designers, programmers, art, QA, Studio Manager) and `company/STUDIO-MANAGEMENT.md` how work is scored. In the claude.ai session these ran as sub-agents (lanes G1 UI, G2 guide/tutorial, E art/perf, Q QA, N narrative, L lead programmer) that never commit; the Producer reviewed each hand-back, re-ran the checks, committed by explicit paths and logged rulings in `company/DECISIONS.md`. In Claude Code you may use sub-agents the same way or do the work directly, but keep the review step: re-run `check_fast.sh` yourself before committing, and keep logging decisions in `company/DECISIONS.md` and ledger notes in `company/LEDGER.md`.
+
+## Saves and data
+
+- Save compatibility: fixtures `game/tests/fixtures/save_0_6_{a,b,c,d}.json` are checked by `check_save_compat`. The additive `tutorial` key has states `new/running/done/skipped/legacy` (missing = legacy; v greater than 1 treated as legacy; carried into `next_season`).
+- Saves serialise with `JSON.stringify(gs.d)` and `from_dict`.
+- Android export: `game/export_presets.cfg` (package `com.lowfuyi.mobaesports.alpha`, label "Gloamline Alpha"; include filter ships `*.json` and the OFL font licence). Android tooling notes are in `tools/android/`.
