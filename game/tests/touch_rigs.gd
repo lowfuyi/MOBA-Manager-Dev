@@ -60,7 +60,7 @@ class NestedPage extends Control:
 		return carousel.get_global_transform() * Vector2(float(carousel._xs[i]) + float(carousel._ws[i]) + Carousel.GAP * 0.5 - carousel.h_offset(), carousel.card_height() * 0.5)
 
 
-class HoleRig extends Control:
+class HoleRig extends RefCounted:
 	const GAP := 8.0
 	var main: Control
 	var sheet: BottomSheet
@@ -91,6 +91,7 @@ class HoleRig extends Control:
 			sheet_btn2.text = "Other"
 			sheet_btn2.custom_minimum_size = Vector2(300, 96)
 			sheet_btn2.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+			sheet_btn2.mouse_filter = Control.MOUSE_FILTER_PASS    # as UI.button: a drag that starts on it scrolls the sheet
 			sheet_btn2.pressed.connect(func() -> void: sheet_btn2_taps += 1)
 			content.add_child(sheet_btn2)
 			var spacer := Control.new()
@@ -106,7 +107,12 @@ class HoleRig extends Control:
 			if e is InputEventMouseButton and (e as InputEventMouseButton).pressed:
 				scrim_taps += 1)
 		sheet.panel.gui_input.connect(func(e: InputEvent) -> void:
+			# a press that a button handled bubbles up through the panel too; count only presses on bare panel (no button under it)
 			if e is InputEventMouseButton and (e as InputEventMouseButton).pressed:
+				var g: Vector2 = sheet.panel.get_global_transform() * (e as InputEventMouseButton).position
+				for b in [sheet_btn, sheet_btn2, sheet.close_button]:
+					if (b as Control).get_global_rect().has_point(g):
+						return
 				sheet_panel_taps += 1)
 		var layer: CanvasLayer = main.overlay_layer
 		for i in 4:
@@ -145,7 +151,7 @@ class HoleRig extends Control:
 		return [sheet_btn_taps, sheet_btn2_taps, page_btn_taps, scrim_taps, sheet_panel_taps]
 
 	func sheet_open() -> bool:
-		return BottomSheet.current() == sheet
+		return is_instance_valid(sheet) and BottomSheet.current() == sheet
 
 	func free_all() -> void:
 		for d in dims:

@@ -124,9 +124,6 @@ func _set_items(p_items: Array) -> void:
 	for c in _shown:
 		if is_instance_valid(c):
 			(c as Node).queue_free()
-	for c in items:
-		if is_instance_valid(c) and (c as Node).get_parent() == null:
-			(c as Node).queue_free()    # a card given but not shown (beyond MAX_CARDS) is never in the tree
 	items = p_items.duplicate()
 	_shown.clear()
 	for i in mini(items.size(), MAX_CARDS):
@@ -137,6 +134,9 @@ func _set_items(p_items: Array) -> void:
 		if tut_id != "":
 			UI.tag(c, "%s.%d" % [tut_id, i], false)
 		_shown.append(c)
+	for i in range(MAX_CARDS, items.size()):
+		if is_instance_valid(items[i]):
+			(items[i] as Node).queue_free()    # a card beyond MAX_CARDS is never shown: freed now, not left as an orphan
 	_tile.count = maxi(0, items.size() - MAX_CARDS)
 	_tile.visible = items.size() > MAX_CARDS
 	_tile.queue_redraw()

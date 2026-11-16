@@ -246,13 +246,18 @@ const NAMES := ["Brikai", "Soldor", "Brammont", "Vexa", "Tolliver", "Quillan", "
 ## A display card for the carousel: name, a line, a chip, and (optionally) a real Button the carousel must make inert.
 func car_card(idx: int, with_btn: bool = false, long_name: String = "") -> DepthCard:
 	var c := DepthCard.new(0)
-	_reg("DepthCard", c)
+	var reg := idx < Carousel.MAX_CARDS    # a card beyond 8 is freed by the carousel, so the audits do not list it
+	if reg:
+		_reg("DepthCard", c)
 	c.content.add_child(UI.label(long_name if long_name != "" else String(NAMES[idx % NAMES.size()]), UI.S_HEAD, UI.TEXT))
 	c.content.add_child(UI.label(Strings.t("squad.now_playing"), UI.S_SMALL, UI.TEXT2))
 	var row := HFlowContainer.new()
 	row.add_theme_constant_override("h_separation", 10)
 	c.content.add_child(row)
-	row.add_child(_reg("Chip", Chip.new(Strings.t("fatigue.tired") if idx % 2 == 0 else Strings.t("mood.hot"), "warn" if idx % 2 == 0 else "good")) as Chip)
+	var chip := Chip.new(Strings.t("fatigue.tired") if idx % 2 == 0 else Strings.t("mood.hot"), "warn" if idx % 2 == 0 else "good")
+	if reg:
+		_reg("Chip", chip)
+	row.add_child(chip)
 	if with_btn:
 		var b := UI.button(Strings.t("common.ok"), _note.bind("inner_button"))    # inert inside a carousel card: the card taps
 		c.content.add_child(b)
@@ -309,7 +314,7 @@ func open_sheet(sz: String, rows: int, long: bool = false) -> BottomSheet:
 
 func _build_sheet() -> void:
 	body.add_child(_cap("OPEN A SHEET: S FITS ITS CONTENT, M IS 60 PERCENT, L IS 85"))
-	for spec in [["S", 2, false], ["M", 4, false], ["L", 9, false], ["M", 3, true]]:
+	for spec in [["S", 1, false], ["M", 4, false], ["L", 9, false], ["M", 3, true]]:
 		var label := "Sheet %s%s" % [spec[0], ", long title" if spec[2] else ""]
 		var b := UI.button(label, func() -> void: open_sheet(String(spec[0]), int(spec[1]), bool(spec[2])), "normal")
 		body.add_child(_reg("SheetButton", b) as Button)

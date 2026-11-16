@@ -44,6 +44,17 @@ static func run(ctx) -> void:
 			sc.scroll_vertical = max_scroll
 			await ctx.shot(section + "b")
 			await _measure(ctx, section + "b")
+	# the real BottomSheet in S, M, L and with a long title, opened the way a screen opens it (I-08)
+	var sg: Control = Gallery.new("sheet")
+	App.go(sg)
+	await ctx.settle()
+	for spec in [["S", 1, false], ["M", 4, false], ["L", 9, false], ["M", 3, true]]:
+		var sheet: BottomSheet = sg.open_sheet(String(spec[0]), int(spec[1]), bool(spec[2]))
+		await ctx.settle()
+		await ctx.shot("sheet_%s%s" % [String(spec[0]).to_lower(), "_long" if spec[2] else ""])
+		await _measure(ctx, "sheet_%s%s" % [String(spec[0]).to_lower(), "_long" if spec[2] else ""])
+		sheet.close()
+		await ctx.settle()
 	App.go(Gallery.new("data"))
 	await ctx.settle()
 	App.toast(Strings.t("squad.toast.auto"), UI.GOOD)

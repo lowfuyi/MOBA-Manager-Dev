@@ -56,6 +56,7 @@ var _build_footer: Callable
 var _scrim_tr := TouchTrack.new()
 var _drag_tr := TouchTrack.new()
 var _drag_from_chrome := false
+var _press_g := Vector2.ZERO    # where the drag began, in canvas coordinates (the panel moves under the finger, so local ones drift)
 var _dragging := false
 var _shift := 0.0
 var _tween: Tween
@@ -256,7 +257,7 @@ func _layout() -> void:
 		return
 	var vh := get_viewport_rect().size.y
 	var max_h := vh * float(SIZES[size_name])
-	var chrome := float(GRIP_H) + maxf(float(HEADER_H), _head.get_combined_minimum_size().y) + 2.0
+	var chrome := chrome_height()
 	if _foot_wrap.visible:
 		chrome += _foot_wrap.get_combined_minimum_size().y
 	if size_name == "S":
@@ -268,8 +269,9 @@ func _layout() -> void:
 		_scroll.custom_minimum_size.y = 0.0
 
 
+## Handle + header + hairline + the 2 px top border of the panel box: the part of the sheet that drags it.
 func chrome_height() -> float:
-	return float(GRIP_H) + maxf(float(HEADER_H), _head.get_combined_minimum_size().y) + 2.0
+	return 2.0 + float(GRIP_H) + maxf(float(HEADER_H), _head.get_combined_minimum_size().y) + 2.0
 
 
 func _rest_y() -> float:
@@ -351,12 +353,13 @@ func _on_panel_input(e: InputEvent) -> void:
 	match what:
 		"down":
 			_drag_from_chrome = _drag_tr.press_pos.y <= chrome_height() and not is_closing
+			_press_g = panel.get_global_transform() * _drag_tr.press_pos
 			_dragging = false
 			_shift = 0.0
 		"move":
 			if not _drag_from_chrome or is_closing:
 				return
-			var d := _drag_tr.pos - _drag_tr.press_pos
+			var d: Vector2 = panel.get_global_transform() * _drag_tr.pos - _press_g
 			if not _dragging:
 				if d.length() > TouchTrack.SLOP and d.y > 0.0 and absf(d.y) > absf(d.x):
 					_dragging = true
