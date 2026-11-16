@@ -66,4 +66,4 @@ Remaining plan, in order: I-14 first-run flow (offer card, Skip, resume, Setting
 
 - Save compatibility: fixtures `game/tests/fixtures/save_0_6_{a,b,c,d}.json` are checked by `check_save_compat`. The additive `tutorial` key has states `new/running/done/skipped/legacy` (missing = legacy; v greater than 1 treated as legacy; carried into `next_season`).
 - Saves serialise with `JSON.stringify(gs.d)` and `from_dict`.
-- Android export: `game/export_presets.cfg` (package `com.lowfuyi.mobaesports.alpha`, label "Gloamline Alpha"; include filter ships `*.json` and the OFL font licence). Android tooling notes are in `tools/android/`.
+- Android export: `game/export_presets.cfg` (package `com.lowfuyi.mobaesports.alpha`, label "Gloamline Alpha"; include filter ships `*.json` and the OFL font licence). `tools/android/` holds the debug keystore; the Android SDK, JDK and Godot export templates are not in the repo, so install them in your environment before exporting an APK (the Alpha 0.6 APK was built earlier from the claude.ai workspace; see `docs/ALPHA-0.6-NOTES.md`).
