@@ -112,7 +112,7 @@ static func to_svg(ops: Array, box: float, tones: Dictionary, clip_circle: bool 
 				var p0 := c + Vector2(cos(a0), sin(a0)) * r
 				var p1 := c + Vector2(cos(a1), sin(a1)) * r
 				var large := 1 if absf(float(op[5]) - float(op[4])) > 180.0 else 0
-				s += "<path d=\"M%s %s A%s %s 0 %d 1 %s %s\" %s/>" % [_f(p0.x), _f(p0.y), _f(r), _f(r), large, _f(p1.x), _f(p1.y), _paint(col, float(op[7]))]
+				s += "<path d=\"M%s %s A%s %s 0 %d 1 %s %s\" %s/>" % [_f(p0.x), _f(p0.y), _f(r), _f(r), large, _f(p1.x), _f(p1.y), _paint(col, float(op[6]))]
 			"b":
 				s += "<path d=\"M%s %s C%s %s %s %s %s %s\" %s/>" % [_f(float(op[1])), _f(float(op[2])), _f(float(op[3])), _f(float(op[4])), _f(float(op[5])), _f(float(op[6])), _f(float(op[7])), _f(float(op[8])), _paint(col, float(op[9]))]
 	if clip_circle:
@@ -176,7 +176,7 @@ static func draw(ci: CanvasItem, ops: Array, box: float, rect: Rect2, tones: Dic
 					pts.append(o + Vector2(float(op[1]) + cos(a) * float(op[3]), float(op[2]) + sin(a) * float(op[4])) * k)
 				ci.draw_colored_polygon(pts, col)
 			"a":
-				var w := float(op[7]) * k
+				var w := float(op[6]) * k
 				var c := o + Vector2(float(op[1]), float(op[2])) * k
 				var r := float(op[3]) * k
 				ci.draw_arc(c, r, deg_to_rad(float(op[4])), deg_to_rad(float(op[5])), 24, col, w, true)

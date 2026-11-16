@@ -97,6 +97,11 @@ static func league() -> Array:
 	return _league
 
 
+## The resolved styles of the league set with set_league() (id -> style), for Badge.prepare().
+static func league_styles() -> Dictionary:
+	return _league_styles
+
+
 ## The badge style of one club. With a league set (or passed) the clash rules apply; without, it is the plain hash result.
 static func for_club(club_id: String, league_ids: Array = []) -> Dictionary:
 	if not league_ids.is_empty():

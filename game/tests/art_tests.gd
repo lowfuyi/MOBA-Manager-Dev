@@ -326,6 +326,33 @@ func _badge_distinct(check: Callable) -> void:
 	check.call(Badge.cache_misses == 20 and Badge.cache_hits == 20, "badge gallery of 20: layers built once (%d misses), reused on the second pass (%d hits)" % [Badge.cache_misses, Badge.cache_hits])
 	check.call(max_layers <= 8, "badge: at most 8 polygon layers per badge (largest %d), so a badge is 2 draw calls and a batch of any size is 2" % max_layers)
 	check.call(Badge.layers(gal_styles[gal[0]]).size() <= 8, "badge gallery: node budget is 1 Control for the whole gallery (draw_batch), not one per badge")
+	# the badge atlas: every prepared badge has its own non-empty cell; a second ask is a hit; a bigger list rebuilds it
+	TexCache.reset()
+	Badge.reset_cache()
+	Badge.prepare(gal_styles)
+	var ba := Badge.atlas(112)
+	check.call((ba["failed"] as Array).is_empty() and (ba["rects"] as Dictionary).size() == 20, "badge atlas: 20 prepared badges are 20 cells of 112 px (%d x %d px), none failed" % [ba["w"], ba["h"]])
+	var full: Image = (ba["tex"] as Texture2D).get_image()
+	var empty_cells := 0
+	var seen := {}
+	for k in ba["rects"]:
+		var cell := full.get_region(Rect2i(ba["rects"][k]))
+		if not _bbox(cell).has_area():
+			empty_cells += 1
+		seen[cell.get_data().hex_encode().sha256_text()] = true
+	check.call(empty_cells == 0, "badge atlas: no empty cell")
+	check.call(seen.size() >= 18, "badge atlas: the 20 cells are %d different pictures (the made-up clubs share hues past 12 by design)" % seen.size())
+	var hits_before := TexCache.hits
+	Badge.atlas(112)
+	check.call(TexCache.hits == hits_before + 1 and Badge.bucket_for(40.0) == 48 and Badge.bucket_for(64.0) == 72 and Badge.bucket_for(96.0) == 112, "badge atlas: a second ask is one hit; sizes up to 56 use the 48 cell, up to 80 the 72 cell, above that the 112 cell")
+	var more := BadgeStyle.resolve(["extra_a", "extra_b"])
+	Badge.prepare(more)
+	var ba2 := Badge.atlas(112)
+	check.call((ba2["rects"] as Dictionary).size() == 22 and Badge.atlas(48)["rects"].size() == 22, "badge atlas: preparing 2 more clubs rebuilds the atlases with 22 cells")
+	check.call(not (ba2["rects"] as Dictionary).has("nobody|shield|plain|#000000"), "badge atlas negative control: a club that was never prepared has no cell (drawing it takes the polygon fallback)")
+	check.call(TexCache.violations().is_empty() and TexCache.bytes() < 2 * 1024 * 1024, "badge atlas: 22 badges at the 3 sizes together are %.0f KB (under 2 MB), no violation" % (float(TexCache.bytes()) / 1024.0))
+	Badge.reset_cache()
+	TexCache.reset()
 
 
 # ---- 3. role glyphs and icons ----------------------------------------------------------------------------------------
@@ -479,7 +506,7 @@ func _silhouettes(check: Callable) -> void:
 	var heroes: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/heroes.json"))
 	Silhouette.register(heroes)
 	var a := Silhouette.atlas()
-	check.call((a["failed"] as Array).is_empty(), "silhouette: the portrait atlas rasterised with no failed cell (%d x %d px, %d cells)" % [a["w"], a["h"], (a["rects"] as Dictionary).size()])
+	check.call((a["failed"] as Array).is_empty(), "silhouette: the portrait atlas (15 busts, background, 3 rings, disc, 5 corner chips) rasterised with no failed cell (%d x %d px, %d cells)" % [a["w"], a["h"], (a["rects"] as Dictionary).size()])
 	var cells := {}
 	var empty: Array = []
 	for role in ArtPalette.ROLES:
@@ -538,7 +565,8 @@ func _silhouettes(check: Callable) -> void:
 		shifts[inf["hue_shift"]] = true
 		if inf["mirror"]:
 			mirrors += 1
-		check.call(absf(float(inf["hue_shift"])) <= 10.0, "silhouette: hue shift of %s within plus or minus 10 degrees" % h["id"]) if absf(float(inf["hue_shift"])) > 10.0 else null
+		if absf(float(inf["hue_shift"])) > 10.0:
+			check.call(false, "silhouette: hue shift of %s within plus or minus 10 degrees" % h["id"])
 	check.call(shifts.size() >= 12 and mirrors > 5 and mirrors < 35, "silhouette: the hero id varies the background hue (%d distinct shifts) and the mirror (%d of 40)" % [shifts.size(), mirrors])
 	# negative control: an unknown role falls back to a drawable one, and two empty cells are 'not distinct'
 	check.call(Silhouette.info("nobody", "wizard")["role"] == "mid", "silhouette negative control: an unknown role is replaced by a drawable one, never an empty draw")
@@ -582,12 +610,9 @@ func _avatars(check: Callable) -> void:
 	hex_area = absf(hex_area) * 0.5
 	var circ_area := PI * 20.0 * 20.0
 	check.call(absf(hw * 2.0 - 44.0) < 0.01 and absf(hex_area / circ_area - 1.0) < 0.06, "avatar: the 44 px hexagon has the same area as the 40 px circle (ratio %.3f)" % (hex_area / circ_area))
-	check.call(not Geometry2D.is_point_in_polygon(Vector2(20.0 * cos(PI / 6.0) * 1.02, 20.0 * sin(PI / 6.0) * 1.02), hex) or true, "avatar: token geometry builds")
-	var corner_circle := Vector2(20.0 * 0.7071, 20.0 * 0.7071)
-	check.call(Geometry2D.is_point_in_polygon(corner_circle * 0.999 + Vector2(0, 0), hex) == false or true, "avatar: shapes compared below")
 	# circle vs hexagon: the hexagon has corners the circle lacks (point at the left/right) and flats the circle lacks (top/bottom)
 	check.call(Geometry2D.is_point_in_polygon(Vector2(21.5, 0.0), hex) and not (Vector2(21.5, 0.0).length() <= 20.0), "avatar: at 21.5 px to the side the hexagon is still there and the circle is not (a shape cue that survives greyscale)")
-	check.call(not Geometry2D.is_point_in_polygon(Vector2(0.0, -19.9), hex) == false or true, "avatar: top flat checked in check_art")
+	check.call(not Geometry2D.is_point_in_polygon(Vector2(0.0, -20.0), hex) and Vector2(0.0, -19.9).length() <= 20.0, "avatar: at the top the circle reaches 20 px and the hexagon's flat edge stops at 19.05 (flat top, round top)")
 
 
 # ---- 6. the texture cache --------------------------------------------------------------------------------------------
@@ -637,8 +662,7 @@ func _cache(check: Callable) -> void:
 	var fat := Image.create(1024, 1024, false, Image.FORMAT_RGBA8)
 	for i in 3:
 		TexCache.get_or_make("fat%d" % i, func() -> Image: return fat)
-	check.call(TexCache.bytes() > TexCache.BUDGET_BYTES * 0 and TexCache.violations().is_empty() == (TexCache.bytes() <= TexCache.BUDGET_BYTES), "cache negative control: 3 textures of 1024 x 1024 (%.0f MB) are judged against the 8 MB budget, not waved through" % (float(TexCache.bytes()) / 1048576.0))
-	check.call(not TexCache.violations().is_empty(), "cache negative control: 12 MB of textures is a violation")
+	check.call(TexCache.bytes() == 12 * 1024 * 1024 and not TexCache.violations().is_empty(), "cache negative control: 3 textures of 1024 x 1024 (%.0f MB) are judged against the 8 MB budget, not waved through" % (float(TexCache.bytes()) / 1048576.0))
 	TexCache.reset()
 	# the SVG loader missing: the atlas still builds, lists the failed cells, and the callers use the code fallback
 	TexCache.force_fail = true
@@ -686,6 +710,11 @@ func _surface_and_vec(check: Callable) -> void:
 	check.call(only_a.size() == 1 and VecOps.has_tone(ops, "a") and not VecOps.has_tone(only_a, "m"), "vec ops: only() and has_tone() select by tone")
 	var moved := VecOps.shifted(["c", 10, 10, 3, "m"], 5, -2, "r")
 	check.call(moved == ["c", 15.0, 8.0, 3, "r"], "vec ops: shifted() moves an op and can change its tone")
+	# strokes are strokes: an arc and a ring have a hole in the middle (a wrong op index once drew them as filled sectors)
+	var arc_img := TexCache.rasterise(VecOps.to_svg([["a", 24, 24, 14, 0, 270, 4, "m"], ["o", 24, 24, 5, 2, "m"]], 48.0, {"m": Color.WHITE}), 1.0)
+	check.call(arc_img != null and arc_img.get_pixel(24, 24).a < 0.05 and arc_img.get_pixel(24, 38).a > 0.9 and arc_img.get_pixel(24, 17).a < 0.05 and arc_img.get_pixel(24, 10).a > 0.9, "vec ops: an arc and a ring are strokes (hollow inside, 4 px wide on the line), not filled sectors")
+	var wedge := TexCache.rasterise(VecOps.to_svg([["f", [24, 24, 38, 24, 24, 38], "m"]], 48.0, {"m": Color.WHITE}), 1.0)
+	check.call(wedge != null and wedge.get_pixel(28, 28).a > 0.9, "vec ops negative control: a filled polygon is solid inside, so the hollow test above can fail")
 	# negative control: an empty tone map draws nothing
 	var empty := TexCache.rasterise(VecOps.to_svg(ops, 48.0, {}), 1.0)
 	check.call(empty == null or not _bbox(empty).has_area(), "vec ops negative control: with no tone given nothing is drawn")

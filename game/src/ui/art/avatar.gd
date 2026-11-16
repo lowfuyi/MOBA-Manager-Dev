@@ -3,7 +3,7 @@ extends RefCounted
 ## Players are people, not heroes: until a human artist paints them, an initial avatar (ART-BIBLE 6.2). A circle with the role
 ## ring, a role-colour wash (55 percent into the page colour, a small hue shift from the player id so a squad is not five
 ## identical discs), the first letter of the name in TEXT, and the role glyph in a dark chip at the lower right.
-## No faces. Built from the portrait atlas (Silhouette), so an avatar is three quads of one texture plus the letter.
+## No faces. Built from the portrait atlas (Silhouette), so an avatar is four quads of one texture plus the letter: 2 draw calls.
 ##
 ## The two side tokens of the match are here too (ART-BIBLE 3.8): `draw_token`: you are a TEAL CIRCLE, they are a CORAL
 ## HEXAGON, a letter inside; shape carries the side, so it still reads in greyscale and for colour-blind players.
@@ -55,11 +55,8 @@ static func draw(ci: CanvasItem, player_id: String, rect: Rect2, opts: Dictionar
 	ci.draw_string(font, Vector2(rect.position.x, c.y + float(size) * 0.36), letter, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, size, ArtPalette.TEXT)
 	if bool(opts.get("glyph", true)):
 		var d := clampf(rect.size.x * 0.34, 20.0, 30.0)
-		var cc := rect.end - Vector2(d * 0.5, d * 0.5) - Vector2(rect.size.x * 0.04, rect.size.x * 0.04)
-		ci.draw_circle(cc, d * 0.5, ArtPalette.VOID)
-		ci.draw_arc(cc, d * 0.5 - 0.75, 0.0, TAU, 24, ring_col, 1.5, true)
-		var g := d * 0.77
-		Icons.draw(ci, Icons.role_id(role), Rect2(cc - Vector2(g, g) * 0.5, Vector2(g, g)), ring_col)
+		var off_p := rect.size.x * 0.04
+		Silhouette.draw_chip(ci, role, Rect2(rect.end - Vector2(d + off_p, d + off_p), Vector2(d, d)))
 
 
 ## The points of a flat-top hexagon with point-to-point width `w` around `c`.

@@ -4,13 +4,15 @@ extends RefCounted
 ## (5 roles x 3 variants = 15 silhouettes) with its accents (visor, eyes, orb, halo, lantern) in the role colour. Original
 ## shapes: generic fantasy archetypes in flat navy, no face, no signature item of any existing hero.
 ##
-## The 15 busts, the background disc and the rings are baked once into ONE atlas (20 cells of 96 px, 480 x 384 px,
-## 0.74 MB), so a portrait is four quads of one texture and a whole grid of portraits is one draw call per pass.
+## The 15 busts, the background disc, the rings and the five corner chips are baked once into ONE atlas (20 cells of 96 px
+## and 5 of 32 px, 480 x 416 px, 0.8 MB), so a portrait is four quads of one texture and a whole grid of portraits is one draw call per pass.
 ## Which variant a hero gets: by its ARCHETYPE inside its role (VARIANT_OF), so every archetype of a role has its own
 ## silhouette; an unknown archetype falls back to the hero-id hash. The hero id also gives a small hue shift (plus or minus
 ## 10 degrees) on the background and a left/right mirror, so eight gunners are related but not identical.
 
 const CELL := 96
+const CHIP_CELL := 32
+const ATLAS_W := 480
 const BOX := 96.0
 const INK := Color("0d1526")
 const RIM_SHIFT := Vector2(-2.4, -2.4)
@@ -151,20 +153,34 @@ static func _cells() -> Array:
 	for role in ArtPalette.ROLES:
 		var col := ArtPalette.role_color(role)
 		for v in 3:
-			cells.append({"key": key(role, v), "svg": VecOps.to_svg(ops_for(role, v), BOX, {"k": INK, "r": col, "a": col}, true)})
+			cells.append({"key": key(role, v), "svg": VecOps.to_svg(ops_for(role, v), BOX, {"k": INK, "r": col, "a": col}, true), "box": BOX, "w": CELL})
 	var g := "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\">"
-	cells.append({"key": "bg", "svg": g + "<defs><radialGradient id=\"g\" cx=\"0.3\" cy=\"0.26\" r=\"0.85\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#737373\"/></radialGradient></defs><circle cx=\"48\" cy=\"48\" r=\"48\" fill=\"url(#g)\"/></svg>"})
-	cells.append({"key": "ring5", "svg": g + "<circle cx=\"48\" cy=\"48\" r=\"43.5\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"5\"/></svg>"})
-	cells.append({"key": "ring7", "svg": g + "<circle cx=\"48\" cy=\"48\" r=\"42.5\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"7\"/></svg>"})
-	cells.append({"key": "dark", "svg": g + "<circle cx=\"48\" cy=\"48\" r=\"47\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"2\"/></svg>"})
-	cells.append({"key": "disc", "svg": g + "<circle cx=\"48\" cy=\"48\" r=\"48\" fill=\"#FFFFFF\"/></svg>"})
+	cells.append({"key": "bg", "box": BOX, "w": CELL, "svg": g + "<defs><radialGradient id=\"g\" cx=\"0.3\" cy=\"0.26\" r=\"0.85\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#737373\"/></radialGradient></defs><circle cx=\"48\" cy=\"48\" r=\"48\" fill=\"url(#g)\"/></svg>"})
+	cells.append({"key": "ring5", "box": BOX, "w": CELL, "svg": g + "<circle cx=\"48\" cy=\"48\" r=\"43.5\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"5\"/></svg>"})
+	cells.append({"key": "ring7", "box": BOX, "w": CELL, "svg": g + "<circle cx=\"48\" cy=\"48\" r=\"42.5\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"7\"/></svg>"})
+	cells.append({"key": "dark", "box": BOX, "w": CELL, "svg": g + "<circle cx=\"48\" cy=\"48\" r=\"47\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"2\"/></svg>"})
+	cells.append({"key": "disc", "box": BOX, "w": CELL, "svg": g + "<circle cx=\"48\" cy=\"48\" r=\"48\" fill=\"#FFFFFF\"/></svg>"})
+	for role in ArtPalette.ROLES:    # the 32 px corner chip of ART-BIBLE 6.2: a VOID disc, a 1.5 px role rim, the role glyph
+		cells.append({"key": chip_key(role), "box": 32.0, "w": CHIP_CELL, "svg": _chip_svg(role)})
 	return cells
+
+
+static func chip_key(role: String) -> String:
+	return "chip:" + role
+
+
+static func _chip_svg(role: String) -> String:
+	var col := ArtPalette.role_color(role)
+	var hexs := "#%02X%02X%02X" % [int(col.r * 255.0 + 0.5), int(col.g * 255.0 + 0.5), int(col.b * 255.0 + 0.5)]
+	var glyph: String = Icons.svg_of(Icons.role_id(role))
+	var inner := glyph.substr(glyph.find(">") + 1).replace("</svg>", "").replace("#FFFFFF", hexs)
+	return "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\"><circle cx=\"16\" cy=\"16\" r=\"16\" fill=\"#070D1A\"/><circle cx=\"16\" cy=\"16\" r=\"15.1\" fill=\"none\" stroke=\"%s\" stroke-width=\"1.8\"/><g transform=\"translate(4.5 4.5) scale(0.46)\">%s</g></svg>" % [hexs, inner]
 
 
 static func atlas() -> Dictionary:
 	if TexCache.has("portraits@96"):
-		return TexCache.atlas("portraits@96", [], BOX, CELL, 5)    # a hit; the cells are not rebuilt
-	return TexCache.atlas("portraits@96", _cells(), BOX, CELL, 5)
+		return TexCache.atlas("portraits@96", [], ATLAS_W)    # a hit; the cells are not rebuilt
+	return TexCache.atlas("portraits@96", _cells(), ATLAS_W)
 
 
 static func ok() -> bool:
@@ -201,10 +217,12 @@ static func draw_role(ci: CanvasItem, role: String, variant: int, rect: Rect2, h
 	if failed.is_empty():
 		var tex: Texture2D = a["tex"]
 		ci.draw_texture_rect_region(tex, rect, rects["bg"], tint * dim)
-		var r := rect
-		if mirror:
-			r = Rect2(Vector2(rect.end.x, rect.position.y), Vector2(-rect.size.x, rect.size.y))
-		ci.draw_texture_rect_region(tex, r, rects[key(role, clampi(variant, 0, 2))], dim)
+		if mirror:    # flip the bust left to right about the middle of the rect
+			ci.draw_set_transform(Vector2(rect.end.x, rect.position.y), 0.0, Vector2(-1.0, 1.0))
+			ci.draw_texture_rect_region(tex, Rect2(Vector2.ZERO, rect.size), rects[key(role, clampi(variant, 0, 2))], dim)
+			ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		else:
+			ci.draw_texture_rect_region(tex, rect, rects[key(role, clampi(variant, 0, 2))], dim)
 		ci.draw_texture_rect_region(tex, rect, rects["ring7" if small else "ring5"], ring_col)
 		ci.draw_texture_rect_region(tex, rect, rects["dark"], ArtPalette.VOID)
 	else:    # the SVG loader failed: a flat disc, a ring and the plain bust from the same ops
@@ -218,8 +236,18 @@ static func draw_role(ci: CanvasItem, role: String, variant: int, rect: Rect2, h
 		ci.draw_line(rect.get_center() + Vector2(-m, -m), rect.get_center() + Vector2(m, m), ArtPalette.BAD_DEFAULT, maxf(3.0, rect.size.x * 0.07), true)
 	if corner_glyph:
 		var d := clampf(rect.size.x * 0.46, 20.0, 26.0)
-		var cc := rect.end - Vector2(d * 0.5, d * 0.5)
-		ci.draw_circle(cc, d * 0.5, ArtPalette.VOID)
-		ci.draw_arc(cc, d * 0.5 - 0.75, 0.0, TAU, 24, ArtPalette.role_color(role), 1.5, true)
-		var g := d * 0.77
-		Icons.draw(ci, Icons.role_id(role), Rect2(cc - Vector2(g, g) * 0.5, Vector2(g, g)), ArtPalette.role_color(role))
+		draw_chip(ci, role, Rect2(rect.end - Vector2(d, d), Vector2(d, d)))
+
+
+## The corner role chip (a dark disc, a role-colour rim and the role glyph) into `rect` (20 to 30 px square).
+static func draw_chip(ci: CanvasItem, role: String, rect: Rect2) -> void:
+	var a := atlas()
+	var k := chip_key(role)
+	if not (a["failed"] as Array).has(k):
+		ci.draw_texture_rect_region(a["tex"], rect, a["rects"][k])
+		return
+	var cc := rect.get_center()
+	ci.draw_circle(cc, rect.size.x * 0.5, ArtPalette.VOID)
+	ci.draw_arc(cc, rect.size.x * 0.5 - 0.75, 0.0, TAU, 24, ArtPalette.role_color(role), 1.5, true)
+	var g := rect.size.x * 0.77
+	Icons.draw(ci, Icons.role_id(role), Rect2(cc - Vector2(g, g) * 0.5, Vector2(g, g)), ArtPalette.role_color(role))

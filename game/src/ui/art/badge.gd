@@ -1,25 +1,32 @@
 class_name Badge
 extends RefCounted
 ## Draws a club badge (ART-BIBLE 6.3) from a BadgeStyle: shadow, body in the club primary, a pattern in the secondary, a
-## soft gloss, a 3 px white 35 percent rim and the ink initial. All code, no texture: the layers are polygons in a 100 x 100
-## box, computed once per club and cached. `layers()` is pure geometry (headless-testable, and `raster()` turns it into an
-## Image for the distinctness tests); `draw()` and `draw_batch()` put it on a CanvasItem.
+## soft gloss, a 3 px white 35 percent rim and the ink initial. The layers are polygons in a 100 x 100 box, computed once per
+## club and cached; `layers()` is pure geometry (headless-testable, and `raster()` turns it into an Image for the tests).
 ##
-## Draw calls: the shapes of any number of badges are untextured and batch into one call; the letters are glyphs of one font
-## atlas and are one more. `draw_batch()` therefore draws all shapes first and all letters second (2 calls for a whole
-## gallery); `draw()` for a single badge is 2 calls (shapes, letter).
+## Two ways to draw, chosen by what the I-05 measurement showed (Godot 4.3 GL Compatibility, Xvfb): every `draw_colored_polygon`
+## is ONE DRAW CALL, polygons do not batch (20 badges of 7 layers were 154 calls). So the normal route is the ATLAS:
+## `prepare(styles)` once per league bakes every badge (without its letter) to a cell of a small atlas through SVG, and
+## `draw()` is then one quad of that atlas plus the letter (glyphs of the font atlas): 20 badges are 2 calls whatever the
+## order, and 21 Controls cost the same as one. A badge that was not prepared (or an SVG loader that failed) falls back to
+## the polygons: correct, but about 8 calls per badge, so call `prepare()` before drawing a list.
 
 const BOX := 100.0
-## letter size (fraction of the box), centre y of the capital letter, per shape (diamond and banner have less room)
-const LETTER := {"shield": [0.58, 44.0], "roundel": [0.64, 50.0], "hexagon": [0.60, 50.0], "diamond": [0.46, 50.0], "banner": [0.50, 38.0], "arch": [0.60, 54.0]}
+## letter size (fraction of the box), centre y of the capital letter, per shape (diamond and banner have less room). Only TWO
+## sizes on purpose: every font size is its own glyph atlas, so a list with six sizes would break the batch six times.
+const LETTER := {"shield": [0.60, 44.0], "roundel": [0.60, 50.0], "hexagon": [0.60, 50.0], "diamond": [0.48, 50.0], "banner": [0.48, 38.0], "arch": [0.60, 54.0]}
 const CAP_H := 0.70     # capital height of the badge font as a fraction of its size (Barlow Semi Condensed: 0.70)
 
+const BUCKETS := [48, 72, 112]    # atlas cell sizes: a badge is drawn from the smallest cell that is not smaller (up to 56 from 48)
+
+static var _prepared: Dictionary = {}    # cell key -> style
 static var _cache: Dictionary = {}
 static var cache_hits := 0
 static var cache_misses := 0
 
 
 static func reset_cache() -> void:
+	_prepared.clear()
 	_cache.clear()
 	cache_hits = 0
 	cache_misses = 0
@@ -148,6 +155,69 @@ static func raster(style: Dictionary, px: int) -> Image:
 	return img
 
 
+# ---- the atlas -----------------------------------------------------------------------------------------------------
+
+static func _cell_key(style: Dictionary) -> String:
+	return "%s|%s|%s|%s" % [style["id"], style["shape_name"], style["pattern_name"], BadgeStyle.hex(style["primary"])]
+
+
+static func _path(poly: PackedVector2Array) -> String:
+	var d := ""
+	for i in poly.size():
+		d += ("M" if i == 0 else "L") + ("%.2f %.2f " % [poly[i].x, poly[i].y])
+	return d + "Z"
+
+
+## The SVG of a badge without its letter: the layers of `layers()` as paths.
+static func to_svg(style: Dictionary) -> String:
+	var s := "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 100 100\">"
+	for l in layers(style):
+		var c: Color = l["color"]
+		var hexs := "#%02X%02X%02X" % [int(c.r * 255.0 + 0.5), int(c.g * 255.0 + 0.5), int(c.b * 255.0 + 0.5)]
+		if l["kind"] == "rim":
+			s += "<path d=\"%s\" fill=\"none\" stroke=\"%s\" stroke-opacity=\"%.2f\" stroke-width=\"3\" stroke-linejoin=\"round\"/>" % [_path(l["poly"]), hexs, c.a]
+		else:
+			s += "<path d=\"%s\" fill=\"%s\" fill-opacity=\"%.2f\"/>" % [_path(l["poly"]), hexs, c.a]
+	return s + "</svg>"
+
+
+## Register the badges of a league (or any list) to be baked. styles: Array or Dictionary of BadgeStyle dictionaries.
+## Call once when the clubs are known (new game, load). Drawing a badge that is not registered uses the polygon fallback.
+static func prepare(styles: Variant) -> void:
+	var list: Array = (styles as Dictionary).values() if styles is Dictionary else styles
+	var changed := false
+	for st in list:
+		var k := _cell_key(st)
+		if not _prepared.has(k):
+			_prepared[k] = st
+			changed = true
+	if changed:
+		for b in BUCKETS:    # a bigger list needs new atlases: drop the old ones from the cache
+			TexCache.drop("badges@%d" % b)
+
+
+static func bucket_for(px: float) -> int:
+	if px <= 56.0:
+		return 48
+	if px <= 80.0:
+		return 72
+	return 112
+
+
+## The atlas of one cell size, built from the prepared badges on first use.
+static func atlas(cell: int) -> Dictionary:
+	var nm := "badges@%d" % cell
+	var width := cell * 6
+	if TexCache.has(nm):
+		return TexCache.atlas(nm, [], width)
+	var cells: Array = []
+	for k in _prepared:
+		cells.append({"key": k, "svg": to_svg(_prepared[k]), "box": 100.0, "w": cell})
+	if cells.is_empty():
+		cells.append({"key": "none", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1\" height=\"1\"/>", "box": 1.0, "w": cell})
+	return TexCache.atlas(nm, cells, width)
+
+
 # ---- drawing -------------------------------------------------------------------------------------------------------
 
 static func _style_of(club: Variant) -> Dictionary:
@@ -171,11 +241,17 @@ static func _scaled(poly: PackedVector2Array, o: Vector2, k: float) -> PackedVec
 	return out
 
 
-## Pass 1: the shapes (untextured).
+## Pass 1: the shapes. One quad of the atlas when the badge was prepared, else the polygons.
 static func draw_shapes(ci: CanvasItem, club: Variant, rect: Rect2) -> void:
 	var style := _style_of(club)
 	var k := minf(rect.size.x, rect.size.y) / BOX
 	var o := rect.position
+	var key := _cell_key(style)
+	if _prepared.has(key):
+		var a := atlas(bucket_for(minf(rect.size.x, rect.size.y)))
+		if not (a["failed"] as Array).has(key) and (a["rects"] as Dictionary).has(key):
+			ci.draw_texture_rect_region(a["tex"], Rect2(o, Vector2(BOX, BOX) * k), a["rects"][key])
+			return
 	for l in layers(style):
 		var poly := _scaled(l["poly"], o, k)
 		if l["kind"] == "rim":
@@ -197,15 +273,24 @@ static func draw_letter(ci: CanvasItem, club: Variant, club_name: String, rect: 
 	ci.draw_string(f, Vector2(rect.position.x, base), _initial(club_name, str(style["id"])), HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, int(roundf(size)), style["ink"])
 
 
-## One badge: its shapes, then its letter (2 draw calls).
+## One badge: its shapes, then its letter (2 draw calls when prepared).
 static func draw(ci: CanvasItem, club: Variant, club_name: String, rect: Rect2, font: Font = null) -> void:
 	draw_shapes(ci, club, rect)
 	draw_letter(ci, club, club_name, rect, font)
 
 
-## Many badges in two passes (all shapes, then all letters): items = [{"club": id or style, "name": String, "rect": Rect2}].
+## Many badges in two passes (all shapes, then all letters, the letters grouped by size so each font size is one batch):
+## items = [{"club": id or style, "name": String, "rect": Rect2}].
 static func draw_batch(ci: CanvasItem, items: Array, font: Font = null) -> void:
 	for it in items:
 		draw_shapes(ci, it["club"], it["rect"])
+	var by_size: Dictionary = {}
 	for it in items:
-		draw_letter(ci, it["club"], str(it["name"]), it["rect"], font)
+		var style := _style_of(it["club"])
+		var px := int(roundf(float((LETTER[style["shape_name"]] as Array)[0]) * BOX * minf(it["rect"].size.x, it["rect"].size.y) / BOX))
+		if not by_size.has(px):
+			by_size[px] = []
+		(by_size[px] as Array).append(it)
+	for px in by_size:
+		for it in by_size[px]:
+			draw_letter(ci, it["club"], str(it["name"]), it["rect"], font)

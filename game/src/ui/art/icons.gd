@@ -64,19 +64,19 @@ static func _cell_for(px: float) -> int:
 ## (accent only, white) for icons that have an accent fragment. Role glyphs have "#m" only.
 static func atlas(cell: int) -> Dictionary:
 	if TexCache.has("icons@%d" % cell):
-		return TexCache.atlas("icons@%d" % cell, [], BOX, cell, 8)    # a hit; the cells are not rebuilt
+		return TexCache.atlas("icons@%d" % cell, [], cell * 8)    # a hit; the cells are not rebuilt
 	var white := {"m": Color.WHITE, "d": Color(1, 1, 1, 0.4)}
 	var acc := {"a": Color.WHITE}
 	var cells: Array = []
 	for id in IDS:
 		if ROLE_SVG.has(id):
-			cells.append({"key": id + "#m", "svg": ROLE_SVG[id]})
+			cells.append({"key": id + "#m", "svg": ROLE_SVG[id], "box": BOX, "w": cell})
 			continue
 		var ops := ops_of(id)
-		cells.append({"key": id + "#m", "svg": VecOps.to_svg(ops, BOX, white)})
+		cells.append({"key": id + "#m", "svg": VecOps.to_svg(ops, BOX, white), "box": BOX, "w": cell})
 		if VecOps.has_tone(ops, "a"):
-			cells.append({"key": id + "#a", "svg": VecOps.to_svg(ops, BOX, acc)})
-	return TexCache.atlas("icons@%d" % cell, cells, BOX, cell, 8)
+			cells.append({"key": id + "#a", "svg": VecOps.to_svg(ops, BOX, acc), "box": BOX, "w": cell})
+	return TexCache.atlas("icons@%d" % cell, cells, cell * 8)
 
 
 static func draw(ci: CanvasItem, id: String, rect: Rect2, colour: Color = Color.WHITE, accent: Color = Color(0, 0, 0, 0)) -> void:

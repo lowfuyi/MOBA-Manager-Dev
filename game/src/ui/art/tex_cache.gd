@@ -37,6 +37,14 @@ static func reset() -> void:
 	force_fail = false
 
 
+## Forget one cached entry (an atlas that must be rebuilt because its content list changed).
+static func drop(key: String) -> void:
+	if _tex.has(key):
+		_bytes -= int(_sizes[key] & 0xFFFFFFFF)
+		_tex.erase(key)
+		_sizes.erase(key)
+
+
 static func bytes() -> int:
 	return _bytes
 
@@ -105,30 +113,45 @@ static func svg_tex(key: String, svg: String, box: float, px: int) -> Texture2D:
 	return _store(key, img)
 
 
-## An atlas: cells = [{"key": String, "svg": String}], every cell `cell` px square on a grid `cols` wide. Returns
-## {"tex": Texture2D, "rects": {key: Rect2}, "cell": int, "failed": [keys]} and caches it under `name`.
-static func atlas(atlas_name: String, cells: Array, box: float, cell: int, cols: int) -> Dictionary:
+## An atlas: cells = [{"key": String, "svg": String, "box": float (the SVG's declared size), "w": int (cell px, square)}],
+## packed left to right in rows (a "shelf" packer) into an image `width` px wide. Returns
+## {"tex": Texture2D, "rects": {key: Rect2}, "failed": [keys], "w": int, "h": int} and caches it under `atlas_name`.
+## Asking again for a cached name returns it (one hit) and ignores `cells`.
+static func atlas(atlas_name: String, cells: Array, width: int) -> Dictionary:
 	if _tex.has(atlas_name) and _tex[atlas_name] is Dictionary:
 		hits += 1
 		return _tex[atlas_name]
 	misses += 1
-	var rows := int(ceil(float(cells.size()) / float(cols)))
-	var img := Image.create(cols * cell, rows * cell, false, Image.FORMAT_RGBA8)
 	var rects := {}
 	var failed: Array = []
+	var x := 0
+	var y := 0
+	var row_h := 0
+	var placed: Array = []
+	for c in cells:
+		var w: int = int(c["w"])
+		if x + w > width:
+			x = 0
+			y += row_h
+			row_h = 0
+		rects[c["key"]] = Rect2(Vector2(x, y), Vector2(w, w))
+		placed.append(Vector2i(x, y))
+		x += w
+		row_h = maxi(row_h, w)
+	var height := y + row_h
+	var img := Image.create(width, maxi(height, 1), false, Image.FORMAT_RGBA8)
 	for i in cells.size():
 		var c: Dictionary = cells[i]
-		var pos := Vector2i((i % cols) * cell, (i / cols) * cell)
-		rects[c["key"]] = Rect2(Vector2(pos), Vector2(cell, cell))
-		var cimg := rasterise(str(c["svg"]), float(cell) / box)
+		var w: int = int(c["w"])
+		var cimg := rasterise(str(c["svg"]), float(w) / float(c["box"]))
 		if cimg == null:
 			failed.append(c["key"])
 			continue
-		if cimg.get_width() != cell or cimg.get_height() != cell:
-			cimg.resize(cell, cell, Image.INTERPOLATE_BILINEAR)
-		img.blit_rect(cimg, Rect2i(0, 0, cell, cell), pos)
+		if cimg.get_width() != w or cimg.get_height() != w:
+			cimg.resize(w, w, Image.INTERPOLATE_BILINEAR)
+		img.blit_rect(cimg, Rect2i(0, 0, w, w), placed[i])
 	var tex := ImageTexture.create_from_image(img)
-	var out := {"tex": tex, "rects": rects, "cell": cell, "failed": failed, "w": img.get_width(), "h": img.get_height()}
+	var out := {"tex": tex, "rects": rects, "failed": failed, "w": img.get_width(), "h": img.get_height()}
 	_tex[atlas_name] = out
 	var b := img.get_width() * img.get_height() * 4
 	_sizes[atlas_name] = b | (maxi(img.get_width(), img.get_height()) << 32)
