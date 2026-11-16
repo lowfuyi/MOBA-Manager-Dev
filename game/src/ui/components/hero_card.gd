@@ -4,14 +4,16 @@ extends RefCounted
 ## all 40 cards with it, one pass at a time across every card (so each pass is one batch); the hero sheet preview and any
 ## single card draw all passes of one card with pass -1. One piece of code draws a hero everywhere (build plan I-09).
 ##
-## Passes (ordered by texture, not by card; the plan says three, this is the same idea counted by atlas: the portrait atlas and
-## the icon atlas are two textures, so the marks are their own pass; text is split by font size):
-##   0 PASS_BG      card background, outline, side stripe, corner badge (disc or hexagon), number pill   (cards atlas)
-##   1 PASS_PORTRAIT the portrait of the hero                                                           (portrait atlas)
-##   2 PASS_MARKS   star, patch arrow, tick in the badge, cross over a banned portrait                   (icon atlas)
-##   3 PASS_TEXT26  the name                                                                            (SemiBold 26)
-##   4 PASS_TEXT24  the number, the patch delta, "Ban"                                                   (SemiBold 24)
-##
+## Passes (ordered by texture and by draw command, not by card; the plan says three, this is the same idea counted the way the
+## renderer batches: consecutive commands of one kind on one texture are one draw call, so nine-patches, plain quads, portrait
+## quads, icon quads and each font size are runs of their own):
+##   0 PASS_CARD     the card background (9-slice)                                                     (cards atlas)
+##   1 PASS_OUTLINE  the selected / coach outline (9-slice) and the number pill (9-slice)              (cards atlas)
+##   2 PASS_SHAPES   the side stripe and the corner badge, a disc or a hexagon (plain quads)           (cards atlas)
+##   3 PASS_PORTRAIT the portrait of the hero                                                          (portrait atlas)
+##   4 PASS_MARKS    star, patch arrow, tick in the badge, cross over a banned portrait                (icon atlas)
+##   5 PASS_TEXT26   the name                                                                          (SemiBold 26)
+##   6 PASS_TEXT24   the number, the patch delta, "Ban"                                                (SemiBold 24)
 ## `hero` is a heroes.json row (id, name, role_primary, archetype); prepare() makes the cheap form the grid keeps.
 ## `state` is a String (a state name) or a Dictionary: {s, rec, arrow, delta, num, pressed}.
 ##   s      "available" | "selected" | "banned" | "you" | "them"
@@ -22,12 +24,14 @@ extends RefCounted
 ## a cross over it and the word "Ban"; picked by you = a teal CIRCLE badge with a tick and a teal side stripe; picked by them = a
 ## coral HEXAGON badge with a tick and a coral stripe; recommended = a coral outline and a star. Banned and picked are not tappable.
 
-const PASS_BG := 0
-const PASS_PORTRAIT := 1
-const PASS_MARKS := 2
-const PASS_TEXT26 := 3
-const PASS_TEXT24 := 4
-const PASSES := 5
+const PASS_CARD := 0
+const PASS_OUTLINE := 1
+const PASS_SHAPES := 2
+const PASS_PORTRAIT := 3
+const PASS_MARKS := 4
+const PASS_TEXT26 := 5
+const PASS_TEXT24 := 6
+const PASSES := 7
 
 const H := 196.0
 const PORTRAIT := 96.0
@@ -101,8 +105,12 @@ static func draw(ci: CanvasItem, rect: Rect2, hero: Dictionary, state: Variant, 
 static func _pass(ci: CanvasItem, r: Rect2, h: Dictionary, st: Dictionary, p: int) -> void:
 	var s := String(st["s"])
 	match p:
-		PASS_BG:
-			_bg(ci, r, st, s)
+		PASS_CARD:
+			CardKit.bg(ci, "card", r, _bg_tint(st, s))
+		PASS_OUTLINE:
+			_outline(ci, r, st, s)
+		PASS_SHAPES:
+			_shapes(ci, r, s)
 		PASS_PORTRAIT:
 			var sil: Dictionary = h["sil"]
 			CardKit.portrait(ci, Rect2(r.position + Vector2((r.size.x - PORTRAIT) * 0.5, 12.0), Vector2(PORTRAIT, PORTRAIT)), str(sil["role"]),
@@ -137,13 +145,19 @@ static func _pill_rect(r: Rect2, text_w: float) -> Rect2:
 	return Rect2(r.end.x - 10.0 - w, r.position.y + 144.0, w, 44.0)
 
 
-static func _bg(ci: CanvasItem, r: Rect2, st: Dictionary, s: String) -> void:
-	CardKit.bg(ci, "card", r, _bg_tint(st, s))
+static func _outline(ci: CanvasItem, r: Rect2, st: Dictionary, s: String) -> void:
 	if bool(st["rec"]):
 		CardKit.bg(ci, "ring", r, UI.CORAL)
+	if s == "selected":
+		CardKit.bg(ci, "ring", r, UI.ACCENT)
+	var num := String(st["num"])
+	if num != "":
+		CardKit.bg(ci, "pill", _pill_rect(r, CardKit.text_w(_font26(), UI.S_CAPTION, num)), UI.PANEL3 if s != "banned" else UI.PANEL2)
+
+
+static func _shapes(ci: CanvasItem, r: Rect2, s: String) -> void:
 	match s:
 		"selected":
-			CardKit.bg(ci, "ring", r, UI.ACCENT)
 			CardKit.shape(ci, "disc", _badge_rect(r), UI.ACCENT)
 		"you":
 			CardKit.shape(ci, "solid", Rect2(r.position + Vector2(0, 22), Vector2(6, r.size.y - 44)), UI.ACCENT)
@@ -151,10 +165,6 @@ static func _bg(ci: CanvasItem, r: Rect2, st: Dictionary, s: String) -> void:
 		"them":
 			CardKit.shape(ci, "solid", Rect2(r.position + Vector2(0, 22), Vector2(6, r.size.y - 44)), UI.CORAL)
 			CardKit.shape(ci, "hex", _badge_rect(r), UI.CORAL)
-	var num := String(st["num"])
-	if num != "":
-		var f := _font26()
-		CardKit.bg(ci, "pill", _pill_rect(r, CardKit.text_w(f, UI.S_CAPTION, num)), UI.PANEL3 if s != "banned" else UI.PANEL2)
 
 
 static func _marks(ci: CanvasItem, r: Rect2, st: Dictionary, s: String) -> void:

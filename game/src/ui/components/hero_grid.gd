@@ -37,6 +37,7 @@ var _last_g := Vector2.ZERO
 var _moved := false
 var _pressed_idx := -1            # hero index drawn pressed
 var _last_cw := 0.0
+var _has_cues := false
 
 
 func _init(p_tut_id: String = "") -> void:
@@ -208,11 +209,13 @@ func _note_cue() -> void:
 		var c := HeroCard.cue_of(_states[i])
 		if c != "" and not cues.has(c):
 			cues.append(c)
+	_has_cues = not cues.is_empty()
 	CompKit.set_cue(self, ",".join(PackedStringArray(cues)))
 
 
+## "states" while any card on show is in a marked state (then the cue meta lists their cues); "" when every card is plain.
 func state_name() -> String:
-	return "states" if String(CompKit.cue_of(self)) != "" else ""
+	return "states" if _has_cues else ""
 
 
 # ---- layout ----------------------------------------------------------------------------------------------------------------

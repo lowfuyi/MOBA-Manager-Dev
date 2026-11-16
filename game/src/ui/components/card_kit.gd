@@ -147,11 +147,27 @@ static func dashed(ci: CanvasItem, rect: Rect2, tint: Color, width: float = 2.0,
 		y += dash + gap
 
 
+## The same dashed outline, queued on a display list (Ops) instead of drawn.
+static func dashed_ops(ops: Ops, rect: Rect2, tint: Color, width: float = 2.0, dash: float = 10.0, gap: float = 7.0, corner: float = 14.0) -> void:
+	var x := rect.position.x + corner
+	while x < rect.end.x - corner:
+		var l := minf(dash, rect.end.x - corner - x)
+		ops.shape("solid", Rect2(x, rect.position.y, l, width), tint)
+		ops.shape("solid", Rect2(x, rect.end.y - width, l, width), tint)
+		x += dash + gap
+	var y := rect.position.y + corner
+	while y < rect.end.y - corner:
+		var l2 := minf(dash, rect.end.y - corner - y)
+		ops.shape("solid", Rect2(rect.position.x, y, width, l2), tint)
+		ops.shape("solid", Rect2(rect.end.x - width, y, width, l2), tint)
+		y += dash + gap
+
+
 # ---- portraits and avatars (pass 1: one run of the portrait atlas) ----------------------------------------------------------
 
 ## A hero portrait: lit background, role-colour rim light bust, ring, dark outer ring: four quads of the portrait atlas
 ## (Silhouette.draw_role draws the same picture with a transform and a line; this one only emits quads so it batches).
-## `mirror` flips the bust left to right (negative source width). `banned` dims it and drops the ring to TEXT_OFF.
+## `mirror` flips the bust left to right (by transform). `banned` dims it and drops the ring to TEXT_OFF.
 static func portrait(ci: CanvasItem, rect: Rect2, role: String, variant: int, hue_shift: float = 0.0, mirror: bool = false, banned: bool = false) -> void:
 	var a := Silhouette.atlas()
 	if not (a["failed"] as Array).is_empty():
@@ -164,8 +180,13 @@ static func portrait(ci: CanvasItem, rect: Rect2, role: String, variant: int, hu
 	ci.draw_texture_rect_region(tex, rect, rects["bg"], Silhouette.bg_tint(role, hue_shift) * dim)
 	var bust: Rect2 = rects[Silhouette.key(role, clampi(variant, 0, 2))]
 	if mirror:
-		bust = Rect2(bust.position + Vector2(bust.size.x, 0.0), Vector2(-bust.size.x, bust.size.y))
-	ci.draw_texture_rect_region(tex, rect, bust, dim)
+		# a flip by transform: a negative source width draws NOTHING for a cell that touches the right edge of the atlas (the
+		# engine samples at u = 1.0; seen with jungle variant 1 and bot variant 0), so the mirror is a transform instead
+		ci.draw_set_transform(Vector2(rect.end.x, rect.position.y), 0.0, Vector2(-1.0, 1.0))
+		ci.draw_texture_rect_region(tex, Rect2(Vector2.ZERO, rect.size), bust, dim)
+		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	else:
+		ci.draw_texture_rect_region(tex, rect, bust, dim)
 	ci.draw_texture_rect_region(tex, rect, rects["ring7" if rect.size.x <= 64.0 else "ring5"], ring_col)
 	ci.draw_texture_rect_region(tex, rect, rects["dark"], ArtPalette.VOID)
 

@@ -104,7 +104,13 @@ func _show(section: String) -> Gallery:
 # ---- the icon hook ------------------------------------------------------------------------------------------------
 
 func _icon_hook() -> void:
-	ok(not IconHook.draw_fn.is_valid(), "icon hook: unwired by default (I-09 sets IconHook.draw_fn), the placeholder draws")
+	# I-09 migrated this row (R4): the hook is still empty until something wires it, and ArtWire (I-09) is what wires it
+	ArtWire.unwire_icons()
+	ok(not IconHook.draw_fn.is_valid(), "icon hook: unwired when nothing has wired it, the placeholder draws")
+	ArtWire.wire_icons()
+	ok(IconHook.draw_fn.is_valid(), "icon hook: ArtWire.wire_icons() sets IconHook.draw_fn to the real icons (I-09)")
+	ArtWire.unwire_icons()
+	ok(not IconHook.draw_fn.is_valid(), "icon hook: ArtWire.unwire_icons() puts the placeholder back")
 	var distinct := {}
 	for k in Chip.ICONS:
 		distinct[Chip.ICONS[k]] = true

@@ -6,7 +6,7 @@ extends Screen
 ## the short state names printed above each sample are test annotations (ASCII), not game text.
 ## `items` maps a component kind to the nodes built, so a test can reach them: items["DepthCard"], items["Chip"], ...
 
-const SECTIONS := ["cards", "headers", "chips", "icons", "segmented", "data", "list", "carousel", "sheet"]
+const SECTIONS := ["cards", "headers", "chips", "icons", "segmented", "data", "list", "carousel", "sheet", "players", "heroes", "lanes"]
 const ROLES := ["top", "jg", "mid", "bot", "sup"]
 
 var section := "cards"
@@ -318,3 +318,175 @@ func _build_sheet() -> void:
 		var label := "Sheet %s%s" % [spec[0], ", long title" if spec[2] else ""]
 		var b := UI.button(label, func() -> void: open_sheet(String(spec[0]), int(spec[1]), bool(spec[2])), "normal")
 		body.add_child(_reg("SheetButton", b) as Button)
+
+
+# ---- cards (I-09): PlayerCard, HeroGrid, LaneBoard --------------------------------------------------------------------------
+
+const LONG_PLAYER := "Marrowbrook"     # 11 characters, the longest name the cards must fit (the data's longest is 8)
+const HERO_STATES := {"brannoch": "selected", "dunmarrow": "banned", "skarrow": "you", "hegwin": "them"}
+
+
+func hero_rows() -> Array:
+	var out: Array = []
+	if App.world != null:
+		out.append_array(App.world.heroes.values())    # the file order of heroes.json (brannoch first)
+	return out
+
+
+func _hero(id: String) -> Dictionary:
+	return App.world.heroes[id] if App.world != null and App.world.heroes.has(id) else {"id": id, "name": id.capitalize(), "role_primary": "mid", "archetype": ""}
+
+
+func _real_card(idx: int, variant: String, extra: Dictionary = {}) -> PlayerCard:
+	var pid: String = App.world.club_players(App.world.club_ids[5])[idx]["id"]
+	var o: Dictionary = PlayerCard.data_for(App.world, App.gs, pid)
+	for k in extra:
+		o[k] = extra[k]
+	var c := PlayerCard.make(pid, variant, o)
+	_reg("PlayerCard", c)
+	return c
+
+
+func _long_chips() -> Array:
+	return [{"text": Strings.t("fatigue.tired"), "variant": "warn", "icon": "fatigue"}, {"text": Strings.t("contract.final"), "variant": "warn", "icon": "contract"},
+		{"text": Strings.t("mood.cold"), "variant": "bad", "icon": "form"}, {"text": Strings.t("mood.happy"), "variant": "good", "icon": "morale"}]
+
+
+func _build_players() -> void:
+	body.add_child(_cap("TALL: REAL PLAYERS, STARTER, SELECTED, 11-LETTER NAME, DISABLED"))
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", UI.GAP)
+	grid.add_theme_constant_override("v_separation", UI.GAP)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(grid)
+	grid.add_child(_real_card(0, "tall", {"tut_id": "gal.player.tall"}))
+	grid.add_child(_real_card(1, "tall", {"starter": true}))
+	grid.add_child(_real_card(2, "tall", {"selected": true}))
+	var long := PlayerCard.make("p900", "tall", {"name": LONG_PLAYER, "role": "sup", "age": 24, "rating": 83, "chips": _long_chips(), "starter": true})
+	_reg("PlayerCard", long)
+	grid.add_child(long)
+	var dis := PlayerCard.make("p901", "tall", {"name": "Ashjin", "role": "top", "age": 19, "rating": 47, "disabled": true})
+	_reg("PlayerCard", dis)
+	grid.add_child(dis)
+	grid.add_child(_real_card(3, "tall"))
+	body.add_child(_cap("ROW: PICKER AND REPORT"))
+	var rows := VBoxContainer.new()
+	rows.add_theme_constant_override("separation", 8)
+	body.add_child(rows)
+	rows.add_child(_real_card(4, "row"))
+	var rlong := PlayerCard.make("p902", "row", {"name": LONG_PLAYER, "role": "jg", "age": 31, "rating": 76, "chips": _long_chips(), "selected": true})
+	_reg("PlayerCard", rlong)
+	rows.add_child(rlong)
+	body.add_child(_cap("TOKEN (NAMES ABOVE FOR TOP AND BOT) AND MINI"))
+	var map := Control.new()
+	map.custom_minimum_size = Vector2(0, 420)
+	map.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	map.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	body.add_child(map)
+	var specs: Array = [["top", "Ashjin", 0.06, 0.0, "above", "down"], ["jg", "Brammont", 0.24, 1.0, "below", ""], ["mid", LONG_PLAYER, 0.5, 0.0, "below", "up"],
+			["bot", "Soldor", 0.94, 0.0, "above", ""], ["sup", "Vexa", 0.76, 1.0, "below", ""]]
+	for sp in specs:
+		var t := PlayerCard.make("pt_" + String(sp[0]), "token", {"name": sp[1], "role": sp[0], "rating": 71, "name_side": sp[4], "status": sp[5], "tut_id": "gal.token." + String(sp[0]) if sp[0] == "mid" else ""})
+		_reg("PlayerCard", t)
+		map.add_child(t)
+		t.set_meta("frac", Vector2(float(sp[2]), float(sp[3])))
+	var place := func() -> void:    # the tokens stay inside the map whatever its width (never from 720)
+		for t in map.get_children():
+			var fr: Vector2 = t.get_meta("frac")
+			t.position = Vector2(fr.x * (map.size.x - 96.0), 80.0 + fr.y * (map.size.y - 96.0 - 160.0))
+	map.resized.connect(place)
+	place.call()
+	var minis := HBoxContainer.new()
+	minis.add_theme_constant_override("separation", 12)
+	body.add_child(minis)
+	for r in ROLES:
+		var m := PlayerCard.make("pm_" + r, "mini", {"name": "Quillan", "role": r})
+		_reg("PlayerCard", m)
+		minis.add_child(m)
+	body.add_child(_cap("IN A CAROUSEL: DISPLAY CARDS, THE CAROUSEL TAPS"))
+	var cards: Array = []
+	for i in 4:
+		var c := PlayerCard.make("pc%d" % i, "tall", {"name": String(NAMES[i]), "role": ROLES[i % 5], "age": 20 + i, "rating": 60 + i * 4, "chips": [] if i % 2 == 0 else _long_chips().slice(0, 1)})
+		_reg("PlayerCard", c)
+		cards.append(c)
+	var car := Carousel.new(300.0, cards, Callable(), "gal.pcar")
+	car.card_tapped.connect(func(i: int) -> void: _note("pcard%d" % i))
+	body.add_child(_reg("Carousel", car) as Carousel)
+
+
+class _HeroPreview extends Control:
+	var hero: Dictionary
+	var state: Variant
+
+	func _init(h: Dictionary, st: Variant) -> void:
+		hero = h
+		state = st
+		custom_minimum_size = Vector2(216, HeroCard.H)
+		size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		HeroCard.draw(self, Rect2(Vector2.ZERO, custom_minimum_size), hero, state)
+
+
+func _build_heroes() -> void:
+	body.add_child(_cap("ROLE FILTER (24 PX WORDS) AND THE 40-HERO GRID, ONE CONTROL"))
+	var seg := HeroGrid.role_filter(Callable(), "gal.hero.filter")
+	var fixed := Control.new()    # the filter sits in the fixed area above the grid, so it gets the whole 672 / 578 px, not the scrolled page's 664 / 570
+	fixed.custom_minimum_size = Vector2(UI.canvas_w() - 48.0, UI.BTN_H)
+	fixed.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	seg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	fixed.add_child(seg)
+	body.add_child(fixed)
+	_reg("Segmented", seg)
+	var grid := HeroGrid.new("gal.hero.grid")
+	grid.set_heroes(hero_rows())
+	var i := 0
+	for id in App.world.heroes.keys():
+		var st := {"s": HERO_STATES.get(id, "available"), "arrow": ["up", "down", "flat", ""][i % 4], "delta": ["+1.6", "-1.6", "0.0", ""][i % 4], "num": "%d" % (46 + (i * 7) % 50), "rec": i == 5}
+		grid.set_state(id, st)
+		i += 1
+	grid.hero_tapped.connect(func(id: String) -> void:
+		_note("hero:" + id)
+		grid.set_selected(id))
+	seg.changed.connect(func(role: Variant) -> void: grid.set_filter(String(role)))
+	body.add_child(_reg("HeroGrid", grid) as HeroGrid)
+	body.add_child(_cap("ONE CARD, ALL PASSES (THE SHEET PREVIEW): AVAILABLE, BANNED, YOU, THEM"))
+	var flow := HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 12)
+	flow.add_theme_constant_override("v_separation", 12)
+	body.add_child(flow)
+	for st in ["available", "banned", {"s": "you", "num": "82"}, {"s": "them", "arrow": "up", "delta": "+2.0", "num": "75"}]:
+		var pv := _HeroPreview.new(_hero("gravenstone"), st)
+		_reg("HeroPreview", pv)
+		flow.add_child(pv)
+
+
+func _build_lanes() -> void:
+	body.add_child(_cap("LANE BOARD, COMPACT: TWO FILLED, ONE TARGET, TWO OPEN, TWO BANS EACH"))
+	var board := LaneBoard.new(true, "gal.lane.board")
+	_fill_board(board)
+	body.add_child(_reg("LaneBoard", board) as LaneBoard)
+	body.add_child(_cap("FULL ROWS, LONG NAMES (11 LETTERS), A BANNED SLOT"))
+	var full := LaneBoard.new(false)
+	_fill_board(full)
+	full.set_slot("top", "them", {"state": "filled", "hero": _hero("gravenstone"), "player": LONG_PLAYER})
+	full.set_slot("sup", "you", {"state": "banned", "hero": _hero("tanglewick"), "player": "Vexa"})
+	body.add_child(_reg("LaneBoard", full) as LaneBoard)
+
+
+func _fill_board(b: LaneBoard) -> void:
+	b.set_slot("top", "you", {"state": "filled", "hero": _hero("brannoch"), "player": "Ashjin"})
+	b.set_slot("top", "them", {"state": "filled", "hero": _hero("dunmarrow"), "player": "Brikai"})
+	b.set_slot("jg", "you", {"state": "empty", "player": "Brammont"})
+	b.set_slot("jg", "them", {"state": "empty", "player": "Tolliver"})
+	b.set_slot("mid", "you", {"state": "empty", "player": LONG_PLAYER})
+	b.set_slot("mid", "them", {"state": "empty", "player": "Quillan"})
+	b.set_slot("bot", "you", {"state": "empty", "player": "Soldor"})
+	b.set_slot("bot", "them", {"state": "empty", "player": "Marrow"})
+	b.set_slot("sup", "you", {"state": "empty", "player": "Vexa"})
+	b.set_slot("sup", "them", {"state": "empty", "player": "Pell"})
+	b.set_target("mid", "you")
+	b.set_bans("you", [_hero("skarrow"), _hero("hegwin")])
+	b.set_bans("them", [_hero("ottomere"), _hero("gravenstone")])
