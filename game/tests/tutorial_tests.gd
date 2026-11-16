@@ -936,11 +936,14 @@ func _tg_opponent(check: Callable, w: World) -> void:
 		var snap := _tg_snap(gs)
 		var opp := TutorialGame.opponent(gs)
 		var mine: float = w.team_rating(gs.lineup_for(gs.club()))
-		var opp_r: float = w.team_rating(gs.lineup_for(opp))
+		var opp_r := -1.0
 		var others: Array = []
 		for c in w.club_ids:
 			if c != gs.club():
-				others.append(float(w.team_rating(gs.lineup_for(c))))
+				var rc: float = w.team_rating(gs.lineup_for(c))
+				others.append(rc)
+				if c == opp:
+					opp_r = rc
 		var any_not_above := false
 		var best_below := -1e18
 		var nearest_above := 1e18
