@@ -347,6 +347,17 @@ func handle_back() -> bool:
 	return true
 
 
+## True while the guided game is running (a step is current, whether or not its card is on screen yet).
+func is_running() -> bool:
+	return m != null and m.is_running()
+
+
+## True while the current step asks the Draft screen to hold the armed "Sure?" state of Auto-finish (TUTORIAL 3.2a rule 1,
+## `hold_armed` in data/tutorial_v1.json): the 3 second revert is suspended until the player taps Sure? or the step ends.
+func holds_armed() -> bool:
+	return is_running() and bool(m.step().get("hold_armed", false))
+
+
 ## The line for App.debug_info(): "tutorial=<state> step_skipped=<id|none> total_s=<n> fallbacks=<n>". "" when no save is loaded.
 func debug_line() -> String:
 	if m == null:

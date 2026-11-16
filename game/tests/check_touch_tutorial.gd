@@ -278,20 +278,21 @@ func _s2(variant: String) -> void:
 	await _show(_card("s2b", ["s2.btn2"]))
 	var sv0: int = _sheet._scroll.scroll_vertical
 	var b2: int = _counts["btn2"]
-	await sim.drag(_sheet_btn2.get_global_rect().get_center(), Vector2(0, -200), 10)
-	await frames(4)
-	var last_r := Rect2()
-	var still := 0
-	for i in 200:    # the fling after the release ends: the button has not moved for 6 frames
-		var rr := _sheet_btn2.get_global_rect()
-		still = still + 1 if rr == last_r else 0
-		last_r = rr
-		if still >= 6:
-			break
+	# the finger goes down in the hole, moves 120 px up and stays: the hole follows the target while the finger is held
+	var start := _sheet_btn2.get_global_rect().get_center()
+	sim.finger("down", start)
+	await frames(1)
+	var pos := start
+	for i in 6:
+		pos += Vector2(0, -20)
+		sim.finger("move", pos, Vector2(0, -20))
 		await frames(1)
-	await frames(2)
-	ok(_sheet._scroll.scroll_vertical > sv0 + 50 and _counts["btn2"] == b2 and BottomSheet.is_open(), "S2 %s: a drag that starts in the hole scrolls the sheet's content (%+d) and presses nothing" % [variant, _sheet._scroll.scroll_vertical - sv0])
-	ok(_overlay.hole_rect() == _sheet_btn2.get_global_rect().grow(8.0).intersection(Rect2(Vector2.ZERO, screen)), "S2 %s: the hole followed the scrolled target %s vs %s (mode %s, target %s)" % [variant, str(_overlay.hole_rect()), str(_sheet_btn2.get_global_rect().grow(8.0)), _overlay.mode, str(_overlay.target_rect())])
+	await frames(4)
+	var want := _sheet_btn2.get_global_rect().grow(8.0).intersection(Rect2(Vector2.ZERO, screen))
+	ok(_sheet._scroll.scroll_vertical > sv0 + 50 and _overlay.hole_rect() == want, "S2 %s: while the finger drags the sheet's content from inside the hole, the hole follows the target (%s vs %s)" % [variant, str(_overlay.hole_rect()), str(want)])
+	sim.finger("up", pos)
+	await frames(4)
+	ok(_counts["btn2"] == b2 and BottomSheet.is_open(), "S2 %s: a drag that starts in the hole scrolls the sheet's content (%+d) and presses nothing" % [variant, _sheet._scroll.scroll_vertical - sv0])
 	await _free_rig()
 
 

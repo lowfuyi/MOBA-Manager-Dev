@@ -567,6 +567,16 @@ func _flow() -> void:
 	# the debug line
 	var info := App.debug_info()
 	ok(info.contains("tutorial=done step_skipped=none total_s=") and info.contains("fallbacks=0"), "debug: App.debug_info() carries the tutorial line (%s)" % r.debug_line())
+	# the armed "Sure?" of Auto-finish is held while step 15 is the current step
+	await _fresh_main()
+	r = App.tutorial
+	await _at_step("coach_rest")
+	ok(r.is_running() and r.holds_armed(), "hold: step 15 asks the Draft screen to hold the armed Sure? state")
+	await _at_step("tab_squad")
+	ok(r.is_running() and not r.holds_armed(), "hold: other steps do not")
+	r.skip()
+	await frames(2)
+	ok(not r.is_running() and not r.holds_armed(), "hold: nothing is held when the tutorial is not running")
 	# stray taps on the dim: nudge, then the second line, never a step change
 	await _fresh_main()
 	r = App.tutorial
@@ -593,6 +603,17 @@ func _cost() -> void:
 	await _at_step("tab_squad")
 	var o := _overlay()
 	ok(o.is_processing(), "cost: the overlay polls while a step is up")
+	# large text switched on while the step is up: the overlay rebuilds on the viewport change
+	var cw0 := o.card_rect().size.x
+	App.apply_large_text(true)
+	await until_s(func() -> bool: return o.mode == "shown" and o.card_rect().size.x < cw0 - 10.0, 1.5)
+	await frames(6)
+	var vpl := o.get_viewport_rect().size
+	ok(o.mode == "shown" and o.card_rect().size.x <= vpl.x - 31.0 and vpl.x < 640.0 and o.card_rect().end.y <= vpl.y - 39.0 and not o.card_rect().intersects(o.hole_rect()), "resize: large text switched on under a shown step: the card is rebuilt for %s (card %s, hole %s)" % [str(vpl), str(o.card_rect()), str(o.hole_rect())])
+	App.apply_large_text(false)
+	await until_s(func() -> bool: return o.mode == "shown" and o.card_rect().size.x > cw0 - 2.0, 1.5)
+	await frames(6)
+	ok(o.mode == "shown" and o.card_rect().size.x > cw0 - 2.0, "resize: and back to normal text")
 	await frames(10)
 	var objs0 := int(Performance.get_monitor(Performance.OBJECT_COUNT))
 	var res0 := int(Performance.get_monitor(Performance.OBJECT_RESOURCE_COUNT))

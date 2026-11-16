@@ -838,20 +838,15 @@ func _place_dims() -> void:
 	dims[3].size = Vector2(maxf(0.0, vp.x - h.end.x), h.size.y)
 
 
-## An info step (and any moment the hole is moving, or waiting in grace) puts a STOP blocker over the hole.
+## An info step (and any moment the hole is moving, or the old hole is still drawn while the next target is found) puts a STOP
+## blocker over the hole as drawn.
 func _update_blocker() -> void:
-	var want := false
-	if _vis and _has_hole and _kind_dim() > 0.0:
-		want = String(_c.get("kind", "")) == "info" or _moving or mode == "wait"
-	if _vis and mode == "wait" and _kind_dim() > 0.0:
-		want = true
+	var hv := _hole_vis
+	var want := _vis and _kind_dim() > 0.0 and hv.size.x > 0.0 and ((String(_c.get("kind", "")) == "info" and _has_hole) or _moving or mode == "wait")
 	blocker.visible = want
-	if want and _has_hole:
-		blocker.position = _hole_vis.position
-		blocker.size = _hole_vis.size
-	elif want:
-		blocker.position = Vector2.ZERO
-		blocker.size = Vector2.ZERO
+	if want:
+		blocker.position = hv.position
+		blocker.size = hv.size
 
 
 # ---- animation callbacks (one tween at a time) ---------------------------------------------------------------------------------
