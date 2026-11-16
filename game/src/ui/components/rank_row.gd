@@ -41,6 +41,7 @@ var clipped: Array = []
 var name_lines: Array = []
 var note_lines: Array = []
 var pill_inline := true
+var _cut: Array = []        # the name or the note, when wrap() had to cut it
 var _back := CardKit.Ops.new()
 var _ops := CardKit.Ops.new()
 var _badge := {}
@@ -182,6 +183,11 @@ func _relayout() -> void:
 			pill_inline = false if lines.is_empty() else (CardKit.text_w(fn, UI.S_BODY, String(lines[lines.size() - 1])) + 12.0 + _pill_w() <= room)
 	name_lines = lines
 	note_lines = PlanKit.wrap(_fsmall(), UI.S_SMALL, String(data["note"]), room, 2)
+	_cut = []
+	if PlanKit.was_cut(name_lines, nm):
+		_cut.append(nm)
+	if PlanKit.was_cut(note_lines, String(data["note"])):
+		_cut.append(String(data["note"]))
 	var h := row_h()
 	if not is_equal_approx(custom_minimum_size.y, h):
 		custom_minimum_size = Vector2(0.0, h)
@@ -266,6 +272,7 @@ func _layout() -> void:
 func _draw() -> void:
 	draw_count += 1
 	_layout()
+	PlanKit.batch_order(_back)
 	_back.flush(self)
 	var br := badge_rect()
 	var c: Variant = data["club"]
@@ -274,6 +281,7 @@ func _draw() -> void:
 		Badge.draw_letter(self, c, String(data["name"]), br, UI.font("Bold"))
 	_ops.flush(self)
 	clipped = _ops.clipped.duplicate()
+	clipped.append_array(_cut)
 
 
 # ---- touch ------------------------------------------------------------------------------------------------------------------------------

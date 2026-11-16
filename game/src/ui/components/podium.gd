@@ -34,6 +34,7 @@ var _back := CardKit.Ops.new()
 var _ops := CardKit.Ops.new()
 var _badges: Array = []
 var _lines: Dictionary = {}    # rank -> the name lines
+var _cut: Array = []           # names wrap() had to cut
 var _lines_w := -1.0
 var _tr := TouchTrack.new()
 var _press_g := Vector2.ZERO
@@ -183,10 +184,14 @@ func _fname() -> Font:
 
 func _relayout() -> void:
 	_lines.clear()
+	_cut = []
 	_lines_w = _w()
 	var room := col_w() - 8.0
 	for r in rows:
-		_lines[int(r["rank"])] = PlanKit.wrap(_fname(), UI.S_SMALL, String(r["name"]), room, 2)
+		var ln := PlanKit.wrap(_fname(), UI.S_SMALL, String(r["name"]), room, 2)
+		_lines[int(r["rank"])] = ln
+		if PlanKit.was_cut(ln, String(r["name"])):
+			_cut.append(String(r["name"]))
 
 
 func _on_resized() -> void:
@@ -217,7 +222,7 @@ func _layout() -> void:
 	for rank in ORDER:
 		var r := row_for_rank(rank)
 		var ped := pedestal_rect(rank)
-		var look := rank == _look_rank
+		var look: bool = rank == _look_rank
 		# the pedestal: a wash of the club colour over the surface; an accent outline when it is yours
 		var wash := UI.PANEL3
 		var club: Variant = r.get("club", "")
@@ -256,6 +261,7 @@ func _layout() -> void:
 func _draw() -> void:
 	draw_count += 1
 	_layout()
+	PlanKit.batch_order(_back)
 	_back.flush(self)
 	for b in _badges:
 		Badge.draw_shapes(self, b["club"], b["rect"])
@@ -263,6 +269,7 @@ func _draw() -> void:
 		Badge.draw_letter(self, b["club"], String(b["name"]), b["rect"], UI.font("Bold"))
 	_ops.flush(self)
 	clipped = _ops.clipped.duplicate()
+	clipped.append_array(_cut)
 
 
 # ---- touch --------------------------------------------------------------------------------------------------------------------------------

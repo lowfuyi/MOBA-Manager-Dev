@@ -15,6 +15,9 @@ const HISTORY_MAX := 40
 
 var world: World
 var d: Dictionary = {}
+## The tutorial game's private plan set (0.7, I-13). Runtime only: it is never written into `d`, so a save never holds it.
+## Empty = no tutorial game in flight. TutorialGame.start() fills it, TutorialGame.leave() empties it.
+var sandbox_plan: Dictionary = {}
 
 
 # ---------------------------------------------------------------- creation
@@ -289,6 +292,8 @@ func _series_game(s: Dictionary) -> Dictionary:
 
 ## Called after the managed club finished a game (result from MatchRunner.finish).
 func record_human_game(game: Dictionary, result: Dictionary) -> void:
+	if bool(game.get("tutorial", false)) or bool(result.get("tutorial", false)):
+		return   # the tutorial game (I-13) is a sandbox: it writes nothing to the save
 	if game["kind"] == "exhibition":
 		record_exhibition_game(game, result)
 		return
@@ -676,12 +681,20 @@ func autoplay(until_all: bool = false) -> void:
 func plans_for(g: Dictionary) -> Dictionary:
 	var mine := "B" if g["blue"] == club() else "R"
 	var out := {"B": "ai", "R": "ai"}
-	out[mine] = plan_set()
+	if bool(g.get("tutorial", false)):   # the tutorial game plays its sandbox plan, any other game the saved one (I-13)
+		out[mine] = sandbox_plan if not sandbox_plan.is_empty() else GamePlan.neutral_set()
+	else:
+		out[mine] = saved_plan_set()
 	return out
 
 
-## The managed club's plan set (older saves have none: neutral).
+## The plan set the screens edit: the tutorial game's sandbox while one is in flight, otherwise the saved plan (I-13).
 func plan_set() -> Dictionary:
+	return sandbox_plan if not sandbox_plan.is_empty() else saved_plan_set()
+
+
+## The managed club's saved plan set (older saves have none: neutral).
+func saved_plan_set() -> Dictionary:
 	if not d.has("plan"):
 		d["plan"] = GamePlan.neutral_set()
 	return d["plan"]

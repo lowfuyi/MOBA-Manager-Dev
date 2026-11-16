@@ -10,6 +10,10 @@ func _init(g: Dictionary = {}) -> void:
 
 
 func go_back() -> void:
+	if TutorialGame.is_tutorial(game):   # backing out of the tutorial game drops its sandbox (I-13)
+		TutorialGame.leave(App.gs)
+		if App.tutorial != null:
+			App.tutorial.set_game_live(false)
 	if game["kind"] == "exhibition":
 		App.go(ScreenPractice.new())
 	else:
@@ -25,7 +29,8 @@ func _ready() -> void:
 	Tips.show(body, "prematch")
 	var c := UI.card(body, UI.PANEL2)
 	if game["kind"] == "exhibition":
-		c.add_child(UI.label(Strings.f("pre.practice_note", {"game": game["game"], "bo": game["best_of"]}), UI.S_SMALL, UI.WARN))
+		var note: String = Strings.t("tut.practice.note") if TutorialGame.is_tutorial(game) else Strings.f("pre.practice_note", {"game": game["game"], "bo": game["best_of"]})
+		c.add_child(UI.label(note, UI.S_SMALL, UI.WARN))
 	c.add_child(UI.label(Strings.f("pre.versus", {"me": gs.club_name(me), "opp": gs.club_name(opp)}), UI.S_BIG, UI.TEXT))
 	c.add_child(UI.label(Strings.f("pre.side", {"side": Strings.t("hub.side.blue" if my_side == "B" else "hub.side.red")}), UI.S_SMALL, UI.DIM))
 	var secs: int = 15 if game["full"] else 10
@@ -56,7 +61,8 @@ func _ready() -> void:
 
 
 func _quick() -> void:
-	App.gs.pace_quick()
+	if TutorialGame.logs_pace(game):
+		App.gs.pace_quick()
 	ScreenHub._finish_game(game, App.gs.auto_game(game))
 
 

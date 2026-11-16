@@ -44,6 +44,25 @@ static func wrap(font: Font, size: int, text: String, room: float, max_lines: in
 	return lines
 
 
+## True when wrap() had to cut the text (a line ends in "..."): the lines joined are not the words given.
+static func was_cut(lines: Array, text: String) -> bool:
+	return " ".join(PackedStringArray(lines)) != " ".join(text.split(" ", false))
+
+
+## Draw order that batches: every 9-slice background (card, ring, pill) first, then every plain quad (disc, solid), each group in the
+## order it was queued. The renderer merges consecutive draws of one kind and one texture; interleaved 9-slices and quads were
+## 13 calls for a podium that is 8 in this order. Only safe where a quad never lies UNDER a 9-slice (true for the podium and the row).
+static func batch_order(ops: CardKit.Ops) -> void:
+	var nine: Array = []
+	var quads: Array = []
+	for b in ops.bgs:
+		if b[3]:
+			quads.append(b)
+		else:
+			nine.append(b)
+	ops.bgs = nine + quads
+
+
 static func name_of_phase(id: String) -> String:
 	return Strings.t("gp.phase." + id)
 

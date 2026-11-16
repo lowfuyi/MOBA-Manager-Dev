@@ -42,7 +42,7 @@ func go_back() -> void:
 
 func _ready() -> void:
 	my_side = "B" if game["blue"] == App.gs.club() else "R"
-	if App.gs.is_quick():
+	if TutorialGame.quick_applies(App.gs, game):   # Quick mode is ignored in the tutorial game (I-13)
 		call_deferred("_continue")
 		return
 	_events = Report.feed(res, my_side)
@@ -170,7 +170,9 @@ func _skip() -> void:
 
 func _continue() -> void:
 	var gs := App.gs
-	if gs.is_quick():
+	if not TutorialGame.logs_pace(game):
+		pass   # the tutorial game never writes the pace log (I-13)
+	elif gs.is_quick():
 		gs.pace_quick()
 	else:
 		var total := _watch_t

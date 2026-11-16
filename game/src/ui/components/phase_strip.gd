@@ -30,6 +30,8 @@ const H_HORIZONTAL := 136.0
 const ROW_H := 112.0
 const NODE := 56.0
 const CAP_LH := 28.0
+const V_CX := 31.0           # the vertical form: the node centre, so the 60 px rim of a selected node is not cut at the left edge
+const V_LABEL_X := 76.0
 const SLOP := TouchTrack.SLOP
 
 static var _map: Dictionary = {}
@@ -43,6 +45,7 @@ var applied := 0
 var draw_count := 0
 var clipped: Array = []
 var _ops := CardKit.Ops.new()
+var _cut: Array = []
 var _tr := TouchTrack.new()
 var _press_g := Vector2.ZERO
 var _press_i := -1
@@ -211,7 +214,7 @@ func strip_h() -> float:
 
 func _apply_size() -> void:
 	if vertical:
-		custom_minimum_size = Vector2(ceilf(NODE + 12.0 + _label_w()) + 4.0, ROW_H * float(phases.size()))
+		custom_minimum_size = Vector2(ceilf(V_LABEL_X + _label_w()) + 4.0, ROW_H * float(phases.size()))
 	else:
 		var h := strip_h()
 		if not is_equal_approx(custom_minimum_size.y, h):
@@ -321,7 +324,7 @@ func cell_rect(i: int) -> Rect2:
 func node_center(i: int) -> Vector2:
 	var c := cell_rect(i)
 	if vertical:
-		return Vector2(NODE * 0.5, c.position.y + 36.0)
+		return Vector2(V_CX, c.position.y + 36.0)
 	return Vector2(c.position.x + c.size.x * 0.5, 32.0)
 
 
@@ -353,6 +356,7 @@ func _fill_count(id: String) -> int:
 
 func _layout() -> void:
 	_ops.clear()
+	_cut = []
 	var n := phases.size()
 	if n == 0:
 		return
@@ -403,7 +407,7 @@ func _layout() -> void:
 			_ops.icon("tick" if res == "win" else "cross", Rect2(c + Vector2(13, 11), Vector2(24, 24)), UI.GOOD if res == "win" else UI.BAD)
 		var lab_col := UI.TEXT if sel else (UI.TEXT_OFF if locked else UI.TEXT2)
 		if vertical:
-			_ops.text(f26, UI.S_SMALL, String(p["label"]), NODE + 12.0, c.y, maxf(10.0, size.x - NODE - 12.0), lab_col, 0)
+			_ops.text(f26, UI.S_SMALL, String(p["label"]), V_LABEL_X, c.y, maxf(10.0, size.x - V_LABEL_X), lab_col, 0)
 			continue
 		var cell := cell_rect(i)
 		var room := cell.size.x - 8.0
@@ -411,6 +415,8 @@ func _layout() -> void:
 		var cap := String(p["caption"])
 		if cap != "":
 			var cl := PlanKit.wrap(f26, UI.S_CAPTION, cap, room, 2)
+			if PlanKit.was_cut(cl, cap):
+				_cut.append(cap)
 			for k in cl.size():
 				_ops.text(f26, UI.S_CAPTION, String(cl[k]), cell.position.x + 4.0, 106.0 + CAP_LH * float(k), room, UI.DIM if not locked else UI.TEXT_OFF, 1)
 		# pips: one per control that acts in this phase
@@ -427,6 +433,7 @@ func _draw() -> void:
 	_layout()
 	_ops.flush(self)
 	clipped = _ops.clipped.duplicate()
+	clipped.append_array(_cut)
 
 
 func _enter_tree() -> void:

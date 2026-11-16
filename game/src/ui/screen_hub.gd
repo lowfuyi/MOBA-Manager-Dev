@@ -147,11 +147,16 @@ func _quick(g: Dictionary) -> void:
 ## cash, chemistry) are captured before and after, so the payoff screen can show what the game did.
 static func _finish_game(g: Dictionary, res: Dictionary) -> void:
 	var gs := App.gs
-	var before := Payoff.snapshot(gs)
+	var tut := TutorialGame.is_tutorial(g)   # the tutorial game (I-13): flag on the result, no Payoff, sandbox plan dropped
+	var before := {} if tut else Payoff.snapshot(gs)
 	App.last_game = g
-	App.last_result = res
+	App.last_result = TutorialGame.stamp(res, g)
 	gs.record_human_game(g, res)
-	App.last_payoff = Payoff.compare(gs, before)
+	App.last_payoff = {} if tut else Payoff.compare(gs, before)
+	if tut:
+		TutorialGame.leave(gs)
+		if App.tutorial != null:
+			App.tutorial.set_game_live(false)
 	App.autosave()
 	App.go(ScreenReport.new(g, res, false))
 

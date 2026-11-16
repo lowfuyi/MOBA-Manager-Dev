@@ -602,5 +602,5 @@ func _build_standings() -> void:
 	col2.add_child(_reg("RankRow", RankRow.new({"rank": 9, "club": longid, "name": long_club, "main": "1523", "sub": "0-1", "own": true})) as RankRow)
 	col2.add_child(_reg("RankRow", RankRow.new({"rank": 10, "club": longid, "name": long_club, "main": "111", "sub": "0-1"})) as RankRow)
 	col2.add_child(_reg("RankRow", RankRow.new({"rank": 11, "club": longid, "name": "Pinehollow Owls", "main": "888", "sub": "0-2"})) as RankRow)
-	col2.add_child(_reg("RankRow", RankRow.new({"rank": 9, "club": longid, "name": long_club, "own": true, "note": Strings.f("standings.pin.out", {"n": 3}) + ". " + Strings.t("standings.cut.after")})) as RankRow)
+	col2.add_child(_reg("RankRow", RankRow.new({"rank": 9, "club": longid, "name": long_club, "own": true, "note": Strings.f("standings.cut.out", {"rank": 9, "n": 3})})) as RankRow)
 

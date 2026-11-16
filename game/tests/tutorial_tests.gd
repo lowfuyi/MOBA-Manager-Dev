@@ -4,7 +4,8 @@ extends RefCounted
 ## every step (negative controls), stages and shortcuts, skip_if (no_next_game, already_on, event_seen with the EventBus
 ## ring buffer, its bookmark and its 64-event limit), Skip with Undo at every step, the state `new` and the other four
 ## states, replay (game.n), resume after a kill at every step (live true and false) and through a JSON round trip,
-## the unknown higher `v`, a step id that left the data, the Home offer, the debug line.
+## the unknown higher `v`, a step id that left the data, the Home offer, the debug line. I-13 (at the end): the tutorial game
+## (TutorialGame) is a sandbox: deep compare of gs.d, RNG isolation, replay seeds, the opponent rule, legacy saves, resume, the flag.
 ## Pure logic: no autoloads, no UI classes (EventBus is a Node but a plain one). Auto-discovered by run_tests.gd.
 
 ## The happy path: [event, data, step id after, stage after]. The first entry is Start on the welcome modal (state new).
@@ -43,6 +44,7 @@ func run(check: Callable) -> void:
 	_card_and_debug(check)
 	_game_flags(check)
 	_offers(check)
+	_tutorial_game(check)
 
 
 # ------------------------------------------------------------------ helpers
@@ -702,3 +704,366 @@ func _offers(check: Callable) -> void:
 	# killing the app at the modal changes nothing: the state is still new and no flag was set
 	var k := TutorialState.from_save(JSON.parse_string(JSON.stringify(TutorialState.new_state())))
 	check.call(k.state() == "new" and TutorialState.offer_for(k.snapshot(), false, false) == "welcome_modal", "flow: killing the app at the welcome modal shows it again")
+
+
+# ================================================================== I-13 the tutorial game (TutorialGame, sandbox)
+const TG_CLUB := "ironquill_wolves"
+const TG_FIXTURES := ["save_0_6_a.json", "save_0_6_b.json", "save_0_6_c.json", "save_0_6_d.json"]
+
+
+## The save without its tutorial key, as sorted JSON: what the deep compare reads.
+func _tg_snap(gs: GameState) -> String:
+	var c: Dictionary = gs.d.duplicate(true)
+	c.erase("tutorial")
+	return JSON.stringify(c, "", true)
+
+
+## A tutorial game as the screens play it: start, draft with the AI, finish with the plans, stamp, record, leave.
+func _tg_play(gs: GameState, w: World, edit_plan: bool = true) -> Dictionary:
+	var g := TutorialGame.start(gs)
+	if g.is_empty():
+		return {}
+	if edit_plan:
+		gs.plan_set()["default"]["g"] = 50     # the Game Plan screen edits what plan_set() returns, in place
+		gs.plan_set()["default"]["jf"] = "mid_lane"
+	var dr := MatchRunner.prepare(w, gs.lineup_for(g["blue"]), gs.lineup_for(g["red"]), gs.meta_for(int(g["round"])), int(gs.d["save_seed"]), g["id"], bool(g["full"]))
+	dr.finish_with_ai()
+	var res := MatchRunner.finish(w, dr, gs.plans_for(g))
+	TutorialGame.stamp(res, g)
+	gs.record_human_game(g, res)
+	TutorialGame.leave(gs)
+	return {"game": g, "res": res}
+
+
+func _tg_fixture(name: String) -> Dictionary:
+	var f := FileAccess.open("res://tests/fixtures/" + name, FileAccess.READ)
+	if f == null:
+		return {}
+	var data = JSON.parse_string(f.get_as_text())
+	return data if data is Dictionary else {}
+
+
+## What a real next league game gives, as a string: the result's numbers and the picks.
+func _tg_digest(res: Dictionary) -> String:
+	return "%s|%s|%s|%s|%s" % [str(res["mseed"]), str(res["final"]), str(res["blue_won"]), JSON.stringify(res["picks"], "", true), JSON.stringify(res["bans"], "", true)]
+
+
+func _tutorial_game(check: Callable) -> void:
+	TutorialState.use_data({})
+	var w := World.load_default()
+	_tg_sandbox(check, w)
+	_tg_rng_isolation(check, w)
+	_tg_replay_seeds(check, w)
+	_tg_opponent(check, w)
+	_tg_legacy(check, w)
+	_tg_resume_and_flag(check, w)
+
+
+func _tg_sandbox(check: Callable, w: World) -> void:
+	# the deep compare, from a brand-new save, a save mid-season, and the quick path (auto_game)
+	for round_to_play in [0, 3, 9]:
+		var gs := GameState.new_game(w, TG_CLUB, 9100 + round_to_play)
+		var guard := 0
+		while int(gs.d["round"]) < round_to_play and guard < 100:
+			guard += 1
+			var ng := gs.next_game()
+			if not ng.is_empty():
+				gs.record_human_game(ng, gs.auto_game(ng))
+			else:
+				gs._finish_round_if_done()
+		var before := _tg_snap(gs)
+		var fat_before := JSON.stringify(w.fatigue, "", true)
+		var tut_before := JSON.stringify(gs.tutorial(), "", true)
+		var out := _tg_play(gs, w)
+		check.call(not out.is_empty() and TutorialGame.is_tutorial(out["game"]) and TutorialGame.is_tutorial(out["res"]), "tutorial game at round %d: game and result carry the flag" % round_to_play)
+		check.call(_tg_snap(gs) == before, "tutorial game at round %d: gs.d is identical before and after (all keys but tutorial)" % round_to_play)
+		check.call(JSON.stringify(w.fatigue, "", true) == fat_before, "tutorial game at round %d: the world's fatigue is unchanged" % round_to_play)
+		check.call(JSON.stringify(gs.tutorial(), "", true) == tut_before, "tutorial game at round %d: even the tutorial key is untouched by the game itself (the runner owns it)" % round_to_play)
+		check.call(not TutorialGame.is_live(gs), "tutorial game at round %d: the sandbox plan is gone after leave()" % round_to_play)
+	# the Quick button path: auto_game, then the stamp, then record
+	var q := GameState.new_game(w, TG_CLUB, 9200)
+	var qb := _tg_snap(q)
+	var qg := TutorialGame.start(q)
+	var qr := TutorialGame.stamp(q.auto_game(qg), qg)
+	q.record_human_game(qg, qr)
+	TutorialGame.leave(q)
+	check.call(_tg_snap(q) == qb, "the Quick button path (auto_game) leaves gs.d identical too")
+	# the flag alone is enough: a game dict without the flag but a result with it is skipped as well, and the reverse
+	var f1 := GameState.new_game(w, TG_CLUB, 9201)
+	var g1 := TutorialGame.start(f1)
+	var r1 := f1.auto_game(g1)
+	var b1 := _tg_snap(f1)
+	f1.record_human_game(g1, r1)
+	check.call(_tg_snap(f1) == b1, "the flag on the game alone: skipped")
+	TutorialGame.leave(f1)
+	var g1b := g1.duplicate()
+	g1b.erase("tutorial")
+	f1.record_human_game(g1b, TutorialGame.stamp(r1.duplicate(), g1))
+	check.call(_tg_snap(f1) == b1, "the flag on the result alone: skipped")
+	# negative controls: the same compare must SEE a real practice game and a real league game
+	var n1 := GameState.new_game(w, TG_CLUB, 9202)
+	var nb := _tg_snap(n1)
+	n1.start_practice(n1.quick_match_opponent(), 1)
+	var pg := n1.practice_game()
+	n1.record_human_game(pg, n1.auto_game(pg))
+	check.call(_tg_snap(n1) != nb, "negative control: a real Quick Match changes gs.d (fatigue, bonds, exh_n), the compare would catch it")
+	var n2 := GameState.new_game(w, TG_CLUB, 9203)
+	var nb2 := _tg_snap(n2)
+	var lg := n2.next_game()
+	n2.record_human_game(lg, n2.auto_game(lg))
+	check.call(_tg_snap(n2) != nb2, "negative control: a real league game changes gs.d")
+	# the sandbox plan: edits land in the sandbox, never in the saved plan; plans_for plays the right one
+	var p := GameState.new_game(w, TG_CLUB, 9204)
+	var saved_before := JSON.stringify(p.d["plan"], "", true)
+	var pg2 := TutorialGame.start(p)
+	check.call(TutorialGame.is_live(p) and GamePlan.is_neutral(p.plan_set()["default"]) and (p.plan_set()["triggers"] as Array).is_empty(), "start(): a live sandbox plan that starts neutral")
+	p.plan_set()["default"]["a"] = 100
+	p.plan_set()["triggers"].append({"when": "behind_early", "plan": GamePlan.neutral()})
+	check.call(JSON.stringify(p.d["plan"], "", true) == saved_before, "editing plan_set() while the tutorial game is live does not touch the saved plan")
+	check.call(int(p.plans_for(pg2)["B"]["default"]["a"]) == 100, "plans_for(tutorial game) plays the sandbox plan")
+	var league := p.next_game()
+	check.call(int(p.plans_for(league)["B"]["default"]["a"]) == 0 or int(p.plans_for(league)["R"]["default"]["a"]) == 0, "plans_for(a league game) plays the saved plan, even while the sandbox is live")
+	check.call(TutorialGame.plan_copy(p) == p.sandbox_plan and not is_same(TutorialGame.plan_copy(p), p.sandbox_plan), "plan_copy() is an equal copy")
+	TutorialGame.leave(p)
+	check.call(GamePlan.is_neutral(p.plan_set()["default"]) and JSON.stringify(p.plan_set(), "", true) == saved_before, "after leave(): plan_set() is the saved plan again")
+	check.call(JSON.stringify(p.d, "", true).find("sandbox") < 0, "the sandbox is never written into the save")
+	# the replay in every phase: playoffs and done, and on a day whose practice is already used
+	var ph := GameState.new_game(w, TG_CLUB, 9205)
+	ph.autoplay(false)
+	var phase_now: String = ph.d["phase"]
+	var pb := _tg_snap(ph)
+	var po := _tg_play(ph, w)
+	check.call(not po.is_empty() and _tg_snap(ph) == pb, "playoffs phase (%s): the tutorial game runs and changes nothing" % phase_now)
+	ph.autoplay(true)
+	var db := _tg_snap(ph)
+	var dn := _tg_play(ph, w)
+	check.call(not dn.is_empty() and _tg_snap(ph) == db, "phase %s after the split: the tutorial game runs and changes nothing" % String(ph.d["phase"]))
+	var used := GameState.new_game(w, TG_CLUB, 9206)
+	used.start_practice(used.quick_match_opponent(), 1)
+	var ug := used.practice_game()
+	used.record_human_game(ug, used.auto_game(ug))
+	check.call(not used.practice_available(), "setup: the practice day is used up")
+	var ub := _tg_snap(used)
+	var uo := _tg_play(used, w)
+	check.call(not uo.is_empty() and _tg_snap(used) == ub, "a used practice day does not stop the tutorial game, and it changes nothing")
+
+
+func _tg_rng_isolation(check: Callable, w: World) -> void:
+	var wa := World.load_default()     # one World per save: a World is bound to the save made last
+	var wb := World.load_default()
+	var a := GameState.new_game(wa, TG_CLUB, 9300)
+	var ng_a := a.next_game()
+	var opp_a := a.quick_match_opponent()
+	var res_a := a.auto_game(ng_a)
+	var b := GameState.new_game(wb, TG_CLUB, 9300)
+	_tg_play(b, wb)
+	_tg_play(b, wb)     # two of them, to be sure
+	var ng_b := b.next_game()
+	check.call(JSON.stringify(ng_b, "", true) == JSON.stringify(ng_a, "", true), "RNG isolation: the next league game is the same fixture")
+	check.call(b.quick_match_opponent() == opp_a, "RNG isolation: the real Quick Match opponent draw is the same")
+	check.call(_tg_digest(b.auto_game(ng_b)) == _tg_digest(res_a), "RNG isolation: the next league game result is identical with and without tutorial games played first")
+	# and further on: a whole season of auto-play ends in the same save
+	a.autoplay(true)
+	b.autoplay(true)
+	check.call(_tg_snap(a) == _tg_snap(b), "RNG isolation: after a whole split the two saves are identical")
+	var gt := TutorialGame.start(b)
+	TutorialGame.leave(b)
+	check.call(String(gt["id"]).begins_with("tut:9300:") and Pcg32.match_seed(9300, String(gt["id"])) != Pcg32.match_seed(9300, "S1-R0-A"), "the tutorial id is a tut: id, a different stream from a league fixture")
+
+
+func _tg_replay_seeds(check: Callable, w: World) -> void:
+	var gs := GameState.new_game(w, TG_CLUB, 9400)
+	var m := TutorialState.new(gs.tutorial())
+	var ids: Array = []
+	var seeds: Array = []
+	var opps: Array = []
+	for i in 3:
+		m.replay() if i > 0 else m.accept()
+		gs.set_tutorial(m.snapshot())
+		var g := TutorialGame.start(gs)
+		ids.append(String(g["id"]))
+		seeds.append(TutorialGame.match_seed(gs))
+		opps.append(String(g["red"]))
+		TutorialGame.leave(gs)
+	check.call(ids == ["tut:9400:1", "tut:9400:2", "tut:9400:3"], "replay: ids are tut:<seed>:<n> with n 1, 2, 3 (got %s)" % str(ids))
+	check.call(seeds[0] != seeds[1] and seeds[1] != seeds[2] and seeds[0] != seeds[2], "replaying twice gives three different match seeds")
+	check.call(opps[0] == opps[1] and opps[1] == opps[2], "a replay is the same club on another seed")
+	var again := GameState.new_game(w, TG_CLUB, 9400)
+	var m2 := TutorialState.new(again.tutorial())
+	m2.accept()
+	again.set_tutorial(m2.snapshot())
+	check.call(String(TutorialGame.start(again)["id"]) == "tut:9400:1", "scripted runs repeat: the same save and n give the same id")
+	var other := GameState.new_game(w, TG_CLUB, 9401)
+	var m3 := TutorialState.new(other.tutorial())
+	m3.accept()
+	other.set_tutorial(m3.snapshot())
+	check.call(String(TutorialGame.start(other)["id"]) == "tut:9401:1", "another save seed gives another id")
+	# two different games really play differently on the seeds (not a proof of luck, a check the id feeds the sim)
+	var r1 := _tg_play(gs, w, false)
+	m.replay()
+	gs.set_tutorial(m.snapshot())
+	var r2 := _tg_play(gs, w, false)
+	check.call(str(r1["res"]["mseed"]) != str(r2["res"]["mseed"]), "the two replays' results carry different mseed values")
+
+
+## The opponent never stronger than the player in 200 random clubs and saves (and the documented fallback for the weakest club).
+func _tg_opponent(check: Callable, w: World) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 13013
+	var ok_all := true
+	var closest_all := true
+	var stronger := 0
+	var weakest_cases := 0
+	var fallback_nearest := true
+	var no_side_effect := true
+	for i in 200:
+		var club: String = w.club_ids[rng.randi() % w.club_ids.size()]
+		var gs := GameState.new_game(w, club, 1000 + rng.randi() % 100000)
+		var rounds := rng.randi() % 14
+		var guard := 0
+		while int(gs.d["round"]) < rounds and guard < 60:
+			guard += 1
+			var ng := gs.next_game()
+			if not ng.is_empty():
+				gs.record_human_game(ng, gs.auto_game(ng))
+			else:
+				gs._finish_round_if_done()
+		if rng.randi() % 3 == 0:     # some saves with a shuffled lineup
+			var ids: Array = (gs.d["roster"] as Array).duplicate()
+			var slots: Array = ["top", "jg", "mid", "bot", "sup"]
+			for s in slots:
+				gs.assign(s, ids[rng.randi() % ids.size()])
+		var snap := _tg_snap(gs)
+		var opp := TutorialGame.opponent(gs)
+		var mine: float = w.team_rating(gs.lineup_for(gs.club()))
+		var opp_r: float = w.team_rating(gs.lineup_for(opp))
+		var others: Array = []
+		for c in w.club_ids:
+			if c != gs.club():
+				others.append(float(w.team_rating(gs.lineup_for(c))))
+		var any_not_above := false
+		var best_below := -1e18
+		var nearest_above := 1e18
+		for r in others:
+			if r <= mine:
+				any_not_above = true
+				best_below = maxf(best_below, r)
+			else:
+				nearest_above = minf(nearest_above, r)
+		if opp == "" or opp == gs.club():
+			ok_all = false
+		elif any_not_above:
+			ok_all = ok_all and opp_r <= mine
+			closest_all = closest_all and is_equal_approx(opp_r, best_below)
+		else:
+			weakest_cases += 1
+			stronger += 1
+			fallback_nearest = fallback_nearest and is_equal_approx(opp_r, nearest_above)
+		no_side_effect = no_side_effect and _tg_snap(gs) == snap
+	check.call(ok_all, "200 random clubs and saves: the opponent is never stronger whenever any club is not stronger")
+	check.call(closest_all, "200 random clubs and saves: it is the strongest club that is not above ours (closest from below)")
+	check.call(fallback_nearest, "the weakest-club fallback is the nearest club above (%d of 200 cases)" % weakest_cases)
+	check.call(no_side_effect, "choosing the opponent changes nothing in the save")
+	# the three hand-made cases of the rule on a fake rating: strongest club, weakest club, and a tie
+	var gs2 := GameState.new_game(w, TG_CLUB, 5)
+	var opp2 := TutorialGame.opponent(gs2)
+	check.call(opp2 != "" and opp2 != TG_CLUB and w.clubs.has(opp2), "the default club gets a real other club")
+	check.call(TutorialGame.opponent(gs2) == opp2, "the same save gives the same opponent every time (no draw)")
+
+
+func _tg_legacy(check: Callable, w: World) -> void:
+	for name in TG_FIXTURES:
+		var data := _tg_fixture(name)
+		if data.is_empty():
+			check.call(false, "fixture %s loads" % name)
+			continue
+		var gs := GameState.from_dict(World.load_default(), data)
+		check.call(gs.tutorial()["state"] == "legacy", "%s: a 0.6 save reads as legacy" % name)
+		var before := _tg_snap(gs)
+		var out := _tg_play(gs, gs.world)
+		check.call(not out.is_empty() and _tg_snap(gs) == before, "%s: a legacy save runs the tutorial game and gs.d is identical after" % name)
+		check.call(gs.tutorial()["state"] == "legacy" and not (gs.tutorial().has("game")), "%s: the legacy key is untouched by the game" % name)
+		# the legacy offer, Show me: accept() makes it running with game.n 1 and the game works from there
+		var m := TutorialState.new(gs.tutorial())
+		m.accept()
+		gs.set_tutorial(m.snapshot())
+		var g2 := TutorialGame.start(gs)
+		check.call(String(g2["id"]).ends_with(":1") and TutorialGame.game_n(gs) == 1, "%s: after Show me the id has n 1" % name)
+		TutorialGame.leave(gs)
+	# a save with no plan key at all (very old): the sandbox must not create one
+	var old := GameState.new_game(w, TG_CLUB, 9500)
+	old.d.erase("plan")
+	old.d.erase("tutorial")
+	var rt = JSON.parse_string(JSON.stringify(old.d))
+	var lg := GameState.from_dict(World.load_default(), rt)
+	check.call(lg.tutorial()["state"] == "legacy" and not lg.d.has("plan"), "setup: a legacy save with no plan key")
+	var b := _tg_snap(lg)
+	var o := _tg_play(lg, lg.world)
+	check.call(not o.is_empty() and _tg_snap(lg) == b and not lg.d.has("plan"), "a legacy save without a plan key: the sandbox does not create d[plan]")
+
+
+func _tg_resume_and_flag(check: Callable, w: World) -> void:
+	# a running tutorial, game live, saved and reloaded through JSON (the app was killed): section 5 item 10
+	for case in [["watch", true], ["start_match", true], ["result", false], ["tab_plan", true]]:
+		var step: String = case[0]
+		var live: bool = case[1]
+		var gs := GameState.new_game(w, TG_CLUB, 9600)
+		var m := TutorialState.new(gs.tutorial())
+		m.accept()
+		m.replay()     # n = 2, so "unchanged" is a real check
+		gs.set_tutorial(m.snapshot())
+		var g := TutorialGame.start(gs)
+		var opp_before: String = g["red"]
+		var id_before: String = g["id"]
+		var snap := m.snapshot()
+		snap["step"] = step
+		snap["game"]["live"] = live
+		snap["game"]["plan"] = {"default": {"g": 50}} if live else {}
+		gs.set_tutorial(snap)
+		var before := _tg_snap(gs)
+		var raw = JSON.parse_string(JSON.stringify(gs.d))
+		var back := GameState.from_dict(World.load_default(), raw)
+		var t := back.tutorial()
+		var ch := TutorialState.chapter_of(step)
+		var want_step := "tab_club" if ch == 6 else "tab_plan"
+		check.call(t["step"] == want_step and t["game"]["live"] == false and (t["game"]["plan"] as Dictionary).is_empty(), "resume at %s (live %s): step %s, live false, sandbox plan emptied" % [step, str(live), want_step])
+		check.call(int(t["game"]["n"]) == 2, "resume at %s: game.n is unchanged (2)" % step)
+		check.call(not TutorialGame.is_live(back), "resume at %s: no sandbox plan after a load (it is runtime only)" % step)
+		var g2 := TutorialGame.start(back)
+		check.call(String(g2["id"]) == id_before and String(g2["red"]) == opp_before, "resume at %s: the restarted game is the same game (same id %s, same opponent), no duplicate" % [step, id_before])
+		TutorialGame.leave(back)
+		check.call(_tg_snap(back) == before, "resume at %s: loading and restarting changed nothing in the save (all keys but tutorial)" % step)
+	# the result flag survives a save and a load of a running tutorial
+	var gs2 := GameState.new_game(w, TG_CLUB, 9601)
+	var m2 := TutorialState.new(gs2.tutorial())
+	m2.accept()
+	m2.set_game_live(true)
+	gs2.set_tutorial(m2.snapshot())
+	var g := TutorialGame.start(gs2)
+	var res := TutorialGame.stamp(gs2.auto_game(g), g)
+	var game_rt = JSON.parse_string(JSON.stringify(g))
+	var res_rt = JSON.parse_string(JSON.stringify(res))
+	check.call(game_rt is Dictionary and res_rt is Dictionary and TutorialGame.is_tutorial(game_rt) and TutorialGame.is_tutorial(res_rt), "the tutorial flag on the game and on the result survives a JSON round trip")
+	var raw2 = JSON.parse_string(JSON.stringify(gs2.d))       # the save, written while the tutorial game is live
+	var back2 := GameState.from_dict(World.load_default(), raw2)
+	check.call(back2.tutorial()["state"] == "running" and back2.tutorial()["game"]["live"] == false, "save and load of a running tutorial: still running, live false after the load")
+	var b2 := _tg_snap(back2)
+	back2.record_human_game(game_rt, res_rt)      # the game still on screen finishes after the reload: the flag still holds
+	check.call(_tg_snap(back2) == b2, "after save and load, finishing the flagged game (flag from the round-tripped dictionaries) still changes nothing")
+	var plain_rt: Dictionary = res_rt.duplicate()
+	plain_rt.erase("tutorial")
+	var game_plain: Dictionary = game_rt.duplicate()
+	game_plain.erase("tutorial")
+	back2.start_practice(back2.quick_match_opponent(), 1)
+	var pg := back2.practice_game()
+	back2.record_human_game(pg, back2.auto_game(pg))
+	check.call(_tg_snap(back2) != b2, "negative control: without the flag the same kind of game does change the save")
+	check.call(not JSON.stringify(gs2.d).contains("\"tutorial\":true"), "the flag is never written into the save: gs.d holds no `tutorial: true` game")
+	TutorialGame.leave(gs2)
+	# the readers for the screens
+	var qg := GameState.new_game(w, TG_CLUB, 9602)
+	qg.set_quick(true)
+	check.call(TutorialGame.quick_applies(qg, {}) and not TutorialGame.quick_applies(qg, {"tutorial": true}), "Quick mode applies to a real game and is ignored for the tutorial game")
+	check.call(TutorialGame.timed({}) and not TutorialGame.timed({"tutorial": true}) and TutorialGame.DRAFT_LIMIT_S == 0.0, "the draft timer: on for a real game, off for the tutorial game")
+	check.call(TutorialGame.logs_pace({}) and not TutorialGame.logs_pace({"tutorial": true}), "the pace log: written for a real game, skipped for the tutorial game")
+	check.call(not TutorialGame.is_tutorial(null) and not TutorialGame.is_tutorial({}) and not TutorialGame.is_tutorial({"tutorial": false}), "is_tutorial: null, empty and false are not tutorial games")

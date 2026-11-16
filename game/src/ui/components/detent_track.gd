@@ -64,6 +64,7 @@ var _lines_w := -1.0
 var _eff_lines := 1
 var _note_lines := 0
 var _moved_idx := -1
+var _cut: Array = []         # lines wrap() had to cut (a word wider than the control)
 
 
 ## The labels of a Game Plan control from the merged copy: gp.c.<id>.name / neg / pos / balanced (the effect lines and the word at
@@ -355,6 +356,7 @@ func _on_resized() -> void:
 
 func _layout() -> void:
 	_ops.clear()
+	_cut = []
 	var w := _w()
 	var fb := UI.font("SemiBold")
 	var fs := _f_small()
@@ -423,6 +425,8 @@ func _layout() -> void:
 	var eff := inert_text if full else effect_text()
 	var eff_col := UI.TEXT_OFF if off else UI.TEXT2
 	var lines := PlanKit.wrap(fs, UI.S_SMALL, eff, w)
+	if PlanKit.was_cut(lines, eff):
+		_cut.append(eff)
 	for k in lines.size():
 		_ops.text(fs, UI.S_SMALL, String(lines[k]), 0.0, y + lh * (float(k) + 0.5), w, eff_col, 0)
 	y += lh * float(_eff_lines)
@@ -439,6 +443,8 @@ func _layout() -> void:
 	# the partial note
 	if inert == "partial":
 		var nl := PlanKit.wrap(fs, UI.S_SMALL, inert_text, w - 36.0)
+		if PlanKit.was_cut(nl, inert_text):
+			_cut.append(inert_text)
 		_ops.icon("warn", Rect2(0.0, y + lh * 0.5 - 12.0, 24.0, 24.0), UI.WARN)
 		for k in nl.size():
 			_ops.text(fs, UI.S_SMALL, String(nl[k]), 36.0, y + lh * (float(k) + 0.5), w - 36.0, UI.TEXT2, 0)
@@ -449,6 +455,7 @@ func _draw() -> void:
 	_layout()
 	_ops.flush(self)
 	clipped = _ops.clipped.duplicate()
+	clipped.append_array(_cut)
 
 
 # ---- touch ------------------------------------------------------------------------------------------------------------------
