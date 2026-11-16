@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "note": "The 27 steps of TUTORIAL.md 3.2 as data (build plan 0.7 I-11). Read by TutorialState; checked by tools/validate_data.py. Keys point at tut.* strings in i18n/en.json.",
+  "chapters": [
+    {"n": 1, "key": "tut.ch.1", "resume": "home_card"},
+    {"n": 2, "key": "tut.ch.2", "resume": "tab_squad"},
+    {"n": 3, "key": "tut.ch.3", "resume": "tab_plan"},
+    {"n": 4, "key": "tut.ch.4", "resume": "tab_plan"},
+    {"n": 5, "key": "tut.ch.5", "resume": "tab_plan"},
+    {"n": 6, "key": "tut.ch.6", "resume": "tab_club"},
+    {"n": 7, "key": "tut.ch.7", "resume": "tab_club"}
+  ],
+  "steps": [
+    {"id": "welcome", "chapter": 1, "screen": "home", "target": [], "kind": "modal", "dim": "full", "key": "tut.welcome", "done_on": ["tut:start"], "skip": "A", "buttons": ["start", "skip"]},
+    {"id": "home_card", "chapter": 1, "screen": "home", "target": ["home.next_card"], "kind": "info", "dim": "full", "key": "tut.home_card", "done_on": ["tut:next"], "skip": "A", "buttons": ["skip", "next"], "skip_if": "no_next_game"},
+    {"id": "tabs", "chapter": 1, "screen": "home", "target": ["tabbar"], "kind": "info", "dim": "full", "key": "tut.tabs", "done_on": ["tut:next"], "skip": "A", "buttons": ["skip", "next"]},
+    {"id": "tab_squad", "chapter": 1, "screen": "home", "target": ["tab.squad"], "kind": "tap", "dim": "full", "key": "tut.tab_squad", "done_on": ["tap:tab.squad"], "skip": "A", "buttons": ["skip"]},
+    {"id": "squad_bench", "chapter": 2, "screen": "squad", "target": ["squad.bench.0"], "kind": "tap", "dim": "full", "key": "tut.squad_bench", "done_on": ["open:player_card"], "skip": "A", "buttons": ["skip"], "variants": {"alt": "tut.squad_bench.alt"}},
+    {"id": "player_card", "chapter": 2, "screen": "squad", "target": ["roster.card.head"], "kind": "info", "dim": "full", "key": "tut.player_card", "done_on": ["tut:next"], "skip": "A", "buttons": ["skip", "next"], "compact": true},
+    {"id": "tab_plan", "chapter": 3, "screen": "squad", "target": ["tab.plan"], "kind": "tap", "dim": "full", "key": "tut.tab_plan", "done_on": ["tap:tab.plan"], "skip": "A", "buttons": ["skip"]},
+    {"id": "plan_practice", "chapter": 3, "screen": "plan", "target": ["plan.tile.practice"], "kind": "tap", "dim": "full", "key": "tut.plan_practice", "done_on": ["tap:plan.tile.practice"], "skip": "A", "buttons": ["skip"]},
+    {"id": "quick_match", "chapter": 3, "screen": "practice", "target": ["practice.quick"], "kind": "tap", "dim": "full", "key": "tut.quick_match", "done_on": ["tap:practice.quick"], "skip": "A", "buttons": ["skip"]},
+    {"id": "matchups", "chapter": 3, "screen": "prematch", "target": ["prematch.matchups"], "kind": "info", "dim": "full", "key": "tut.matchups", "done_on": ["tut:next"], "skip": "B", "buttons": ["skip", "next"]},
+    {"id": "start_draft", "chapter": 3, "screen": "prematch", "target": ["prematch.start_draft"], "kind": "tap", "dim": "full", "key": "tut.start_draft", "done_on": ["tap:prematch.start_draft"], "skip": "B", "buttons": ["skip"]},
+    {"id": "ban", "chapter": 4, "screen": "draft", "target": ["draft.choices"], "kind": "event", "dim": "full", "key": "tut.ban", "done_on": ["draft:ban"], "skip": "B", "buttons": ["skip"], "stage_b": {"on": "draft:sheet", "on_data": {"kind": "ban"}, "target": ["draft.sheet.confirm"], "key": "tut.ban.confirm", "compact": true, "buttons": ["skip"]}},
+    {"id": "pick", "chapter": 4, "screen": "draft", "target": ["draft.choices"], "kind": "event", "dim": "full", "key": "tut.pick", "done_on": ["draft:sheet", "draft:pick"], "skip": "B", "buttons": ["skip"], "done_data": {"draft:sheet": {"kind": "pick"}}},
+    {"id": "role", "chapter": 4, "screen": "draft", "target": ["draft.slot_list", "draft.sheet.confirm"], "kind": "event", "dim": "full", "key": "tut.role", "done_on": ["draft:pick"], "skip": "B", "buttons": ["skip"], "compact": true, "skip_if": "event_seen:draft:pick"},
+    {"id": "coach_rest", "chapter": 4, "screen": "draft", "target": ["draft.auto_rest"], "kind": "tap", "dim": "full", "key": "tut.coach_rest", "done_on": ["draft:done"], "skip": "B", "buttons": ["skip", "shortcut"], "hold_armed": true, "skip_if": "event_seen:draft:done", "stage_b": {"on": "tap:draft.auto_rest", "target": ["draft.auto_rest"], "key": "tut.coach_rest.sure", "compact": false, "buttons": ["skip", "shortcut"]}, "shortcut": {"key": "tut.shortcut.coach_rest", "does": "draft_auto_finish"}},
+    {"id": "open_plan", "chapter": 5, "screen": "draft", "target": ["draft.game_plan"], "kind": "tap", "dim": "full", "key": "tut.open_plan", "done_on": ["tap:draft.game_plan"], "skip": "B", "buttons": ["skip"]},
+    {"id": "coach_suggest", "chapter": 5, "screen": "gameplan", "target": ["gp.coach"], "kind": "tap", "dim": "full", "key": "tut.coach_suggest", "done_on": ["gp:coach_apply", "gp:coach_close"], "skip": "B", "buttons": ["skip", "shortcut"], "stage_b": {"on": "gp:coach_open", "target": ["gp.coach_apply"], "key": "tut.coach_suggest.apply", "compact": true, "buttons": ["skip", "shortcut"]}, "shortcut": {"key": "tut.shortcut.apply", "does": "gp_coach_apply"}},
+    {"id": "start_match", "chapter": 5, "screen": "gameplan", "target": ["gp.start_match"], "kind": "tap", "dim": "full", "key": "tut.start_match", "done_on": ["tap:gp.start_match"], "skip": "B", "buttons": ["skip"]},
+    {"id": "watch", "chapter": 5, "screen": "match", "target": ["match.controls"], "kind": "event", "dim": "none", "key": "tut.watch", "done_on": ["match:speed", "match:skip", "match:end"], "skip": "B", "buttons": ["skip"], "passthrough": true, "variants": {"arena": "tut.watch.arena"}},
+    {"id": "see_report", "chapter": 5, "screen": "match", "target": ["match.report_btn"], "kind": "tap", "dim": "light", "key": "tut.see_report", "done_on": ["tap:match.report_btn"], "skip": "B", "buttons": ["skip"]},
+    {"id": "result", "chapter": 6, "screen": "report", "target": ["report.result"], "kind": "info", "dim": "full", "done_on": ["tut:next"], "skip": "C", "buttons": ["skip", "next"], "key_win": "tut.result.win", "key_loss": "tut.result.loss"},
+    {"id": "why", "chapter": 6, "screen": "report", "target": ["report.why"], "kind": "tap", "dim": "full", "key": "tut.why", "done_on": ["tut:next"], "skip": "C", "buttons": ["skip", "next"], "stage_b": {"on": "open:report_why", "target": ["report.why_sheet"], "key": "tut.why.sheet", "compact": true, "buttons": ["skip", "next"]}},
+    {"id": "continue", "chapter": 6, "screen": "report", "target": ["report.continue"], "kind": "tap", "dim": "full", "key": "tut.continue", "done_on": ["tap:report.continue"], "skip": "C", "buttons": ["skip"]},
+    {"id": "tab_club", "chapter": 7, "screen": "practice", "target": ["tab.club"], "kind": "tap", "dim": "full", "key": "tut.tab_club", "done_on": ["tap:tab.club"], "skip": "C", "buttons": ["skip"]},
+    {"id": "form_tile", "chapter": 7, "screen": "club", "target": ["club.tile.form"], "kind": "tap", "dim": "full", "key": "tut.form_tile", "done_on": ["tap:club.tile.form"], "skip": "C", "buttons": ["skip"]},
+    {"id": "form_switch", "chapter": 7, "screen": "standings", "target": ["stand.metric"], "kind": "tap", "dim": "full", "key": "tut.form_switch", "done_on": ["stand:metric"], "skip": "C", "buttons": ["skip"]},
+    {"id": "finish", "chapter": 7, "screen": "standings", "target": [], "kind": "modal", "dim": "full", "key": "tut.finish", "done_on": ["tut:finish"], "skip": "none", "buttons": ["go_home"]}
+  ]
+}

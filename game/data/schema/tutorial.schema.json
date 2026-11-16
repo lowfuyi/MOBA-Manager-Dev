@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Guided first game (tutorial_v1.json, TUTORIAL.md 3.2 and 7.6)",
+  "type": "object",
+  "required": ["version", "chapters", "steps"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"const": 1},
+    "note": {"type": "string"},
+    "chapters": {
+      "type": "array", "minItems": 7, "maxItems": 7,
+      "items": {
+        "type": "object", "required": ["n", "key", "resume"], "additionalProperties": false,
+        "properties": {
+          "n": {"type": "integer", "minimum": 1, "maximum": 7},
+          "key": {"type": "string", "pattern": "^tut\\.ch\\.[1-7]$"},
+          "resume": {"type": "string", "pattern": "^[a-z_]+$"}
+        }
+      }
+    },
+    "steps": {"type": "array", "minItems": 27, "maxItems": 27, "items": {"$ref": "#/$defs/step"}}
+  },
+  "$defs": {
+    "event": {"type": "string", "pattern": "^[a-z_]+:[a-z0-9_.]+$"},
+    "targets": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9_.]+$"}, "maxItems": 2, "uniqueItems": true},
+    "buttons": {"type": "array", "items": {"enum": ["start", "next", "go_home", "shortcut", "skip"]}, "uniqueItems": true},
+    "textkey": {"type": "string", "pattern": "^tut\\.[a-z_.]+$"},
+    "step": {
+      "type": "object",
+      "required": ["id", "chapter", "screen", "target", "kind", "dim", "done_on", "skip", "buttons"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z_]+$"},
+        "chapter": {"type": "integer", "minimum": 1, "maximum": 7},
+        "screen": {"enum": ["home", "squad", "plan", "practice", "prematch", "draft", "gameplan", "match", "report", "club", "standings"]},
+        "target": {"$ref": "#/$defs/targets"},
+        "kind": {"enum": ["modal", "info", "tap", "event"]},
+        "dim": {"enum": ["full", "light", "none"]},
+        "key": {"$ref": "#/$defs/textkey"},
+        "key_win": {"$ref": "#/$defs/textkey"},
+        "key_loss": {"$ref": "#/$defs/textkey"},
+        "variants": {"type": "object", "additionalProperties": {"$ref": "#/$defs/textkey"}},
+        "done_on": {"type": "array", "minItems": 1, "items": {"anyOf": [{"$ref": "#/$defs/event"}, {"enum": ["tut:start", "tut:next", "tut:finish"]}]}, "uniqueItems": true},
+        "done_data": {"type": "object", "additionalProperties": {"type": "object"}},
+        "skip": {"enum": ["A", "B", "C", "none"]},
+        "skip_if": {"type": "string", "pattern": "^(no_next_game|target_missing|already_on:[a-z_]+|event_seen:[a-z_]+:[a-z0-9_.]+)$"},
+        "buttons": {"$ref": "#/$defs/buttons"},
+        "compact": {"type": "boolean"},
+        "hold_armed": {"type": "boolean"},
+        "passthrough": {"type": "boolean"},
+        "shortcut": {
+          "type": "object", "required": ["key", "does"], "additionalProperties": false,
+          "properties": {"key": {"$ref": "#/$defs/textkey"}, "does": {"enum": ["draft_auto_finish", "gp_coach_apply"]}}
+        },
+        "stage_b": {
+          "type": "object", "required": ["on", "target", "key", "buttons"], "additionalProperties": false,
+          "properties": {
+            "on": {"$ref": "#/$defs/event"}, "on_data": {"type": "object"},
+            "target": {"$ref": "#/$defs/targets"}, "key": {"$ref": "#/$defs/textkey"},
+            "compact": {"type": "boolean"}, "buttons": {"$ref": "#/$defs/buttons"}
+          }
+        }
+      }
+    }
+  }
+}
