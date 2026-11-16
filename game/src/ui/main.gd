@@ -168,6 +168,8 @@ func toast(text: String, color: Color = UI.TEXT, action: String = "", cb: Callab
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if BottomSheet.handle_back():
+			return    # an open sheet uses the Back press up (I-08); the overlay slot will do the same in I-12
 		if _current != null and _current.has_method("go_back"):
 			_current.call("go_back")
 		else:

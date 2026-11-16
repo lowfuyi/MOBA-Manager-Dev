@@ -6,7 +6,7 @@ extends Screen
 ## the short state names printed above each sample are test annotations (ASCII), not game text.
 ## `items` maps a component kind to the nodes built, so a test can reach them: items["DepthCard"], items["Chip"], ...
 
-const SECTIONS := ["cards", "headers", "chips", "icons", "segmented", "data", "list"]
+const SECTIONS := ["cards", "headers", "chips", "icons", "segmented", "data", "list", "carousel", "sheet"]
 const ROLES := ["top", "jg", "mid", "bot", "sup"]
 
 var section := "cards"
@@ -236,3 +236,80 @@ func _build_list() -> void:
 	ListSync.sync(f_box, ROLES, make_row)
 	ListSync.sync(f_box, ["bot", "mid"], make_row)
 	_reg("ListSync", f_box)
+
+
+# ---- carousel (I-08) ----------------------------------------------------------------------------------------------
+
+const NAMES := ["Brikai", "Soldor", "Brammont", "Vexa", "Tolliver", "Quillan", "Marrow", "Jessamy", "Odrin", "Pell"]
+
+
+## A display card for the carousel: name, a line, a chip, and (optionally) a real Button the carousel must make inert.
+func car_card(idx: int, with_btn: bool = false, long_name: String = "") -> DepthCard:
+	var c := DepthCard.new(0)
+	_reg("DepthCard", c)
+	c.content.add_child(UI.label(long_name if long_name != "" else String(NAMES[idx % NAMES.size()]), UI.S_HEAD, UI.TEXT))
+	c.content.add_child(UI.label(Strings.t("squad.now_playing"), UI.S_SMALL, UI.TEXT2))
+	var row := HFlowContainer.new()
+	row.add_theme_constant_override("h_separation", 10)
+	c.content.add_child(row)
+	row.add_child(_reg("Chip", Chip.new(Strings.t("fatigue.tired") if idx % 2 == 0 else Strings.t("mood.hot"), "warn" if idx % 2 == 0 else "good")) as Chip)
+	if with_btn:
+		var b := UI.button(Strings.t("common.ok"), _note.bind("inner_button"))    # inert inside a carousel card: the card taps
+		c.content.add_child(b)
+	return c
+
+
+func _car(p_cap: String, n: int, p_w: float, opts: Dictionary = {}) -> Carousel:
+	body.add_child(_cap(p_cap))
+	var cards: Array = []
+	for i in n:
+		cards.append(car_card(i, bool(opts.get("button", false)), String(opts.get("long", "")) if i == 0 else ""))
+	var car := Carousel.new(p_w, cards, _note.bind("see_all"), String(opts.get("tut", "")), String(opts.get("empty", "")))
+	car.card_tapped.connect(func(i: int) -> void: _note("card%d" % i))
+	body.add_child(_reg("Carousel", car) as Carousel)
+	return car
+
+
+func _build_carousel() -> void:
+	_car("CAROUSEL: 300 WIDE, 5 CARDS, DOTS, THE NEXT CARD PEEKS", 5, 300.0, {"tut": "gal.car", "button": true})
+	_car("560 WIDE (UPCOMING GAMES), 2 CARDS, NO DOTS", 2, 560.0, {"long": long_club})
+	_car("10 CARDS: THE ROW SHOWS 8 AND A SEE ALL TILE", 10, 300.0)
+	var scrolled := _car("SCROLLED TO THE THIRD CARD", 6, 300.0)
+	_scroll_later(scrolled, 2)
+	_car("EMPTY", 0, 300.0, {"empty": Strings.t("empty.history.b")})
+
+
+func _scroll_later(car: Carousel, i: int) -> void:
+	for k in 3:
+		await get_tree().process_frame
+	if is_instance_valid(car):
+		car.scroll_to_index(i, false)
+
+
+# ---- sheet (I-08): a page with the buttons that open the real BottomSheet in each size ----------------------------------
+
+func sheet_title(long: bool) -> String:
+	if long:
+		return Strings.t("draft.sheet.pick_for").format({"role": Strings.t("role.mid"), "name": long_club})
+	return Strings.t("squad.bench_h")
+
+
+## Opens the real sheet the way a screen would: `rows` cards of content, one primary action in the footer.
+func open_sheet(sz: String, rows: int, long: bool = false) -> BottomSheet:
+	var build := func(content: VBoxContainer) -> void:
+		for i in rows:
+			var c := DepthCard.new(0)
+			c.content.add_child(UI.label(String(NAMES[i % NAMES.size()]), UI.S_BODY, UI.TEXT))
+			c.content.add_child(UI.label(Strings.t("squad.now_playing"), UI.S_SMALL, UI.TEXT2))
+			content.add_child(c)
+	var foot := func(footer: VBoxContainer) -> void:
+		BottomSheet.footer_button(footer, Strings.t("common.continue"), _note.bind("sheet_primary"), "primary", "gal.sheet.primary")
+	return BottomSheet.open(sheet_title(long), build, foot, sz, "gal_" + sz.to_lower())
+
+
+func _build_sheet() -> void:
+	body.add_child(_cap("OPEN A SHEET: S FITS ITS CONTENT, M IS 60 PERCENT, L IS 85"))
+	for spec in [["S", 2, false], ["M", 4, false], ["L", 9, false], ["M", 3, true]]:
+		var label := "Sheet %s%s" % [spec[0], ", long title" if spec[2] else ""]
+		var b := UI.button(label, func() -> void: open_sheet(String(spec[0]), int(spec[1]), bool(spec[2])), "normal")
+		body.add_child(_reg("SheetButton", b) as Button)

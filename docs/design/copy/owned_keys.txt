@@ -554,3 +554,4 @@ train.squad_h
 player.tab.overview
 player.tab.stats
 player.tab.career
+sheet.close

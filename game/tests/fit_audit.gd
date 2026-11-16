@@ -81,6 +81,8 @@ static func _walk(n: Node, frame_w: float, out: Array, clip: Rect2, h_scroll: bo
 			clip = clip.intersection(r)
 		if c is ScrollContainer and (c as ScrollContainer).horizontal_scroll_mode != ScrollContainer.SCROLL_MODE_DISABLED:
 			h_scroll = true
+		if c.has_meta("h_scroller"):    # (I-08) a Carousel moves its own cards sideways inside its clip
+			h_scroll = true
 	for ch in n.get_children():
 		_walk(ch, frame_w, out, clip, h_scroll)
 
