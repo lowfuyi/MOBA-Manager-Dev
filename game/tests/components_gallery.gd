@@ -6,7 +6,7 @@ extends Screen
 ## the short state names printed above each sample are test annotations (ASCII), not game text.
 ## `items` maps a component kind to the nodes built, so a test can reach them: items["DepthCard"], items["Chip"], ...
 
-const SECTIONS := ["cards", "headers", "chips", "icons", "segmented", "data", "list", "carousel", "sheet", "players", "heroes", "lanes"]
+const SECTIONS := ["cards", "headers", "chips", "icons", "segmented", "data", "list", "carousel", "sheet", "players", "heroes", "lanes", "plan", "standings"]
 const ROLES := ["top", "jg", "mid", "bot", "sup"]
 
 var section := "cards"
@@ -490,3 +490,117 @@ func _fill_board(b: LaneBoard) -> void:
 	b.set_target("mid", "you")
 	b.set_bans("you", [_hero("skarrow"), _hero("hegwin")])
 	b.set_bans("them", [_hero("ottomere"), _hero("gravenstone")])
+
+
+# ---- plan (I-10): PhaseStrip and DetentTrack ----------------------------------------------------------------------------------
+
+func _strip(p_cap: String, phases: Array, selected: String, vertical: bool = false, tut: String = "") -> PhaseStrip:
+	body.add_child(_cap(p_cap))
+	var st := PhaseStrip.new(phases, selected, func(id: String) -> void: _note("phase:" + id), vertical, tut)
+	if vertical:
+		var row := HBoxContainer.new()
+		row.add_child(st)
+		body.add_child(row)
+	else:
+		body.add_child(st)
+	_reg("PhaseStrip", st)
+	return st
+
+
+func _track(control_id: String, v: int, tut: String = "") -> DetentTrack:
+	var t := DetentTrack.new(control_id, v, func(cid: String, val: int) -> void: _note("track:%s:%d" % [cid, val]), {}, tut)
+	_reg("DetentTrack", t)
+	return t
+
+
+func _build_plan() -> void:
+	var lead := func(n: int, m: int) -> String: return Strings.f("gp.lead", {"n": n, "m": m})
+	var a := _strip("PHASE STRIP: EARLY SELECTED, LEAD CAPTIONS, A PIP PER CONTROL THAT ACTS", PhaseStrip.default_phases(), "early", false, "gal.phase")
+	a.set_caption("early", lead.call(2, 4))
+	a.set_caption("mid", lead.call(0, 2))
+	a.set_caption("late", lead.call(1, 2))
+	var b := _strip("A TRIGGER PLAN: EARLY LOCKED (STILL TAPPABLE), OVERALL SELECTED", PhaseStrip.default_phases(), "overall")
+	b.set_locked("early", true)
+	b.set_caption("early", Strings.t("gp.trigger_locked"))
+	b.set_caption("mid", lead.call(0, 2))
+	b.set_caption("late", lead.call(1, 2))
+	var v := _strip("VERTICAL (THE REPORT STORY): RESULTS AS A TICK OR A CROSS, MID SELECTED", ["early", "mid", "late"], "mid", true, "gal.phasev")
+	v.set_result("early", "win")
+	v.set_result("mid", "lose")
+	v.set_result("late", "win")
+	body.add_child(_cap("DETENT TRACK: BALANCED, A HALF STEP, A FULL STEP (EACH SHOWS ITS PHASES)"))
+	var card := DepthCard.new(1)
+	body.add_child(card)
+	card.content.add_theme_constant_override("separation", 12)
+	card.content.add_child(_track("g", 0, "gal.track"))
+	card.content.add_child(_track("t", -50))
+	card.content.add_child(_track("l", 100))
+	body.add_child(_cap("INERT: NO EFFECT IN THIS PLAN (LOCK, HOLLOW THUMB, WORDS), PARTIAL NOTE, DISABLED"))
+	var card2 := DepthCard.new(1)
+	body.add_child(card2)
+	card2.content.add_theme_constant_override("separation", 12)
+	var inert := _track("a", 50)
+	inert.set_inert("full")
+	card2.content.add_child(inert)
+	var partial := _track("s", -100)
+	partial.set_inert("partial")
+	card2.content.add_child(partial)
+	var dis := _track("r", 50)
+	dis.set_disabled(true)
+	card2.content.add_child(dis)
+	body.add_child(_cap("LONGEST EFFECT LINE AT THE FAR END"))
+	var card3 := DepthCard.new(1)
+	body.add_child(card3)
+	card3.content.add_child(_track("m", -100))
+
+
+# ---- standings (I-10): Podium and RankRow -------------------------------------------------------------------------------------
+
+func _club_id_named(nm: String) -> String:
+	if App.world != null:
+		for id in App.world.club_ids:
+			if String(App.world.clubs[id]["name"]) == nm:
+				return String(id)
+	return "club_long"
+
+
+func _rows(n: int, first_rank: int = 1, own_rank: int = -1) -> Array:
+	var out: Array = []
+	var ids: Array = App.world.club_ids if App.world != null else []
+	for i in n:
+		var cid := String(ids[(i + first_rank - 1) % maxi(1, ids.size())]) if not ids.is_empty() else "club%d" % i
+		var nm := String(App.world.clubs[cid]["name"]) if not ids.is_empty() else "Club %d" % i
+		var rank := first_rank + i
+		out.append({"rank": rank, "club": cid, "name": nm, "main": str(maxi(0, 30 - rank * 3)), "sub": "%d-%d" % [maxi(0, 10 - rank), rank - 1], "own": rank == own_rank})
+	return out
+
+
+func _build_standings() -> void:
+	var longid := _club_id_named(long_club)
+	body.add_child(_cap("PODIUM: 2ND, 1ST, 3RD (YOURS HAS THE PILL AND THE OUTLINE)"))
+	var pod_rows := _rows(3, 1, 2)
+	body.add_child(_reg("Podium", Podium.new(pod_rows, "gal.podium")) as Podium)
+	body.add_child(_cap("THREE EQUAL CLUBS, ALL THREE NAMES 19 CHARACTERS"))
+	var eq: Array = []
+	for i in 3:
+		eq.append({"rank": i + 1, "club": longid, "name": long_club, "main": "3", "sub": "1-0", "own": false})
+	body.add_child(_reg("Podium", Podium.new(eq)) as Podium)
+	body.add_child(_cap("RANK ROWS 4 TO 10: OWN ROW, THE PLAYOFF LINE AFTER 4"))
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 0)
+	body.add_child(col)
+	var rs := _rows(7, 4, 9)
+	for i in rs.size():
+		var row := RankRow.new(rs[i], "gal.rank.own" if bool(rs[i]["own"]) else "")
+		_reg("RankRow", row)
+		col.add_child(row)
+		if i == 0:
+			col.add_child(_reg("RankDivider", RankRow.divider(Strings.t("standings.playoff_line"))) as Control)
+	body.add_child(_cap("19-CHARACTER NAME ON YOUR ROW, FORM RATING, 3 DIGITS, A PINNED ROW WITH A SENTENCE"))
+	var col2 := VBoxContainer.new()
+	body.add_child(col2)
+	col2.add_child(_reg("RankRow", RankRow.new({"rank": 9, "club": longid, "name": long_club, "main": "1523", "sub": "0-1", "own": true})) as RankRow)
+	col2.add_child(_reg("RankRow", RankRow.new({"rank": 10, "club": longid, "name": long_club, "main": "111", "sub": "0-1"})) as RankRow)
+	col2.add_child(_reg("RankRow", RankRow.new({"rank": 11, "club": longid, "name": "Pinehollow Owls", "main": "888", "sub": "0-2"})) as RankRow)
+	col2.add_child(_reg("RankRow", RankRow.new({"rank": 9, "club": longid, "name": long_club, "own": true, "note": Strings.f("standings.pin.out", {"n": 3}) + ". " + Strings.t("standings.cut.after")})) as RankRow)
+
