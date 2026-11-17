@@ -272,34 +272,16 @@
    "since": "I-18"
   },
   "16_standings": {
-   "status": "legacy",
-   "leaves_with": "I-20",
-   "measured": {
-    "draws": 29,
-    "nodes": 82
-   },
-   "draws": 35,
-   "nodes": 95
+   "status": "redesigned",
+   "since": "I-20"
   },
   "16b_standings_form": {
-   "status": "legacy",
-   "leaves_with": "I-20",
-   "measured": {
-    "draws": 31,
-    "nodes": 61
-   },
-   "draws": 35,
-   "nodes": 70
+   "status": "redesigned",
+   "since": "I-20"
   },
   "17_standings_results": {
-   "status": "legacy",
-   "leaves_with": "I-20",
-   "measured": {
-    "draws": 27,
-    "nodes": 16
-   },
-   "draws": 30,
-   "nodes": 20
+   "status": "redesigned",
+   "since": "I-20"
   },
   "18_settings": {
    "status": "legacy",
@@ -315,14 +297,8 @@
    "since": "I-15"
   },
   "19b_trophies": {
-   "status": "legacy",
-   "leaves_with": "I-20",
-   "measured": {
-    "draws": 32,
-    "nodes": 23
-   },
-   "draws": 40,
-   "nodes": 30
+   "status": "redesigned",
+   "since": "I-20"
   },
   "19c_roster_career": {
    "status": "redesigned",

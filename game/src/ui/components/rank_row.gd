@@ -270,6 +270,9 @@ func _layout() -> void:
 
 
 func _draw() -> void:
+	if batched():
+		get_parent().queue_redraw()    # the table draws its rows in one pass (I-20 perf); this row's canvas item stays empty
+		return
 	draw_count += 1
 	_layout()
 	PlanKit.batch_order(_back)
@@ -282,6 +285,56 @@ func _draw() -> void:
 	_ops.flush(self)
 	clipped = _ops.clipped.duplicate()
 	clipped.append_array(_cut)
+
+
+## True inside a parent with `draws_rows()` (the Standings table, I-20): ten rows then cost a few draw calls, not about sixty.
+func batched() -> bool:
+	var p := get_parent()
+	return p != null and p.has_method("draws_rows")
+
+
+## The parent's half of the batched draw: [back list, front list] of this row, in its own coordinates.
+func queue_for_batch() -> Array:
+	draw_count += 1
+	_layout()
+	return [_back, _ops]
+
+
+## Draw every visible RankRow child of `ci` in one pass: all backs, then all badges, all letters, then all texts.
+static func draw_children(ci: Control) -> void:
+	var back := CardKit.Ops.new()
+	var front := CardKit.Ops.new()
+	var spans: Array = []
+	for c in ci.get_children():
+		var rr := c as RankRow
+		if rr == null or not rr.visible:
+			continue
+		var parts := rr.queue_for_batch()
+		back.append_shifted(parts[0], rr.position)
+		var t0 := front.texts.size()
+		front.append_shifted(parts[1], rr.position)
+		spans.append([rr, t0, front.texts.size()])
+	PlanKit.batch_order(back)
+	back.flush(ci)
+	for sp in spans:
+		var rr := sp[0] as RankRow
+		var cl: Variant = rr.data["club"]
+		if cl is Dictionary or String(cl) != "":
+			Badge.draw_shapes(ci, cl, Rect2(rr.badge_rect().position + rr.position, rr.badge_rect().size))
+	for sp in spans:
+		var rr := sp[0] as RankRow
+		var cl: Variant = rr.data["club"]
+		if cl is Dictionary or String(cl) != "":
+			Badge.draw_letter(ci, cl, String(rr.data["name"]), Rect2(rr.badge_rect().position + rr.position, rr.badge_rect().size), UI.font("Bold"))
+	front.flush(ci)
+	for sp in spans:
+		var rr := sp[0] as RankRow
+		var cut: Array = []
+		for k in range(int(sp[1]), int(sp[2])):
+			if front.clipped.has(String((front.texts[k] as Array)[2])):
+				cut.append(String((front.texts[k] as Array)[2]))
+		cut.append_array(rr._cut)
+		rr.clipped = cut
 
 
 # ---- touch ------------------------------------------------------------------------------------------------------------------------------
@@ -317,6 +370,8 @@ func _set_look(v: bool) -> void:
 		return
 	_pressed_look = v
 	queue_redraw()
+	if batched():
+		get_parent().queue_redraw()
 
 
 # ---- the playoff line -----------------------------------------------------------------------------------------------------------------

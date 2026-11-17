@@ -576,6 +576,16 @@ func _tapper() -> void:
 			taps += 1
 			await frames(3)
 			continue
+		if target is DraftKit.RoleBar and not o.is_fallback() and kind == "tap":
+			var bar := target as DraftKit.RoleBar    # a drawn segmented control (Standings' metric, I-20): tap the other option
+			for i in bar.options.size():
+				if bar.options[i]["id"] != bar.selected_id:
+					bar.press(i)
+					break
+			real_taps += 1
+			taps += 1
+			await frames(4)
+			continue
 		if target is PlayerCard and not o.is_fallback() and kind == "tap":
 			(target as PlayerCard).pressed.emit()    # a drawn card (the Squad's bench, I-19) takes the tap itself
 			real_taps += 1
@@ -603,7 +613,7 @@ func _tapper() -> void:
 	ok(r.m != null and r.m.state() == "done", "tapper: the scripted run reaches the end (state done)")
 	var n_steps := TutorialState.steps().size()
 	print("     tapper: %d cards (steps and stages), %d taps (%d on real controls), %d fallbacks %s, %d passed over" % [steps_seen.size(), taps, real_taps, r.fallbacks, str(fell), r.passed.size()])
-	ok(fell == ["form_switch"], "tapper: after I-19 (build plan I-19 acceptance): the only fallback card is step 26 (%s)" % str(fell))
+	ok(fell.is_empty() and r.fallbacks == 0, "tapper: after I-20 (build plan I-20 acceptance): no fallback card at all (%s)" % str(fell))
 	ok(taps == steps_seen.size(), "tapper: exactly one tap per card (%d taps, %d cards)" % [taps, steps_seen.size()])
 	ok(steps_seen.size() + r.passed.size() >= n_steps, "tapper: every one of the %d steps was shown or passed over" % n_steps)
 	ok(_dev().tutorial_flag("finished_once"), "tapper: finished_once on the device")

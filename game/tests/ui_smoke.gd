@@ -75,7 +75,7 @@ func _run() -> void:
 		ok(cur() == st and st.body.get_child_count() > 1, "standings tab builds: " + t)
 	var fst := ScreenStandings.new("form")
 	App.go(fst)
-	ok(fst._tab == "form", "standings can open on the form tab")
+	ok(fst.view() == "table" and fst._metric == "form", "standings can open on the form view (I-20: the table on Form Rating)")
 	var club_scr := ScreenClub.new()
 	App.go(club_scr)
 	await get_tree().process_frame
