@@ -284,34 +284,16 @@
    "nodes": 30
   },
   "14_report_top": {
-   "status": "legacy",
-   "leaves_with": "I-18",
-   "measured": {
-    "draws": 20,
-    "nodes": 153
-   },
-   "draws": 25,
-   "nodes": 170
+   "status": "redesigned",
+   "since": "I-18"
   },
   "15_report_mid": {
-   "status": "legacy",
-   "leaves_with": "I-18",
-   "measured": {
-    "draws": 44,
-    "nodes": 153
-   },
-   "draws": 50,
-   "nodes": 170
+   "status": "redesigned",
+   "since": "I-18"
   },
   "15b_report_lines": {
-   "status": "legacy",
-   "leaves_with": "I-18",
-   "measured": {
-    "draws": 49,
-    "nodes": 153
-   },
-   "draws": 55,
-   "nodes": 170
+   "status": "redesigned",
+   "since": "I-18"
   },
   "16_standings": {
    "status": "legacy",

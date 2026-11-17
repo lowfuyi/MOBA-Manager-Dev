@@ -177,12 +177,14 @@ func _tour() -> void:
 	await shot("13_match_end")
 	m._continue()
 	await shot("14_report_top")
-	var sc: ScrollContainer = cur().body.get_parent()
+	var rp: ScreenReport = cur()
+	var sc: ScrollContainer = rp.page_scroll    # I-18: the report scrolls above a sticky Continue
 	sc.scroll_vertical = 900
 	await shot("15_report_mid")
-	_open_section(cur(), "Player lines")
+	rp._toggle_dig()    # More detail, Players (was the "Player lines" section)
 	await get_tree().process_frame
-	sc.scroll_vertical = 1100
+	await get_tree().process_frame
+	sc.scroll_vertical = 100000
 	await shot("15b_report_lines")
 	cur()._leave()
 	var st := ScreenStandings.new()

@@ -532,9 +532,13 @@ func _tapper() -> void:
 	var taps := 0
 	var steps_seen: Array = []
 	var real_taps := 0
+	var fell: Array = []
 	var guard := 0
 	while guard < 400 and r.m != null and r.m.state() != "done":
 		guard += 1
+		if r.m.step_id() == "see_report" and _cur() is ScreenMatch:
+			(_cur() as ScreenMatch)._skip()    # the player watches to the end or taps Skip: the Report button shows at the end
+			await frames(3)
 		var shown := await until(func(): return _overlay() != null and (_overlay().mode == "shown" or _overlay().mode == "fallback") and _overlay().step_id == r.m.step_id(), 8000)
 		if not shown:
 			print("     tapper: nothing shown at %s (mode %s)" % [r.m.step_id(), _overlay().mode if _overlay() != null else "no overlay"])
@@ -544,6 +548,8 @@ func _tapper() -> void:
 		if steps_seen.is_empty() or steps_seen[steps_seen.size() - 1] != sid + "/" + o.stage:
 			steps_seen.append(sid + "/" + o.stage)
 		var ids := o.button_ids()
+		if o.is_fallback() and not fell.has(sid):
+			fell.append(sid)
 		var kind := String(o.card_data().get("kind", ""))
 		var target: Control = null
 		for tid in o.card_data().get("target", []):
@@ -590,7 +596,8 @@ func _tapper() -> void:
 				break
 	ok(r.m != null and r.m.state() == "done", "tapper: the scripted run reaches the end (state done)")
 	var n_steps := TutorialState.steps().size()
-	print("     tapper: %d cards (steps and stages), %d taps (%d on real controls), %d fallbacks, %d passed over" % [steps_seen.size(), taps, real_taps, r.fallbacks, r.passed.size()])
+	print("     tapper: %d cards (steps and stages), %d taps (%d on real controls), %d fallbacks %s, %d passed over" % [steps_seen.size(), taps, real_taps, r.fallbacks, str(fell), r.passed.size()])
+	ok(fell == ["squad_bench", "player_card", "form_switch"], "tapper: CP2 (build plan section 10): the fallback cards are exactly steps 5, 6 and 26 (%s)" % str(fell))
 	ok(taps == steps_seen.size(), "tapper: exactly one tap per card (%d taps, %d cards)" % [taps, steps_seen.size()])
 	ok(steps_seen.size() + r.passed.size() >= n_steps, "tapper: every one of the %d steps was shown or passed over" % n_steps)
 	ok(_dev().tutorial_flag("finished_once"), "tapper: finished_once on the device")
