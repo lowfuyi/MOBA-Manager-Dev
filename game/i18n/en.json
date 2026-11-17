@@ -1190,5 +1190,15 @@
   "home.fixtures_h": "Games left this season",
   "home.fixture_row": "Round {round}  -  {opp}  -  {side}",
   "home.season_done": "Season complete",
-  "home.round": "Round {round}"
+  "home.round": "Round {round}",
+  "gp.you": "You",
+  "gp.them": "Them",
+  "gp.plan_chip": "Plan: {name}",
+  "gp.plan_chip_more": "Plan: {name} +{n}",
+  "gp.reset_short": "Reset",
+  "gp.half": "A bit: {word}",
+  "gp.plans.h": "Which plan",
+  "gp.plans.default_hint": "Used all game, and for the early game in every plan.",
+  "gp.toggle.on": "On",
+  "gp.toggle.off": "Off"
 }

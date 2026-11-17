@@ -256,24 +256,12 @@
    "since": "I-16"
   },
   "11b_gameplan": {
-   "status": "legacy",
-   "leaves_with": "I-17",
-   "measured": {
-    "draws": 34,
-    "nodes": 131
-   },
-   "draws": 40,
-   "nodes": 145
+   "status": "redesigned",
+   "since": "I-17"
   },
   "11c_gameplan_trigger": {
-   "status": "legacy",
-   "leaves_with": "I-17",
-   "measured": {
-    "draws": 26,
-    "nodes": 133
-   },
-   "draws": 30,
-   "nodes": 150
+   "status": "redesigned",
+   "since": "I-17"
   },
   "12_match_mid": {
    "status": "legacy",

@@ -161,7 +161,7 @@ func _tour() -> void:
 	var gp := ScreenGamePlan.new(g, d.draft)
 	App.go(gp)
 	await shot("11b_gameplan")
-	gp._coach()
+	gp._coach_apply()
 	gp._set_tab("behind_early")
 	gp._toggle_trigger()
 	gp._set_value("r", 100)

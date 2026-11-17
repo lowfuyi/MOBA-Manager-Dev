@@ -1,0 +1,12 @@
+{
+  "gp.you": "You",
+  "gp.them": "Them",
+  "gp.plan_chip": "Plan: {name}",
+  "gp.plan_chip_more": "Plan: {name} +{n}",
+  "gp.reset_short": "Reset",
+  "gp.half": "A bit: {word}",
+  "gp.plans.h": "Which plan",
+  "gp.plans.default_hint": "Used all game, and for the early game in every plan.",
+  "gp.toggle.on": "On",
+  "gp.toggle.off": "Off"
+}

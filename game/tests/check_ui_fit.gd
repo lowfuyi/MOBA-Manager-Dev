@@ -6,7 +6,7 @@ extends Node
 ## Ends with " N checks, M failures".
 
 const FitAudit = preload("res://tests/fit_audit.gd")
-const BASELINE_NODES := {"home": 37, "squad": 36, "draft": 38, "game_plan": 133, "report": 151, "standings": 82}   # I-00, fixed seed; home re-based at I-15 (37), draft at I-16 (38)
+const BASELINE_NODES := {"home": 37, "squad": 36, "draft": 38, "game_plan": 34, "report": 151, "standings": 82}   # I-00, fixed seed; home re-based at I-15 (37), draft at I-16 (38), game_plan at I-17 (34)
 const SEED := 20261109
 
 var checks := 0
@@ -95,7 +95,7 @@ func _flow(variant: String) -> void:
 	d._auto_rest()
 	var gp := ScreenGamePlan.new(g, d.draft)
 	App.go(gp)
-	gp._coach()
+	gp._coach_apply()
 	gp._set_tab("behind_early")
 	gp._toggle_trigger()
 	gp._set_value("r", 100)

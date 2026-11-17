@@ -575,3 +575,13 @@ home.fixture_row
 home.season_done
 home.round
 draft.meta_hint
+gp.you
+gp.them
+gp.plan_chip
+gp.plan_chip_more
+gp.reset_short
+gp.half
+gp.plans.h
+gp.plans.default_hint
+gp.toggle.on
+gp.toggle.off

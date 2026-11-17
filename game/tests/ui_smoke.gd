@@ -383,9 +383,9 @@ func _exercise_game_plan(g: Dictionary, d: ScreenDraft) -> ScreenDraft:
 	gp._set_value("a", 100)
 	gp._set_tab("ahead_early")
 	gp._toggle_trigger()
-	gp._coach()
+	gp._coach_apply()
 	gp._set_tab("default")
-	gp._coach()
+	gp._coach_apply()
 	var tot := 0
 	for k in GamePlan.SLIDERS:
 		tot += int(ps["default"][k])
