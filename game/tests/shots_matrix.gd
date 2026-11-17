@@ -92,6 +92,7 @@ func _ready() -> void:
 		print("SHOTS: needs a renderer; run under xvfb-run with --rendering-driver opengl3")
 		get_tree().quit(2)
 		return
+	TutorialRunner.home_offers = false    # I-14: no welcome modal or offer card over Home in these pictures and counts
 	var e := OS.get_environment("SHOT_DIR")
 	if e != "":
 		dir = e

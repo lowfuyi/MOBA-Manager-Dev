@@ -22,6 +22,10 @@ signal presented(step_id: String, stage: String)
 
 const UNDO_S := 4.5
 
+## Home's offers (welcome modal, offer and resume cards; I-14). Screen tests that are not about the guide turn this off so no
+## modal covers what they tap; it changes nothing in the save or on the device.
+static var home_offers := true
+
 var m: TutorialState
 var overlay: CoachOverlay
 var device: DeviceState = DeviceState.new()    # tests point it at a temp file
@@ -68,6 +72,8 @@ func bind(from_load: bool = false) -> void:
 	var bus: EventBus = App.bus
 	m = TutorialState.from_save(_gs.tutorial(), bus.seen, bus.sequence) if from_load else TutorialState.new(_gs.tutorial(), bus.seen, bus.sequence)
 	_carry(m.set_context(_context()))
+	if from_load and m.is_running():
+		_gs.set_tutorial(m.snapshot())    # the resumed step (live false, plan empty) is what the next autosave writes
 	if m.is_running() and not m.resume_pending:
 		_present()
 
@@ -93,6 +99,8 @@ func _on_event(event_name: String, data: Dictionary) -> void:
 	if event_name.begins_with("screen:"):
 		screen_id = String(data.get("help_id", event_name.substr(7)))
 		_carry(m.set_context(_context()))
+	if m.resume_pending:
+		return    # the resume card on Home is not answered yet: the guide waits, nothing the player does moves it
 	_carry(m.feed(event_name, data))
 
 
@@ -282,6 +290,24 @@ func show_welcome() -> void:
 	_sync()
 	if m != null and m.state() == "new":
 		_present()
+
+
+## What Home shows for this save on this device (TUTORIAL 6.2): "welcome_modal", "returning_card", "legacy_card",
+## "resume_card" or "none" (DeviceState.home_offer with this runner's machine, so a step taken this session counts).
+func home_offer() -> String:
+	_sync()
+	if m == null or not home_offers:
+		return "none"
+	return device.home_offer(m.snapshot(), m.resume_pending)
+
+
+## Home calls this once it is built. A brand-new save on a device that never answered the guide gets the welcome modal here;
+## every other offer is an inline card that Home places itself (OfferCard). Returns the offer kind.
+func on_home() -> String:
+	var k := home_offer()
+	if k == "welcome_modal":
+		show_welcome()
+	return k
 
 
 ## Show me / Replay: begin a run at step 1 (the welcome card).

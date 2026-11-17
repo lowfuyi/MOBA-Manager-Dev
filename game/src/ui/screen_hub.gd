@@ -50,8 +50,22 @@ func _ready() -> void:
 		c.add_child(UI.button(Strings.t("hub.skip_to_end"), _skip_to_end, "primary"))
 	else:
 		_next_card(g)
+	_offer()
 	_attention()
 	_tiles(row)
+
+
+## The guided first game (I-14, TUTORIAL 6.2): an inline offer or resume card below the Next-match card and its Play button,
+## never above them; or, for a brand-new save on a fresh device, the welcome modal on the overlay (after this screen is up).
+func _offer() -> void:
+	if App.tutorial == null:
+		return
+	var kind: String = App.tutorial.home_offer()
+	var card := OfferCard.make_for(kind)
+	if card != null:
+		body.add_child(card)
+	elif kind == "welcome_modal":
+		App.tutorial.on_home.call_deferred()
 
 
 func _next_card(g: Dictionary) -> void:

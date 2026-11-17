@@ -32,6 +32,7 @@ func _snap(gs: GameState) -> String:
 
 
 func _ready() -> void:
+	TutorialRunner.home_offers = false    # I-14: Home's welcome modal and offer cards depend on this machine's settings.cfg; tested in check_tutorial_flow
 	get_window().size = Vector2i(720, 1280)
 	await frames(2)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEMP_CFG))
@@ -95,6 +96,9 @@ func _prematch_and_finish() -> void:
 	var g := TutorialGame.start(gs)
 	App.tutorial.set_game_live(true)
 	ok(App.tutorial.m.game()["live"] == true, "setup: the runner knows the tutorial game is live")
+	App.go(ScreenPreMatch.new(gs.next_game()))
+	await frames(3)
+	ok(_screen() != null and _find_button(_screen(), Strings.t("pre.change_lineup")) != null, "pre_: a real game's Pre-match still has Change lineup (control row)")
 	var before := _snap(gs)
 	var pace_before := JSON.stringify(gs.d.get("pace", {}), "", true)   # d.get: gs.pace() would create the key and the compare would see it
 	App.go(ScreenPreMatch.new(g))
@@ -103,6 +107,8 @@ func _prematch_and_finish() -> void:
 	ok(scr is ScreenPreMatch, "pre_: the Pre-match screen is up for the tutorial game")
 	ok(scr != null and _find_label(scr, Strings.t("tut.practice.note")) != null, "pre_: it shows the tutorial note (nothing in it counts), not the series line")
 	ok(scr != null and _find_label(scr, Strings.f("pre.practice_note", {"game": 1, "bo": 1})) == null, "pre_: the ordinary practice note is not shown for the tutorial game")
+	ok(scr != null and _find_button(scr, Strings.t("pre.change_lineup")) == null and _find_button(scr, Strings.t("pre.rotate")) == null,
+			"pre_: Change lineup and Rotate are hidden for the tutorial game (they edit the season; I-14)")
 	var qb := _find_button(scr, Strings.t("hub.quick")) if scr != null else null
 	ok(qb != null, "pre_: the Quick (auto-play) button exists, outside every tutorial hole by design")
 	if qb != null:

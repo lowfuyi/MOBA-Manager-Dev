@@ -53,6 +53,7 @@ func until(cond: Callable, max_frames: int = 60) -> bool:
 
 
 func _ready() -> void:
+	TutorialRunner.home_offers = false    # I-14: Home's welcome modal and offer cards depend on this machine's settings.cfg; tested in check_tutorial_flow
 	await get_tree().process_frame
 	if not DisplayServer.is_touchscreen_available():
 		_relaunch_with_touch_emulation()

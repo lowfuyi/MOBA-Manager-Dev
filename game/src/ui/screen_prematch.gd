@@ -54,8 +54,10 @@ func _ready() -> void:
 	if not tired.is_empty():
 		var tc := UI.card(body, UI.PANEL2, 14)
 		tc.add_child(UI.label(Strings.f("pre.tired_warn", {"n": tired.size()}), UI.S_SMALL, UI.WARN))
-		tc.add_child(UI.button(Strings.t("pre.rotate"), _rotate, "normal", 76))
-	body.add_child(UI.button(Strings.t("pre.change_lineup"), func(): App.go(ScreenRoster.new("prematch", game))))
+		if not TutorialGame.is_tutorial(game):    # Rotate and Change lineup are real edits to the season: not in the tutorial game (I-13 ruling 5)
+			tc.add_child(UI.button(Strings.t("pre.rotate"), _rotate, "normal", 76))
+	if not TutorialGame.is_tutorial(game):
+		body.add_child(UI.button(Strings.t("pre.change_lineup"), func(): App.go(ScreenRoster.new("prematch", game))))
 	body.add_child(UI.button(Strings.t("pre.start_draft"), func(): App.go(ScreenDraft.new(game)), "primary"))
 	body.add_child(UI.button(Strings.t("hub.quick"), _quick, "normal", 76))
 

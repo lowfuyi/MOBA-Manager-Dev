@@ -78,6 +78,7 @@ func _ready() -> void:
 		print("PERF|SKIPPED|headless renderer draws nothing; run under xvfb-run with --rendering-driver opengl3")
 		get_tree().quit(0)
 		return
+	TutorialRunner.home_offers = false    # I-14: no welcome modal or offer card over Home in these pictures and counts
 	as_module = true
 	var path := OS.get_environment("PERF_ALLOWANCES")
 	if path == "":

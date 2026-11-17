@@ -28,5 +28,7 @@ func _ready() -> void:
 func _choose(cid: String) -> void:
 	var seed_value: int = int(Time.get_unix_time_from_system()) % 1000000007
 	App.gs = GameState.new_game(App.world, cid, seed_value)
+	if App.tutorial != null:
+		App.tutorial.bind()    # a brand-new save is state "new": Home asks (welcome modal or inline card, I-14)
 	App.autosave()
 	App.go(ScreenHub.new())

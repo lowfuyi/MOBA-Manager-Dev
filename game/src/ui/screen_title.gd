@@ -22,4 +22,6 @@ func _continue() -> void:
 		App.go(ScreenClubSelect.new())
 		return
 	App.gs = gs
+	if App.tutorial != null:
+		App.tutorial.bind(true)    # a loaded save: the kill-resume rule and the resume card (build plan 5 item 10, I-14)
 	App.go(ScreenHub.new())

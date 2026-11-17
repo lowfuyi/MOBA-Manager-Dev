@@ -80,6 +80,7 @@ func _missing_glyphs(root: Node, out: Array) -> void:
 
 
 func _ready() -> void:
+	TutorialRunner.home_offers = false    # I-14: Home's welcome modal and offer cards depend on this machine's settings.cfg; tested in check_tutorial_flow
 	get_window().size = Vector2i(720, 1280)    # a headless window is 100 x 100 until told otherwise
 	await frames(1)
 	only_state = OS.get_environment("FIT_ONLY")

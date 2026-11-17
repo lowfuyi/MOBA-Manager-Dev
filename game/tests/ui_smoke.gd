@@ -19,6 +19,7 @@ func cur() -> Control:
 
 
 func _ready() -> void:
+	TutorialRunner.home_offers = false    # I-14: Home's welcome modal and offer cards depend on this machine's settings.cfg; tested in check_tutorial_flow
 	await get_tree().process_frame
 	await _run()
 	print("ui smoke: %d checks, %d failures" % [checks, fails])

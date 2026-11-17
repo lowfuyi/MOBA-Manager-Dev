@@ -53,6 +53,7 @@ func _tap_text(node: Node, needle: String) -> bool:
 func _ready() -> void:
 	if as_module:
 		return
+	TutorialRunner.home_offers = false    # I-14: no welcome modal or offer card over Home in these pictures and counts
 	var e := OS.get_environment("SHOT_DIR")
 	if e != "":
 		dir = e

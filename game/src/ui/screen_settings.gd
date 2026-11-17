@@ -23,6 +23,7 @@ func _ready() -> void:
 
 func _rebuild() -> void:
 	UI.clear(body)
+	body.add_child(SettingsHelpCard.new())    # "Help and learning" is the first thing under the title (TUTORIAL 6.3, I-14)
 	var c := UI.card(body)
 	var cb := CheckButton.new()
 	cb.text = Strings.t("settings.quick")
@@ -49,7 +50,6 @@ func _rebuild() -> void:
 	acc.add_child(UI.label(Strings.t("settings.large_text_hint"), UI.S_SMALL, UI.DIM))
 	acc.add_child(_toggle(Strings.t("settings.colorblind"), UI.colorblind, func(v): App.set_colorblind(v); _rebuild()))
 	acc.add_child(UI.label(Strings.t("settings.colorblind_hint"), UI.S_SMALL, UI.DIM))
-	acc.add_child(UI.button(Strings.t("settings.tips_again"), func(): App.tips_reset(); App.toast(Strings.t("settings.tips_done"), UI.GOOD), "normal", 76))
 	_pace_card()
 	var pv := UI.card(body)
 	pv.add_child(UI.label(Strings.t("settings.privacy_h"), UI.S_BODY, UI.ACCENT))
@@ -110,4 +110,6 @@ func _pace_card() -> void:
 func _reset() -> void:
 	GameState.delete_save()
 	App.gs = null
+	if App.tutorial != null:
+		App.tutorial.bind()    # the save and its tutorial state are gone; device flags stay (TUTORIAL 6.3)
 	App.go(ScreenTitle.new())
