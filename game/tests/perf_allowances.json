@@ -71,22 +71,12 @@
    "nodes": 35
   },
   "04c_tab_plan": {
-   "status": "legacy",
-   "measured": {
-    "draws": 30,
-    "nodes": 31
-   },
-   "draws": 35,
-   "nodes": 35
+   "status": "redesigned",
+   "since": "I-21b"
   },
   "04c_tab_club": {
-   "status": "legacy",
-   "measured": {
-    "draws": 29,
-    "nodes": 30
-   },
-   "draws": 35,
-   "nodes": 35
+   "status": "redesigned",
+   "since": "I-21b"
   },
   "04c_tab_more": {
    "status": "legacy",
@@ -150,13 +140,8 @@
    "nodes": 105
   },
   "08_prematch": {
-   "status": "legacy",
-   "measured": {
-    "draws": 21,
-    "nodes": 33
-   },
-   "draws": 25,
-   "nodes": 40
+   "status": "redesigned",
+   "since": "I-21b"
   },
   "08b_training": {
    "status": "legacy",

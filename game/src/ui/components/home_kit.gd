@@ -597,6 +597,7 @@ class CardHead extends Control:
 ## SPIKE-RESULTS-0.7 S4). Columns come from the width (UI-PASS-2 2.3 rule 2): floor((w + gap) / (min cell + gap)).
 class TileGrid extends GridContainer:
 	const MIN_CELL := 260.0
+	var min_cell := MIN_CELL        # a screen whose sub lines are long sets a wider cell (Plan and Club: one column, I-21b)
 	var draw_count := 0
 	var _ops := CardKit.Ops.new()
 
@@ -610,7 +611,7 @@ class TileGrid extends GridContainer:
 		sort_children.connect(queue_redraw)
 
 	func _on_resized() -> void:
-		var n := maxi(1, int(floor((size.x + float(UI.GAP)) / (MIN_CELL + float(UI.GAP)))))
+		var n := maxi(1, int(floor((size.x + float(UI.GAP)) / (min_cell + float(UI.GAP)))))
 		if n != columns:
 			columns = n
 		queue_redraw()

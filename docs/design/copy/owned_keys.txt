@@ -601,3 +601,5 @@ squad.card.fatigue
 squad.card.put_in
 squad.card.renew
 squad.card.release
+pre.edge.up
+pre.edge.down

@@ -109,6 +109,8 @@ func _visible_in_viewport(c: Control) -> bool:
 
 
 func _hit(tile: Control) -> BaseButton:
+	if tile is BaseButton:
+		return tile as BaseButton    # I-21b: a drawn StatTile is its own hit button
 	for c in tile.get_children():
 		if c is BaseButton:
 			return c as BaseButton
@@ -140,7 +142,7 @@ func _tags_plan() -> void:
 	await _go(ScreenPlan.new())
 	for id in ["plan.tile.training", "plan.tile.chem", "plan.tile.practice"]:
 		var t := UI.find_tag(id)
-		ok(t is PanelContainer and _visible_in_viewport(t) and _hit(t) != null, "tags_plan: %s is a visible tile on Plan" % id)
+		ok((t is PanelContainer or t is HomeKit.StatTile) and _visible_in_viewport(t) and _hit(t) != null, "tags_plan: %s is a visible tile on Plan" % id)
 	_events.clear()
 	_hit(UI.find_tag("plan.tile.practice")).pressed.emit()
 	await frames(4)
@@ -224,7 +226,7 @@ func _tags_club() -> void:
 	await _go(ScreenClub.new())
 	for id in ["club.tile.form", "club.tile.finance", "club.tile.fa"]:
 		var t := UI.find_tag(id)
-		ok(t is PanelContainer and t.is_visible_in_tree() and _hit(t) != null, "tags_club: %s is a tile on Club" % id)
+		ok((t is PanelContainer or t is HomeKit.StatTile) and t.is_visible_in_tree() and _hit(t) != null, "tags_club: %s is a tile on Club" % id)
 	ok(_visible_in_viewport(UI.find_tag("club.tile.form")), "tags_club: the Form Rating tile is on screen without scrolling")
 	_events.clear()
 	_hit(UI.find_tag("club.tile.form")).pressed.emit()
