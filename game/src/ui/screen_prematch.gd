@@ -26,7 +26,7 @@ func _ready() -> void:
 	var my_side := "B" if game["blue"] == me else "R"
 	var opp: String = game["red"] if my_side == "B" else game["blue"]
 	setup(Strings.t("pre.title.practice" if game["kind"] == "exhibition" else "pre.title"), go_back)
-	Tips.show(body, "prematch")
+	# The old Pre-match tip is retired (I-21a): it would sit under tutorial steps 10 and 11. tip.prematch* stay in en.json until I-24.
 	var c := UI.card(body, UI.PANEL2)
 	if game["kind"] == "exhibition":
 		var note: String = Strings.t("tut.practice.note") if TutorialGame.is_tutorial(game) else Strings.f("pre.practice_note", {"game": game["game"], "bo": game["best_of"]})
@@ -39,6 +39,7 @@ func _ready() -> void:
 	var mine := gs.lineup()
 	var theirs := gs.lineup_for(opp)
 	var m := UI.card(body)
+	UI.tag(m.get_parent() as Control, "prematch.matchups", false)    # tutorial step 10 (the card's panel, so the hole has its edge)
 	m.add_child(UI.label(Strings.t("pre.matchups"), UI.S_BODY, UI.ACCENT))
 	for s in GameState.SLOTS:
 		var a: Dictionary = mine[s]
@@ -58,7 +59,7 @@ func _ready() -> void:
 			tc.add_child(UI.button(Strings.t("pre.rotate"), _rotate, "normal", 76))
 	if not TutorialGame.is_tutorial(game):
 		body.add_child(UI.button(Strings.t("pre.change_lineup"), func(): App.go(ScreenRoster.new("prematch", game))))
-	body.add_child(UI.button(Strings.t("pre.start_draft"), func(): App.go(ScreenDraft.new(game)), "primary"))
+	body.add_child(UI.tag(UI.button(Strings.t("pre.start_draft"), func(): App.go(ScreenDraft.new(game)), "primary"), "prematch.start_draft"))
 	body.add_child(UI.button(Strings.t("hub.quick"), _quick, "normal", 76))
 
 

@@ -74,7 +74,9 @@ func _ready() -> void:
 	bottom.add_child(_speed_btn)
 	bottom.add_child(_skip_btn)
 	body.add_child(bottom)
+	UI.tag(bottom, "match.controls", false)    # tutorial step 19: Speed and Skip together (I-21a)
 	_go_btn = UI.button(Strings.t("match.report"), _continue, "primary")
+	UI.tag(_go_btn, "match.report_btn")    # tutorial step 20
 	_go_btn.visible = false
 	body.add_child(_go_btn)
 	_add_line(Strings.t("match.start"), UI.DIM)
@@ -149,23 +151,32 @@ func _end() -> void:
 	_speed_btn.visible = false
 	_skip_btn.visible = false
 	_go_btn.visible = true
+	_raise("match:end")
 
 
 func _toggle_speed() -> void:
 	_fast = not _fast
 	_used_fast = _used_fast or _fast
 	_speed_btn.text = Strings.t("match.speed2" if _fast else "match.speed1")
+	_raise("match:speed", {"fast": _fast})
 
 
 func _skip() -> void:
 	if _finished or _events.is_empty():
 		return
 	_skipped = true
+	_raise("match:skip")
 	while _shown < _events.size():
 		_reveal(_events[_shown])
 		_shown += 1
 	_elapsed = _total_min
 	_end()
+
+
+## TUTORIAL 7.5 events (I-21a). Observed only: nothing here changes the match or its result (R7).
+func _raise(event_name: String, data: Dictionary = {}) -> void:
+	if is_instance_valid(App.bus):
+		App.bus.emit(event_name, data)
 
 
 func _continue() -> void:

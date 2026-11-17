@@ -542,6 +542,11 @@ func _tapper() -> void:
 		var target: Control = null
 		for tid in o.card_data().get("target", []):
 			target = UI.find_tag(String(tid))
+		if target != null and not (target is BaseButton):
+			for k in target.get_children():    # a tile (UI.tag_tile): its flat hit button takes the tap
+				if k is BaseButton:
+					target = k
+					break
 		var before := "%s/%s/%s" % [r.m.state(), r.m.step_id(), r.m.stage]
 		if o.is_fallback() or kind == "modal" or kind == "info" or target == null or not (target is BaseButton):
 			var which := "start" if ids.has("start") else ("go_home" if ids.has("go_home") else "next")

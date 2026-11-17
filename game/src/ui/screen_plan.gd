@@ -27,14 +27,18 @@ func _ready() -> void:
 		kinds[k] = int(kinds.get(k, 0)) + 1
 		if w.fatigue_of(p["id"]) >= 50.0:
 			tired += 1
-	body.add_child(UI.tile(Strings.t("plan.train.h"), Strings.f("plan.train.tired", {"n": tired}) if tired > 0 else Strings.t("plan.train.fresh"),
+	var tiles: Array = []    # tutorial ids, in order (I-21a): training, chemistry, practice
+	tiles.append(UI.tile(Strings.t("plan.train.h"), Strings.f("plan.train.tired", {"n": tired}) if tired > 0 else Strings.t("plan.train.fresh"),
 			Strings.f("plan.train.sub", {"t": kinds["stat"], "h": kinds["hero"], "r": kinds["rest"], "s": kinds["scrim"]}),
 			UI.WARN if tired > 0 else UI.GOOD, func(): App.go(ScreenTraining.new())))
-	body.add_child(UI.tile(Strings.t("plan.chem.h"), UI.pct(gs.chem_bonus()), Strings.f("plan.chem.sub", {"avg": "%.0f" % gs.bond_mean()}),
+	tiles.append(UI.tile(Strings.t("plan.chem.h"), UI.pct(gs.chem_bonus()), Strings.f("plan.chem.sub", {"avg": "%.0f" % gs.bond_mean()}),
 			UI.ACCENT, func(): App.go(ScreenChemistry.new())))
 	var pv: String = Strings.t("plan.practice.busy") if gs.practice_in_progress() else Strings.t("plan.practice.ready" if gs.practice_available() else "plan.practice.used")
-	body.add_child(UI.tile(Strings.t("plan.practice.h"), pv, Strings.t("plan.practice.sub"),
+	tiles.append(UI.tile(Strings.t("plan.practice.h"), pv, Strings.t("plan.practice.sub"),
 			UI.ACCENT if gs.practice_available() or gs.practice_in_progress() else UI.DIM, func(): App.go(ScreenPractice.new())))
+	for i in tiles.size():
+		body.add_child(tiles[i])
+		UI.tag_tile(tiles[i], ["plan.tile.training", "plan.tile.chem", "plan.tile.practice"][i])
 	var c := UI.card(body)
 	c.add_child(UI.label(Strings.t("plan.gp.h"), UI.S_BODY, UI.ACCENT))
 	var custom := not GamePlan.is_neutral(gs.plan_set()["default"]) or not (gs.plan_set()["triggers"] as Array).is_empty()

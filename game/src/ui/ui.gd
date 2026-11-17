@@ -307,6 +307,18 @@ static func _on_tag_exit(id: String, instance_id: int) -> void:
 		_tags.erase(id)
 
 
+## Tag a `UI.tile` (a panel with a flat hit button over it): the panel carries the id, so the tutorial hole has the tile's edge, and a
+## tap on the tile raises `tap:<id>` after the tile's own action, as a tagged button does (I-21a).
+static func tag_tile(tile: Control, id: String) -> Control:
+	tag(tile, id, false)
+	for c in tile.get_children():
+		if c is BaseButton:
+			var tap := _on_tag_tap.bind(id)
+			if not (c as BaseButton).pressed.is_connected(tap):
+				(c as BaseButton).pressed.connect(tap)
+	return tile
+
+
 static func _on_tag_tap(id: String) -> void:
 	if is_instance_valid(App.bus):
 		App.bus.emit("tap:" + id)

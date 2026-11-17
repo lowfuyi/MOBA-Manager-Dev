@@ -19,9 +19,10 @@ func _ready() -> void:
 	setup(Strings.t("club.title"), Callable())
 	var gs := App.gs
 	var net := int(round(gs.weekly_net()))
-	body.add_child(UI.tile(Strings.t("club.fin.h"), PlayerView.money(gs.cash()),
+	var t_fin := UI.tile(Strings.t("club.fin.h"), PlayerView.money(gs.cash()),
 			Strings.f("club.fin.sub", {"net": "%+d" % net, "bill": PlayerView.money(gs.wage_bill()), "cap": PlayerView.money(gs.wage_cap())}),
-			UI.GOOD if gs.cash() >= 0.0 else UI.BAD, func(): App.go(ScreenFinance.new())))
+			UI.GOOD if gs.cash() >= 0.0 else UI.BAD, func(): App.go(ScreenFinance.new()))
+	body.add_child(UI.tag_tile(t_fin, "club.tile.finance"))
 	var row := {}
 	for r in gs.standings():
 		if r["club"] == gs.club():
@@ -32,7 +33,9 @@ func _ready() -> void:
 	for f in gs.form_ranking():
 		if f["club"] == gs.club():
 			frank = int(f["rank"])
-	body.add_child(UI.tile(Strings.t("club.form.h"), Strings.f("club.form.val", {"rank": frank, "rating": int(round(gs.form_rating(gs.club())))}),
-			Strings.t("club.form.sub"), UI.TEXT, func(): App.go(ScreenStandings.new("form"))))
-	body.add_child(UI.tile(Strings.t("club.fa.h"), Strings.f("club.fa.count", {"n": gs.fa_players().size()}),
-			Strings.f("club.fa.sub", {"n": gs.roster_slots_used(), "max": Economy.data()["max_roster"]}), UI.ACCENT, func(): App.go(ScreenFreeAgents.new("hub"))))
+	var t_form := UI.tile(Strings.t("club.form.h"), Strings.f("club.form.val", {"rank": frank, "rating": int(round(gs.form_rating(gs.club())))}),
+			Strings.t("club.form.sub"), UI.TEXT, func(): App.go(ScreenStandings.new("form")))
+	body.add_child(UI.tag_tile(t_form, "club.tile.form"))
+	var t_fa := UI.tile(Strings.t("club.fa.h"), Strings.f("club.fa.count", {"n": gs.fa_players().size()}),
+			Strings.f("club.fa.sub", {"n": gs.roster_slots_used(), "max": Economy.data()["max_roster"]}), UI.ACCENT, func(): App.go(ScreenFreeAgents.new("hub")))
+	body.add_child(UI.tag_tile(t_fa, "club.tile.fa"))

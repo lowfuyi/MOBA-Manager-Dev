@@ -26,6 +26,9 @@ func _rebuild() -> void:
 	var gs := App.gs
 	var intro := UI.card(body, UI.PANEL2)
 	intro.add_child(UI.label(Strings.t("practice.intro"), UI.S_SMALL, UI.DIM))
+	if tutorial_mode():
+		_tutorial_card()
+		return
 	if gs.practice_in_progress():
 		_series()
 		return
@@ -39,7 +42,7 @@ func _rebuild() -> void:
 	var q := UI.card(body)
 	q.add_child(UI.label(Strings.t("practice.quick.h"), UI.S_BODY, UI.ACCENT))
 	q.add_child(UI.label(Strings.t("practice.quick.body"), UI.S_SMALL, UI.DIM))
-	q.add_child(UI.button(Strings.t("practice.quick.go"), _quick_match, "play"))
+	q.add_child(UI.tag(UI.button(Strings.t("practice.quick.go"), _quick_match, "play"), "practice.quick"))
 	var c := UI.card(body)
 	c.add_child(UI.label(Strings.t("practice.choose.h"), UI.S_BODY, UI.ACCENT))
 	var lens := UI.hbox()
@@ -49,6 +52,38 @@ func _rebuild() -> void:
 	for r in gs.practice_opponents():
 		var txt := Strings.f("practice.opp", {"club": gs.club_name(r["club"]), "rating": "%.1f" % float(r["rating"]), "form": "%.0f" % gs.form_rating(r["club"])})
 		c.add_child(UI.button(txt, _start.bind(r["club"], _len), "normal", 76))
+
+
+const TUTORIAL_STEPS := ["plan_practice", "quick_match", "matchups", "start_draft"]
+
+
+## True while the guided first game is at steps 8 to 11 and no tutorial game is in flight: Quick Match then starts the tutorial game,
+## a sandbox that writes nothing to the save (I-13), whatever the phase or the practice day says. (Steps 10 and 11 count too: a
+## player who backs out of the tutorial Pre-match gets the tutorial game again, never a real practice game.) Otherwise Practice is
+## the real one.
+static func tutorial_mode() -> bool:
+	if App.tutorial == null or not App.tutorial.is_running() or App.gs == null:
+		return false
+	return TUTORIAL_STEPS.has(App.tutorial.m.step_id()) and not TutorialGame.is_live(App.gs)
+
+
+func _tutorial_card() -> void:
+	var q := UI.card(body)
+	q.add_child(UI.label(Strings.t("practice.quick.h"), UI.S_BODY, UI.ACCENT))
+	q.add_child(UI.label(Strings.t("tut.practice.note"), UI.S_SMALL, UI.WARN))
+	q.add_child(UI.tag(UI.button(Strings.t("practice.quick.go"), _tutorial_quick, "play"), "practice.quick"))
+
+
+## Quick Match in tutorial mode (the I-13 hand-off): the tutorial game, live in the runner, autosaved, then Pre-match.
+func _tutorial_quick() -> void:
+	var gs := App.gs
+	var g := TutorialGame.start(gs)
+	if g.is_empty():
+		_quick_match()    # no opponent at all (cannot happen in a league of ten): the real Quick Match
+		return
+	App.tutorial.set_game_live(true)
+	App.autosave()
+	App.go(ScreenPreMatch.new(g))
 
 
 func _set_len(n: int) -> void:
