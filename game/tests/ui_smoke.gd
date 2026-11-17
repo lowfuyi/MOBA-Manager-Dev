@@ -161,16 +161,17 @@ func _run() -> void:
 	await get_tree().process_frame
 	ok(absf(get_viewport().get_visible_rect().size.x - 720.0) < 1.0, "test window is phone sized (%.0f wide)" % get_viewport().get_visible_rect().size.x)
 	ok(UI.GOOD == UI.GOOD_DEFAULT and win.content_scale_factor == 1.0, "defaults: normal colours and text size")
-	ok(not App.tip_seen("hub"), "the hub tip has not been seen on a fresh device")
+	# I-15: Home no longer shows the old welcome tip (the guided first game and its offer card replace it)
+	App.tips_reset()
+	ok(not App.tip_seen("hub"), "the hub tip has not been seen after a tips reset")
 	var hub_t := ScreenHub.new()
 	App.go(hub_t)
 	await get_tree().process_frame
-	var kids_with := hub_t.body.get_child_count()
-	hub_t.body.get_child(1).queue_free()    # the tip card sits right under the club header
+	var tip_txt := ""
+	for n in hub_t.find_children("*", "Label", true, false):
+		tip_txt += UI.plain((n as Label).text) + "\n"
+	ok(not tip_txt.contains(UI.plain(Strings.t("tip.hub.h"))) and not tip_txt.contains(UI.plain(Strings.t("tip.hub"))), "Home shows no old welcome tip card, even with the tips reset")
 	App.tip_mark("hub")
-	App.go(ScreenHub.new())
-	await get_tree().process_frame
-	ok(cur().body.get_child_count() == kids_with - 1, "the hub tip stays away once dismissed")
 	App.tips_reset()
 	ok(not App.tip_seen("hub"), "tips can be brought back from Settings")
 	var sets := ScreenSettings.new()

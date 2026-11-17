@@ -66,7 +66,7 @@ func _real_file(check: Callable) -> void:
 				every_row_formula = false
 	check.call(every_row_formula, "every legacy row is measured + 10 percent rounded up to the next 5")
 	# the I-02 numbers handed over with the task: state -> [draws measured, nodes measured, draw allowance, node allowance]
-	var six := {"04_hub": [45, 60, 50, 70], "05_roster": [34, 36, 40, 40], "10_draft_ban_2": [38, 81, 45, 90],
+	var six := {"05_roster": [34, 36, 40, 40], "10_draft_ban_2": [38, 81, 45, 90],
 			"11c_gameplan_trigger": [26, 133, 30, 150], "14_report_top": [20, 153, 25, 170], "16_standings": [29, 82, 35, 95]}
 	for s in six:
 		var r = rows.get(s, {})
@@ -75,6 +75,8 @@ func _real_file(check: Callable) -> void:
 				"%s row: measured %d draw calls, %d nodes; allowance %d / %d" % [s, w[0], w[1], w[2], w[3]])
 	# the worst screen in the game is named, with its allowance above the hard limit
 	var chem = rows.get("08f_chemistry_lower", {})
+	var hub = rows.get("04_hub", {})
+	check.call(hub is Dictionary and hub.get("status") == "redesigned" and hub.get("since") == "I-15", "04_hub row: redesigned since I-15 (held to the target 60 / 120)")
 	check.call(chem is Dictionary and int(chem["draws"]) == 165, "Chemistry scrolled keeps the 165 draw-call allowance (a legacy exception to the hard 100)")
 	# negative control on the real file: one more draw call than any row allows fails that row, exactly at the allowance passes
 	var all_ok := true

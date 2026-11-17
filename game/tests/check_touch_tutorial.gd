@@ -123,6 +123,9 @@ func _fresh_main() -> void:
 	App.gs = GameState.new_game(App.world, App.world.club_ids[5], 20261109)
 	App.go(ScreenHub.new())
 	await frames(3)
+	var real_card := UI.find_tag("home.next_card")
+	if real_card != null:
+		real_card.hide()    # I-15: Home now carries the real home.next_card; this suite tests the overlay on the stub's targets
 	App.tutorial.autosave = false
 	App.tutorial.device = DeviceState.new(TEMP_CFG)
 

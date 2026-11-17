@@ -501,9 +501,15 @@ func _fallback() -> void:
 	await until(func(): return _overlay_up())
 	_overlay().wait_s = CoachOverlay.WAIT_S    # the real timeouts for this row (the others use short ones)
 	_overlay().missing_s = CoachOverlay.MISSING_S
+	var real_card := UI.find_tag("home.next_card")
+	ok(real_card != null, "fallback: the redesigned Home carries home.next_card (I-15)")
+	if real_card != null:
+		real_card.get_parent().queue_free()    # TUTORIAL 9 test 13: remove one target (before step 2 starts); hidden would read as
+		# "not on screen yet" (the 6 s wait of TUTORIAL 3.4), removed reads as "missing" (the 2 s fallback tested here)
+	await frames(3)
+	ok(UI.find_tag("home.next_card") == null, "fallback: with the card removed no control carries home.next_card")
 	_overlay().press("start")
 	await frames(2)
-	ok(UI.find_tag("home.next_card") == null, "fallback: the old Home has no home.next_card yet (I-15 adds it)")
 	var t0 := Time.get_ticks_msec()
 	ok(await until(func(): return _overlay() != null and _overlay().is_fallback(), 8000), "fallback: the fallback card shows")
 	var waited := Time.get_ticks_msec() - t0

@@ -54,24 +54,12 @@
    "nodes": 65
   },
   "04_hub": {
-   "status": "legacy",
-   "leaves_with": "I-15",
-   "measured": {
-    "draws": 45,
-    "nodes": 60
-   },
-   "draws": 50,
-   "nodes": 70
+   "status": "redesigned",
+   "since": "I-15"
   },
   "04b_hub_lower": {
-   "status": "legacy",
-   "leaves_with": "I-15",
-   "measured": {
-    "draws": 53,
-    "nodes": 60
-   },
-   "draws": 60,
-   "nodes": 70
+   "status": "redesigned",
+   "since": "I-15"
   },
   "04d_practice": {
    "status": "legacy",
@@ -419,14 +407,8 @@
    "nodes": 75
   },
   "19_hub_after": {
-   "status": "legacy",
-   "leaves_with": "I-15",
-   "measured": {
-    "draws": 45,
-    "nodes": 45
-   },
-   "draws": 50,
-   "nodes": 50
+   "status": "redesigned",
+   "since": "I-15"
   },
   "19b_trophies": {
    "status": "legacy",

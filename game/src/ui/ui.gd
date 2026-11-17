@@ -476,7 +476,10 @@ static func button(text: String, cb: Callable, kind: String = "normal", min_h: i
 		"danger":
 			b.add_theme_stylebox_override("normal", box(BAD.darkened(0.45), R_BTN, 18))
 		"flat":
-			b.add_theme_stylebox_override("normal", box(Color(0, 0, 0, 0), 12, 12))
+			# nothing to draw: an empty box with the same 12 px content margins (a transparent StyleBoxFlat still costs a draw call)
+			var e := StyleBoxEmpty.new()
+			e.set_content_margin_all(12)
+			b.add_theme_stylebox_override("normal", e)
 	b.button_down.connect(_pulse.bind(b))
 	b.pressed.connect(cb)
 	return b

@@ -494,10 +494,13 @@ func _draw() -> void:
 	var total := pill + float(dot_n - 1) * (disc + gap)
 	var x := (size.x - total) * 0.5
 	var y := _card_h + float(DOTS_H) * 0.5
+	# from the cards atlas (one texture), so all the dots are one draw call, not one per dot (I-15 perf)
 	for i in dot_n:
 		if i == cur:
-			draw_style_box(UI.box(UI.TEAL_HI, 5), Rect2(Vector2(x, y - 5.0), Vector2(pill, disc)))
+			CardKit.shape(self, "solid", Rect2(Vector2(x + disc * 0.5, y - 5.0), Vector2(pill - disc, disc)), UI.TEAL_HI)
+			CardKit.shape(self, "disc", Rect2(Vector2(x, y - 5.0), Vector2(disc, disc)), UI.TEAL_HI)
+			CardKit.shape(self, "disc", Rect2(Vector2(x + pill - disc, y - 5.0), Vector2(disc, disc)), UI.TEAL_HI)
 			x += pill + gap
 		else:
-			draw_circle(Vector2(x + disc * 0.5, y), disc * 0.5, UI.DIM)
+			CardKit.shape(self, "disc", Rect2(Vector2(x, y - disc * 0.5), Vector2(disc, disc)), UI.DIM)
 			x += disc + gap
