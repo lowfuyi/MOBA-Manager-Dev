@@ -68,7 +68,6 @@ DATA_KEYS = re.compile(r"^(help\.[a-z]+\.terms|gl\..+\.where)$")
 # Open problems in strings outside the patch (COPY-0.7.md 6.4). Warnings only.
 KNOWN_OPEN = {
     "chem.pentagon_hint": "colour-only cue (Greener line); needs a non-colour cue first",
-    "tip.hub": "says Tap Play but the button reads 'Play game'; the key is retired when Home is rebuilt (COPY-0.7.md 6.3)",
     **{k: "gendered pronoun in an existing string (COPY-0.7.md 6.4)" for k in (
         "chem.bench_hint", "neg.asking", "neg.block.locked", "neg.pv.bench", "neg.pv.h_sign",
         "release.block.unknown", "release.confirm", "release.yes", "season.contracts_hint",

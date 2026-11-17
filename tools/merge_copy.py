@@ -9,6 +9,7 @@
     python3 tools/merge_copy.py --update FILE.json               # UPDATE MODE, dry run: table of key, old text, new text
     python3 tools/merge_copy.py --update FILE.json --write       # write game/i18n/en.json
     python3 tools/merge_copy.py --seed-owned [--write]           # once: own every merged, non-held key of --patch
+    python3 tools/merge_copy.py --retire KEYS.json [--write]     # RETIRE MODE (I-24): delete keys no code uses any more
 
 Rules
   * Refuses (exit 1, nothing written) when a file has a duplicate key, the patch has a non-ASCII character,
@@ -20,7 +21,7 @@ Rules
     that is not in en.json yet, it is not added). Each entry says which build step releases it. Release a key by
     deleting it from the hold file in that step and running this script again with --write.
   * New keys are appended after the existing ones, grouped by prefix (first dotted segment, stable order).
-  * Keys are never deleted: retiring old keys is a later step (COPY-0.7 section 6.3, after the code stops using them).
+  * Add and update modes never delete keys. Retiring is its own mode (below, COPY-0.7 section 6.3).
   * Add mode also writes every key it takes from the patch into the allow-list docs/design/copy/owned_keys.txt
     (one key per line, '#' starts a comment). A hold key that is not in this patch is skipped (the hold file is shared
     by several patches); it is an error only when it is in neither the patch nor en.json.
@@ -34,6 +35,11 @@ Update mode (COPY-0.7 section 8, route A) changes the text of existing keys, not
     change at the same time). Keys are never added, renamed or deleted. Key order, indentation and line endings stay;
     en.json must already be in the tool's canonical format (2-space JSON, one key per line, LF) or it is refused.
   * Changing owned_keys.txt is a Producer or Lead Programmer edit, never Narrative's.
+
+Retire mode (build plan I-24) deletes keys the game no longer uses
+  * KEYS.json is a JSON list of keys. The WHOLE list is refused (nothing written) if any key: is not in en.json, is on the
+    hold list, or is still named anywhere in game/src, game/tests or game/data (a quoted "key" in a .gd, .tscn or .json file;
+    i18n is not searched). The keys also leave owned_keys.txt. Key order of the rest stays.
 """
 import argparse, json, pathlib, re, shutil, sys, tempfile
 
@@ -57,8 +63,20 @@ def load_unique(path):
     return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=hook)
 
 
-def merge(en, patch, hold):
-    """Returns (merged dict, report dict). Raises ValueError on a refusal."""
+RETIRED = ROOT / "docs/design/copy/retire_0_7.json"
+
+
+def retired_keys(path=None):
+    """Keys retired by retire mode (I-24). Add mode never brings them back."""
+    path = pathlib.Path(path or RETIRED)
+    return set(json.loads(path.read_text(encoding="utf-8"))) if path.exists() else set()
+
+
+def merge(en, patch, hold, retired=None):
+    """Returns (merged dict, report dict). Raises ValueError on a refusal. Retired keys in the patch are skipped (never re-added).
+    NOTE: re-running an OLD patch (en_0_7.json) would also undo later update-mode changes; release held keys with a patch that
+    holds only them (en_0_7_release_about.json, I-24)."""
+    patch = {k: v for k, v in patch.items() if k not in (retired if retired is not None else retired_keys())}
     errs = []
     for k, v in patch.items():
         if not isinstance(v, str):
@@ -149,6 +167,37 @@ def update(en, upd, owned, hold=(), allow_placeholder_change=False):
     return out, changes
 
 
+def users_of(key, roots):
+    """Files under `roots` (directories) that name `key` in quotes: "key" or 'key'. i18n files are never searched."""
+    hits = []
+    for r in roots:
+        for f in pathlib.Path(r).rglob("*"):
+            if f.suffix not in (".gd", ".tscn", ".json") or "i18n" in f.parts or not f.is_file():
+                continue
+            text = f.read_text(encoding="utf-8", errors="replace")
+            if f'"{key}"' in text or f"'{key}'" in text:
+                hits.append(str(f))
+    return hits
+
+
+def retire(en, keys, hold=(), roots=()):
+    """Retire mode. Returns the table without `keys`. Raises ValueError listing EVERY refusal."""
+    errs = []
+    if not isinstance(keys, list) or not keys:
+        raise ValueError("retire file must be a non-empty JSON list of keys")
+    for k in keys:
+        if k not in en:
+            errs.append(f"{k}: not in en.json")
+        if k in hold:
+            errs.append(f"{k}: is on the hold list")
+        users = users_of(k, roots)
+        if users:
+            errs.append(f"{k}: still used by {', '.join(sorted(users)[:3])}")
+    if errs:
+        raise ValueError("\n".join(errs))
+    return {k: v for k, v in en.items() if k not in keys}
+
+
 def canonical(table):
     return json.dumps(table, indent=2, ensure_ascii=False) + "\n"
 
@@ -205,6 +254,7 @@ def main(argv=None):
     ap.add_argument("--allow-placeholder-change", action="store_true", help="update mode, programmer only")
     ap.add_argument("--expect-changed", type=int, help="update mode: number of keys that change")
     ap.add_argument("--seed-owned", action="store_true", help="own every non-held key of --patch that is already in en.json (once)")
+    ap.add_argument("--retire", metavar="FILE", help="retire mode: delete the keys listed (a JSON list) that nothing uses")
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--expect-total", type=int, help="keys taken from the patch (patch size minus held)")
     ap.add_argument("--expect-replaced", type=int)
@@ -215,6 +265,8 @@ def main(argv=None):
     owned_path = pathlib.Path(a.owned)
     if a.update:
         return main_update(a, en_path, hold_path, owned_path)
+    if a.retire:
+        return main_retire(a, en_path, hold_path, owned_path)
     if a.seed_owned:
         return main_seed(a, en_path, patch_path, hold_path, owned_path)
     try:
@@ -248,6 +300,27 @@ def main(argv=None):
         "# Keys Narrative may change through 'merge_copy.py --update'. One key per line. Producer or Lead Programmer edits only.\n"
     print(f"allow-list: {len(to_own)} keys to add to {owned_path.name} (now {len(owned_now)})")
     return finish(en_path, merged, [(owned_path, owned_text(old_text, to_own))], a.write)
+
+
+def main_retire(a, en_path, hold_path, owned_path):
+    try:
+        en = load_unique(en_path)
+        keys = json.loads(pathlib.Path(a.retire).read_text(encoding="utf-8"))
+        hold = load_unique(hold_path) if hold_path.exists() else {}
+        out = retire(en, keys, hold, [ROOT / "game/src", ROOT / "game/tests", ROOT / "game/data"])
+    except ValueError as e:
+        print("REFUSED (nothing written):\n" + str(e))
+        return 1
+    for k in keys:
+        print(f"RETIRED {k}: {en[k][:90]!r}")
+    print(f"en.json: {len(en)} -> {len(out)} keys")
+    extra = []
+    if owned_path.exists():
+        lines = owned_path.read_text(encoding="utf-8").splitlines(keepends=True)
+        kept = [ln for ln in lines if ln.split("#", 1)[0].strip() not in keys]
+        if len(kept) != len(lines):
+            extra.append((owned_path, "".join(kept)))
+    return finish(en_path, out, extra, a.write)
 
 
 def main_update(a, en_path, hold_path, owned_path):

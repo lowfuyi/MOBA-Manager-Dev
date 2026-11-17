@@ -216,9 +216,11 @@ def test_real_allow_list_shape():
     patch = M.load_unique(ROOT / "docs/design/copy/en_0_7.json")
     hold = M.load_unique(ROOT / "docs/design/copy/hold_0_7.json")
     older = ["role.short.jg", "role.short.sup", "chem.pentagon_hint"] + [
-        k for k in C.KNOWN_OPEN if k not in ("chem.pentagon_hint", "tip.hub", "draft.meta_hint")]
+        k for k in C.KNOWN_OPEN if k not in ("chem.pentagon_hint", "draft.meta_hint")]
     assert len(older) == 15 and set(older) <= set(owned)
-    assert {k for k in patch if k not in hold} <= set(owned)     # the keys written by the I-00 merge
+    retired = set(json.loads((ROOT / "docs/design/copy/retire_0_7.json").read_text()))    # retired in I-24 (merge_copy --retire)
+    assert {k for k in patch if k not in hold and k not in retired} <= set(owned)     # the keys written by the I-00 merge
+    assert not retired & set(en) and not retired & set(owned)
     assert not (set(hold) - {"chem.pentagon_hint"}) & set(owned)  # held patch keys are not owned yet
     for k in ("player.tab.overview", "player.tab.stats", "player.tab.career"):
         assert k in owned
@@ -262,3 +264,55 @@ def test_released_draft_meta_hint_is_clean():
     e, w = C.check(en, {})
     assert not any("draft.meta_hint" in x for x in e + w)
     assert "arrow" in en["draft.meta_hint"]
+
+
+# ---- retire mode (I-24) ----------------------------------------------------------------------------------------------------------
+
+def _tree(tmp_path, code):
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "a.gd").write_text(code)
+    return [src]
+
+
+def test_retire_removes_unused_keys(tmp_path):
+    en = {"a.one": "One", "a.two": "Two", "b.three": "Three"}
+    out = M.retire(en, ["a.two"], {}, _tree(tmp_path, 'Strings.t("a.one")\n'))
+    assert out == {"a.one": "One", "b.three": "Three"}
+    assert list(out) == ["a.one", "b.three"]
+
+
+def test_retire_refuses_a_key_the_code_uses_and_lists_every_refusal(tmp_path):
+    en = {"a.one": "One", "a.two": "Two"}
+    with pytest.raises(ValueError) as e:
+        M.retire(en, ["a.one", "z.missing"], {"a.two": {}}, _tree(tmp_path, "x = Strings.t('a.one')\n"))
+    msg = str(e.value)
+    assert "a.one: still used by" in msg and "z.missing: not in en.json" in msg
+
+
+def test_retire_refuses_a_held_key(tmp_path):
+    with pytest.raises(ValueError):
+        M.retire({"a.one": "One"}, ["a.one"], {"a.one": {"release_in": "I-25"}}, _tree(tmp_path, ""))
+
+
+def test_retire_never_searches_i18n(tmp_path):
+    roots = _tree(tmp_path, "")
+    (roots[0] / "i18n").mkdir()
+    (roots[0] / "i18n" / "en.json").write_text('{"a.one": "One"}')
+    assert M.retire({"a.one": "One", "a.two": "Two"}, ["a.one"], {}, roots) == {"a.two": "Two"}
+
+
+def test_retire_cli_writes_and_drops_owned_lines(tmp_path):
+    d = setup(tmp_path)
+    keys = d / "retire.json"
+    keys.write_text(json.dumps(["a.two"]))
+    rc = M.main(["--en", str(d / "en.json"), "--hold", str(d / "hold.json"), "--owned", str(d / "owned.txt"), "--retire", str(keys), "--write"])
+    assert rc == 0
+    en = json.loads((d / "en.json").read_text())
+    assert "a.two" not in en and "a.one" in en
+    assert "a.two" not in M.read_owned(d / "owned.txt")
+
+
+def test_add_mode_never_brings_back_a_retired_key():
+    merged, rep = M.merge({"a.one": "One"}, {"a.one": "One", "a.new": "New", "tip.old": "Old"}, {}, {"tip.old"})
+    assert "tip.old" not in merged and rep["new"] == ["a.new"]

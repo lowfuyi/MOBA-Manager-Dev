@@ -527,7 +527,6 @@ match.phase.late
 feed.t.jungle
 club.pick.hint
 draft.recommended
-tip.prematch
 about.limits.b
 about.licences.h
 about.licences.font
@@ -604,3 +603,6 @@ squad.card.release
 pre.edge.up
 pre.edge.down
 lesson.skip
+about.included.b
+about.test.b
+about.licences.read

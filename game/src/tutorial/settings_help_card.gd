@@ -71,5 +71,4 @@ static func replay_now() -> void:
 static func hints_reset() -> void:
 	var dev: DeviceState = App.tutorial.device if App.tutorial != null else DeviceState.new()
 	dev.hints_reset()
-	App.tips_reset()    # the old tips still on screen come back too (until I-24 retires them)
 	App.toast(Strings.t("settings.help_reset_done"), UI.GOOD)

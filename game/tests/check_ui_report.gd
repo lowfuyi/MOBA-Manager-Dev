@@ -288,7 +288,7 @@ func _truths(r: ScreenReport, label: String) -> void:
 	if String(top["id"]) == "luck":
 		ok(UI.plain(r.stat_sentence()).contains(UI.plain(Strings.t("factor.luck")).to_lower().split(" ")[0]) or r.stat_sentence().begins_with("Luck"), "stat_%s: luck is said plainly" % label)
 	var text := _labels(r)
-	ok(not text.contains(UI.plain(Strings.t("tip.report.h"))) and not text.contains(UI.plain(Strings.t("tip.got_it"))), "no_tips_%s: no old Tips card on the Report" % label)
+	ok(not text.contains(UI.plain(Strings.t("help.got_it"))), "no_tips_%s: no old tip card (with Got it) on the Report" % label)
 	ok(_coral(r) == 1 and _coral(r.continue_button.get_parent()) >= 1, "coral_%s: Continue is the one coral action (%d coral buttons)" % [label, _coral(r)])
 
 

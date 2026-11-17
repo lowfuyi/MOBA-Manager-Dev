@@ -443,9 +443,7 @@ func _hints() -> void:
 	dv.set_lesson_status("l1", "snoozed:2")
 	dv.set_lesson_status("l2", "dismissed")
 	dv.set_lesson_status("l3", "done")
-	App.tip_mark("hub")
 	var s: ScreenSettings = await _settings()
-	ok(_find_button(s, Strings.t("settings.tips_again")) == null, "hints: the old Show the welcome tips again button is gone")
 	var hc := UI.find_tag("settings.help_card") as SettingsHelpCard
 	ok(hc != null and UI.plain(hc.hints_button.text) == UI.plain(Strings.t("settings.help_reset")), "hints: Show help hints again is on the card")
 	ok(_find_button(hc, Strings.t("settings.lessons")) != null and _find_button(hc, Strings.t("settings.glossary")) != null, "hints: Lessons (I-23) and Glossary (I-22) are on the card")
@@ -454,7 +452,6 @@ func _hints() -> void:
 	dv = _dev()
 	ok(dv.help_ids().is_empty() and not dv.help_seen("home"), "hints: the ? dots are cleared")
 	ok(dv.lesson_status("l1") == "offered" and dv.lesson_status("l2") == "offered" and dv.lesson_status("l3") == "done", "hints: snoozed and dismissed lessons are offered again, done keeps its tick")
-	ok(not App.tip_seen("hub"), "hints: the old tips come back too (until I-24)")
 	ok(_find_button(App.main.toast_layer, Strings.t("settings.help_reset_done")) != null or _toast_text().contains(UI.plain(Strings.t("settings.help_reset_done"))), "hints: a toast confirms")
 	# the card in large text: every button at least 96 px, nothing wider than the screen
 	App.apply_large_text(true)

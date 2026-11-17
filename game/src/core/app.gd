@@ -63,21 +63,6 @@ func set_colorblind(v: bool) -> void:
 	UI.set_colorblind(v)
 
 
-## One-time hints for a new manager: remembered on this device, not in the save.
-func tip_seen(key: String) -> bool:
-	var cf := ConfigFile.new()
-	return cf.load(SETTINGS_PATH) == OK and bool(cf.get_value("tips", key, false))
-
-
-func tip_mark(key: String) -> void:
-	_write_setting("tips", key, true)
-
-
-func tips_reset() -> void:
-	var cf := ConfigFile.new()
-	if cf.load(SETTINGS_PATH) == OK and cf.has_section("tips"):
-		cf.erase_section("tips")
-		cf.save(SETTINGS_PATH)
 
 
 ## What a tester pastes into a message: a short template plus the debug lines.

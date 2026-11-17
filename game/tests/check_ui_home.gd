@@ -340,7 +340,7 @@ func _paths() -> void:
 	var txt := ""
 	for n in h.find_children("*", "Label", true, false):
 		txt += UI.plain((n as Label).text) + "\n"
-	ok(not txt.contains(UI.plain(Strings.t("tip.hub"))), "paths_home: no old welcome tip on Home")
+	ok(not ResourceLoader.exists("res://src/ui/tips.gd"), "paths_home: the old welcome tip is retired (I-24)")
 	ok(h.attention == null, "paths_home: round 1: no contracts card yet (D6: from round 9), nobody tired")
 	h.play_button.pressed.emit()
 	await frames(4)

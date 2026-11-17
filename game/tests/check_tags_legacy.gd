@@ -208,14 +208,8 @@ func _tags_prematch() -> void:
 	ok(_labels_text(m).contains(UI.plain(Strings.t("pre.matchups"))), "tags_prematch: it holds the matchups heading")
 	var sd := UI.find_tag("prematch.start_draft")
 	ok(sd is Button and _visible_in_viewport(sd) and UI.plain((sd as Button).text) == UI.plain(Strings.t("pre.start_draft")), "tags_prematch: prematch.start_draft is the Start draft button, on screen")
-	var seen_before := App.tip_seen("prematch")
-	App.tips_reset()    # the old tip would show now if Pre-match still asked for it
 	await _go(ScreenPreMatch.new(g))
-	var txt := _labels_text(_cur())
-	ok(not txt.contains(UI.plain(Strings.t("tip.prematch.h"))) and not txt.contains(UI.plain(Strings.t("tip.prematch"))), "tags_prematch: no old Pre-match tip card, even with the tips reset")
-	ok(_find_text_button(_cur(), Strings.t("tip.got_it")) == null, "tags_prematch: no tip Got it button")
-	if seen_before:
-		App.tip_mark("prematch")
+	ok(_find_text_button(_cur(), Strings.t("help.got_it")) == null, "tags_prematch: no tip card with Got it (the old tips are retired, I-24)")
 	_events.clear()
 	(UI.find_tag("prematch.start_draft") as Button).pressed.emit()
 	await frames(4)
