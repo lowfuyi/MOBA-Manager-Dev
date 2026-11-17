@@ -246,11 +246,11 @@ func _own() -> void:
 	for r in _rows(s):
 		if (r as RankRow).is_own():
 			own_ctl = r
-	var visible := s.page_scroll.get_global_rect().intersects(own_ctl.get_global_rect().grow(-own_ctl.get_global_rect().size.y * 0.25))
+	var visible := s.page_scroll.get_global_rect().intersects(_core(own_ctl))
 	ok(s.pinned.visible == not visible, "own: the pinned row shows exactly when your row is out of view (visible %s, pinned %s)" % [visible, s.pinned.visible])
 	s.page_scroll.scroll_vertical = 100000
 	await frames(5)
-	visible = s.page_scroll.get_global_rect().intersects(own_ctl.get_global_rect().grow(-own_ctl.get_global_rect().size.y * 0.25))
+	visible = s.page_scroll.get_global_rect().intersects(_core(own_ctl))
 	ok(s.pinned.visible == not visible, "own: scrolled to the end, the pinned row follows (visible %s, pinned %s)" % [visible, s.pinned.visible])
 	if s.pinned.visible:
 		ok(UI.plain(String(s.pinned.data["note"])) == UI.plain(s.pin_text()), "own: the pinned row says the line sentence")
@@ -333,3 +333,8 @@ func _tags() -> void:
 	s.metric.press(s.metric.index_of("points"))
 	await frames(6)
 	ok(App.tutorial.m.step_id() != "form_switch" and App.tutorial.fallbacks == 0, "tags_stand: switching to Points completes step 26 (now %s), no fallback" % App.tutorial.m.step_id())
+
+
+func _core(c: Control) -> Rect2:
+	var gr := c.get_global_rect().abs()
+	return Rect2(gr.position.x, gr.position.y + gr.size.y * 0.25, gr.size.x, gr.size.y * 0.5)

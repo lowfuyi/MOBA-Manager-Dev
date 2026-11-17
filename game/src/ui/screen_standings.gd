@@ -353,9 +353,10 @@ func _update_pin() -> void:
 		var mine: Dictionary = _own_row
 		if own == null:
 			own = podium
-		var vis := page_scroll.get_global_rect()
-		var gr := own.get_global_rect()
-		show = gr.size.y > 0.0 and not vis.intersects(gr.grow(-gr.size.y * 0.25))
+		var vis := page_scroll.get_global_rect().abs()
+		var gr := own.get_global_rect().abs()
+		var core := Rect2(gr.position.x, gr.position.y + gr.size.y * 0.25, gr.size.x, gr.size.y * 0.5)    # the middle half of the row
+		show = gr.size.y > 0.0 and vis.size.y > 0.0 and not vis.intersects(core)
 		if show:
 			var d := mine.duplicate()
 			d["note"] = pin_text()

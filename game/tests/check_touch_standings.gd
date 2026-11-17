@@ -137,5 +137,10 @@ func _rows(v: String) -> void:
 	for r in s.rows.get_children():
 		if r is RankRow and (r as RankRow).is_own():
 			own = r
-	var vis := s.page_scroll.get_global_rect().intersects(own.get_global_rect().grow(-own.get_global_rect().size.y * 0.25))
+	var vis := s.page_scroll.get_global_rect().intersects(_core(own))
 	ok(s.pinned.visible == not vis, "touch_stand_%s: after the swipe the pinned row matches whether your row is in view (%s / %s)" % [v, vis, s.pinned.visible])
+
+
+func _core(c: Control) -> Rect2:
+	var gr := c.get_global_rect().abs()
+	return Rect2(gr.position.x, gr.position.y + gr.size.y * 0.25, gr.size.x, gr.size.y * 0.5)
