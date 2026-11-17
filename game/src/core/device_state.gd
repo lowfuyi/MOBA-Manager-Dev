@@ -123,6 +123,19 @@ func lesson_ids() -> Array:
 	return Array(cf.get_section_keys("lessons")) if cf.has_section("lessons") else []
 
 
+## Lesson bookkeeping beside the statuses (I-23): "new_day" / "new_day_lesson" (the one new offer of a match day) and
+## "until.<id>" (the match day a snooze ends). Section [lessons_meta]; "" when unset.
+func lesson_meta(key: String) -> Variant:
+	return _load().get_value("lessons_meta", key, "")
+
+
+func set_lesson_meta(key: String, v: Variant) -> bool:
+	if not _valid_key(key):
+		return false
+	_write("lessons_meta", key, v)
+	return true
+
+
 ## Show help hints again, lesson half: snoozed and dismissed go back to offered; done keeps its tick. Returns how many changed.
 func lessons_reset_offers() -> int:
 	var cf := _load()

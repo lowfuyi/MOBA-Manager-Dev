@@ -248,7 +248,7 @@ func _add_button(id: String, count: int) -> void:
 	var kind := "primary"
 	match id:
 		"skip":
-			text = Strings.t("tut.skip")
+			text = Strings.t(String(_c.get("skip_key", "tut.skip")))    # a lesson says "Skip lesson" (I-23)
 			kind = "flat"
 		"next":
 			text = Strings.t("tut.next")

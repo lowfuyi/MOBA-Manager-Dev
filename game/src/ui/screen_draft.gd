@@ -712,6 +712,12 @@ func _show_done() -> void:
 	filter.visible = false
 	grid_scroll.visible = false
 	done_box.visible = true
+	if not TutorialGame.is_tutorial(game) and not done_box.has_meta("lesson_checked"):
+		done_box.set_meta("lesson_checked", true)
+		var offer := LessonOffer.make("draftdone", "draftdone")    # lesson L5 (I-23) on a real game's Draft complete
+		if offer != null:
+			done_box.add_child(offer)
+			done_box.move_child(offer, 1)
 	var card := done_box.get_node("DoneCard") as DepthCard
 	if card.content.get_child_count() == 0:
 		var mine_ev := Comp.evaluate(draft.picks[my_side].values())

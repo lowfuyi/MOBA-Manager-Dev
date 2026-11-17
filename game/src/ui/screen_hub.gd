@@ -372,6 +372,10 @@ func _offer() -> void:
 		body.add_child(card)
 	elif kind == "welcome_modal":
 		App.tutorial.on_home.call_deferred()
+	elif TutorialRunner.home_offers:
+		var lo := LessonOffer.make("home")    # a lesson offer (I-23) only when the guide has nothing to offer here
+		if lo != null:
+			body.add_child(lo)
 
 
 func _quick(g: Dictionary) -> void:

@@ -33,9 +33,11 @@ func _ready() -> void:
 	var head := UI.card(body, UI.PANEL2)
 	head.add_child(UI.label(Strings.f("chem.summary", {"chem": "%.0f" % gs.chem(), "bonus": UI.pct(gs.chem_bonus())}), UI.S_BIG, UI.TEXT))
 	head.add_child(UI.label(Strings.t("chem.hint"), UI.S_SMALL, UI.DIM))
+	UI.tag(head.get_parent() as Control, "chem.summary", false)    # lesson L4 (I-23)
 
 	var pc := UI.card(body)
 	pc.add_child(UI.label(Strings.t("chem.pentagon_h"), UI.S_BODY, UI.ACCENT))
+	UI.tag(pc.get_parent() as Control, "chem.map", false)    # lesson L4 (I-23): the bond picture
 	var pent := BondPentagon.new()
 	for s in GameState.SLOTS:
 		pent.ids.append(lu[s]["id"])
@@ -93,6 +95,7 @@ func _ready() -> void:
 	var tc := UI.card(body, UI.PANEL2)
 	tc.add_child(UI.label(Strings.t("chem.scrim_hint"), UI.S_SMALL, UI.DIM))
 	tc.add_child(UI.button(Strings.t("chem.training"), func(): App.go(ScreenTraining.new()), "normal", 76))
+	UI.tag(tc.get_parent() as Control, "chem.training", false)    # lesson L4 (I-23)
 
 
 func _cell(text: String, bg: Color, fg: Color) -> PanelContainer:

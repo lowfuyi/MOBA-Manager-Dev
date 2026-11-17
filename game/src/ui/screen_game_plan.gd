@@ -345,6 +345,7 @@ func _build() -> void:
 	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	page.add_theme_constant_override("separation", 20)
 	page_scroll.add_child(page)
+	UI.tag(page_scroll, "gp.sliders", false)    # lesson L5 (I-23): the controls of the page
 	note_label = UI.label("", UI.S_SMALL, UI.WARN)
 	note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	page.add_child(note_label)
@@ -357,6 +358,7 @@ func _build() -> void:
 	off_card.content.add_child(off_button)
 	page.add_child(off_card)
 	stand = _Stand.new()
+	UI.tag(stand, "gp.contests", false)    # lesson L5 (I-23)
 	page.add_child(stand)
 	for id in GamePlan.SLIDERS:
 		var t := DetentTrack.new(id, 0, _on_track, {}, "gp.c." + id)

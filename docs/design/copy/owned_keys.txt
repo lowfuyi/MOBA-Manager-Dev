@@ -603,3 +603,4 @@ squad.card.renew
 squad.card.release
 pre.edge.up
 pre.edge.down
+lesson.skip

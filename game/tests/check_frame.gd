@@ -15,7 +15,7 @@ const HELP_IDS := {
 	"ScreenStandings": "standings", "ScreenFinance": "finance", "ScreenFreeAgents": "freeagents",
 	"ScreenNegotiation": "negotiation", "ScreenSeasonEnd": "season", "ScreenSettings": "settings",
 	"ScreenClubSelect": "clubselect", "ScreenTitle": "title", "ScreenAbout": "about", "ScreenGameOver": "gameover",
-	"ScreenGlossary": "glossary",
+	"ScreenGlossary": "glossary", "ScreenLessons": "lessons",
 }
 
 var checks := 0

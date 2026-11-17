@@ -23,11 +23,13 @@ var _tabbar: PanelContainer
 var _tab_buttons: Dictionary = {}
 var _toasts: VBoxContainer
 var _current: Control
+var _lessons: LessonRunner
 var _runner: TutorialRunner
 
 
 func _ready() -> void:
 	theme = UI.make_theme()
+	SettingsHelpCard.lessons_open = Callable(ScreenLessons, "open_screen")    # Settings > Help and learning > Lessons (I-23)
 	SettingsHelpCard.glossary_open = Callable(ScreenGlossary, "open_screen")    # Settings > Help and learning > Glossary (I-22); a static method, not a lambda bound to Main
 	bus = EventBus.new()
 	bus.name = "EventBus"
@@ -73,6 +75,10 @@ func _ready() -> void:
 	_runner.name = "TutorialRunner"
 	add_child(_runner)
 	App.tutorial = _runner
+	_lessons = LessonRunner.new()    # the optional lessons (I-23), on the same overlay slot, never while the guide runs
+	_lessons.name = "LessonRunner"
+	add_child(_lessons)
+	App.lessons = _lessons
 	App.mark_started()
 
 
@@ -81,6 +87,8 @@ func _exit_tree() -> void:
 		App.bus = null
 	if App.tutorial == _runner:
 		App.tutorial = null
+	if App.lessons == _lessons:
+		App.lessons = null
 
 
 func _make_layer(layer_name: String, layer_index: int) -> CanvasLayer:

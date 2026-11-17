@@ -37,6 +37,7 @@ func _rebuild() -> void:
 	var gs := App.gs
 	var w := App.world
 	var head := UI.card(body, UI.PANEL2)
+	UI.tag(head.get_parent() as Control, "training.preview", false)    # lesson L2 (I-23)
 	head.add_child(UI.label(Strings.t("train.intro"), UI.S_SMALL, UI.DIM))
 	_preview(head)
 	head.add_child(UI.button(Strings.t("train.coach_all"), _coach_all, "normal", 76))
@@ -60,7 +61,10 @@ func _rebuild() -> void:
 		return sa < sb or (sa == sb and String(a["id"]) < String(b["id"])))
 	for p in ps:
 		var line := Strings.f("train.row", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "focus": _focus_text(p)}) + UI.fatigue_tag(w.fatigue_of(p["id"]))
-		sq.add_child(UI.button(line, _toggle.bind(p["id"]), "primary" if _open == p["id"] else "normal", 76))
+		var rb := UI.button(line, _toggle.bind(p["id"]), "primary" if _open == p["id"] else "normal", 76)
+		sq.add_child(rb)
+		if p == ps[0]:
+			UI.tag(rb, "training.row.0", false)    # lesson L2 (I-23)
 		if _open == p["id"]:
 			_picker(sq, p)
 
@@ -68,6 +72,7 @@ func _rebuild() -> void:
 func _picker(parent: VBoxContainer, p: Dictionary) -> void:
 	var w := App.world
 	var box := UI.card(parent, UI.PANEL2, 12)
+	UI.tag(box.get_parent() as Control, "training.picker", false)    # lesson L2 (I-23)
 	box.add_child(UI.label(Strings.f("train.pick_h", {"name": p["name"]}), UI.S_SMALL, UI.DIM))
 	var fat := w.fatigue_of(p["id"])
 	var cur := App.gs.focus_of(p)
@@ -98,6 +103,8 @@ func _toggle(pid: String) -> void:
 	_open = "" if _open == pid else pid
 	_hero_list = false
 	_rebuild()
+	if _open != "" and is_instance_valid(App.bus):
+		App.bus.emit("open:training_picker", {"pid": pid})    # lesson L2 step 3 (I-23): the picker opened
 
 
 func _toggle_heroes() -> void:

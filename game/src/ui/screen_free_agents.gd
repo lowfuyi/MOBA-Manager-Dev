@@ -51,6 +51,7 @@ func _rebuild() -> void:
 	bar.add_child(UI.button(Strings.f("fa.filter", {"role": role_txt}), _next_role, "normal", 76))
 	bar.add_child(UI.button(Strings.f("fa.sort", {"by": Strings.t("fa.sort." + SORTS[_sort])}), _next_sort, "normal", 76))
 	body.add_child(bar)
+	UI.tag(bar, "fa.filters", false)    # lesson L7 (I-23)
 	var ps := w.free_agent_players()
 	var list: Array = []
 	for p in ps:
@@ -78,7 +79,10 @@ func _rebuild() -> void:
 			tag = "  -  " + Strings.t("fa.locked")
 		var line := Strings.f("fa.row1", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "age": w.age_of(p)}) + "\n" \
 				+ Strings.f("fa.row2", {"rating": "%.0f" % Economy.best_slot_rating(w, p), "pot": "%.0f" % Economy.potential_rating(w, p), "wage": gs.asking_wage(p["id"])}) + tag
-		body.add_child(UI.button(line, _open.bind(p["id"]), "normal", 104))
+		var row := UI.button(line, _open.bind(p["id"]), "normal", 104)
+		body.add_child(row)
+		if p == list[0]:
+			UI.tag(row, "fa.row.0", false)    # lesson L7 (I-23): the first player (info only: no tap through)
 
 
 func _next_role() -> void:

@@ -1,0 +1,416 @@
+{
+ "version": "v1",
+ "note": "Lessons (TUTORIAL 4, build plan I-23): eight optional lessons, 33 steps. Text: les.<step id> (l6.sponsor has a locked variant), titles lesson.title.<id>. start: where Start goes first (home, plan, club; draftdone and report only start on that screen). place: where the offer card shows. Unlock rules (round numbers are first guesses for the Lead Game Designer, kept here so they change without code): see 'unlock'. Lessons never change the club: a tap step only navigates or opens something.",
+ "unlock": {
+  "l1": {
+   "games": 1
+  },
+  "l2": {
+   "round": 2,
+   "fatigue": 25
+  },
+  "l3": {
+   "round": 9,
+   "contract_ending": true
+  },
+  "l4": {
+   "round": 3
+  },
+  "l5": {
+   "real_draft_done": true
+  },
+  "l6": {
+   "round": 4
+  },
+  "l7": {
+   "round": 6
+  },
+  "l8": {
+   "real_report": true
+  }
+ },
+ "snooze_days": 3,
+ "lessons": [
+  {
+   "id": "l1",
+   "start": "home",
+   "place": "home",
+   "steps": [
+    {
+     "id": "l1.open",
+     "target": [
+      "home.tile.standing"
+     ],
+     "kind": "tap",
+     "done_on": [
+      "tap:home.tile.standing"
+     ]
+    },
+    {
+     "id": "l1.table",
+     "target": [
+      "stand.podium"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l1.metric",
+     "target": [
+      "stand.metric"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l1.tabs",
+     "target": [
+      "stand.views"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "l2",
+   "start": "plan",
+   "place": "home",
+   "steps": [
+    {
+     "id": "l2.open",
+     "target": [
+      "plan.tile.training"
+     ],
+     "kind": "tap",
+     "done_on": [
+      "tap:plan.tile.training"
+     ]
+    },
+    {
+     "id": "l2.preview",
+     "target": [
+      "training.preview"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l2.player",
+     "target": [
+      "training.row.0"
+     ],
+     "kind": "tap",
+     "done_on": [
+      "open:training_picker"
+     ]
+    },
+    {
+     "id": "l2.rest",
+     "target": [
+      "training.picker"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "l3",
+   "start": "home",
+   "place": "home",
+   "steps": [
+    {
+     "id": "l3.open",
+     "target": [
+      "tab.squad"
+     ],
+     "kind": "tap",
+     "done_on": [
+      "tap:tab.squad"
+     ]
+    },
+    {
+     "id": "l3.row",
+     "target": [
+      "squad.bench.expiring",
+      "squad.bench.0"
+     ],
+     "kind": "tap",
+     "done_on": [
+      "open:player_card"
+     ]
+    },
+    {
+     "id": "l3.contract",
+     "target": [
+      "roster.card.contract"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l3.renew",
+     "target": [
+      "roster.card.renew",
+      "roster.card.release"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "l4",
+   "start": "plan",
+   "place": "home",
+   "steps": [
+    {
+     "id": "l4.open",
+     "target": [
+      "plan.tile.chem"
+     ],
+     "kind": "tap",
+     "done_on": [
+      "tap:plan.tile.chem"
+     ]
+    },
+    {
+     "id": "l4.summary",
+     "target": [
+      "chem.summary"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l4.map",
+     "target": [
+      "chem.map"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l4.scrim",
+     "target": [
+      "chem.training"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "l5",
+   "start": "draftdone",
+   "place": "draftdone",
+   "steps": [
+    {
+     "id": "l5.open",
+     "target": [
+      "draft.game_plan"
+     ],
+     "kind": "tap",
+     "done_on": [
+      "tap:draft.game_plan"
+     ]
+    },
+    {
+     "id": "l5.edge",
+     "target": [
+      "gp.edge"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l5.contests",
+     "target": [
+      "gp.contests"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ],
+     "prep": "gp_phase:early"
+    },
+    {
+     "id": "l5.phases",
+     "target": [
+      "gp.phases"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ],
+     "prep": "gp_phase:overall"
+    },
+    {
+     "id": "l5.plan",
+     "target": [
+      "gp.plan_chip"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l5.sliders",
+     "target": [
+      "gp.sliders"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "l6",
+   "start": "home",
+   "place": "club",
+   "steps": [
+    {
+     "id": "l6.club",
+     "target": [
+      "tab.club"
+     ],
+     "kind": "tap",
+     "done_on": [
+      "tap:tab.club"
+     ]
+    },
+    {
+     "id": "l6.finance",
+     "target": [
+      "club.tile.finance"
+     ],
+     "kind": "tap",
+     "done_on": [
+      "tap:club.tile.finance"
+     ]
+    },
+    {
+     "id": "l6.balance",
+     "target": [
+      "fin.balance"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l6.cap",
+     "target": [
+      "fin.balance"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l6.sponsor",
+     "target": [
+      "fin.sponsor"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ],
+     "key_locked": "les.l6.sponsor_locked"
+    }
+   ]
+  },
+  {
+   "id": "l7",
+   "start": "club",
+   "place": "club",
+   "steps": [
+    {
+     "id": "l7.open",
+     "target": [
+      "club.tile.fa"
+     ],
+     "kind": "tap",
+     "done_on": [
+      "tap:club.tile.fa"
+     ]
+    },
+    {
+     "id": "l7.filters",
+     "target": [
+      "fa.filters"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l7.row",
+     "target": [
+      "fa.row.0"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "l8",
+   "start": "report",
+   "place": "report",
+   "steps": [
+    {
+     "id": "l8.payoff",
+     "target": [
+      "report.payoff"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    },
+    {
+     "id": "l8.tip",
+     "target": [
+      "report.tip"
+     ],
+     "kind": "info",
+     "done_on": [
+      "tut:next"
+     ]
+    }
+   ]
+  }
+ ]
+}

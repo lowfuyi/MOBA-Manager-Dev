@@ -529,6 +529,10 @@ func _build() -> void:
 			Strings.f("report.summary", {"margin": Strings.t("report.margin." + word), "len": ScreenMatch._mmss(Report.game_minutes(res))}), series)
 	UI.tag(result, "report.result", false)
 	page.add_child(result)
+	if not is_practice() and not is_tutorial():
+		var offer := LessonOffer.make("report", "report")    # lesson L8 (I-23) on a real report
+		if offer != null:
+			page.add_child(offer)
 	# 2. the story
 	var sbox := VBoxContainer.new()
 	sbox.add_theme_constant_override("separation", 8)

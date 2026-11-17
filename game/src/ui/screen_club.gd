@@ -21,6 +21,9 @@ func go_back() -> void:
 func _ready() -> void:
 	setup(Strings.t("club.title"), Callable())
 	var gs := App.gs
+	var lo := LessonOffer.make("club")    # lessons L6 and L7 (I-23)
+	if lo != null:
+		body.add_child(lo)
 	grid = HomeKit.TileGrid.new()
 	grid.min_cell = 600.0
 	body.add_child(grid)

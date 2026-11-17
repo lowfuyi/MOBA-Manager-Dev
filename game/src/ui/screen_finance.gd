@@ -23,6 +23,7 @@ func _rebuild() -> void:
 	UI.clear(body)
 	var gs := App.gs
 	var o := UI.card(body, UI.PANEL2)
+	UI.tag(o.get_parent() as Control, "fin.balance", false)    # lesson L6 (I-23): balance and the wage cap
 	o.add_child(UI.label(Strings.t("fin.balance"), UI.S_SMALL, UI.DIM))
 	o.add_child(UI.label(PlayerView.money(gs.cash()), UI.S_TITLE, UI.GOOD if gs.cash() >= 0.0 else UI.BAD))
 	o.add_child(UI.label(Strings.f("fin.weekly", {"income": PlayerView.money(gs.weekly_income()), "wages": PlayerView.money(gs.wage_bill()), "net": ("%+d" % int(round(gs.weekly_net())))}), UI.S_BODY, UI.TEXT))
@@ -53,6 +54,7 @@ func _sponsor_line(offer: Dictionary) -> String:
 func _sponsor_card() -> void:
 	var gs := App.gs
 	var c := UI.card(body)
+	UI.tag(c.get_parent() as Control, "fin.sponsor", false)    # lesson L6 (I-23)
 	c.add_child(UI.label(Strings.t("fin.sponsor_h"), UI.S_BODY, UI.ACCENT))
 	if gs.sponsor_changeable():
 		c.add_child(UI.label(Strings.t("fin.sponsor_pick"), UI.S_SMALL, UI.DIM))

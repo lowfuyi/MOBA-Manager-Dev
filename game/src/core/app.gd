@@ -10,6 +10,7 @@ var gs: GameState
 var main: Control          # set by Main: shows one screen at a time
 var bus: EventBus          # set by Main (which creates it): UI events such as tap:<tag> and screen:<help id>; null before Main exists
 var tutorial: TutorialRunner   # set by Main after the first screen (I-12): the guided first game; null before Main exists
+var lessons: LessonRunner      # set by Main (I-23): the optional lessons; null before Main exists
 var last_result: Dictionary = {}    # most recent managed-club game (for the report)
 var last_game: Dictionary = {}
 var last_payoff: Dictionary = {}   # what the last game changed (Payoff.compare), for the payoff screen
