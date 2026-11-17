@@ -15,6 +15,7 @@ const HELP_IDS := {
 	"ScreenStandings": "standings", "ScreenFinance": "finance", "ScreenFreeAgents": "freeagents",
 	"ScreenNegotiation": "negotiation", "ScreenSeasonEnd": "season", "ScreenSettings": "settings",
 	"ScreenClubSelect": "clubselect", "ScreenTitle": "title", "ScreenAbout": "about", "ScreenGameOver": "gameover",
+	"ScreenGlossary": "glossary",
 }
 
 var checks := 0
@@ -323,16 +324,16 @@ func _test_screen_frame(main: Control, v: String) -> void:
 	var hdr: Control = cur()._header
 	ok(hdr != null and hdr.size.y >= 96.0 - 0.5, v + "the page header is at least 96 px high (%.0f)" % (hdr.size.y if hdr != null else -1.0))
 	var slot: Control = cur().help_slot
-	ok(slot != null and slot.get_parent() == hdr and slot.get_child_count() == 0 and not slot.visible, v + "a page with a header has an empty, hidden '?' slot at the right end of it")
+	ok(slot != null and slot.get_parent() == hdr and slot.get_child_count() == 1 and slot.get_child(0) is HelpSheet.HelpButton and slot.visible, v + "a page with a header and a help sheet has the '?' in its slot at the right end of it (I-22)")
 	ok(hdr.get_child(hdr.get_child_count() - 1) == slot, v + "the slot is the last item in the header")
 	App.go(ScreenHub.new())
 	await frames(3)
 	var hs: Control = cur().help_slot
-	ok(hs != null and hs.get_parent() == cur() and hs.get_child_count() == 0, v + "the Home page (no header) has a free, empty '?' slot")
+	ok(hs != null and hs.get_parent() == cur() and hs.get_child_count() == 1 and hs.get_child(0) is HelpSheet.HelpButton, v + "the Home page (no header) has the '?' in its free slot (I-22)")
 	var sr: Rect2 = cur().get_global_rect()
 	var hr: Rect2 = hs.get_global_rect()
 	ok(is_equal_approx(hr.end.x, sr.end.x) and is_equal_approx(hr.position.y, sr.position.y) and is_equal_approx(hr.size.x, 96.0) and is_equal_approx(hr.size.y, 96.0), v + "the free slot is the 96 x 96 top right corner of the page (%s in %s)" % [str(hr), str(sr)])
-	# filling the slot (I-22 will do this with the real button)
+	# filling the slot by hand (a page with no help id gets no "?" from setup(); I-22's real button goes in the same way)
 	var scr := Screen.new()
 	scr.setup("Slot", Callable(), true)
 	App.go(scr)

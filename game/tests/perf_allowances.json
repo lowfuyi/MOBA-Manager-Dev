@@ -30,7 +30,7 @@
    "status": "legacy",
    "measured": {
     "draws": 8,
-    "nodes": 10
+    "nodes": 11
    },
    "draws": 10,
    "nodes": 15
@@ -39,7 +39,7 @@
    "status": "legacy",
    "measured": {
     "draws": 12,
-    "nodes": 23
+    "nodes": 24
    },
    "draws": 15,
    "nodes": 30
@@ -47,11 +47,11 @@
   "03_clubselect": {
    "status": "legacy",
    "measured": {
-    "draws": 27,
-    "nodes": 58
+    "draws": 29,
+    "nodes": 60
    },
-   "draws": 30,
-   "nodes": 65
+   "draws": 35,
+   "nodes": 70
   },
   "04_hub": {
    "status": "redesigned",
@@ -64,11 +64,11 @@
   "04d_practice": {
    "status": "legacy",
    "measured": {
-    "draws": 40,
-    "nodes": 31
+    "draws": 42,
+    "nodes": 33
    },
-   "draws": 45,
-   "nodes": 35
+   "draws": 50,
+   "nodes": 40
   },
   "04c_tab_plan": {
    "status": "redesigned",
@@ -81,11 +81,11 @@
   "04c_tab_more": {
    "status": "legacy",
    "measured": {
-    "draws": 39,
-    "nodes": 44
+    "draws": 42,
+    "nodes": 52
    },
-   "draws": 45,
-   "nodes": 50
+   "draws": 50,
+   "nodes": 60
   },
   "05_roster": {
    "status": "redesigned",
@@ -106,38 +106,38 @@
   "07c_finance": {
    "status": "legacy",
    "measured": {
-    "draws": 31,
-    "nodes": 26
+    "draws": 33,
+    "nodes": 28
    },
-   "draws": 35,
-   "nodes": 30
+   "draws": 40,
+   "nodes": 35
   },
   "07d_free_agents": {
    "status": "legacy",
    "measured": {
-    "draws": 36,
-    "nodes": 55
+    "draws": 38,
+    "nodes": 57
    },
-   "draws": 40,
+   "draws": 45,
    "nodes": 65
   },
   "07e_negotiation_full": {
    "status": "legacy",
    "measured": {
-    "draws": 32,
-    "nodes": 94
+    "draws": 34,
+    "nodes": 96
    },
    "draws": 40,
-   "nodes": 105
+   "nodes": 110
   },
   "07f_negotiation_refused": {
    "status": "legacy",
    "measured": {
-    "draws": 32,
-    "nodes": 94
+    "draws": 34,
+    "nodes": 96
    },
    "draws": 40,
-   "nodes": 105
+   "nodes": 110
   },
   "08_prematch": {
    "status": "redesigned",
@@ -146,17 +146,17 @@
   "08b_training": {
    "status": "legacy",
    "measured": {
-    "draws": 42,
-    "nodes": 36
+    "draws": 44,
+    "nodes": 38
    },
    "draws": 50,
-   "nodes": 40
+   "nodes": 45
   },
   "08c_training_picker": {
    "status": "legacy",
    "measured": {
-    "draws": 42,
-    "nodes": 51
+    "draws": 44,
+    "nodes": 53
    },
    "draws": 50,
    "nodes": 60
@@ -164,8 +164,8 @@
   "08d_training_heroes": {
    "status": "legacy",
    "measured": {
-    "draws": 42,
-    "nodes": 82
+    "draws": 44,
+    "nodes": 84
    },
    "draws": 50,
    "nodes": 95
@@ -173,19 +173,19 @@
   "08e_chemistry": {
    "status": "legacy",
    "measured": {
-    "draws": 77,
-    "nodes": 114
+    "draws": 79,
+    "nodes": 116
    },
-   "draws": 85,
+   "draws": 90,
    "nodes": 130
   },
   "08f_chemistry_lower": {
    "status": "legacy",
    "measured": {
-    "draws": 149,
-    "nodes": 114
+    "draws": 151,
+    "nodes": 116
    },
-   "draws": 165,
+   "draws": 170,
    "nodes": 130
   },
   "09_draft_start": {
@@ -228,21 +228,21 @@
    "status": "legacy",
    "leaves_with": "arena 0.8",
    "measured": {
-    "draws": 12,
-    "nodes": 21
+    "draws": 14,
+    "nodes": 23
    },
-   "draws": 15,
-   "nodes": 25
+   "draws": 20,
+   "nodes": 30
   },
   "13_match_end": {
    "status": "legacy",
    "leaves_with": "arena 0.8",
    "measured": {
-    "draws": 10,
-    "nodes": 26
+    "draws": 12,
+    "nodes": 28
    },
    "draws": 15,
-   "nodes": 30
+   "nodes": 35
   },
   "14_report_top": {
    "status": "redesigned",
@@ -271,11 +271,11 @@
   "18_settings": {
    "status": "legacy",
    "measured": {
-    "draws": 39,
-    "nodes": 65
+    "draws": 42,
+    "nodes": 73
    },
-   "draws": 45,
-   "nodes": 75
+   "draws": 50,
+   "nodes": 85
   },
   "19_hub_after": {
    "status": "redesigned",
@@ -304,20 +304,20 @@
   "19e_practice": {
    "status": "legacy",
    "measured": {
-    "draws": 18,
-    "nodes": 11
+    "draws": 20,
+    "nodes": 13
    },
-   "draws": 20,
+   "draws": 25,
    "nodes": 15
   },
   "20_season_end": {
    "status": "legacy",
    "measured": {
-    "draws": 19,
-    "nodes": 50
+    "draws": 21,
+    "nodes": 52
    },
    "draws": 25,
-   "nodes": 55
+   "nodes": 60
   }
  }
 }

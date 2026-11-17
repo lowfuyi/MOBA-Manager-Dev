@@ -34,16 +34,28 @@ class RoleBar extends Control:
 		else:
 			options = p_options.duplicate(true)
 		selected_id = p_selected
-		var two := false
-		for o in options:
-			two = two or String(o.get("sub", "")) != ""
-		custom_minimum_size = Vector2(0, H + (24.0 if two else 0.0))
 		size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		mouse_filter = Control.MOUSE_FILTER_STOP
-		resized.connect(queue_redraw)
+		resized.connect(_relayout)
+		_relayout()
 		CompKit.mark_stateful(self)
 		CompKit.tag(self, tut_id)
 		CompKit.set_cue(self, "pill+ring")
+
+	## A label that does not fit its segment wraps to two lines (I-22: "Match and draft" at large text); the bar grows by a line.
+	func label_lines(i: int) -> Array:
+		var w := (size.x if size.x > 0.0 else UI.canvas_w() - 48.0) / float(maxi(1, options.size())) - 12.0
+		return PlanKit.wrap(UI.font("SemiBold"), UI.S_CAPTION, String(options[i]["label"]), w, 2)
+
+	func _relayout() -> void:
+		var extra := 0.0
+		for i in options.size():
+			if String(options[i].get("sub", "")) != "" or label_lines(i).size() > 1:
+				extra = 24.0
+		var h := H + extra
+		if absf(custom_minimum_size.y - h) > 0.5:
+			custom_minimum_size = Vector2(0, h)
+		queue_redraw()
 
 	func seg_rect(i: int) -> Rect2:
 		var w := size.x / float(maxi(1, options.size()))
@@ -116,7 +128,9 @@ class RoleBar extends Control:
 			var locked := bool(options[i].get("locked", false))
 			var tc := UI.INK_TEAL if on else (UI.TEXT_OFF if locked else UI.TEXT)
 			_ops.icon("lock" if locked else String(options[i]["icon"]), Rect2(r.get_center().x - 14.0, r.position.y + 12.0, 28.0, 28.0), tc)
-			_ops.text(UI.font("SemiBold"), UI.S_CAPTION, String(options[i]["label"]), r.position.x + 2.0, r.position.y + 62.0, r.size.x - 4.0, tc, 1)
+			var ll := label_lines(i)
+			for k in ll.size():
+				_ops.text(UI.font("SemiBold"), UI.S_CAPTION, String(ll[k]), r.position.x + 2.0, r.position.y + 62.0 + 26.0 * float(k), r.size.x - 4.0, tc, 1)
 			var sub := String(options[i].get("sub", ""))
 			if sub != "":
 				_ops.text(UI.font("SemiBold"), UI.S_CAPTION, sub, r.position.x + 2.0, r.position.y + 90.0, r.size.x - 4.0, tc, 1)

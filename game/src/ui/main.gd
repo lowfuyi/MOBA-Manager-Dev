@@ -28,6 +28,7 @@ var _runner: TutorialRunner
 
 func _ready() -> void:
 	theme = UI.make_theme()
+	SettingsHelpCard.glossary_open = Callable(ScreenGlossary, "open_screen")    # Settings > Help and learning > Glossary (I-22); a static method, not a lambda bound to Main
 	bus = EventBus.new()
 	bus.name = "EventBus"
 	add_child(bus)

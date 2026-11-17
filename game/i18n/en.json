@@ -888,7 +888,7 @@
   "help.squad.title": "Squad",
   "help.squad.see": "Your five starters on a small map, one per role, and the bench below.",
   "help.squad.do": "Tap a starter to change who plays that role. Tap a bench player to open their card.",
-  "help.squad.know": "A player out of position loses rating. Pick best lineup for me fixes it in one tap.",
+  "help.squad.know": "A player out of position loses rating. Auto lineup fixes it in one tap.",
   "help.squad.terms": "role,rating,fatigue,form,morale",
   "help.player.title": "Player card",
   "help.player.see": "Tiredness, form and morale bars, the contract, bonds and best heroes. Stats and Career are one tap away.",

@@ -190,3 +190,28 @@
 - I-21b accepted (Plan, Club and Match day restyled; done directly by the Producer). Plan and Club use Home's drawn StatTiles in one TileGrid (one column: `TileGrid.min_cell` added, the sub lines are long) with icons, values and arrows; the I-21a tags move with the tiles (now the tile buttons themselves; a new `club.tile.table`). Match day: a raised versus card (Home's VersusPanel: both badges, names, the team-rating bar), side and draft chips, the lane matchups as one drawn control with the role glyph, both players and ratings, and an ARROW AND A WORD (Stronger, Even, Weaker; off-role as a warning glyph and the word), so the I-21a colour-only debt is paid; Start draft is now the coral action (it was teal), Change lineup and Auto-play follow. Copy patch 7 (pre.edge.up, pre.edge.down).
 - I-21b numbers (Xvfb, llvmpipe; not a phone): Plan 24 draw calls / 17 nodes, Club 17 / 12, Match day 27 to 37 / 22 to 27; perf rows 04c_tab_plan, 04c_tab_club, 08_prematch `redesigned`. Tests: new `check_ui_tabs` 46 checks; migrated `check_tags_legacy` (a tile tag can be the drawn tile button). Screens viewed twice in normal and large text.
 - I-21b ruling: Start draft becomes the coral "go" action of Match day (the old screen had it teal "primary"); nothing else on the screen is coral.
+- I-22 accepted (help sheets, "?" and glossary; done directly by the Producer). `src/tutorial/help_sheet.gd`: `HelpSheet.HelpButton` (an 88 px circle in a 96 px hit area with the teal "never opened" dot; tag help.button) goes into every screen with a help entry from `Screen.setup()` (one place; Title, About, Game over and the Glossary have none), and `HelpSheet.open(id)` shows the sheet (BottomSheet id "help", size L): What you see, What to do, Good to know, the words on the screen as buttons that open the term in place with Back, Got it, Open the glossary. Opening marks the screen seen on the device (`DeviceState.help_mark`). `HelpSheet.paused()` stops the Draft timer (and the other side's turn) and the Match playback while the sheet is open. `src/tutorial/screen_glossary.gd`: 49 terms in four groups as one drawn list, a term sheet with "Where to see it"; from a help sheet the glossary opens as a sheet in place, so a Draft or Match in progress is never left. Data: `data/help_v1.json` (20 screens), `data/glossary_v1.json` (groups). Settings shows Glossary (`SettingsHelpCard.glossary_open` set in Main). Copy update 1: `help.squad.know` named the old "Pick best lineup for me" button; it now says Auto lineup.
+- I-22 numbers (Xvfb, llvmpipe; not a phone): the "?" adds about 2 draw calls and 2 nodes to a screen; help sheet over Squad 66 draw calls (hard 100), glossary 23, term sheet 35. Tests: new `check_ui_help` 32 checks (TUTORIAL 9 tests 11, 12, 14: 20 sheets, buttons on every reachable screen, sheet content and three ways to close, the dot and its persistence, Draft and Match pauses with an unchanged result, the glossary; a mutant without the Draft pause was caught); migrated `check_frame` (the slot now holds the "?"), `perf_gate_tests` (Chemistry allowance). Draft in large text: the title moved to its own row under the header (with the "?" it had 106 px and broke "Your ban" with a lone word).
+- I-22 rulings: (1) The help sheet is size L everywhere (at M the "Words on this screen" sat below the fold). (2) `DraftKit.RoleBar` wraps a label that does not fit to two lines and grows by one line (glossary groups at large text; any screen using it). (3) "Where to see it" sends screens that need a game in progress (Match day, Draft, Game Plan, Match, Report) to Home. (4) Not built: "Take the lesson" (I-23), haptics. (5) Help id "player" is the Squad player sheet, which has no "?" of its own (it is a sheet); its text is reachable from the Squad's words and the glossary.
+- **Perf re-baseline no. 2 of 2 (build plan section 6, at I-22):** every remaining legacy row reset to its measured value with the "?" in place, allowance = measured + 10 percent rounded up to 5. Old and new side by side below. Rows only went up by the "?" (about +2 draw calls, +2 nodes each); Chemistry scrolled stays the one legacy exception above the hard limit (165 -> 170). The plan asks for the Technical Director's review: done by the Producer only, so it is owed (Technical Director to confirm).
+| State | Old measured (draws/nodes) | Old allowance | New measured | New allowance |
+|---|---|---|---|---|
+| 01_title | 8 / 10 | 10 / 15 | 8 / 11 | 10 / 15 |
+| 02_about | 12 / 23 | 15 / 30 | 12 / 24 | 15 / 30 |
+| 03_clubselect | 27 / 58 | 30 / 65 | 29 / 60 | 35 / 70 |
+| 04d_practice | 40 / 31 | 45 / 35 | 42 / 33 | 50 / 40 |
+| 04c_tab_more | 39 / 44 | 45 / 50 | 42 / 52 | 50 / 60 |
+| 07c_finance | 31 / 26 | 35 / 30 | 33 / 28 | 40 / 35 |
+| 07d_free_agents | 36 / 55 | 40 / 65 | 38 / 57 | 45 / 65 |
+| 07e_negotiation_full | 32 / 94 | 40 / 105 | 34 / 96 | 40 / 110 |
+| 07f_negotiation_refused | 32 / 94 | 40 / 105 | 34 / 96 | 40 / 110 |
+| 08b_training | 42 / 36 | 50 / 40 | 44 / 38 | 50 / 45 |
+| 08c_training_picker | 42 / 51 | 50 / 60 | 44 / 53 | 50 / 60 |
+| 08d_training_heroes | 42 / 82 | 50 / 95 | 44 / 84 | 50 / 95 |
+| 08e_chemistry | 77 / 114 | 85 / 130 | 79 / 116 | 90 / 130 |
+| 08f_chemistry_lower | 149 / 114 | 165 / 130 | 151 / 116 | 170 / 130 |
+| 12_match_mid | 12 / 21 | 15 / 25 | 14 / 23 | 20 / 30 |
+| 13_match_end | 10 / 26 | 15 / 30 | 12 / 28 | 15 / 35 |
+| 18_settings | 39 / 65 | 45 / 75 | 42 / 73 | 50 / 85 |
+| 19e_practice | 18 / 11 | 20 / 15 | 20 / 13 | 25 / 15 |
+| 20_season_end | 19 / 50 | 25 / 55 | 21 / 52 | 25 / 60 |

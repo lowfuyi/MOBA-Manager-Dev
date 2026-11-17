@@ -85,6 +85,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _finished or _events.is_empty():
 		return
+	if HelpSheet.paused():
+		return    # a help sheet is open: the playback waits (the result was decided before it, so nothing changes; I-22)
 	_watch_t += delta
 	_elapsed += delta * _speed * (2.0 if _fast else 1.0) / 60.0
 	_clock.text = _mmss(minf(_elapsed, _total_min))

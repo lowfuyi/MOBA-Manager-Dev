@@ -1,0 +1,26 @@
+{
+ "version": "v1",
+ "note": "Help sheets (TUTORIAL 5.1, build plan I-22): one entry per help id (Screen.help_id()). The text is in i18n/en.json under help.<id>.title/see/do/know/terms. Title, About and Game over have no sheet.",
+ "screens": [
+  "home",
+  "squad",
+  "player",
+  "plan",
+  "training",
+  "chemistry",
+  "practice",
+  "prematch",
+  "draft",
+  "gameplan",
+  "match",
+  "report",
+  "club",
+  "standings",
+  "finance",
+  "freeagents",
+  "negotiation",
+  "season",
+  "settings",
+  "clubselect"
+ ]
+}

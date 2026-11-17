@@ -245,6 +245,8 @@ func _process(delta: float) -> void:
 				_disarm()
 	if draft == null or draft.is_done():
 		return
+	if HelpSheet.paused():
+		return    # a help sheet is open: the timer and the other side wait (I-22)
 	var cur := draft.current()
 	if cur["team"] == my_side:
 		if not timed():
@@ -305,7 +307,14 @@ func _build() -> void:
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	header.add_child(title_label)
+	if UI.large:
+		# large text: back, timer, Auto-finish and "?" leave the title about 106 px, so "Your ban" broke into two lines with a
+		# lone word (I-22 fit audit); the title gets its own row under the header instead, and the header keeps a spacer
+		var sp := Control.new()
+		sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		header.add_child(sp)
+	else:
+		header.add_child(title_label)
 	timer = _Timer.new()
 	header.add_child(timer)
 	auto_button = UI.button(Strings.t("draft.auto_rest"), _on_auto, "flat")
@@ -324,6 +333,9 @@ func _build() -> void:
 		help_slot.size_flags_horizontal = Control.SIZE_SHRINK_END
 		header.add_child(help_slot)
 	body.add_child(header)
+	if UI.large:
+		title_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		body.add_child(title_label)
 	steps = _Steps.new()
 	body.add_child(steps)
 	board = LaneBoard.new(_compact_board(), "draft.board")

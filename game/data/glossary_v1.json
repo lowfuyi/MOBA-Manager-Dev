@@ -1,0 +1,63 @@
+{
+ "version": "v1",
+ "note": "Glossary (TUTORIAL 5.3, build plan I-22): 49 terms in four groups. Text in i18n/en.json: gl.<id>.name/def/where (where = a help id); group names gl.group.<group>.",
+ "groups": {
+  "players": [
+   "team_rating",
+   "rating",
+   "role",
+   "stats",
+   "potential",
+   "form",
+   "morale",
+   "fatigue",
+   "bonds",
+   "understanding",
+   "chemistry",
+   "personality",
+   "training_focus",
+   "rest",
+   "scrim"
+  ],
+  "match": [
+   "coach",
+   "draft",
+   "ban",
+   "pick",
+   "hero",
+   "familiarity",
+   "fit",
+   "patch_strength",
+   "patch",
+   "composition",
+   "game_plan",
+   "edge",
+   "risk",
+   "lane",
+   "objective",
+   "teamfight",
+   "base",
+   "margin",
+   "standout",
+   "luck"
+  ],
+  "league": [
+   "table",
+   "form_rating",
+   "playoffs",
+   "best_of",
+   "practice_match",
+   "quick_match",
+   "exhibition"
+  ],
+  "club": [
+   "contract",
+   "wage",
+   "wage_cap",
+   "cash",
+   "sponsor",
+   "free_agent",
+   "signing_fee"
+  ]
+ }
+}

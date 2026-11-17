@@ -448,7 +448,7 @@ func _hints() -> void:
 	ok(_find_button(s, Strings.t("settings.tips_again")) == null, "hints: the old Show the welcome tips again button is gone")
 	var hc := UI.find_tag("settings.help_card") as SettingsHelpCard
 	ok(hc != null and UI.plain(hc.hints_button.text) == UI.plain(Strings.t("settings.help_reset")), "hints: Show help hints again is on the card")
-	ok(_find_button(hc, Strings.t("settings.lessons")) == null and _find_button(hc, Strings.t("settings.glossary")) == null, "hints: Lessons and Glossary wait for their screens (I-22, I-23)")
+	ok(_find_button(hc, Strings.t("settings.lessons")) == null and _find_button(hc, Strings.t("settings.glossary")) != null, "hints: Glossary is on the card (I-22); Lessons waits for its screen (I-23)")
 	hc.hints_button.pressed.emit()
 	await frames(2)
 	dv = _dev()

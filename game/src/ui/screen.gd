@@ -78,6 +78,8 @@ func setup(title: String, back: Callable = Callable(), scroll: bool = true) -> v
 		help_slot.offset_right = 0
 		help_slot.offset_top = 0
 		add_child(help_slot)
+	if HelpSheet.has_help(help_id()):    # the "?" of every screen with a help sheet (I-22); Title, About and Game over have none
+		add_help_button(HelpSheet.HelpButton.new(help_id()))
 	if scroll:
 		var sc := ScrollContainer.new()
 		sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
