@@ -401,21 +401,24 @@ func _standings_tabs() -> void:
 		await look("standings_" + t)
 
 
-## The Squad screen is redesigned later (I-19); its player card shares PlayerView.stat_block with Negotiation, whose bars
-## were squeezed to a stub at large text, so the bars of that card are checked here (audit rule 7).
+## The Squad's player sheet (I-19): its Stats tab draws the eight bars in one control (SquadKit.Stats); the audit's floor for a
+## bar is still 96 px (rule 7). The sheet also builds its Career tab.
 func _roster_detail() -> void:
 	var rs := ScreenRoster.new("hub")
 	App.go(rs)
 	rs._toggle_player(App.gs.d["lineup"]["mid"])
 	await look("roster_detail")
-	_open_section_text(cur(), "Career with us")
+	rs._set_card_tab("stats")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var w := rs.card_stats.bar_width() if rs.card_stats != null else 0.0
+	ok(rs.card_stats != null and rs.card_stats.rows.size() == 8 and w >= 96.0, "roster_%s: 8 stat bars in the player sheet, %.0f px wide (floor 96)" % [variant, w])
+	rs._set_card_tab("career")
 	await look("roster_detail_career")
-	var bars: Array = []
-	_collect_bars(cur(), bars)
-	var narrow := 100000.0
-	for b in bars:
-		narrow = minf(narrow, (b as ProgressBar).size.x)
-	ok(bars.size() >= 8 and narrow >= 96.0, "roster_%s: %d stat bars, the narrowest is %.0f px (it was about 30 at large text before I-04)" % [variant, bars.size(), narrow])
+	if BottomSheet.is_open():
+		BottomSheet.current().close()
+	for i in 20:
+		await get_tree().process_frame
 
 
 func _collect_bars(n: Node, out: Array) -> void:

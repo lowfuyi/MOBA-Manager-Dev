@@ -98,44 +98,20 @@
    "nodes": 50
   },
   "05_roster": {
-   "status": "legacy",
-   "leaves_with": "I-19",
-   "measured": {
-    "draws": 34,
-    "nodes": 36
-   },
-   "draws": 40,
-   "nodes": 40
+   "status": "redesigned",
+   "since": "I-19"
   },
   "06_roster_picker": {
-   "status": "legacy",
-   "leaves_with": "I-19",
-   "measured": {
-    "draws": 36,
-    "nodes": 49
-   },
-   "draws": 40,
-   "nodes": 55
+   "status": "redesigned",
+   "since": "I-19"
   },
   "07_roster_detail": {
-   "status": "legacy",
-   "leaves_with": "I-19",
-   "measured": {
-    "draws": 34,
-    "nodes": 94
-   },
-   "draws": 40,
-   "nodes": 105
+   "status": "redesigned",
+   "since": "I-19"
   },
   "07b_roster_release": {
-   "status": "legacy",
-   "leaves_with": "I-19",
-   "measured": {
-    "draws": 34,
-    "nodes": 96
-   },
-   "draws": 40,
-   "nodes": 110
+   "status": "redesigned",
+   "since": "I-19"
   },
   "07c_finance": {
    "status": "legacy",
@@ -349,44 +325,20 @@
    "nodes": 30
   },
   "19c_roster_career": {
-   "status": "legacy",
-   "leaves_with": "I-19",
-   "measured": {
-    "draws": 42,
-    "nodes": 112
-   },
-   "draws": 50,
-   "nodes": 125
+   "status": "redesigned",
+   "since": "I-19"
   },
   "19d_roster_career_lower": {
-   "status": "legacy",
-   "leaves_with": "I-19",
-   "measured": {
-    "draws": 37,
-    "nodes": 112
-   },
-   "draws": 45,
-   "nodes": 125
+   "status": "redesigned",
+   "since": "I-19"
   },
   "19f_roster_career_bottom": {
-   "status": "legacy",
-   "leaves_with": "I-19",
-   "measured": {
-    "draws": 50,
-    "nodes": 112
-   },
-   "draws": 55,
-   "nodes": 125
+   "status": "redesigned",
+   "since": "I-19"
   },
   "19g_roster_career_log": {
-   "status": "legacy",
-   "leaves_with": "I-19",
-   "measured": {
-    "draws": 64,
-    "nodes": 112
-   },
-   "draws": 75,
-   "nodes": 125
+   "status": "redesigned",
+   "since": "I-19"
   },
   "19e_practice": {
    "status": "legacy",

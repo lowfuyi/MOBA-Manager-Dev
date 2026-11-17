@@ -1,0 +1,18 @@
+{
+  "squad.title": "Squad",
+  "squad.auto": "Auto lineup",
+  "squad.pill.rating": "Team rating",
+  "squad.pill.chem": "Chemistry",
+  "squad.pill.squad": "Squad",
+  "squad.pill.wages": "Wages a week",
+  "squad.start_h": "Starting five",
+  "squad.start_hint": "Tap a player on the map to change who plays that role.",
+  "squad.done": "Done",
+  "squad.card.overview": "Overview",
+  "squad.card.stats": "Stats",
+  "squad.card.career": "Career",
+  "squad.card.fatigue": "Tiredness",
+  "squad.card.put_in": "Put in lineup",
+  "squad.card.renew": "Renew",
+  "squad.card.release": "Release"
+}

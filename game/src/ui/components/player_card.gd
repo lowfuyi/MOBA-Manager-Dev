@@ -146,7 +146,8 @@ func _note_access() -> void:
 # ---- setters (in place; an equal value changes nothing) -----------------------------------------------------------------------
 
 func set_opt(key: String, value: Variant) -> void:
-	if opts.get(key) == value:
+	var cur: Variant = opts.get(key)
+	if typeof(cur) == typeof(value) and cur == value:    # a value of another type (an int rating over the "" default) is a change
 		return
 	opts[key] = value
 	applied += 1
@@ -407,10 +408,72 @@ func _layout_token(s: Vector2) -> void:
 # ---- drawing -----------------------------------------------------------------------------------------------------------------------
 
 func _draw() -> void:
+	if batched():
+		get_parent().queue_redraw()    # the parent draws its cards in one pass (I-19 perf); this card's own canvas item stays empty
+		return
 	draw_count += 1
 	_layout()
 	_ops.flush(self)
 	clipped = _ops.clipped.duplicate()
+
+
+## True when the parent draws this card (a parent with `draws_cards()`, I-19: the Squad map, bench and picker rows), so ten cards
+## cost a few draw calls in all instead of about eight each, the way LaneBoard draws its LaneRows (I-16).
+func batched() -> bool:
+	var p := get_parent()
+	return p != null and p.has_method("draws_cards")
+
+
+## The parent's half of the batched draw: lay this card out and hand over its display list (in this card's coordinates).
+func queue_for_batch() -> CardKit.Ops:
+	draw_count += 1
+	_layout()
+	return _ops
+
+
+## Draw every visible PlayerCard child of `ci` in one display list (call from the parent's _draw, after its own background).
+## `under` (optional) is the parent's own display list, drawn in the same passes, under the cards.
+static func draw_children(ci: Control, under: CardKit.Ops = null, reorder: bool = false) -> void:
+	var ops := under if under != null else CardKit.Ops.new()
+	var spans: Array = []
+	for c in ci.get_children():
+		var pc := c as PlayerCard
+		if pc == null or not pc.visible:
+			continue
+		var t0 := ops.texts.size()
+		var cop := pc.queue_for_batch()
+		if pc.modulate.a < 0.99 or pc._pressed_look:
+			cop = _tinted(cop, pc.modulate.a, pc._pressed_look)
+		ops.append_shifted(cop, pc.position)
+		spans.append([pc, t0, ops.texts.size()])
+	if reorder:
+		PlanKit.batch_order(ops)    # every 9-slice first, then the quads: fewer texture switches (safe for cards side by side)
+	ops.flush(ci)
+	for sp in spans:
+		var cut: Array = []
+		for k in range(int(sp[1]), int(sp[2])):
+			if ops.clipped.has(String((ops.texts[k] as Array)[2])):
+				cut.append(String((ops.texts[k] as Array)[2]))
+		(sp[0] as PlayerCard).clipped = cut
+
+
+## A copy of a card's display list with its alpha applied (a disabled card is drawn at 60 percent) and darker when pressed.
+static func _tinted(src: CardKit.Ops, a: float, pressed_look: bool) -> CardKit.Ops:
+	var o := CardKit.Ops.new()
+	var k := 0.85 if pressed_look else 1.0
+	for b in src.bgs:
+		var c: Color = b[2]
+		o.bgs.append([b[0], b[1], Color(c.r * k, c.g * k, c.b * k, c.a * a), b[3]])
+	o.portraits = src.portraits.duplicate(true)
+	for ic in src.icons:
+		var c2: Color = ic[2]
+		o.icons.append([ic[0], ic[1], Color(c2.r, c2.g, c2.b, c2.a * a)])
+	for t in src.texts:
+		var u: Array = (t as Array).duplicate()
+		var c3: Color = u[6]
+		u[6] = Color(c3.r, c3.g, c3.b, c3.a * a)
+		o.texts.append(u)
+	return o
 
 
 # ---- touch (only when tappable) -----------------------------------------------------------------------------------------------------
@@ -442,6 +505,8 @@ func _set_look(v: bool) -> void:
 		return
 	_pressed_look = v
 	queue_redraw()
+	if batched():
+		get_parent().queue_redraw()
 
 
 # ---- from the game --------------------------------------------------------------------------------------------------------------------

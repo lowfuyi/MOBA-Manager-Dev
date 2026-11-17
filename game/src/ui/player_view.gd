@@ -59,11 +59,12 @@ static func stat_block(parent: VBoxContainer, p: Dictionary, gains: bool = false
 	parent.add_child(UI.label(Strings.t("stat.help.pot"), UI.S_CAPTION, UI.DIM))
 
 
-## "Career with us": games, wins, kills/deaths/assists, best game and milestones (GDD 4.2). Collapsed by default.
-static func career_section(parent: VBoxContainer, pid: String) -> void:
+## "Career with us": games, wins, kills/deaths/assists, best game and milestones (GDD 4.2). Collapsed by default; `open` shows it
+## expanded (the Squad player sheet's Career tab, I-19).
+static func career_section(parent: VBoxContainer, pid: String, open: bool = false) -> void:
 	var gs := App.gs
 	var c: Dictionary = gs.career_all().get(pid, {})
-	var box := UI.section(parent, Strings.t("career.h"), false)
+	var box := UI.section(parent, Strings.t("career.h"), open)
 	if c.is_empty() or int(c.get("g", 0)) == 0 and (c.get("log", []) as Array).is_empty():
 		box.add_child(UI.label(Strings.t("career.none"), UI.S_SMALL, UI.DIM))
 		return

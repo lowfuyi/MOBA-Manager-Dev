@@ -103,10 +103,11 @@ func _tour() -> void:
 	rs._toggle_slot("top")
 	rs._toggle_player(App.gs.d["lineup"]["mid"])
 	await shot("07_roster_detail")
-	rs._confirm_release = App.gs.d["lineup"]["mid"]
-	rs._rebuild()
+	rs._ask_release(App.gs.d["lineup"]["mid"])    # I-19: the confirm is a sheet
 	await shot("07b_roster_release")
-	rs._confirm_release = ""
+	BottomSheet.current().close()
+	for i in 20:
+		await get_tree().process_frame
 	App.go(ScreenFinance.new())
 	await shot("07c_finance")
 	var fa_scr := ScreenFreeAgents.new("hub")
@@ -204,12 +205,10 @@ func _tour() -> void:
 	await shot("19b_trophies")
 	var rsc := ScreenRoster.new("hub")
 	App.go(rsc)
-	rsc._toggle_player(App.gs.d["lineup"]["mid"])
+	rsc._toggle_player(App.gs.d["lineup"]["mid"])    # I-19: the player sheet, Career tab; the four states scroll the sheet
+	rsc._set_card_tab("career")
 	await get_tree().process_frame
-	_open_section(cur(), "Career with us")
-	_tap_text(cur(), "Mechanics")
-	await get_tree().process_frame
-	var sc2: ScrollContainer = cur().body.get_parent()
+	var sc2: ScrollContainer = BottomSheet.current()._scroll
 	sc2.scroll_vertical = 500
 	await shot("19c_roster_career")
 	sc2.scroll_vertical = 1000
@@ -218,6 +217,9 @@ func _tour() -> void:
 	await shot("19f_roster_career_bottom")
 	sc2.scroll_vertical = 2400
 	await shot("19g_roster_career_log")
+	BottomSheet.current().close()
+	for i in 20:
+		await get_tree().process_frame
 	var prs := ScreenPractice.new()
 	App.go(prs)
 	await shot("19e_practice")

@@ -66,8 +66,7 @@ func _real_file(check: Callable) -> void:
 				every_row_formula = false
 	check.call(every_row_formula, "every legacy row is measured + 10 percent rounded up to the next 5")
 	# the I-02 numbers handed over with the task: state -> [draws measured, nodes measured, draw allowance, node allowance]
-	var six := {"05_roster": [34, 36, 40, 40],
-			"16_standings": [29, 82, 35, 95]}
+	var six := {"16_standings": [29, 82, 35, 95]}
 	for s in six:
 		var r = rows.get(s, {})
 		var w: Array = six[s]
@@ -79,6 +78,8 @@ func _real_file(check: Callable) -> void:
 	check.call(hub is Dictionary and hub.get("status") == "redesigned" and hub.get("since") == "I-15", "04_hub row: redesigned since I-15 (held to the target 60 / 120)")
 	var dr = rows.get("10_draft_ban_2", {})
 	check.call(dr is Dictionary and dr.get("status") == "redesigned" and dr.get("since") == "I-16", "10_draft_ban_2 row: redesigned since I-16 (held to the target 60 / 120)")
+	var sqr = rows.get("05_roster", {})
+	check.call(sqr is Dictionary and sqr.get("status") == "redesigned" and sqr.get("since") == "I-19", "05_roster row: redesigned since I-19 (held to the target 60 / 120)")
 	var rpr = rows.get("14_report_top", {})
 	check.call(rpr is Dictionary and rpr.get("status") == "redesigned" and rpr.get("since") == "I-18", "14_report_top row: redesigned since I-18 (held to the target 60 / 120)")
 	var gpr = rows.get("11c_gameplan_trigger", {})

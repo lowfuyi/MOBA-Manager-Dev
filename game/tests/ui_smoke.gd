@@ -129,8 +129,7 @@ func _run() -> void:
 	await get_tree().process_frame
 	var cut: String = App.gs.d["roster"][9]
 	rs2._toggle_player(cut)
-	rs2._confirm_release = cut
-	rs2._rebuild()
+	rs2._ask_release(cut)    # I-19: the confirm is a sheet
 	rs2._release(cut)
 	ok((App.gs.d["roster"] as Array).size() == 9 and (App.gs.d["fa"] as Array).has(cut), "release from the roster screen")
 	var cand := ""
