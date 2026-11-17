@@ -287,6 +287,22 @@ class Ops extends RefCounted:
 	func text(font: Font, size: int, s: String, x: float, cy: float, room: float, col: Color, align: int = 0, outline: Variant = null) -> void:
 		texts.append([font, size, s, x, cy, room, col, align, outline])
 
+	## Add everything `other` queued, moved by `d` (a child's display list drawn by its parent in one pass).
+	func append_shifted(other: Ops, d: Vector2) -> void:
+		for b in other.bgs:
+			bgs.append([b[0], Rect2((b[1] as Rect2).position + d, (b[1] as Rect2).size), b[2], b[3]])
+		for p in other.portraits:
+			var q: Array = (p as Array).duplicate()
+			q[1] = Rect2((p[1] as Rect2).position + d, (p[1] as Rect2).size)
+			portraits.append(q)
+		for ic in other.icons:
+			icons.append([ic[0], Rect2((ic[1] as Rect2).position + d, (ic[1] as Rect2).size), ic[2]])
+		for t in other.texts:
+			var u: Array = (t as Array).duplicate()
+			u[3] = float(t[3]) + d.x
+			u[4] = float(t[4]) + d.y
+			texts.append(u)
+
 	func flush(ci: CanvasItem) -> void:
 		for b in bgs:
 			if b[3]:

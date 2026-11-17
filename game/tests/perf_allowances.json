@@ -228,74 +228,32 @@
    "nodes": 130
   },
   "09_draft_start": {
-   "status": "legacy",
-   "leaves_with": "I-16",
-   "measured": {
-    "draws": 10,
-    "nodes": 35
-   },
-   "draws": 15,
-   "nodes": 40
+   "status": "redesigned",
+   "since": "I-16"
   },
   "10_draft_ban_2": {
-   "status": "legacy",
-   "leaves_with": "I-16",
-   "measured": {
-    "draws": 38,
-    "nodes": 81
-   },
-   "draws": 45,
-   "nodes": 90
+   "status": "redesigned",
+   "since": "I-16"
   },
   "10_draft_slotpanel_4": {
-   "status": "legacy",
-   "leaves_with": "I-16",
-   "measured": {
-    "draws": 26,
-    "nodes": 26
-   },
-   "draws": 30,
-   "nodes": 30
+   "status": "redesigned",
+   "since": "I-16"
   },
   "10_draft_slotpanel_5": {
-   "status": "legacy",
-   "leaves_with": "I-16",
-   "measured": {
-    "draws": 22,
-    "nodes": 25
-   },
-   "draws": 25,
-   "nodes": 30
+   "status": "redesigned",
+   "since": "I-16"
   },
   "10_draft_slotpanel_8": {
-   "status": "legacy",
-   "leaves_with": "I-16",
-   "measured": {
-    "draws": 20,
-    "nodes": 24
-   },
-   "draws": 25,
-   "nodes": 30
+   "status": "redesigned",
+   "since": "I-16"
   },
   "10_draft_slotpanel_9": {
-   "status": "legacy",
-   "leaves_with": "I-16",
-   "measured": {
-    "draws": 18,
-    "nodes": 23
-   },
-   "draws": 20,
-   "nodes": 30
+   "status": "redesigned",
+   "since": "I-16"
   },
   "11_draft_done": {
-   "status": "legacy",
-   "leaves_with": "I-16",
-   "measured": {
-    "draws": 13,
-    "nodes": 19
-   },
-   "draws": 15,
-   "nodes": 25
+   "status": "redesigned",
+   "since": "I-16"
   },
   "11b_gameplan": {
    "status": "legacy",

@@ -548,11 +548,28 @@ func _tapper() -> void:
 		var target: Control = null
 		for tid in o.card_data().get("target", []):
 			target = UI.find_tag(String(tid))
+		var hero_grid: HeroGrid = null
 		if target != null and not (target is BaseButton):
 			for k in target.get_children():    # a tile (UI.tag_tile): its flat hit button takes the tap
 				if k is BaseButton:
 					target = k
 					break
+			var grids: Array = []
+			if not (target is BaseButton):
+				grids = Array(target.find_children("*", "HeroGrid", true, false))
+			if not grids.is_empty():
+				hero_grid = grids[0] as HeroGrid    # the draft's choices (I-16): a finger on the first hero card
+		if hero_grid != null and not o.is_fallback():
+			var dr := _cur() as ScreenDraft
+			if dr != null and not dr.draft.is_done() and dr.draft.current()["team"] != dr.my_side:
+				await frames(5)    # the other side is choosing: a player waits for their turn (no tap)
+				continue
+			var first := String(hero_grid.shown_ids()[0])
+			hero_grid._tapped(hero_grid.heroes.find(hero_grid.heroes.filter(func(h: Dictionary) -> bool: return h["id"] == first)[0]))
+			real_taps += 1
+			taps += 1
+			await frames(3)
+			continue
 		var before := "%s/%s/%s" % [r.m.state(), r.m.step_id(), r.m.stage]
 		if o.is_fallback() or kind == "modal" or kind == "info" or target == null or not (target is BaseButton):
 			var which := "start" if ids.has("start") else ("go_home" if ids.has("go_home") else "next")

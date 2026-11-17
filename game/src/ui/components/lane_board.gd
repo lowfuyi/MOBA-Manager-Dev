@@ -93,6 +93,28 @@ func _init(p_compact: bool = true, p_tut_id: String = "") -> void:
 	CompKit.mark_stateful(self)
 	CompKit.tag(self, tut_id)
 	_note_cue()
+	sort_children.connect(queue_redraw)    # rows moved (compact / full, large text): the board redraws them where they are now
+
+
+## The five rows in one display list (each LaneRow lays itself out, the board flushes them together): a few draw calls in all.
+func _draw() -> void:
+	var ops := CardKit.Ops.new()
+	var spans: Array = []
+	for r in ROLES:
+		var lr := rows[r] as LaneRow
+		if not lr.visible:
+			continue
+		var t0 := ops.texts.size()
+		ops.append_shifted(lr.queue_for_board(), lr.position)
+		spans.append([lr, t0, ops.texts.size()])
+	ops.flush(self)
+	for sp in spans:    # hand each row the texts of its own that were cut
+		var lr := sp[0] as LaneRow
+		var cut: Array = []
+		for k in range(int(sp[1]), int(sp[2])):
+			if ops.clipped.has(String((ops.texts[k] as Array)[2])):
+				cut.append(String((ops.texts[k] as Array)[2]))
+		lr.note_clipped(cut)
 
 
 func row(role: String) -> LaneRow:

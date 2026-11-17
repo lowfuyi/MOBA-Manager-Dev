@@ -6,7 +6,7 @@ extends Node
 ## Ends with " N checks, M failures".
 
 const FitAudit = preload("res://tests/fit_audit.gd")
-const BASELINE_NODES := {"home": 37, "squad": 36, "draft": 81, "game_plan": 133, "report": 151, "standings": 82}   # I-00, fixed seed; home re-based at I-15 (the redesigned Home: 37)
+const BASELINE_NODES := {"home": 37, "squad": 36, "draft": 38, "game_plan": 133, "report": 151, "standings": 82}   # I-00, fixed seed; home re-based at I-15 (37), draft at I-16 (38)
 const SEED := 20261109
 
 var checks := 0

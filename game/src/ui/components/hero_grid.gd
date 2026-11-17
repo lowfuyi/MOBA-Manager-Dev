@@ -38,6 +38,8 @@ var _moved := false
 var _pressed_idx := -1            # hero index drawn pressed
 var _last_cw := 0.0
 var _has_cues := false
+var _clip: ScrollContainer = null    # the scroll area the grid sits in (only its visible window is drawn)
+var _last_window := Rect2()
 
 
 func _init(p_tut_id: String = "") -> void:
@@ -54,10 +56,47 @@ func _init(p_tut_id: String = "") -> void:
 
 func _enter_tree() -> void:
 	ArtWire.ensure()
+	_clip = null
+	var p := get_parent()
+	while p != null:
+		if p is ScrollContainer:
+			_clip = p as ScrollContainer
+			break
+		p = p.get_parent()
+	if _clip != null:
+		var cb := Callable(self, "_on_clip_scrolled")
+		if not _clip.get_v_scroll_bar().value_changed.is_connected(cb):
+			_clip.get_v_scroll_bar().value_changed.connect(cb)
 
 
 func _exit_tree() -> void:
 	_tr.reset()
+	if _clip != null and is_instance_valid(_clip):
+		var cb := Callable(self, "_on_clip_scrolled")
+		if _clip.get_v_scroll_bar().value_changed.is_connected(cb):
+			_clip.get_v_scroll_bar().value_changed.disconnect(cb)
+	_clip = null
+
+
+## The grid sits in a scroll area: only the cards in its visible window (plus one row each way) are drawn, so 40 cards do not
+## cost 40 cards of canvas commands (PERF-BUDGET canvas limit; I-16). A scroll redraws, a still grid does not.
+func _on_clip_scrolled(_v: float) -> void:
+	var w := _window()
+	if w != _last_window:
+		queue_redraw()
+
+
+## The part of the grid that can be seen, in the grid's own coordinates (the whole grid when it is not in a scroll area).
+func _window() -> Rect2:
+	var whole := Rect2(Vector2.ZERO, size)
+	if _clip == null or not is_instance_valid(_clip) or not _clip.is_inside_tree():
+		return whole
+	var inv := get_global_transform().affine_inverse()
+	var cr := _clip.get_global_rect()
+	var a := inv * cr.position
+	var b := inv * cr.end
+	var row := HeroCard.H + GAP
+	return Rect2(Vector2(0.0, a.y - row), Vector2(size.x, (b.y - a.y) + row * 2.0)).intersection(whole)
 
 
 func _on_visibility() -> void:
@@ -286,8 +325,12 @@ func hero_at(p: Vector2) -> String:
 
 func _draw() -> void:
 	draw_count += 1
+	var win := _window()
+	_last_window = win
 	for p in HeroCard.PASSES:
 		for slot in _shown.size():
+			if not slot_rect(slot).intersects(win):
+				continue
 			var i: int = _shown[slot]
 			var st: Dictionary = _states[i]
 			if i == _pressed_idx:

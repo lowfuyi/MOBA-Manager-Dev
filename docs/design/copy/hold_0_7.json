@@ -1,8 +1,4 @@
 {
-  "draft.meta_hint": {
-    "release_in": "I-16",
-    "reason": "New text says 'an up arrow means strong, a down arrow means weak'; the arrows are drawn by the new Draft screen. Until then the old screen still shows colour."
-  },
   "about.title": {
     "release_in": "I-25",
     "reason": "New text says 'About Alpha 0.7'; the version label and build move to 0.7 in the acceptance step (App.VERSION_LABEL)."

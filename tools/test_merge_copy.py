@@ -241,16 +241,24 @@ def test_real_update_dry_run_does_not_touch_files(tmp_path):
     upd.write_text(json.dumps({"role.short.sup": "Supp"}))
     assert M.main(["--update", str(upd)]) == 0
     assert (M.DEFAULT_EN.read_bytes(), M.DEFAULT_OWNED.read_bytes()) == before
-    upd.write_text(json.dumps({"draft.meta_hint": "Changed"}))            # held and not owned
+    upd.write_text(json.dumps({"about.title": "Changed"}))                # held and not owned (draft.meta_hint was released in I-16)
     assert M.main(["--update", str(upd), "--write"]) == 1
     assert M.DEFAULT_EN.read_bytes() == before[0]
 
 
-def test_known_open_lets_held_draft_meta_hint_pass_but_only_as_warning(monkeypatch):
+def test_known_open_lets_held_chem_hint_pass_but_only_as_warning(monkeypatch):
     en = C.load_unique(C.EN)
     assert C.main([str(C.EN)]) == 0
     e, w = C.check(en, {})
-    assert e == [] and any("draft.meta_hint" in x for x in w)
-    monkeypatch.setattr(C, "KNOWN_OPEN", {k: v for k, v in C.KNOWN_OPEN.items() if k != "draft.meta_hint"})
+    assert e == [] and any("chem.pentagon_hint" in x for x in w)
+    monkeypatch.setattr(C, "KNOWN_OPEN", {k: v for k, v in C.KNOWN_OPEN.items() if k != "chem.pentagon_hint"})
     e, _ = C.check(en, {})                                         # negative control: without the entry it is an error
-    assert any("draft.meta_hint" in x for x in e)
+    assert any("chem.pentagon_hint" in x for x in e)
+
+
+def test_released_draft_meta_hint_is_clean():
+    # released in I-16 with the arrows it describes: no colour word left, so neither an error nor a warning
+    en = C.load_unique(C.EN)
+    e, w = C.check(en, {})
+    assert not any("draft.meta_hint" in x for x in e + w)
+    assert "arrow" in en["draft.meta_hint"]

@@ -153,7 +153,7 @@
   "draft.choose_pick": "Pick a hero",
   "draft.their_fam": "their best {fam}",
   "draft.my_fam": "{role} {fam}",
-  "draft.meta_hint": "Green = strong in this patch, grey = weak. Numbers are player familiarity.",
+  "draft.meta_hint": "An up arrow means strong in this patch, a down arrow means weak. Numbers are player familiarity.",
   "draft.power": "Power early {e} / mid {m} / late {l}  -  difficulty {d}",
   "draft.meta_line": "Patch strength {meta}",
   "draft.strong_vs": "Strong against: {list}",

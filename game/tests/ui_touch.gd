@@ -180,23 +180,21 @@ func _run() -> void:
 		d._ai_wait = 0.0
 		d._process(0.01)
 	await frames(4)
-	sc = scroller()
-	ok(sc.get_v_scroll_bar().max_value > sc.size.y, "hero list longer than the screen")
-	btns.clear()
-	find_buttons(cur(), btns)
-	var hero_btn: Button = null
-	for x in btns:
-		if "their best" in UI.plain(x.text):
-			hero_btn = x
-			break
+	# I-16: the hero grid is one HeroGrid in its own scroll area (the page itself does not scroll)
+	sc = d.grid_scroll
+	ok(sc.get_v_scroll_bar().max_value > sc.size.y, "hero list longer than its scroll area")
+	var hero_pos := d.grid.global_card_rect(String(d.grid.shown_ids()[0])).get_center()
 	var bans_before: int = d.draft.bans["B"].size() + d.draft.bans["R"].size()
-	await swipe(hero_btn.get_global_rect().get_center(), 250)
-	ok(sc.scroll_vertical > 100, "draft: swipe over a hero button scrolls (scroll=%d)" % sc.scroll_vertical)
-	ok(d.draft.bans["B"].size() + d.draft.bans["R"].size() == bans_before, "draft: swipe did not ban a hero")
+	await swipe(hero_pos, 250)
+	ok(sc.scroll_vertical > 100, "draft: swipe over a hero card scrolls (scroll=%d)" % sc.scroll_vertical)
+	ok(d.draft.bans["B"].size() + d.draft.bans["R"].size() == bans_before and not BottomSheet.is_open(), "draft: swipe did not ban a hero or open its sheet")
 	# back from the draft returns to the pre-match screen
 	get_tree().root.propagate_notification(NOTIFICATION_WM_GO_BACK_REQUEST)
 	await frames()
-	ok(cur() is ScreenPreMatch, "back request in the draft returns to match day")
+	ok(BottomSheet.is_open() and BottomSheet.current().sheet_id == "draft_leave", "back request in a running draft asks first (Leave the draft?)")
+	d._leave()
+	await frames()
+	ok(cur() is ScreenPreMatch, "Leave returns to match day")
 	# 4. training screen: a swipe that starts on a player row scrolls the list; the row still opens on a tap
 	App.go(ScreenHub.new())
 	await frames()

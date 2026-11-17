@@ -19,7 +19,7 @@ const SKY_CLEAR := 120.0    # the top-right corner kept clear for the "?" button
 
 
 static func large() -> bool:
-	return is_instance_valid(App) and App.large_text()
+	return UI.large    # the live state (App.apply_large_text sets it); App.large_text() is only the saved setting
 
 
 # ------------------------------------------------------------------------------------------------------------------ Hero
@@ -469,6 +469,17 @@ class ChipRow extends Control:
 		for it in items:
 			cues.append(_icon_of(it))
 		CompKit.set_cue(self, ",".join(PackedStringArray(cues)))
+
+	## Change the chips in place (an equal list changes nothing).
+	func set_items(p_items: Array) -> void:
+		if p_items == items:
+			return
+		items = p_items.duplicate(true)
+		var cues: Array = []
+		for it in items:
+			cues.append(_icon_of(it))
+		CompKit.set_cue(self, ",".join(PackedStringArray(cues)))
+		_relayout()
 
 	static func _icon_of(it: Array) -> String:
 		return String(it[2]) if String(it[2]) != "" else String(Chip.ICONS.get(String(it[1]), "dot"))

@@ -574,3 +574,4 @@ home.fixtures_h
 home.fixture_row
 home.season_done
 home.round
+draft.meta_hint

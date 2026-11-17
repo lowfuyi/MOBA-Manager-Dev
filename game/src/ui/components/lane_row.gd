@@ -241,7 +241,27 @@ func _slot(side: String, r: Rect2) -> void:
 
 
 func _draw() -> void:
+	if batched():
+		get_parent().queue_redraw()    # the board draws every row in one pass (I-16 perf); this row's own canvas item stays empty
+		return
 	draw_count += 1
 	_layout()
 	_ops.flush(self)
 	clipped = _ops.clipped.duplicate()
+
+
+## True inside a LaneBoard: the board draws this row (LaneBoard._draw), so five rows cost a few draw calls, not five times as many.
+func batched() -> bool:
+	return get_parent() is LaneBoard
+
+
+## The board's half of the batched draw: lay this row out and hand over its display list (in this row's coordinates).
+func queue_for_board() -> CardKit.Ops:
+	draw_count += 1
+	_layout()
+	return _ops
+
+
+## After the board flushed: what was cut in this row (the board's flush records it for every row).
+func note_clipped(cut: Array) -> void:
+	clipped = cut
