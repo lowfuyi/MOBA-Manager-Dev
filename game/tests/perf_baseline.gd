@@ -74,6 +74,7 @@ func shot(name: String) -> void:
 
 
 func _ready() -> void:
+	OS.low_processor_usage_mode = false    # the game sleeps when idle (I-25); a render harness needs every frame drawn
 	if DisplayServer.get_name() == "headless":
 		print("PERF|SKIPPED|headless renderer draws nothing; run under xvfb-run with --rendering-driver opengl3")
 		get_tree().quit(0)

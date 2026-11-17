@@ -41,8 +41,12 @@
     "draws": 12,
     "nodes": 24
    },
-   "draws": 15,
-   "nodes": 30
+   "draws": 20,
+   "nodes": 30,
+   "raise": {
+    "reason": "I-24 added the Licences card to About (the Barlow credit and a button that shows the OFL text): 16 draw calls measured against 15; allowance 20",
+    "approved_by": "Producer (Technical Director to confirm)"
+   }
   },
   "03_clubselect": {
    "status": "legacy",

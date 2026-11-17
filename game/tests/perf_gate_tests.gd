@@ -61,10 +61,12 @@ func _real_file(check: Callable) -> void:
 	var every_row_formula := true
 	for s in rows:
 		var r: Dictionary = rows[s]
-		if r.get("status") == "legacy":
+		if r.get("status") == "legacy" and not r.has("raise"):
 			if int(r["draws"]) != Gate.allowance_for(int(r["measured"]["draws"])) or int(r["nodes"]) != Gate.allowance_for(int(r["measured"]["nodes"])):
 				every_row_formula = false
-	check.call(every_row_formula, "every legacy row is measured + 10 percent rounded up to the next 5")
+	check.call(every_row_formula, "every legacy row without a recorded raise is measured + 10 percent rounded up to the next 5")
+	var ab = rows.get("02_about", {})
+	check.call(ab is Dictionary and ab.has("raise") and String(ab["raise"].get("reason", "")) != "" and String(ab["raise"].get("approved_by", "")) != "", "02_about carries its I-24 raise with a reason and a name")
 	# the I-02 numbers handed over with the task: state -> [draws measured, nodes measured, draw allowance, node allowance]
 	var six := {}    # the six I-02 rows: all redesigned by I-20 (each checked below)
 	for s in six:

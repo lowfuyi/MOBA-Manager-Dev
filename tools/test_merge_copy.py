@@ -243,7 +243,8 @@ def test_real_update_dry_run_does_not_touch_files(tmp_path):
     upd.write_text(json.dumps({"role.short.sup": "Supp"}))
     assert M.main(["--update", str(upd)]) == 0
     assert (M.DEFAULT_EN.read_bytes(), M.DEFAULT_OWNED.read_bytes()) == before
-    upd.write_text(json.dumps({"about.title": "Changed"}))                # held and not owned (draft.meta_hint was released in I-16)
+    upd.write_text(json.dumps({"zz.never.a.key": "Changed"}))             # not in en.json and not owned: refused whatever the hold list says
+                                                                          # (a held key stopped being refused once released: I-16, I-25)
     assert M.main(["--update", str(upd), "--write"]) == 1
     assert M.DEFAULT_EN.read_bytes() == before[0]
 

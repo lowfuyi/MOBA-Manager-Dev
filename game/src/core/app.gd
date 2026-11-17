@@ -1,7 +1,7 @@
 extends Node
 ## Autoload "App": shared game objects and screen navigation.
 
-const VERSION_LABEL := "0.6.0 alpha"
+const VERSION_LABEL := "0.7.0 alpha"
 const LARGE_SCALE := UI.LARGE_SCALE    # one number, kept in ui.gd with the other tokens
 const SETTINGS_PATH := "user://settings.cfg"
 

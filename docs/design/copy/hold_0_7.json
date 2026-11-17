@@ -1,8 +1,4 @@
 {
-  "about.title": {
-    "release_in": "I-25",
-    "reason": "New text says 'About Alpha 0.7'; the version label and build move to 0.7 in the acceptance step (App.VERSION_LABEL)."
-  },
   "chem.pentagon_hint": {
     "release_in": "Chemistry line styles built (UI pass)",
     "reason": "New text names solid, dashed and dotted lines; the Chemistry screen draws them only after the UI pass. Until then the old text (Greener line) stays."

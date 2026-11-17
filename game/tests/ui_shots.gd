@@ -51,6 +51,7 @@ func _tap_text(node: Node, needle: String) -> bool:
 
 
 func _ready() -> void:
+	OS.low_processor_usage_mode = false    # the game sleeps when idle (I-25); a render harness needs every frame drawn
 	if as_module:
 		return
 	TutorialRunner.home_offers = false    # I-14: no welcome modal or offer card over Home in these pictures and counts

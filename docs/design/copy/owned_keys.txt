@@ -606,3 +606,4 @@ lesson.skip
 about.included.b
 about.test.b
 about.licences.read
+about.title
