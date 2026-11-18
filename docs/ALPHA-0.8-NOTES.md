@@ -1,5 +1,13 @@
 # Alpha 0.8 "Arena" - install and test notes
 
+## Update 0.8.0b (2026-11-18): Frame rate setting
+Build: `build/gloamline-0.8.0b-alpha.apk` (25.3 MB, sha256 f9853e17..., versionCode 11, same debug key; installs over 0.8.0 and keeps your save).
+- **Settings > Frame rate**: "30 (saves battery)" or "60 (smoother)". 60 is the default. It is kept on the phone, not in your save.
+- Matches play the same at both: the same results, kills and towers, and a game still takes 75 seconds (37.5 at x2). At 30 it only moves less smoothly. The computer checks compare both rates on 40 games.
+- **Please try both** and tell us: does 30 look too choppy on the map? Does the phone run cooler or the battery last longer at 30? **Heat and battery at 30 vs 60 are not measured**: nothing has run on a phone except your own test.
+- Nothing else changed from 0.8.0. The Fight pass (Alpha 0.8.1) is next.
+
+
 Build: `build/gloamline-0.8.0-alpha.apk` (25.3 MB, sha256 11c508d8..., Android 5.0+, arm64, debug-signed with the same key as 0.7, package `com.lowfuyi.mobaesports.alpha`, version 0.8.0 alpha, versionCode 10).
 It installs over Alpha 0.7 and 0.6 and keeps your save. The match rules and numbers did not change: same simulator, same results for the same game (the golden check is unchanged). The arena only shows a result that was decided before the first frame.
 This is a testing build. The signing key is the shared debug key, so it must never go to a store.
