@@ -8,8 +8,10 @@ extends RefCounted
 ##          moon at 80 percent: an outline before the beat, the owner's shape after it), phase ticks at 24.0 and 51.0 s
 ##   Feed   the feed block: the newest result (tick or cross, the contest's name, 1 to 3 size dots), the previous one dimmed;
 ##          "The game begins." before the first; the end card from 75 s (the result line and the closing sentence)
-## Text is never smaller than 24 px (the floor). The plan row, intent labels, status tags and the word budget come with the
-## arena copy (A-07).
+##   Strip  (A-07) the plan row (your plan chip, up to three parts, and the "If behind" chip: dim until the plan check, lit if it
+##          fired) and the intent row (your label left with a circle, theirs right with a hexagon) from ArenaLabels
+## The status tag replaces the phase chip for 2.0 s; a banner (plan switch, wipe) takes over the feed block. Text is never smaller
+## than 24 px (the floor).
 
 const PHASE_MID := 24.0
 const PHASE_LATE := 51.0
@@ -60,13 +62,13 @@ static func board_values(s: ShowScript, t: float) -> Dictionary:
 
 
 ## The feed block at t: [line 1, line 2], each {kind: "start"|"result"|"end", key, mine, size, text} or {} when empty.
-static func feed_lines(s: ShowScript, t: float, my_club: String, won: bool) -> Array:
+static func feed_lines(s: ShowScript, t: float, my_club: String, won: bool, decided: String = "") -> Array:
 	if t >= ShowScript.WATCH:
 		var k := s.score_at(ShowScript.WATCH)["kills"] as Dictionary
 		var me := s.my_side
 		var score := "%d–%d" % [int(k[me]), int(k[ShowScript.other(me)])]
 		return [{"kind": "end", "won": won, "text": Strings.f("match.result.won" if won else "match.result.lost", {"team": my_club, "score": score})},
-				{"kind": "end2", "won": won, "text": Strings.t("match.end.win" if won else "match.end.loss")}]
+				{"kind": "end2", "won": won, "text": decided if decided != "" else Strings.t("match.end.win" if won else "match.end.loss")}]
 	var shown: Array = []
 	for ev in Report.feed(s.res, s.my_side):
 		if float(ev["t"]) * ShowScript.WATCH <= t + 1e-9:
@@ -85,6 +87,7 @@ static func feed_lines(s: ShowScript, t: float, my_club: String, won: bool) -> A
 
 class Board extends Control:
 	var s: ShowScript
+	var labels: ArenaLabels
 	var tex: Texture2D
 	var names: Array = ["", ""]       # [yours, theirs], the last word of each club name
 	var t := 0.0
@@ -155,10 +158,18 @@ class Board extends Control:
 		_glyph("tower_plain", Rect2(size.x - pad - 128.0, by - 16.0, 32, 32))
 		CardKit.text(self, fnum, UI.S_BODY, str(v["towers_them"]), size.x - pad - 134.0 - 40.0, by, 40.0, UI.TEXT, 2)
 		var chip := Strings.t(String(v["phase"]))
-		var chw := CardKit.text_w(UI.font("SemiBold"), UI.S_CAPTION, chip) + 32.0
+		var tag: Dictionary = labels.at(t)["tag"] if labels != null else {}
+		var is_tag := not tag.is_empty()
+		if is_tag:
+			chip = String(tag["text"])
+		var glyph_w := 36.0 if is_tag else 0.0
+		var chw := minf(CardKit.text_w(UI.font("SemiBold"), UI.S_CAPTION, chip) + 32.0 + glyph_w, size.x - 2.0 * 186.0)
 		var chip_r := Rect2((size.x - chw) / 2.0, by - 18.0, chw, 36.0)
-		draw_rect(chip_r, UI.PANEL3)
-		CardKit.text(self, UI.font("SemiBold"), UI.S_CAPTION, chip, chip_r.position.x + 16.0, by, chw, UI.TEXT)
+		draw_rect(chip_r, UI.PANEL3 if not is_tag else Color(UI.WARN, 0.22))
+		if is_tag:
+			var mine := String(tag["side"]) == s.my_side
+			Icons.draw(self, "side_you" if mine else "side_them", Rect2(chip_r.position.x + 12.0, by - 13.0, 26, 26), UI.ACCENT if mine else UI.CORAL)
+		CardKit.text(self, UI.font("SemiBold"), UI.S_CAPTION, chip, chip_r.position.x + 16.0 + glyph_w, by, chw - 24.0 - glyph_w, UI.TEXT)
 		# row C: the lead graph
 		var g := graph_rect()
 		draw_rect(g, Color(UI.VOID, 0.7))
@@ -202,6 +213,8 @@ class Board extends Control:
 
 class Feed extends Control:
 	var s: ShowScript
+	var labels: ArenaLabels
+	var decided := ""             # "Decided by: <factor>" (the screen passes it; the arena never computes attribution, A1)
 	var my_club := ""
 	var won := false
 	var t := 0.0
@@ -218,7 +231,7 @@ class Feed extends Control:
 		queue_redraw()
 
 	func lines() -> Array:
-		var ls := ArenaHud.feed_lines(s, t, my_club, won)
+		var ls := ArenaHud.feed_lines(s, t, my_club, won, decided)
 		if UI.large:    # 6.7.7: one feed line
 			return [ls[0], {}]
 		return ls
@@ -226,8 +239,14 @@ class Feed extends Control:
 	func _draw() -> void:
 		if s == null:
 			return
-		var ls := lines()
 		var h := size.y if size.y > 0.0 else 80.0
+		var banner: Dictionary = labels.at(t)["banner"] if labels != null and t < ShowScript.WATCH else {}
+		if not banner.is_empty():    # a banner takes over the block: a solid band, amber edge, TEXT words, 26 px
+			draw_rect(Rect2(0, 0, size.x, h), UI.PANEL3)
+			draw_rect(Rect2(0, 0, 8, h), UI.WARN)
+			CardKit.text(self, UI.font("SemiBold"), UI.S_SMALL, String(banner["text"]), 24.0, h / 2.0, size.x - 40.0, UI.TEXT)
+			return
+		var ls := lines()
 		var line_h := h / 2.0 if not UI.large else h
 		for i in 2:
 			var ln: Dictionary = ls[i]
@@ -251,3 +270,80 @@ class Feed extends Control:
 				CardKit.text(self, f, UI.S_SMALL, String(ln["text"]), 42.0, cy, size.x - 120.0, col)
 				for d in int(ArenaHud.SIZE_DOTS[String(ln["size"])]):
 					draw_circle(Vector2(42.0 + w + 18.0 + 16.0 * float(d), cy), 5.0, col)
+
+
+class Strip extends Control:
+	signal plan_tapped
+	var labels: ArenaLabels
+	var t := 0.0
+	var fast := false
+
+	func _init(p_labels: ArenaLabels) -> void:
+		labels = p_labels
+		mouse_filter = Control.MOUSE_FILTER_STOP
+		size = Vector2(672, 100)
+
+	func show_at(p_t: float, p_fast: bool) -> void:
+		t = clampf(p_t, 0.0, ShowScript.WATCH)
+		fast = p_fast
+		queue_redraw()
+
+	func plan_rect() -> Rect2:
+		return Rect2(0, 0, size.x, 44)
+
+	## The plan chip's text: the parts joined, the last part dropped until it fits beside the "If behind" chip (never an ellipsis).
+	func plan_text(room: float) -> String:
+		var parts: Array = labels.plan_parts(t)
+		var f := UI.font("SemiBold")
+		while parts.size() > 1 and CardKit.text_w(f, UI.S_CAPTION, ", ".join(parts)) > room:
+			parts.pop_back()
+		return ", ".join(parts)
+
+	func _gui_input(e: InputEvent) -> void:
+		var up := (e is InputEventMouseButton and not (e as InputEventMouseButton).pressed and (e as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and not (e as InputEventScreenTouch).pressed)
+		if up and plan_rect().has_point((e as InputEventMouse).position if e is InputEventMouse else (e as InputEventScreenTouch).position) and t >= 3.0:
+			accept_event()
+			plan_tapped.emit()
+
+	func _draw() -> void:
+		if labels == null or t >= ShowScript.WATCH:
+			return
+		var f := UI.font("SemiBold")
+		# plan row (from 3.0 s, after the opening labels)
+		if t >= 3.0:
+			var ib := labels.if_behind()
+			var ib_w := 0.0
+			if bool(ib["has"]):
+				var ib_t := Strings.t("arena.plan.if_behind")
+				ib_w = CardKit.text_w(f, UI.S_CAPTION, ib_t) + 32.0
+				var lit := bool(ib["fired"]) and t >= 21.0
+				var ib_r := Rect2(size.x - ib_w, 2, ib_w, 40)
+				draw_rect(ib_r, Color(UI.WARN, 0.25) if lit else Color(UI.PANEL2, 0.6))
+				CardKit.text(self, f, UI.S_CAPTION, ib_t, ib_r.position.x + 16.0, 22.0, ib_w, UI.TEXT if lit else UI.TEXT_OFF)
+			var room := size.x - ib_w - 12.0 - 32.0
+			var pt := plan_text(room)
+			var pw := minf(CardKit.text_w(f, UI.S_CAPTION, pt) + 32.0, room + 32.0)
+			draw_rect(Rect2(0, 2, pw, 40), UI.PANEL2)
+			CardKit.text(self, f, UI.S_CAPTION, pt, 16.0, 22.0, pw - 24.0, UI.TEXT)
+		# intent row
+		var pair: Dictionary = labels.at(t, fast)["pair"]
+		if pair.is_empty():
+			return
+		var cy := 52.0 + 24.0
+		var you: Dictionary = pair["you"]
+		if not you.is_empty():
+			var yt := String(you["text"])
+			var yw := CardKit.text_w(f, UI.S_CAPTION, yt) + 32.0 + 32.0
+			draw_rect(Rect2(0, cy - 22.0, yw, 44), Color(UI.ACCENT, 0.16))
+			Icons.draw(self, "side_you", Rect2(10, cy - 12.0, 24, 24), UI.ACCENT)
+			CardKit.text(self, f, UI.S_CAPTION, yt, 42.0, cy, yw - 48.0, UI.TEXT)
+		var them: Dictionary = pair["them"]
+		if String(pair.get("show", "both")) == "both" and not them.is_empty():
+			var tt := String(them["text"])
+			var tw := CardKit.text_w(f, UI.S_CAPTION, tt) + 32.0 + 32.0
+			var yw2 := (CardKit.text_w(f, UI.S_CAPTION, String(you.get("text", ""))) + 64.0) if not you.is_empty() else 0.0
+			if yw2 + 12.0 + tw <= size.x:    # the pair must fit its row, else only yours shows (6.7.2)
+				var r := Rect2(size.x - tw, cy - 22.0, tw, 44)
+				draw_rect(r, Color(UI.CORAL, 0.16))
+				CardKit.text(self, f, UI.S_CAPTION, tt, r.position.x + 16.0, cy, tw - 48.0, UI.TEXT)
+				Icons.draw(self, "side_them", Rect2(r.end.x - 34.0, cy - 12.0, 24, 24), UI.CORAL)

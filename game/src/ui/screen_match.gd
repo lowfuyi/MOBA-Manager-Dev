@@ -17,6 +17,8 @@ var show_t := 0.0
 var script_: ShowScript
 var choreo: Choreo
 var fx: ArenaFx
+var labels: ArenaLabels
+var decided := ""             # "Decided by: <factor>" for the end card (Report.attribution, once, at the end)
 var _shown := 0               # results revealed so far (0 to 8), read by tests and the tutorial walk
 var _fast := false
 var _watch_t := 0.0           # real seconds spent watching (pace log)
@@ -27,6 +29,7 @@ var _stage: Control
 var _map: ArenaMap
 var _board: ArenaHud.Board
 var _feed: ArenaHud.Feed
+var _strip: ArenaHud.Strip
 var _controls: Control
 var _speed_btn: Button
 var _skip_btn: Button
@@ -54,6 +57,7 @@ func _ready() -> void:
 	script_ = ShowScript.build(res, my_side)
 	choreo = Choreo.build(script_, ScreenMatch.held_variant())
 	fx = ArenaFx.build(script_, choreo, my_side)
+	labels = ArenaLabels.build(script_, UI.large)
 	setup("", Callable(), false)
 	_stage = Control.new()
 	_stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -67,6 +71,11 @@ func _ready() -> void:
 	_stage.add_child(_board)
 	_feed = ArenaHud.Feed.new(script_, ArenaHud.last_word(App.gs.club_name(App.gs.club())))
 	_stage.add_child(_feed)
+	_board.labels = labels
+	_feed.labels = labels
+	_strip = ArenaHud.Strip.new(labels)
+	_strip.plan_tapped.connect(_open_plan)
+	_stage.add_child(_strip)
 	_controls = Control.new()
 	_controls.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_stage.add_child(_controls)
@@ -120,7 +129,9 @@ func _layout() -> void:
 	var strip_y := top + SAFE + board_h + ah
 	var ctrl_y := o.y + h - 24.0 - UI.BTN_H
 	var feed_h := 38.0 if large else 80.0
-	_feed.position = Vector2(o.x + 24.0, strip_y + (8.0 if large else 108.0))
+	_strip.position = Vector2(o.x + 24.0, strip_y)    # plan row 44, gap 8, intent row 48 (6.7.2; the same in large text)
+	_strip.size = Vector2(w - 48.0, 100.0)
+	_feed.position = Vector2(o.x + 24.0, strip_y + 108.0)
 	_feed.size = Vector2(w - 48.0, feed_h)
 	var help_w := UI.BTN_H
 	_controls.position = Vector2(o.x + 24.0, ctrl_y)
@@ -139,8 +150,8 @@ func _layout() -> void:
 func _process(delta: float) -> void:
 	if _finished or script_ == null:
 		return
-	if HelpSheet.paused():
-		return    # a help sheet is open: the show waits (the result was decided before it, so nothing changes; I-22)
+	if BottomSheet.is_open() and not BottomSheet.current().is_closing:
+		return    # any sheet (help, the plan) pauses the show (6.7.6); the result was decided before it, so nothing changes
 	_watch_t += delta
 	show_t = minf(ShowScript.WATCH, show_t + delta * (2.0 if _fast else 1.0))
 	_apply()
@@ -153,6 +164,7 @@ func _apply() -> void:
 	fx.apply(_map, show_t, not UI.animate)
 	_board.show_at(show_t)
 	_feed.show_at(show_t)
+	_strip.show_at(show_t, _fast)
 	var n := 0
 	for item in Report.FEED_ORDER:
 		if float(item[1]) * ShowScript.WATCH <= show_t + 1e-9:
@@ -170,11 +182,42 @@ func _end() -> void:
 		return
 	_finished = true
 	show_t = ShowScript.WATCH
+	decided = ScreenMatch.decided_text(res, my_side)
+	_feed.decided = decided
 	_apply()
 	_speed_btn.visible = false
 	_skip_btn.visible = false
 	_go_btn.visible = true
 	_raise("match:end")
+
+
+## "Decided by: <the biggest factor>", the same factor the Report leads with (UI-PASS-2 6.7.5).
+static func decided_text(r: Dictionary, side: String) -> String:
+	var att := Report.attribution(r, side)
+	var best := {}
+	for f in att["factors"]:
+		if best.is_empty() or absf(float(f["share"])) > absf(float(best["share"])):
+			best = f
+	if best.is_empty():
+		return ""
+	return Strings.f("arena.end.decided", {"factor": Strings.t("factor." + String(best["id"]))})
+
+
+## The plan row tapped: a read-only sheet with the plan in force and the "If behind" plan; the show pauses while it is open.
+func _open_plan() -> void:
+	BottomSheet.open(Strings.t("gp.title"), _plan_body, Callable(), "S", "match_plan")
+
+
+func _plan_body(c: VBoxContainer) -> void:
+	for part in labels.plan_parts(show_t):
+		c.add_child(UI.label(String(part), UI.S_BODY, UI.TEXT))
+	var ib := labels.if_behind()
+	if bool(ib["has"]):
+		var when := String(ib["when"])
+		var hint := ("gp.trigger_hint." + when) if when == "behind_early" or when == "ahead_early" else ("gp.switch.short." + when)
+		var l := UI.label(Strings.t(hint), UI.S_SMALL, UI.TEXT2)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		c.add_child(l)
 
 
 func _toggle_speed() -> void:
