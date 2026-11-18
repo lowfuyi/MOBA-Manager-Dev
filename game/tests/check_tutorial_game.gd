@@ -135,7 +135,7 @@ func _match_quick_mode() -> void:
 	var m := ScreenMatch.new(g, res)
 	App.go(m)
 	await frames(4)
-	ok(_screen() == m and m._clock != null and not m._finished, "match_: Quick mode is ignored for the tutorial game: the watch screen is up")
+	ok(_screen() == m and m.script_ != null and not m._finished, "match_: Quick mode is ignored for the tutorial game: the watch screen (the arena) is up")
 	m._skip()
 	await frames(2)
 	ok(m._finished and m._go_btn != null and m._go_btn.visible, "match_: skip reaches the end of the feed, the Continue button shows")

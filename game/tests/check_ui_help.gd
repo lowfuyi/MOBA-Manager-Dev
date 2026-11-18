@@ -267,14 +267,14 @@ func _pause() -> void:
 	await frames(4)
 	var m := _cur() as ScreenMatch
 	var res_before := JSON.stringify(m.res)
-	var e0: float = m._elapsed
+	var e0: float = m.show_t
 	HelpSheet.open("match")
 	await frames(4)
 	m._process(3.0)
-	var e1: float = m._elapsed
+	var e1: float = m.show_t
 	await _close()
 	m._process(3.0)
-	ok(is_equal_approx(e0, e1) and m._elapsed > e1, "pause: the match playback stands still while help is open and runs after")
+	ok(is_equal_approx(e0, e1) and m.show_t > e1, "pause: the match playback stands still while help is open and runs after")
 	ok(JSON.stringify(m.res) == res_before, "pause: the result is the same with help opened")
 
 

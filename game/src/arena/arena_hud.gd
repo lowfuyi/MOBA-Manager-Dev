@@ -94,7 +94,7 @@ class Board extends Control:
 		tex = p_tex
 		names = [ArenaHud.last_word(mine), ArenaHud.last_word(theirs)]
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		custom_minimum_size = Vector2(0, 142)
+		size = Vector2(720, 142)    # no minimum: large text is 122 (6.7.7)
 
 	func show_at(p_t: float) -> void:
 		t = clampf(p_t, 0.0, ShowScript.WATCH)
@@ -211,7 +211,7 @@ class Feed extends Control:
 		my_club = p_my_club
 		won = s.winner == s.my_side
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		custom_minimum_size = Vector2(0, 80)
+		size = Vector2(672, 80)    # no minimum: large text is one 38 px line
 
 	func show_at(p_t: float) -> void:
 		t = clampf(p_t, 0.0, ShowScript.WATCH)

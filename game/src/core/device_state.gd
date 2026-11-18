@@ -193,3 +193,21 @@ func help_reset() -> void:
 func hints_reset() -> void:
 	help_reset()
 	lessons_reset_offers()
+
+
+# ------------------------------------------------------------------ [arena] (Alpha 0.8 A-06)
+## The held-fight staging for testers (ARENA-MAP 7.3): "" = the data's default (held_island), or "held_gate". A device setting,
+## not part of the save: it changes only how a decided game is drawn.
+const ARENA_HELD := ["", "held_island", "held_gate"]
+
+
+func arena_held() -> String:
+	var v = _load().get_value("arena", "held", "")
+	return String(v) if v is String and ARENA_HELD.has(String(v)) else ""
+
+
+func set_arena_held(id: String) -> bool:
+	if not ARENA_HELD.has(id):
+		return false
+	_write("arena", "held", id)
+	return true

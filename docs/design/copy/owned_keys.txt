@@ -607,3 +607,5 @@ about.included.b
 about.test.b
 about.licences.read
 about.title
+settings.held_gate
+settings.held_gate_hint

@@ -229,24 +229,12 @@
    "since": "I-17"
   },
   "12_match_mid": {
-   "status": "legacy",
-   "leaves_with": "arena 0.8",
-   "measured": {
-    "draws": 14,
-    "nodes": 23
-   },
-   "draws": 20,
-   "nodes": 30
+   "status": "redesigned",
+   "since": "A-06"
   },
   "13_match_end": {
-   "status": "legacy",
-   "leaves_with": "arena 0.8",
-   "measured": {
-    "draws": 12,
-    "nodes": 28
-   },
-   "draws": 15,
-   "nodes": 35
+   "status": "redesigned",
+   "since": "A-06"
   },
   "14_report_top": {
    "status": "redesigned",

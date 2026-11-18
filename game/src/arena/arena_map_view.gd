@@ -47,7 +47,7 @@ var _art: _Bake
 func _init(p_my_side: String = "B") -> void:
 	my_side = p_my_side
 	flip = p_my_side == "R"
-	custom_minimum_size = MAP
+	size = MAP    # no minimum: in large text the arena is 626 x 661 (UI-PASS-2 6.7.7); the parent sets the size
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = true    # zoomed, tokens and towers near the edge must not spill over the scoreboard or the text strip
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
