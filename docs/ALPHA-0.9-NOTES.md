@@ -6,6 +6,16 @@ This is a testing build: the debug key must never go to a store.
 
 **Nothing in this build has run on a phone.** Every number below comes from the computer.
 
+## Update 0.9.2 (2026-11-18, made while you test 0.9.0)
+Build: `build/gloamline-0.9.2-alpha.apk` (25.3 MB, sha256 15453d95..., versionCode 14, same key; installs over 0.9.0 and keeps your save). Optional: finish
+your 0.9.0 test first if you like; nothing here changes how matches play.
+- **Team chemistry** is lighter to draw (the heaviest screen in the game: 151 draw calls when scrolled, now 55) and the lines
+  between starters now show how well they understand each other by **style** as well as colour: solid = well, dashed = fairly
+  well, dotted = poorly (easier for colour-blind players). The hint under the picture says so.
+- **Rings on the map for intent labels:** when a label such as "Going for Stoneback" shows, a ring marks that place on the map
+  (circle for yours, hexagon for theirs).
+- Still not run on a phone.
+
 ## What is in it (since 0.8.0)
 - 0.8.0b: Frame rate setting, 30 or 60.
 - 0.8.1 Fight pass: heroes act by type, health bars, real fight arcs with retreat and chase, the ring only after objective
