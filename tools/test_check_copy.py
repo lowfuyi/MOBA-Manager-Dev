@@ -112,9 +112,11 @@ def test_colour_blind_setting_strings_may_name_colours():
     assert errs({"settings.colorblind": "Colour-blind colours", "settings.colorblind_hint": "Swaps green and red for blue and orange."}) == []
 
 
-def test_chem_hint_is_a_warning_not_an_error():
-    e, w = C.check({"chem.pentagon_hint": "Greener line: better understanding"})
-    assert e == [] and has(w, "chem.pentagon_hint", "known")
+def test_chem_hint_released_with_line_styles():
+    # Alpha 0.9.2: the pentagon draws solid, dashed and dotted lines, so the hint no longer leans on colour alone
+    assert "chem.pentagon_hint" not in C.KNOWN_OPEN
+    e, w = C.check({"chem.pentagon_hint": "Thicker line: stronger bond (the number). Solid line: they understand each other well. Dashed: fairly well. Dotted: poorly."})
+    assert e == [] and not has(w, "chem.pentagon_hint", "known")
 
 
 # ------------------------------------------------------------------ rename: values only

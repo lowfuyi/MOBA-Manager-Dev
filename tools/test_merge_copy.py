@@ -232,9 +232,9 @@ def test_real_en_json_is_canonical_and_patch2_applied():
     en = M.load_unique(M.DEFAULT_EN)
     assert (en["role.short.jg"], en["role.short.sup"]) == ("Jungle", "Support")
     assert en["player.tab.overview"] == "Overview" and en["player.tab.stats"] == "Stats" and en["player.tab.career"] == "Career"
-    assert "dashed" not in en["chem.pentagon_hint"].lower()       # held: old text kept
+    assert "dashed" in en["chem.pentagon_hint"].lower()           # released at 0.9.2 with the line styles
     hold = M.load_unique(ROOT / "docs/design/copy/hold_0_7.json")
-    assert hold["chem.pentagon_hint"]["release_in"] == "Chemistry line styles built (UI pass)"
+    assert hold == {}                                               # nothing held any more
 
 
 def test_real_update_dry_run_does_not_touch_files(tmp_path):
@@ -249,14 +249,16 @@ def test_real_update_dry_run_does_not_touch_files(tmp_path):
     assert M.DEFAULT_EN.read_bytes() == before[0]
 
 
-def test_known_open_lets_held_chem_hint_pass_but_only_as_warning(monkeypatch):
+def test_released_chem_hint_is_clean_and_old_text_would_fail(monkeypatch):
+    # released at 0.9.2 with the line styles it describes: neither an error nor a warning now
     en = C.load_unique(C.EN)
     assert C.main([str(C.EN)]) == 0
     e, w = C.check(en, {})
-    assert e == [] and any("chem.pentagon_hint" in x for x in w)
-    monkeypatch.setattr(C, "KNOWN_OPEN", {k: v for k, v in C.KNOWN_OPEN.items() if k != "chem.pentagon_hint"})
-    e, _ = C.check(en, {})                                         # negative control: without the entry it is an error
-    assert any("chem.pentagon_hint" in x for x in e)
+    assert e == [] and not any("chem.pentagon_hint" in x for x in w)
+    old = dict(en)
+    old["chem.pentagon_hint"] = "Thicker line: stronger bond (the number). Greener line: better understanding."
+    e2, _ = C.check(old, {})                                       # negative control: the colour-only text is an error again
+    assert any("chem.pentagon_hint" in x for x in e2)
 
 
 def test_released_draft_meta_hint_is_clean():

@@ -416,7 +416,7 @@
   "chem.summary": "Chemistry {chem} of 100  -  rating bonus {bonus}",
   "chem.hint": "Bonds grow when players play together. Chemistry turns the bonds of your five starters, and how clearly each one communicates, into a small bonus for the whole team.",
   "chem.pentagon_h": "Your five starters",
-  "chem.pentagon_hint": "Thicker line: stronger bond (the number). Greener line: better understanding.",
+  "chem.pentagon_hint": "Thicker line: stronger bond (the number). Solid line: they understand each other well. Dashed: fairly well. Dotted: poorly.",
   "chem.grid_h": "Who understands whom",
   "chem.grid_hint": "Read across: how well the player on the left takes in what the player on top says, 0 to 100.",
   "chem.langs_h": "Languages",

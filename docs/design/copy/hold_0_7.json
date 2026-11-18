@@ -1,6 +1,1 @@
-{
-  "chem.pentagon_hint": {
-    "release_in": "Chemistry line styles built (UI pass)",
-    "reason": "New text names solid, dashed and dotted lines; the Chemistry screen draws them only after the UI pass. Until then the old text (Greener line) stays."
-  }
-}
+{}

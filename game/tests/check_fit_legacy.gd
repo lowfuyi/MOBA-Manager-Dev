@@ -344,6 +344,10 @@ func _chemistry() -> void:
 			worst = nw
 			worst_name = nm
 	ok(worst <= BondPentagon.NAME_ROOM, "chemistry_%s: the widest of %d player names ('%s') is %.1f px in a %.0f px circle" % [variant, App.world.players.size(), worst_name, worst, BondPentagon.NAME_ROOM])
+	# Alpha 0.9.2: the pentagon's line style carries understanding without colour (UI-PASS-2 item c)
+	ok(BondPentagon.line_style(40.0) == "solid" and BondPentagon.line_style(39.9) == "dashed" and BondPentagon.line_style(20.0) == "dashed" and BondPentagon.line_style(19.9) == "dotted", "chemistry_%s: line style solid from 40, dashed 20 to 39.9, dotted below 20" % variant)
+	var dp := BondPentagon.dash_points(Vector2.ZERO, Vector2(100, 0), 20.0, 12.0)
+	ok(dp.size() == 8 and dp[0] == Vector2.ZERO and dp[1] == Vector2(20, 0) and dp[7].x <= 100.0, "chemistry_%s: dashes 20 on, 12 off over 100 px give four dashes ending on the line" % variant)
 	ok(BondPentagon.TAG_SIZE >= UI.S_CAPTION and BondPentagon.NAME_SIZE >= UI.S_CAPTION and BondPentagon.NUM_SIZE >= UI.S_CAPTION, "chemistry_%s: every pentagon text is at least the 24 px floor" % variant)
 
 

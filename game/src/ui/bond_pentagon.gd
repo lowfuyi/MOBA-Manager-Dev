@@ -34,6 +34,29 @@ static func understanding_color(u: float) -> Color:
 	return UI.BAD.lerp(UI.WARN, t * 2.0) if t < 0.5 else UI.WARN.lerp(UI.GOOD, (t - 0.5) * 2.0)
 
 
+## Line style carries understanding without colour (UI-PASS-2 item c, Alpha 0.9.2): solid at 40 or more, dashed 20 to 39.9,
+## dotted below 20 (the pair's mean of both directions). Thickness still carries the bond; colour stays as reinforcement.
+static func line_style(u: float) -> String:
+	if u >= 40.0:
+		return "solid"
+	return "dashed" if u >= 20.0 else "dotted"
+
+
+## Segment pairs for draw_multiline from a to b: `on` px drawn, `off` px gap (one draw call per line, whatever its pattern).
+static func dash_points(a: Vector2, b: Vector2, on: float, off: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	var d := a.distance_to(b)
+	if d <= 0.0:
+		return out
+	var dir := (b - a) / d
+	var x := 0.0
+	while x < d:
+		out.append(a + dir * x)
+		out.append(a + dir * minf(d, x + on))
+		x += on + off
+	return out
+
+
 ## Width of one line of the pentagon's drawn text, in the font the pentagon draws it with.
 static func text_width(text: String, font_size: int, weight: String) -> float:
 	return UI.font(weight).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
@@ -68,7 +91,14 @@ func _draw() -> void:
 			var u := (float(under_of.call(ids[i], ids[j])) + float(under_of.call(ids[j], ids[i]))) * 0.5
 			var p1 := _point(i)
 			var p2 := _point(j)
-			draw_line(p1, p2, understanding_color(u), 2.0 + b / 100.0 * 14.0, true)
+			var lw := 2.0 + b / 100.0 * 14.0
+			match BondPentagon.line_style(u):
+				"solid":
+					draw_line(p1, p2, understanding_color(u), lw, false)
+				"dashed":
+					draw_multiline(BondPentagon.dash_points(p1, p2, maxf(20.0, 2.2 * lw), maxf(12.0, lw)), understanding_color(u), lw, false)
+				_:
+					draw_multiline(BondPentagon.dash_points(p1, p2, maxf(5.0, lw), maxf(7.0, 1.2 * lw)), understanding_color(u), lw, false)
 	# Alpha 0.9.1: like kinds drawn together (circles, then rims, then number plates, then every text by font and size), so the
 	# renderer can batch them; the picture is the same as before (the plates sit over the lines, the words over the plates).
 	for i in 5:

@@ -23,7 +23,8 @@
  },
  "canvas_target_exceptions": [
   "02_about",
-  "08f_chemistry_lower"
+  "08f_chemistry_lower",
+  "08e_chemistry"
  ],
  "rows": {
   "01_title": {
