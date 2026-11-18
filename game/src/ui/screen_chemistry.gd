@@ -51,24 +51,15 @@ func _ready() -> void:
 	var gc := UI.card(body)
 	gc.add_child(UI.label(Strings.t("chem.grid_h"), UI.S_BODY, UI.ACCENT))
 	gc.add_child(UI.label(Strings.t("chem.grid_hint"), UI.S_SMALL, UI.DIM))
-	var grid := GridContainer.new()
-	grid.columns = 6
-	grid.add_theme_constant_override("h_separation", 4)    # six columns, "Support" (76 px) must fit a cell at large text: 85 px
-	grid.add_theme_constant_override("v_separation", 6)
-	grid.mouse_filter = Control.MOUSE_FILTER_PASS
-	gc.add_child(grid)
-	grid.add_child(_cell("", UI.PANEL, UI.TEXT))
+	var grid := UnderstandingGrid.new()    # one control, one pass (Alpha 0.9.1)
 	for s in GameState.SLOTS:
-		grid.add_child(_cell(Strings.t("role.short." + s), UI.PANEL, UI.ACCENT))
+		grid.heads.append(Strings.t("role.short." + s))
 	for i in 5:
-		grid.add_child(_cell(Strings.t("role.short." + GameState.SLOTS[i]), UI.PANEL, UI.ACCENT))
+		var row: Array = []
 		for j in 5:
-			if i == j:
-				grid.add_child(_cell("-", UI.PANEL, UI.DIM))
-				continue
-			var u := Bonds.understanding(five[i], five[j], gs.bond(five[i]["id"], five[j]["id"]))
-			var col := BondPentagon.understanding_color(u)
-			grid.add_child(_cell("%.0f" % u, col.darkened(0.55), UI.TEXT))
+			row.append(0.0 if i == j else Bonds.understanding(five[i], five[j], gs.bond(five[i]["id"], five[j]["id"])))
+		grid.values.append(row)
+	gc.add_child(grid)
 
 	var lc := UI.card(body)
 	lc.add_child(UI.label(Strings.t("chem.langs_h"), UI.S_BODY, UI.ACCENT))
@@ -97,14 +88,3 @@ func _ready() -> void:
 	tc.add_child(UI.button(Strings.t("chem.training"), func(): App.go(ScreenTraining.new()), "normal", 76))
 	UI.tag(tc.get_parent() as Control, "chem.training", false)    # lesson L4 (I-23)
 
-
-func _cell(text: String, bg: Color, fg: Color) -> PanelContainer:
-	var pc := PanelContainer.new()
-	pc.custom_minimum_size = Vector2(72, 64)
-	pc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	pc.mouse_filter = Control.MOUSE_FILTER_PASS
-	pc.add_theme_stylebox_override("panel", UI.box(bg, 8, 0))    # no padding: "Support" is 76 px (Caption 24 SemiBold), a cell is 85 px at large text
-	var l := UI.label(text, UI.S_CAPTION, fg, HORIZONTAL_ALIGNMENT_CENTER)    # Caption weight (SemiBold), the scale's own pair
-	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	pc.add_child(l)
-	return pc

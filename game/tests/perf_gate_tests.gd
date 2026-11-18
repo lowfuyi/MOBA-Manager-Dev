@@ -88,7 +88,7 @@ func _real_file(check: Callable) -> void:
 	check.call(rpr is Dictionary and rpr.get("status") == "redesigned" and rpr.get("since") == "I-18", "14_report_top row: redesigned since I-18 (held to the target 60 / 120)")
 	var gpr = rows.get("11c_gameplan_trigger", {})
 	check.call(gpr is Dictionary and gpr.get("status") == "redesigned" and gpr.get("since") == "I-17", "11c_gameplan_trigger row: redesigned since I-17 (held to the target 60 / 120)")
-	check.call(chem is Dictionary and int(chem["draws"]) == 170, "Chemistry scrolled keeps its legacy allowance above the hard 100 (165, re-baselined at I-22 to 170: 151 measured with the \"?\")")
+	check.call(chem is Dictionary and chem.get("status") == "redesigned" and chem.get("since") == "0.9.1", "08f_chemistry_lower row: redesigned since 0.9.1 (was the legacy exception at 170; now held to the target 60 / 120)")
 	# negative control on the real file: one more draw call than any row allows fails that row, exactly at the allowance passes
 	var all_ok := true
 	var all_bad := true

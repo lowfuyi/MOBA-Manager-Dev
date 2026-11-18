@@ -349,11 +349,8 @@ func _chemistry() -> void:
 
 ## The width the first role-word cell of the grid gives its text (cell width minus its padding), from the live layout.
 func _grid_cell_text_room(n: Node) -> float:
-	if n is GridContainer:
-		var cell := (n as GridContainer).get_child(1) as PanelContainer
-		if cell != null:
-			var sb: StyleBox = cell.get_theme_stylebox("panel")
-			return cell.size.x - sb.get_margin(SIDE_LEFT) - sb.get_margin(SIDE_RIGHT)
+	if n is UnderstandingGrid:    # Alpha 0.9.1: the grid is one drawn control
+		return (n as UnderstandingGrid).cell_text_room()
 	for ch in n.get_children():
 		var r := _grid_cell_text_room(ch)
 		if r > 0.0:

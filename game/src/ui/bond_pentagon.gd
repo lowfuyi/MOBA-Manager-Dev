@@ -69,18 +69,25 @@ func _draw() -> void:
 			var p1 := _point(i)
 			var p2 := _point(j)
 			draw_line(p1, p2, understanding_color(u), 2.0 + b / 100.0 * 14.0, true)
+	# Alpha 0.9.1: like kinds drawn together (circles, then rims, then number plates, then every text by font and size), so the
+	# renderer can batch them; the picture is the same as before (the plates sit over the lines, the words over the plates).
 	for i in 5:
-		var p := _point(i)
-		draw_circle(p, CIRCLE_R, UI.PANEL2)
-		draw_arc(p, CIRCLE_R, 0.0, TAU, 40, UI.ACCENT, 3.0, true)
-		var tag := _fit(String(tags[i]), TAG_SIZE, TAG_WEIGHT, TAG_ROOM)
-		var nm := _fit(String(names[i]), NAME_SIZE, NAME_WEIGHT, NAME_ROOM)
-		draw_string(tag_font, p + Vector2(-TAG_ROOM * 0.5, -2.0), tag, HORIZONTAL_ALIGNMENT_CENTER, TAG_ROOM, TAG_SIZE, UI.ACCENT)
-		draw_string(name_font, p + Vector2(-NAME_ROOM * 0.5, 26.0), nm, HORIZONTAL_ALIGNMENT_CENTER, NAME_ROOM, NAME_SIZE, UI.TEXT)
+		draw_circle(_point(i), CIRCLE_R, UI.PANEL2)
+	for i in 5:
+		draw_arc(_point(i), CIRCLE_R, 0.0, TAU, 40, UI.ACCENT, 3.0, true)
+	var nums: Array = []
 	for i in 5:
 		for j in range(i + 1, 5):
 			var mid := (_point(i) + _point(j)) * 0.5
 			var txt := "%.0f" % float(bond_of.call(ids[i], ids[j]))
 			var tw := text_width(txt, NUM_SIZE, NUM_WEIGHT)
 			draw_rect(Rect2(mid + Vector2(-tw * 0.5 - 8.0, -20.0), Vector2(tw + 16.0, 34.0)), Color(0.05, 0.08, 0.12, 0.85))
-			draw_string(num_font, mid + Vector2(-tw * 0.5, 6.0), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, NUM_SIZE, UI.TEXT)
+			nums.append([mid + Vector2(-tw * 0.5, 6.0), txt])
+	for i in 5:
+		var tag := _fit(String(tags[i]), TAG_SIZE, TAG_WEIGHT, TAG_ROOM)
+		draw_string(tag_font, _point(i) + Vector2(-TAG_ROOM * 0.5, -2.0), tag, HORIZONTAL_ALIGNMENT_CENTER, TAG_ROOM, TAG_SIZE, UI.ACCENT)
+	for i in 5:
+		var nm := _fit(String(names[i]), NAME_SIZE, NAME_WEIGHT, NAME_ROOM)
+		draw_string(name_font, _point(i) + Vector2(-NAME_ROOM * 0.5, 26.0), nm, HORIZONTAL_ALIGNMENT_CENTER, NAME_ROOM, NAME_SIZE, UI.TEXT)
+	for n in nums:
+		draw_string(num_font, n[0], String(n[1]), HORIZONTAL_ALIGNMENT_LEFT, -1, NUM_SIZE, UI.TEXT)

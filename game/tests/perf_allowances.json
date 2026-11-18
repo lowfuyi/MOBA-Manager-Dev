@@ -179,22 +179,12 @@
    "nodes": 95
   },
   "08e_chemistry": {
-   "status": "legacy",
-   "measured": {
-    "draws": 79,
-    "nodes": 116
-   },
-   "draws": 90,
-   "nodes": 130
+   "status": "redesigned",
+   "since": "0.9.1"
   },
   "08f_chemistry_lower": {
-   "status": "legacy",
-   "measured": {
-    "draws": 151,
-    "nodes": 116
-   },
-   "draws": 170,
-   "nodes": 130
+   "status": "redesigned",
+   "since": "0.9.1"
   },
   "09_draft_start": {
    "status": "redesigned",
