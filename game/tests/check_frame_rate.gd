@@ -92,7 +92,7 @@ func _clock() -> void:
 
 ## One state of the show at time t: what each layer would draw.
 static func _state(s: ShowScript, c: Choreo, fx: ArenaFx, l: ArenaLabels, me: String, t: float, fast: bool) -> String:
-	return JSON.stringify([ArenaHud.board_values(s, t), c.sprites_at(t, me), fx.under_at(t), fx.over_at(t), l.at(t, fast)])
+	return JSON.stringify([ArenaHud.board_values(s, t), fx.sprites_at(t), fx.bars_at(t), fx.under_at(t), fx.over_at(t), l.at(t, fast)])
 
 
 func _same() -> void:

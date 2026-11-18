@@ -12,13 +12,17 @@ extends RefCounted
 ##   camera_at(t)  [canonical focus, zoom]: focus windows on the group beats (ARENA-MAP 8); wide in the held fight (HF4)
 ##   resolves      [{beat, t, win}] the winner marker of every contest, at its stamp (the A-04 test reads it)
 ## Sprite entries: [ICON key, canonical point, size px, alpha]. Arc entries: [canonical centre, radius px, from, to, colour key].
+## Fight pass (Alpha 0.8.1, ACTION-VOCABULARY 11.2): every hit cue and every ledger kill is an action of its attacker by archetype
+## (dash, shot, burst, tether; menders heal), plus the engage of each group beat. hero_pos(key, t) is the token with its lunge;
+## bars_at(t) the health bars (ShowScript.hp_at). An action is kept only when its attacker is up at its start and its hit and the
+## target is up just before the hit.
 
 const LANE_BEATS := ["top", "mid_lane", "bot"]
 const GROUP := {"obj_mid": "N.stoneback", "fight_mid": "N.mossback", "obj_late": "N.moonhulk"}
 const TAKE := {"obj_mid": [31.0, 33.75], "obj_late": [57.0, 60.0]}
 const CLASH := {"obj_mid": [31.5, 33.75], "fight_mid": [41.2, 45.0], "obj_late": [57.0, 60.0], "fight_late": [66.0, 71.25]}
 const HIT_RATIO := {"narrow": 0.55, "clear": 0.7, "decisive": 0.85}
-const MAX_CUES := 12            # live short cues at once (3.2 suggests a cap of 12)
+const MAX_CUES := 24            # live short cues at once (12 in 0.8; the Fight pass raises it to 24, arena_actions_v1.json)
 const FOCUS_IN := 0.45
 const FOCUS_OUT := 0.6
 const GUARD_FALL := [72.0, 72.4]
@@ -32,6 +36,8 @@ var resolves: Array = []
 var guard_ids: Array = []
 var fight_late_at := Vector2(0.5, 0.5)
 var focus: Array = []           # [{from, to, at (canonical)}]
+var actions: Array = []         # [{kind, a (attacker key), b (target key), t0, th (the hit), t1, kill, reach}] sorted by t0
+var _lunges: Dictionary = {}    # attacker key -> its dash and engage actions (the token moves)
 
 
 static func build(p_s: ShowScript, p_c: Choreo, p_my_side: String) -> ArenaFx:
@@ -69,6 +75,7 @@ func _build() -> void:
 		resolves.append({"beat": k, "t": float(ShowScript.RESOLVE[k]), "win": String(s.contests[k]["win"]), "at": at,
 				"size": String(s.contests[k]["size"])})
 	_sparks()
+	_actions()
 	focus = [{"from": 31.0, "to": 36.0, "at": ArenaData.node("N.stoneback")},
 			{"from": 41.0, "to": 46.5, "at": ArenaData.node("N.mossback")},
 			{"from": 57.0, "to": 61.5, "at": ArenaData.node("N.moonhulk")}]
@@ -103,6 +110,214 @@ func _sparks() -> void:
 			sparks.append({"t": t2, "key": hit + "." + slot2, "magic": rng.next_float() < 0.5})
 			t2 += 0.3
 	sparks.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["t"]) < float(b["t"]))
+
+
+func _add_action(att: String, tgt: String, th: float, kill: bool) -> void:
+	var A: Dictionary = ArenaActions.data()["actions"]
+	var kind := ArenaActions.action_of(s.res, att.substr(0, 1), att.substr(2))
+	if kind == "heal":
+		kind = "shot"    # a mender's own hit is a light bolt
+	var t0 := th - float(A[kind]["lead_s"])
+	var t1 := th
+	match kind:
+		"dash":
+			t1 = th + float(A["dash"]["recoil_s"])
+		"burst":
+			t1 = th + float(A["burst"]["burst_s"])
+		"tether":
+			t1 = th if kill else th + float(A["tether"]["hold_s"])
+	if not (c.alive(att, t0) and c.alive(att, t1) and c.alpha(att, t0) >= 1.0 and c.alive(tgt, th - 0.01)):
+		return
+	if not kill and not c.alive(tgt, t1):
+		return
+	actions.append({"kind": kind, "a": att, "b": tgt, "t0": t0, "th": th, "t1": t1, "kill": kill, "reach": float(A["dash"]["reach_px"])})
+
+
+## 11.2 and 11.3: the attacker of every hit cue (the lane opponent; in a group beat a living foe of the `show:act` stream), the
+## killer's action on every ledger kill, the engage of each group beat and the menders' heals.
+func _actions() -> void:
+	var rng := Pcg32.contest_stream(int(s.res["mseed"]), "show:act")
+	for sp in sparks:
+		var tgt := String(sp["key"])
+		var t := float(sp["t"])
+		var foe := ShowScript.other(tgt.substr(0, 1))
+		var att := ""
+		if t < 20.25:
+			att = foe + "." + tgt.substr(2)
+		else:
+			var cands: Array = []
+			for slot in Choreo.SLOTS:
+				var k: String = foe + "." + slot
+				if c.alive(k, t - 0.35) and c.alive(k, t):
+					cands.append(k)
+			if cands.is_empty():
+				continue
+			att = cands[int(rng.next_float() * float(cands.size())) % cands.size()]
+		_add_action(att, tgt, t, false)
+	for e in s.kill_events:
+		_add_action(String(e["side"]) + "." + String(e["killer"]), ShowScript.other(String(e["side"])) + "." + String(e["victim"]), float(e["t"]), true)
+	var eng: Dictionary = ArenaActions.data()["engage"]
+	var fights: Dictionary = ArenaActions.data()["fights"]
+	for k2 in fights:
+		var t0 := float(fights[k2]["from"])
+		var t1 := t0 + float(eng["length_s"])
+		var side := String(s.initiators.get(k2, s.contests[k2]["win"]))
+		var front := ""
+		for want in ["bulwark", "bruiser"]:
+			for slot2 in Choreo.SLOTS:
+				if front == "" and ArenaActions.archetype(s.res, side, slot2) == want and c.alive(side + "." + slot2, t0) and c.alive(side + "." + slot2, t1):
+					front = side + "." + slot2
+		if front == "":
+			for slot3 in Choreo.SLOTS:
+				if front == "" and c.alive(side + "." + slot3, t0) and c.alive(side + "." + slot3, t1):
+					front = side + "." + slot3
+		if front == "":
+			continue
+		var best := ""
+		var bd := INF
+		for slot4 in Choreo.SLOTS:
+			var fk: String = ShowScript.other(side) + "." + slot4
+			if not (c.alive(fk, t0) and c.alive(fk, t0 + 0.3)):
+				continue
+			var dd := c.pos(front, t0).distance_to(c.pos(fk, t0))
+			if dd < bd:
+				bd = dd
+				best = fk
+		if best != "":
+			actions.append({"kind": "engage", "a": front, "b": best, "t0": t0, "th": t0 + 0.3, "t1": t1, "kill": false, "reach": float(eng["reach_px"])})
+	var pulse := float(ArenaActions.data()["actions"]["heal"]["pulse_s"])
+	for h in s.heals:
+		actions.append({"kind": "heal", "a": String(h["by"]), "b": String(h["ally"]), "t0": float(h["t"]), "th": float(h["t"]), "t1": float(h["t"]) + pulse, "kill": false, "reach": 0.0})
+	actions.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["t0"]) < float(b["t0"]))
+	for a2 in actions:
+		if String(a2["kind"]) == "dash" or String(a2["kind"]) == "engage":
+			if not _lunges.has(a2["a"]):
+				_lunges[a2["a"]] = []
+			_lunges[a2["a"]].append(a2)
+
+
+## How far into its lunge an attacker is (0 to 1): a dash eases in to the hit and recoils after it; an engage charges, holds, returns.
+func _lunge_k(a: Dictionary, t: float) -> float:
+	var t0 := float(a["t0"])
+	var th := float(a["th"])
+	var t1 := float(a["t1"])
+	if t < t0 or t >= t1:
+		return 0.0
+	if String(a["kind"]) == "engage":
+		if t < th:
+			return _ease((t - t0) / (th - t0))
+		if t < th + 0.3:
+			return 1.0
+		return 1.0 - _ease((t - th - 0.3) / maxf(0.01, t1 - th - 0.3))
+	if t < th:
+		return _ease((t - t0) / maxf(0.01, th - t0))
+	return 1.0 - _ease((t - th) / maxf(0.01, t1 - th))
+
+
+## The token's offset at t (canonical units): toward its target by the action's reach (never more than 0.6 of the gap).
+func nudge(key: String, t: float) -> Vector2:
+	var off := Vector2.ZERO
+	for a in _lunges.get(key, []):
+		if float(a["t0"]) > t:
+			break
+		var k := _lunge_k(a, t)
+		if k <= 0.0:
+			continue
+		var pa := c.pos(key, t)
+		var pb := c.pos(String(a["b"]), t)
+		var d := Vector2((pb.x - pa.x) * ArenaData.W, (pb.y - pa.y) * ArenaData.H)
+		var dist := d.length()
+		if dist < 1.0:
+			continue
+		var v := d / dist * minf(float(a["reach"]), 0.6 * dist) * k
+		off += v
+	var cap := float(ArenaActions.data()["engage"]["reach_px"])    # two lunges at once never carry a token further than an engage
+	if off.length() > cap:
+		off = off.normalized() * cap
+	return Vector2(off.x / ArenaData.W, off.y / ArenaData.H)
+
+
+func hero_pos(key: String, t: float) -> Vector2:
+	return c.pos(key, t) + nudge(key, t)
+
+
+## Tokens (Choreo.sprites_at) with their lunges.
+func sprites_at(t: float) -> Array:
+	var offs := {}
+	for key in _lunges:
+		var o := nudge(String(key), t)
+		if o != Vector2.ZERO:
+			offs[key] = o
+	return c.sprites_at(t, my_side, offs)
+
+
+## Health bars: [canonical point (the token), hp 0 to 1, "you"/"them", alpha], only while a bar is below full (11.4).
+func bars_at(t: float) -> Array:
+	var out: Array = []
+	for key in c.heroes:
+		var al := c.alpha(String(key), t)
+		if al <= 0.0 or not c.alive(String(key), t):
+			continue
+		var h := s.hp_at(String(key), t)
+		if h < 0.999:
+			out.append([hero_pos(String(key), t), h, who(String(key).substr(0, 1)), al])
+	return out
+
+
+## The cues of the actions live at t (11.2), at most `room` of them.
+func _action_cues(t: float, room: int) -> Array:
+	var out: Array = []
+	var px := Vector2(1.0 / ArenaData.W, 1.0 / ArenaData.H)
+	for a in actions:
+		if out.size() >= room:
+			break
+		var t0 := float(a["t0"])
+		if t0 > t:
+			break
+		var th := float(a["th"])
+		var t1 := float(a["t1"])
+		if t >= t1 + 0.6:
+			continue
+		var ak := String(a["a"])
+		var bk := String(a["b"])
+		match String(a["kind"]):
+			"dash":
+				if t < th:
+					out.append(["trail", hero_pos(ak, t), 44.0, 0.7 * _lunge_k(a, t)])
+				elif t - th < 0.25:
+					out.append(["slash", c.pos(bk, t), 36.0, 1.0 - (t - th) / 0.25])
+			"engage":
+				if t < th + 0.3:
+					out.append(["trail", hero_pos(ak, t), 52.0, 0.9])
+			"shot":
+				if t < th:
+					var x := (t - t0) / maxf(0.01, th - t0)
+					var pa := hero_pos(ak, t)
+					var pb := c.pos(bk, t)
+					out.append(["bolt", pa.lerp(pb, x), 22.0, 1.0])
+					for j in 2:
+						var xb := x - 0.12 * float(j + 1)
+						if xb > 0.0:
+							out.append(["bolt", pa.lerp(pb, xb), 14.0 - 4.0 * float(j), 0.55 - 0.2 * float(j)])
+			"burst":
+				if t < th:
+					out.append(["charge", hero_pos(ak, t), 24.0 + 14.0 * (t - t0) / maxf(0.01, th - t0), 0.9])
+				elif t < t1:
+					var y := (t - th) / maxf(0.01, t1 - th)
+					out.append(["burst_cast", c.pos(bk, t), 34.0 + 40.0 * y, 1.0 - y])
+			"tether":
+				if t < t1 or (t == th and t1 == th):
+					var pa2 := hero_pos(ak, t)
+					var pb2 := c.pos(bk, t)
+					for j2 in 5:
+						out.append(["tether_dot", pa2.lerp(pb2, (float(j2) + 1.0) / 6.0), 12.0, 0.9])
+				if t >= th and t - th < 0.6:
+					out.append(["root", c.pos(bk, t), 40.0, 1.0 - (t - th) / 0.6])
+			"heal":
+				if t < t1:
+					var z := (t - th) / maxf(0.01, t1 - th)
+					out.append(["plus", c.pos(bk, t) + Vector2(0, -(12.0 + 20.0 * z)) * px, 26.0, 1.0 - z])
+	return out
 
 
 func _ease(x: float) -> float:
@@ -176,6 +391,8 @@ func over_at(t: float) -> Array:
 		if dt < 0.2 and live < MAX_CUES and c.alpha(String(sp["key"]), t) >= 1.0:
 			out.append(["spark" if not bool(sp["magic"]) else "ring_magic", c.pos(String(sp["key"]), t), 30.0, 1.0 - dt / 0.2])
 			live += 1
+	# the actions (Fight pass): the rest of the live-cue budget
+	out.append_array(_action_cues(t, MAX_CUES - live))
 	# kills: killer flash 0.3 s, skull 0.6 s and motes 0.5 s at the victim
 	for e in s.kill_events:
 		var dk := t - float(e["t"])
@@ -262,7 +479,8 @@ func arcs_at(t: float) -> Array:
 func apply(m: ArenaMap, t: float, reduced: bool = false) -> void:
 	m.fallen = fallen_at(t)
 	m.sprites_under = under_at(t)
-	m.sprites = c.sprites_at(t, my_side)
+	m.sprites = sprites_at(t)
+	m.bars = bars_at(t)
 	m.sprites_over = over_at(t)
 	m.arcs = arcs_at(t)
 	var cam := camera_at(t, reduced)

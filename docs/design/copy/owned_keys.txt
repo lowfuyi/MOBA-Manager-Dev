@@ -777,3 +777,6 @@ settings.fps_h
 settings.fps_30
 settings.fps_60
 settings.fps_hint
+arena.tag.multi.double
+arena.tag.multi.triple
+arena.tag.multi.more

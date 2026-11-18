@@ -437,7 +437,8 @@ func minions_at(t: float) -> Array:
 
 
 ## Everything to draw at t: [cell key, canonical point, size px, alpha]; cells are ArenaMap.ICON keys.
-func sprites_at(t: float, my_side: String) -> Array:
+## `offs`: hero key -> canonical offset (ArenaFx lunges, 0.8.1).
+func sprites_at(t: float, my_side: String, offs: Dictionary = {}) -> Array:
 	var out: Array = []
 	for m in minions_at(t):
 		out.append(["minion_" + ("you" if m[0] == my_side else "them"), m[1], 14.0, 0.85])
@@ -453,5 +454,5 @@ func sprites_at(t: float, my_side: String) -> Array:
 			continue
 		var h: Dictionary = heroes[key]
 		var who2 := "you" if String(h["side"]) == my_side else "them"
-		out.append(["hero_%s_%s" % [who2, h["slot"]], pos(key, t), px, a])
+		out.append(["hero_%s_%s" % [who2, h["slot"]], pos(key, t) + (offs.get(key, Vector2.ZERO) as Vector2), px, a])
 	return out

@@ -14,7 +14,8 @@ const STRIP_X := 752.0          # the icon strip right of the map in the baked t
 const CELL := 64.0
 const BAKE := Vector2i(752 + 64 * 6, 768)
 ## icon strip cells (column, row; 6 columns by 12 rows): towers and rubble, minion dots (row 0), hero tokens with the slot letter
-## (row 1 yours: teal circles; row 2 theirs: coral flat-top hexagons), effects (rows 3 to 6, A-04). Rows 7 and on are free.
+## (row 1 yours: teal circles; row 2 theirs: coral flat-top hexagons), effects (rows 3 to 6, A-04), the Fight pass actions and
+## the health-bar pieces (rows 7 and 8, Alpha 0.8.1). Rows 9 and on are free.
 const ICON := {"tower_you": Vector2i(0, 0), "tower_them": Vector2i(1, 0), "rubble_you": Vector2i(2, 0), "rubble_them": Vector2i(3, 0),
 		"minion_you": Vector2i(4, 0), "minion_them": Vector2i(5, 0),
 		"hero_you_top": Vector2i(0, 1), "hero_you_jg": Vector2i(1, 1), "hero_you_mid": Vector2i(2, 1), "hero_you_bot": Vector2i(3, 1), "hero_you_sup": Vector2i(4, 1),
@@ -22,7 +23,9 @@ const ICON := {"tower_you": Vector2i(0, 0), "tower_them": Vector2i(1, 0), "rubbl
 		"spark": Vector2i(0, 3), "ring_magic": Vector2i(1, 3), "skull": Vector2i(2, 3), "motes": Vector2i(3, 3), "flash": Vector2i(4, 3), "dust": Vector2i(5, 3),
 		"aura_you": Vector2i(0, 4), "aura_them": Vector2i(1, 4), "ring_you": Vector2i(2, 4), "ring_them": Vector2i(3, 4), "arrow_up_you": Vector2i(4, 4), "arrow_down_you": Vector2i(5, 4),
 		"arrow_up_them": Vector2i(0, 5), "arrow_down_them": Vector2i(1, 5), "burst_amber": Vector2i(2, 5), "burst_pale": Vector2i(3, 5), "glyph_you": Vector2i(4, 5), "glyph_them": Vector2i(5, 5),
-		"ruin": Vector2i(0, 6), "crack": Vector2i(1, 6), "stone": Vector2i(2, 6), "moon": Vector2i(3, 6), "tower_plain": Vector2i(4, 6)}
+		"ruin": Vector2i(0, 6), "crack": Vector2i(1, 6), "stone": Vector2i(2, 6), "moon": Vector2i(3, 6), "tower_plain": Vector2i(4, 6),
+		"bolt": Vector2i(0, 7), "slash": Vector2i(1, 7), "burst_cast": Vector2i(2, 7), "charge": Vector2i(3, 7), "plus": Vector2i(4, 7), "tether_dot": Vector2i(5, 7),
+		"trail": Vector2i(0, 8), "root": Vector2i(1, 8), "bar_bg": Vector2i(2, 8), "bar_fill": Vector2i(3, 8)}
 ## the size each kind is baked at (px); a sprite drawn at size px is scaled from it (effects: 56 px, rows 3 to 6)
 const BAKED_PX := {"hero": 40.0, "minion": 14.0}
 const FX_PX := 56.0
@@ -40,6 +43,7 @@ var sprites: Array = []         # [ICON key, canonical point, size px, alpha], d
 var sprites_under: Array = []   # drawn under the tokens (auras, winner rings; ArenaFx.under_at)
 var sprites_over: Array = []    # drawn over the tokens (sparks, pings, towers falling; ArenaFx.over_at)
 var arcs: Array = []            # [canonical centre, radius px, from, to, "you"/"them"] objective progress rings
+var bars: Array = []            # [canonical point (the token), hp 0 to 1, "you"/"them", alpha] health bars (ArenaFx.bars_at)
 var _vp: SubViewport
 var _art: _Bake
 
@@ -167,6 +171,7 @@ func _draw() -> void:
 		draw_texture_rect_region(tex, Rect2(at - half, half * 2.0), strip_rect(ICON[key]), Color(1, 1, 1, opa if guard else 1.0))
 	_draw_sprites(tex, sprites_under, vs, box)
 	_draw_sprites(tex, sprites, vs, box)
+	_draw_bars(tex, vs, box)
 	_draw_sprites(tex, sprites_over, vs, box)
 	# the progress rings after every sprite (one texture run above stays unbroken; A-08): they circle the pit, outside the tokens
 	for a in arcs:
@@ -195,6 +200,30 @@ func _draw_sprites(tex: Texture2D, list: Array, vs: Vector2, box: Rect2) -> void
 		var half := Vector2(CELL, CELL) * vs * (float(sp[2]) / baked) / 2.0
 		if box.grow(half.x + CELL).has_point(at) and float(sp[3]) > 0.0:
 			draw_texture_rect_region(tex, Rect2(at - half, half * 2.0), strip_rect(ICON[key]), Color(1, 1, 1, clampf(float(sp[3]), 0.0, 1.0)))
+
+
+## Health bars above the tokens (ACTION-VOCABULARY 11.4): a dark back and a fill in the side colour, both regions of solid cells of
+## the strip (sampled inside the cell, so no edge bleeds), so they batch with the tokens.
+func _draw_bars(tex: Texture2D, vs: Vector2, box: Rect2) -> void:
+	if bars.is_empty():
+		return
+	var hp: Dictionary = ArenaActions.data()["hp"]
+	var bw := float(hp["bar_px"][0]) * vs.x
+	var bh := float(hp["bar_px"][1]) * vs.y
+	var up := float(hp["bar_above_px"]) * vs.y
+	var back := strip_rect(ICON["bar_bg"]).grow(-20.0)
+	var fill := strip_rect(ICON["bar_fill"]).grow(-20.0)
+	for b in bars:
+		var at := to_view(b[0]) - Vector2(0, up)
+		if not box.grow(bw).has_point(at):
+			continue
+		var al := clampf(float(b[3]), 0.0, 1.0)
+		var r := Rect2(at - Vector2(bw / 2.0 + 2.0, bh / 2.0 + 2.0), Vector2(bw + 4.0, bh + 4.0))
+		draw_texture_rect_region(tex, r, back, Color(1, 1, 1, 0.85 * al))
+		var w := bw * clampf(float(b[1]), 0.0, 1.0)
+		if w > 0.5:
+			var col: Color = UI.ACCENT if String(b[2]) == "you" else UI.CORAL
+			draw_texture_rect_region(tex, Rect2(at - Vector2(bw / 2.0, bh / 2.0), Vector2(w, bh)), fill, Color(col, al))
 
 
 ## The one-time drawing of the terrain and the icon strip (inside the SubViewport).
@@ -441,11 +470,53 @@ class _Bake extends Node2D:
 		draw_rect(Rect2(c + Vector2(-8, -12), Vector2(16, 30)), UI.TEXT)
 		draw_rect(Rect2(c + Vector2(-13, -20), Vector2(26, 10)), UI.TEXT)
 		draw_rect(Rect2(c + Vector2(-3, 6), Vector2(6, 12)), UI.VOID)
+		_bake_actions()
 		c = _cell("crack")
 		var zz := PackedVector2Array([c + Vector2(-4, -22), c + Vector2(4, -10), c + Vector2(-5, 0), c + Vector2(5, 10), c + Vector2(-2, 22)])
 		draw_polyline(zz, UI.TEXT, 3.0, true)
 		draw_line(c + Vector2(-5, 0), c + Vector2(-16, 6), UI.TEXT, 2.5, true)
 		draw_line(c + Vector2(4, -10), c + Vector2(15, -14), UI.TEXT, 2.5, true)
+
+	## The Fight pass cells (ACTION-VOCABULARY 11.2): neutral colours only (teal and coral mean the two sides), a shape each.
+	func _bake_actions() -> void:
+		var phys := UI.WARN.lerp(UI.TEXT, 0.4)
+		var c := _cell("bolt")    # a glowing round bolt (no direction, so it never needs rotating)
+		draw_circle(c, 13.0, Color(UI.TEXT, 0.25))
+		draw_circle(c, 8.0, phys)
+		draw_circle(c, 3.5, UI.TEXT)
+		c = _cell("slash")    # a crescent swipe
+		draw_arc(c, 20.0, -2.5, -0.6, 20, phys, 7.0, true)
+		draw_arc(c, 13.0, -2.3, -0.8, 16, Color(UI.TEXT, 0.8), 3.0, true)
+		c = _cell("burst_cast")    # a ring with eight sparks round it
+		draw_arc(c, 20.0, 0.0, TAU, 40, UI.TEXT2, 6.0, true)
+		for i in 8:
+			var a := TAU * float(i) / 8.0 + 0.39
+			draw_circle(c + Vector2.from_angle(a) * 27.0, 2.5, UI.TEXT)
+		c = _cell("charge")    # a gathering glow
+		draw_circle(c, 24.0, Color(UI.TEXT2, 0.2))
+		draw_circle(c, 15.0, Color(UI.TEXT2, 0.45))
+		draw_arc(c, 24.0, 0.0, TAU, 32, Color(UI.TEXT2, 0.8), 2.5, true)
+		c = _cell("plus")    # a heal: a plus with a dark rim
+		draw_rect(Rect2(c + Vector2(-6, -18), Vector2(12, 36)), UI.VOID)
+		draw_rect(Rect2(c + Vector2(-18, -6), Vector2(36, 12)), UI.VOID)
+		draw_rect(Rect2(c + Vector2(-4, -16), Vector2(8, 32)), UI.GOOD_DEFAULT)
+		draw_rect(Rect2(c + Vector2(-16, -4), Vector2(32, 8)), UI.GOOD_DEFAULT)
+		c = _cell("tether_dot")
+		draw_circle(c, 9.0, Color(UI.TEXT2, 0.9))
+		draw_circle(c, 4.0, UI.TEXT)
+		c = _cell("trail")    # motion: dashes round the token
+		for i2 in 8:
+			var a2 := TAU * float(i2) / 8.0
+			draw_arc(c, 26.0, a2, a2 + 0.45, 6, Color(UI.TEXT, 0.75), 3.0, true)
+		c = _cell("root")    # a snare: a ring with thorns pointing in
+		draw_arc(c, 22.0, 0.0, TAU, 40, UI.TEXT2, 3.5, true)
+		for i3 in 6:
+			var a3 := TAU * float(i3) / 6.0
+			draw_line(c + Vector2.from_angle(a3) * 22.0, c + Vector2.from_angle(a3) * 13.0, UI.TEXT2, 3.0, true)
+		c = _cell("bar_bg")
+		draw_rect(Rect2(c - Vector2(26, 26), Vector2(52, 52)), UI.VOID)
+		c = _cell("bar_fill")
+		draw_rect(Rect2(c - Vector2(26, 26), Vector2(52, 52)), Color.WHITE)
 
 	func _hex(c: Vector2, r: float) -> PackedVector2Array:
 		var pts := PackedVector2Array()

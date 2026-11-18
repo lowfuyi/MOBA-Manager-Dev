@@ -237,6 +237,23 @@ func _build() -> void:
 		var rt2 := float(ShowScript.RESOLVE[k3])
 		var tg: Dictionary = tags_at[k3]
 		items.append({"kind": "tag", "t": rt2, "until": rt2 + TAG_S, "words": int(tg["words"]), "id": tg["id"], "text": tg["text"], "side": tg["side"]})
+	# multi-kills (Fight pass, ACTION-VOCABULARY 11.3): two or more kills of one side in one group, at the group's last kill
+	var multi := {}
+	for e in s.kill_events:
+		var gk := "%d:%s" % [int(e.get("g", -1)), String(e["side"])]
+		if not multi.has(gk):
+			multi[gk] = {"n": 0, "t": 0.0, "side": String(e["side"])}
+		multi[gk]["n"] = int(multi[gk]["n"]) + 1
+		multi[gk]["t"] = float(e["t"])
+	for gk2 in multi:
+		var mg: Dictionary = multi[gk2]
+		if int(mg["n"]) < 2:
+			continue
+		var mid := "double" if int(mg["n"]) == 2 else ("triple" if int(mg["n"]) == 3 else "more")
+		var mkey := {"double": "arena.tag.multi.double", "triple": "arena.tag.multi.triple", "more": "arena.tag.multi.more"}
+		var mt := Strings.t(String(mkey[mid]))
+		items.append({"kind": "tag", "t": float(mg["t"]), "until": float(mg["t"]) + TAG_S, "words": word_count(mt), "id": "multi_" + mid,
+				"text": mt, "side": mg["side"]})
 	if s.arc == "close":
 		var tc := _label("tag_close", me)
 		items.append({"kind": "tag", "t": 62.0, "until": 62.0 + TAG_S, "words": int(tc["words"]), "id": tc["id"], "text": tc["text"], "side": me})

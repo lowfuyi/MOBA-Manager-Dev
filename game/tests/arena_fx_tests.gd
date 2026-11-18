@@ -8,6 +8,11 @@ extends RefCounted
 ##   budget    at most 12 live hit cues
 ##   HF3       in held_island a winner hero that falls after 61 s rises at its formation point
 ##   A3        the same result gives the same cues
+## Fight pass (Alpha 0.8.1, ACTION-VOCABULARY 11.2):
+##   actions   every action starts at an attacker that is up (and stays up to its end) and hits a target that is up just before
+##             the hit; a kill action is a ledger kill (killer on victim at its moment); every archetype's action kind occurs
+##   lunge     a token's lunge is at most its reach (46 px engage, 18 px dash) and zero outside its actions
+##   bars      a bar is drawn only for a hero that is up, with 0 < hp < 1
 
 const N := 60
 
@@ -48,7 +53,19 @@ func run(check: Callable) -> void:
 				if JSON.stringify(f.over_at(tt)) != JSON.stringify(f2.over_at(tt)) or JSON.stringify(f.under_at(tt)) != JSON.stringify(f2.under_at(tt)):
 					fails["A3"] = int(fails.get("A3", 0)) + 1
 	print("     arena fx: %d results, both seats; held-island rises checked %d" % [N, held_rises])
-	for name in ["resolve", "H5", "towers", "objective", "camera", "budget", "HF3", "A3"]:
+	var kinds := {}
+	for i2 in 8:
+		var a2: String = w.club_ids[i2 % w.club_ids.size()]
+		var b2: String = w.club_ids[(i2 * 5 + 2) % w.club_ids.size()]
+		if a2 == b2:
+			b2 = w.club_ids[(i2 + 1) % w.club_ids.size()]
+		var r2 := MatchRunner.auto(w, w.best_lineup(a2), w.best_lineup(b2), meta, 6100 + i2, "fxa:%d" % i2, false, {"B": "ai", "R": "ai"})
+		var s2 := ShowScript.build(r2, "B")
+		var f2 := ArenaFx.build(s2, Choreo.build(s2), "B")
+		for a in f2.actions:
+			kinds[a["kind"]] = true
+	check.call(kinds.size() == 6, "arena fx actions: dash, shot, burst, tether, heal and engage all occur on 8 more results %s" % str(kinds.keys()))
+	for name in ["resolve", "H5", "towers", "objective", "camera", "budget", "HF3", "A3", "actions", "lunge", "bars"]:
 		check.call(not fails.has(name), "arena fx %s holds (%d failures)" % [name, int(fails.get(name, 0))])
 
 
@@ -76,8 +93,33 @@ func _check_one(f: ArenaFx, s: ShowScript, c: Choreo, me: String) -> Array:
 			bad.append("H5")
 		if victim == "":
 			bad.append("H5")
+	var kills := {}
+	for e3 in s.kill_events:
+		kills["%s|%s.%s|%s.%s" % [str(e3["t"]), e3["side"], e3["killer"], ShowScript.other(String(e3["side"])), e3["victim"]]] = true
+	for a in f.actions:
+		var ok := c.alive(String(a["a"]), float(a["t0"])) and c.alive(String(a["a"]), float(a["t1"])) and c.alive(String(a["b"]), float(a["th"]) - 0.01)
+		var same_side := String(a["a"]).substr(0, 1) == String(a["b"]).substr(0, 1)
+		if same_side != (String(a["kind"]) == "heal"):
+			ok = false
+		if bool(a["kill"]):
+			ok = ok and kills.has("%s|%s|%s" % [str(a["th"]), a["a"], a["b"]])
+		if not ok and not bad.has("actions"):
+			bad.append("actions")
 	var t := 0.0
 	while t < 75.0:
+		for key in c.heroes:
+			var n := f.nudge(String(key), t)
+			var px := Vector2(n.x * ArenaData.W, n.y * ArenaData.H).length()
+			var any := false
+			for a4 in f._lunges.get(key, []):
+				any = any or (t >= float(a4["t0"]) and t < float(a4["t1"]))
+			if px > 46.0 + 0.01 or (px > 1e-6 and not any):
+				if not bad.has("lunge"):
+					bad.append("lunge")
+		for bar in f.bars_at(t):
+			if float(bar[1]) <= 0.0 or float(bar[1]) >= 1.0:
+				if not bad.has("bars"):
+					bad.append("bars")
 		var skulls := 0
 		for sp2 in f.over_at(t):
 			skulls += 1 if String(sp2[0]) == "skull" else 0
