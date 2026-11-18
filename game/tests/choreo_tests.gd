@@ -63,12 +63,26 @@ func _check_one(c: Choreo, s: ShowScript, worst: Dictionary) -> Array:
 	var bad: Array = []
 	# group beats: [order time, check time, centre node, radius px]
 	var beats := [[20.25, 33.0, "N.stoneback", 70.0], [34.5, 44.0, "N.mossback", 78.0], [51.0, 59.5, "N.moonhulk", 76.0]]
+	var objective := {"N.stoneback": "obj_mid", "N.mossback": "fight_mid", "N.moonhulk": "obj_late"}
 	for bt in beats:
 		var centre := ArenaData.node(String(bt[2]))
+		# Fight pass (0.8.1): the beat's losers run back after its last kill, so they are checked as that run starts
+		var beat: String = objective[bt[2]]
+		var tr := float(ArenaActions.fight(beat)["fight_to"])
+		var last := -1.0
+		for e in s.kill_events:
+			if String(e["beat"]) == beat:
+				last = maxf(last, float(e["t"]))
+		if last >= 0.0:
+			tr = minf(tr, last + 0.2)
+		var lose := ShowScript.other(String(s.contests[beat]["win"]))
 		for k in c.heroes:
-			if _died_between(c, k, float(bt[0]) - 2.0, float(bt[1])):
+			var at_t := float(bt[1])
+			if String(k).begins_with(lose) or beat == "fight_mid":
+				at_t = minf(at_t, tr - 0.01)
+			if _died_between(c, k, float(bt[0]) - 2.0, at_t):
 				continue
-			var off := _px(c.pos(k, float(bt[1])), centre)
+			var off := _px(c.pos(k, at_t), centre)
 			if off > float(bt[3]):
 				worst["arrive_px"] = maxf(float(worst["arrive_px"]), off - float(bt[3]))
 				if not bad.has("arrival"):

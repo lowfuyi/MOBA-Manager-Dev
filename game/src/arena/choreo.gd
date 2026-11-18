@@ -7,6 +7,8 @@ extends RefCounted
 ##   heroes   "B.top" .. "R.sup": segments [{t0, t1, pts (canonical), cum (map units)}] and deaths [{t, rise}]
 ##   pack     the match winner's reserve pack (held endings only), six dots on the variant's legs
 ##   minions  ambient waves of 4 dots per lane and side (arena_map.json waves), walking from the gate to the lane's clash point
+## Fight pass (Alpha 0.8.1, ACTION-VOCABULARY 11.3): after Stoneback, the Mossback fight and Moonhulk the losers' survivors run
+## back toward their base ("run": a straight dash, not a graph walk) and after the Mossback fight the winners chase.
 ## The ending: when the match winner also wins fight_late, the data's default_clean (clean_gate); otherwise the held staging
 ## `held_variant` (default: the data's default, held_island; the tester switch of A-06 passes another one).
 
@@ -222,6 +224,27 @@ func _orders(side: String, slot: String) -> Array:
 	o.append([20.25, "go", _form(side, slot, ArenaData.node("N.stoneback")), ROTATE])
 	o.append([34.5, "go", _form(side, slot, ArenaData.node("N.mossback")), ROTATE])
 	o.append([51.0, "go", _form(side, slot, ArenaData.node("N.moonhulk")), ROTATE])
+	# retreat and chase (11.3), 0.2 s after the beat's last kill or at the fight's end
+	var rt: Dictionary = ArenaActions.data()["retreat"]
+	var home := Vector2(0, 1) if side == "B" else Vector2(0, -1)
+	for beat in [["obj_mid", "N.stoneback"], ["obj_late", "N.moonhulk"], ["fight_mid", "N.mossback"]]:
+		var fb := ArenaActions.fight(String(beat[0]))
+		var lose := ShowScript.other(String(script_.contests[beat[0]]["win"]))
+		var tr := float(fb["fight_to"])
+		var last := -1.0
+		for e in script_.kill_events:
+			if String(e["beat"]) == beat[0]:
+				last = maxf(last, float(e["t"]))
+		if last >= 0.0:
+			tr = minf(tr, last + float(rt["after_last_kill_s"]))
+		var at := _form(side, slot, ArenaData.node(String(beat[1])))
+		# [t, "run", target if down at t, speed, step from where the hero stands]: a straggler still arriving turns back from there
+		if side == lose:
+			var back := home * float(rt["loser_back_u"])
+			o.append([tr, "run", at + back, RUSH, back])
+		elif beat[0] == "fight_mid":
+			var chase := -home * float(rt["chase_u"])
+			o.append([tr, "run", at + chase, RUSH, chase])
 	# the ending, from the variant's data (W south in the data's frame)
 	var role := "W" if side == w else "U"
 	var f: Dictionary = ending.get("formation", {})
@@ -296,6 +319,15 @@ func _hero(side: String, slot: String) -> Dictionary:
 				_go(segs, pad, t, last_target, m)
 				if t < catching_until:
 					catching_until = float(segs[segs.size() - 1]["t1"])
+			"run":
+				last_target = ev[2]
+				last_mult = float(ev[3])
+				if t < dead_until:
+					continue
+				_stop(segs, pad, t)
+				var from := _pos_in(segs, t, pad)
+				last_target = from + (ev[4] as Vector2)
+				segs.append(_seg(t, PackedVector2Array([from, last_target]), last_mult))
 			"die":
 				if t < dead_until:
 					continue    # already down (a second fall inside the respawn time shows as one)

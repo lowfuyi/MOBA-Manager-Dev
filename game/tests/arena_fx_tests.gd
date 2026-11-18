@@ -13,6 +13,9 @@ extends RefCounted
 ##             the hit; a kill action is a ledger kill (killer on victim at its moment); every archetype's action kind occurs
 ##   lunge     a token's lunge is at most its reach (46 px engage, 18 px dash) and zero outside its actions
 ##   bars      a bar is drawn only for a hero that is up, with 0 < hp < 1
+##   rings     no ring in the Mossback or the late fight; an objective's ring starts after that beat's last kill; TAKE and CLASH
+##             equal the data
+##   retreat   after Stoneback, Mossback and Moonhulk the losers' survivors end up farther toward their own base
 
 const N := 60
 
@@ -65,7 +68,7 @@ func run(check: Callable) -> void:
 		for a in f2.actions:
 			kinds[a["kind"]] = true
 	check.call(kinds.size() == 6, "arena fx actions: dash, shot, burst, tether, heal and engage all occur on 8 more results %s" % str(kinds.keys()))
-	for name in ["resolve", "H5", "towers", "objective", "camera", "budget", "HF3", "A3", "actions", "lunge", "bars"]:
+	for name in ["resolve", "H5", "towers", "objective", "camera", "budget", "HF3", "A3", "actions", "lunge", "bars", "rings", "retreat"]:
 		check.call(not fails.has(name), "arena fx %s holds (%d failures)" % [name, int(fails.get(name, 0))])
 
 
@@ -93,6 +96,44 @@ func _check_one(f: ArenaFx, s: ShowScript, c: Choreo, me: String) -> Array:
 			bad.append("H5")
 		if victim == "":
 			bad.append("H5")
+	var fights: Dictionary = ArenaActions.data()["fights"]
+	for k5 in fights:
+		var fd: Dictionary = fights[k5]
+		if float(ArenaFx.CLASH[k5][0]) != float(fd["from"]) or float(ArenaFx.CLASH[k5][1]) != float(fd["fight_to"]):
+			bad.append("rings")
+		if fd.has("take") and (float(ArenaFx.TAKE[k5][0]) != float(fd["take"][0]) or float(ArenaFx.TAKE[k5][1]) != float(fd["take"][1])):
+			bad.append("rings")
+	var tr := 41.0
+	while tr < 75.0:
+		if not f.arcs_at(tr).is_empty() and (tr < 54.0 or tr > 61.0):
+			if not bad.has("rings"):
+				bad.append("rings")
+		tr += 0.1
+	for ob2 in ["obj_mid", "obj_late"]:
+		var last := -1.0
+		for e4 in s.kill_events:
+			if String(e4["beat"]) == ob2:
+				last = maxf(last, float(e4["t"]))
+		var tq := float(ArenaFx.CLASH[ob2][0]) - 1.0
+		while tq < float(ArenaFx.TAKE[ob2][0]):
+			if not f.arcs_at(tq).is_empty() or (last >= 0.0 and float(ArenaFx.TAKE[ob2][0]) < last):
+				if not bad.has("rings"):
+					bad.append("rings")
+			tq += 0.05
+	for rb in [["obj_mid", 32.25], ["fight_mid", 45.0], ["obj_late", 58.5]]:
+		var lose := ShowScript.other(String(s.contests[rb[0]]["win"]))
+		var home := 1.0 if lose == "B" else -1.0
+		for slot5 in Choreo.SLOTS:
+			var lk: String = lose + "." + slot5
+			var last2 := -1.0
+			for e5 in s.kill_events:
+				if String(e5["beat"]) == rb[0]:
+					last2 = maxf(last2, float(e5["t"]))
+			var tt0 := float(rb[1]) if last2 < 0.0 else minf(float(rb[1]), last2 + 0.2)    # the run starts here
+			var tt1 := tt0 + 0.9
+			if c.alive(lk, tt0 - 0.01) and c.alive(lk, tt1) and not _fell(c, lk, tt0 - 0.01, tt1) and (c.pos(lk, tt1).y - c.pos(lk, tt0 - 0.01).y) * home < 0.02:
+				if not bad.has("retreat"):
+					bad.append("retreat")
 	var kills := {}
 	for e3 in s.kill_events:
 		kills["%s|%s.%s|%s.%s" % [str(e3["t"]), e3["side"], e3["killer"], ShowScript.other(String(e3["side"])), e3["victim"]]] = true
@@ -171,3 +212,10 @@ func _check_one(f: ArenaFx, s: ShowScript, c: Choreo, me: String) -> Array:
 			if not bad.has("objective"):
 				bad.append("objective")
 	return bad
+
+
+func _fell(c: Choreo, key: String, a: float, b: float) -> bool:
+	for d in c.heroes[key]["deaths"]:
+		if float(d["t"]) <= b and float(d["rise"]) >= a:
+			return true
+	return false

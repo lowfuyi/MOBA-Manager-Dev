@@ -19,8 +19,10 @@ extends RefCounted
 
 const LANE_BEATS := ["top", "mid_lane", "bot"]
 const GROUP := {"obj_mid": "N.stoneback", "fight_mid": "N.mossback", "obj_late": "N.moonhulk"}
-const TAKE := {"obj_mid": [31.0, 33.75], "obj_late": [57.0, 60.0]}
-const CLASH := {"obj_mid": [31.5, 33.75], "fight_mid": [41.2, 45.0], "obj_late": [57.0, 60.0], "fight_late": [66.0, 71.25]}
+## Fight pass (11.3): the objective ring only after the objective fight (arena_actions_v1.json fights.*.take); the hit cues of a
+## group beat fill its fight (from to fight_to); teamfights have no ring. A test keeps these equal to the data.
+const TAKE := {"obj_mid": [32.25, 33.75], "obj_late": [58.5, 60.0]}
+const CLASH := {"obj_mid": [31.0, 32.25], "fight_mid": [41.2, 45.0], "obj_late": [57.0, 58.5], "fight_late": [66.0, 71.25]}
 const HIT_RATIO := {"narrow": 0.55, "clear": 0.7, "decisive": 0.85}
 const MAX_CUES := 24            # live short cues at once (12 in 0.8; the Fight pass raises it to 24, arena_actions_v1.json)
 const FOCUS_IN := 0.45
