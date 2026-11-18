@@ -10,6 +10,10 @@ extends RefCounted
 ##              (P1 to P4: time, killer slot, victim slot) so per-hero kills and deaths equal Report.kda
 ##   objectives Stoneback and Moonhulk to the signs of obj_mid and obj_late (F12); the Cairn falls at 74.0 s (F13)
 ##   score_at(t) the scoreboard as a pure function of show time: clock, kills, towers, objectives, gold lead (F7)
+## Fight pass (Alpha 0.8.1, ACTION-VOCABULARY 11, data/arena_actions_v1.json): kills inside the group beats are re-timed to the
+## fight arc (engage, then spaced kills; crowded kills grouped into double and triple kills; counts unchanged), hp_at(hero, t) is
+## the health bar (0 only at a ledger death), heals are the menders' lifts, `decisive` is the kill of 11.5 and beat_t(t) the beat
+## clock (the slow-down that keeps 75 s).
 ## Sides are "B" (Blue = simulator team A) and "R". s_X = +1 for Blue, -1 for Red.
 
 const WATCH := 75.0
@@ -18,7 +22,8 @@ const KILL_BEATS := ["top", "mid_lane", "bot", "jungle", "obj_mid", "fight_mid",
 const RESOLVE := {"top": 13.5, "mid_lane": 15.75, "bot": 18.0, "jungle": 20.25, "obj_mid": 33.75, "fight_mid": 45.0,
 		"obj_late": 60.0, "fight_late": 71.25, "base_push": 74.0}
 const KILL_WINDOW := {"top": [8.0, 13.5], "mid_lane": [9.5, 15.75], "bot": [11.0, 18.0], "jungle": [13.0, 20.25],
-		"obj_mid": [31.5, 33.75], "fight_mid": [41.2, 45.0], "obj_late": [57.0, 60.0], "fight_late": [66.0, 71.25], "base_push": [71.5, 74.0]}
+		"obj_mid": [31.6, 32.15], "fight_mid": [42.0, 44.8], "obj_late": [57.6, 58.4], "fight_late": [66.9, 71.0], "base_push": [71.5, 74.0]}
+## the group beats' kill windows follow the fight arc of arena_actions_v1.json (fights.*.kills; a test keeps them equal)
 const KP := {"top": 0.6, "mid_lane": 0.6, "bot": 0.9, "jungle": 0.7, "obj_mid": 1.0, "fight_mid": 3.0, "obj_late": 1.2, "fight_late": 4.0, "base_push": 0.5}
 const FRONT_G := {"narrow": 1.0, "clear": 0.8, "decisive": 0.6}
 const LANE_OF := {"top": "top", "mid_lane": "mid", "bot": "bot"}         # sim contest -> map lane id
@@ -52,6 +57,10 @@ var held := false                     # the game winner lost fight_late (the hel
 var initiators: Dictionary = {}       # beat -> side that starts it (staging only)
 var kda: Dictionary = {}
 var minutes := 12.0
+var hp_segs: Dictionary = {}          # hero key "B.top" -> [[t0, t1, h0, h1, "hit" | "down"]] (11.4)
+var heals: Array = []                 # [{t, by (mender key), ally (key)}] sorted by t
+var decisive: Dictionary = {}         # the kill event of 11.5, or {}
+var _hp_rules: Dictionary = {}
 
 
 static func sgn(side: String) -> float:
@@ -125,6 +134,9 @@ func _build() -> void:
 	_initiators(rng)
 	_towers()
 	_kills()
+	_hp()
+	_heals()
+	_decisive()
 
 
 func _flips_and_arc() -> void:
@@ -333,10 +345,10 @@ func _pair() -> void:
 			left_k[side][s] = int(kda[side][s]["k"])
 			left_d[side][s] = int(kda[side][s]["d"])
 	var last_death := {"B": {}, "R": {}}
+	var next_group := 0
+	var bias := float(ArenaActions.data()["spacing"]["loser_first_bias"])
 	for k in KILL_BEATS:
 		var win: Array = KILL_WINDOW[k]
-		var size := "clear" if k == "base_push" else String(contests[k]["size"])
-		var g := float(FRONT_G[size])
 		var slots: Array = []
 		for side in ["B", "R"]:
 			for j in int(kills_per_beat[side][k]):
@@ -344,16 +356,17 @@ func _pair() -> void:
 		var n := slots.size()
 		if n == 0:
 			continue
-		var u := timing.next_float()
-		var times: Array = []
+		var spaced := ShowScript.spaced_times(n, float(win[0]), float(win[1]), timing)
+		var times: Array = spaced[0]
+		var gid: Array = spaced[1]
+		# the trade first, the clean-up after (11.3): the beat's loser tends to score early, its winner late
+		var bw := winner if k == "base_push" else String(contests[k]["win"])
+		var keyed: Array = []
 		for j in n:
-			times.append(float(win[0]) + (float(win[1]) - float(win[0])) * pow((float(j) + u) / float(n), g))
-		times.sort()
-		for i in range(n - 1, 0, -1):    # Fisher-Yates: which side takes which time slot
-			var r := int(timing.next_float() * float(i + 1)) % (i + 1)
-			var tmp: String = slots[i]
-			slots[i] = slots[r]
-			slots[r] = tmp
+			keyed.append([timing.next_float() + (bias if slots[j] == bw else 0.0), slots[j]])
+		keyed.sort_custom(func(a: Array, b: Array) -> bool: return float(a[0]) < float(b[0]))
+		for j in n:
+			slots[j] = keyed[j][1]
 		var died_here := {"B": {}, "R": {}}
 		for j in n:
 			var side: String = slots[j]
@@ -365,8 +378,48 @@ func _pair() -> void:
 			left_d[foe][victim] = int(left_d[foe][victim]) - 1
 			last_death[foe][victim] = t
 			died_here[foe][victim] = int(died_here[foe].get(victim, 0)) + 1
-			kill_events.append({"t": t, "beat": k, "side": side, "killer": killer, "victim": victim})
+			kill_events.append({"t": t, "beat": k, "side": side, "killer": killer, "victim": victim, "g": next_group + int(gid[j])})
+		next_group += int(gid[n - 1]) + 1
 	kill_events.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["t"]) < float(b["t"]))
+
+
+## n kill times in [a, b] (11.3): groups at least min_gap_s apart (after the group's own length), inside a group multi_step_s
+## steps (a double or triple kill). Returns [times (ascending), group index per time (0, 1, ...)].
+static func spaced_times(n: int, a: float, b: float, rng: Pcg32) -> Array:
+	var sp: Dictionary = ArenaActions.data()["spacing"]
+	var gap := float(sp["min_gap_s"])
+	var step := float(sp["multi_step_s"])
+	var w := b - a
+	var groups := n
+	while groups > 1:
+		var span := step * float(ceili(float(n) / float(groups)) - 1)
+		if (w - span) / float(groups - 1) >= gap + span:
+			break
+		groups -= 1
+	var eq: Array = []
+	for i in groups:
+		eq.append(1.0)
+	var sizes := hamilton(n, eq)
+	var maxspan := step * float(int(sizes[0]) - 1)
+	var times: Array = []
+	var gid: Array = []
+	if groups == 1:
+		var st := minf(step, w / float(maxi(1, n - 1)))
+		var span1 := st * float(n - 1)
+		var s0 := a + (w - span1) * (0.25 + 0.5 * rng.next_float())
+		for j in n:
+			times.append(s0 + st * float(j))
+			gid.append(0)
+		return [times, gid]
+	var d := (w - maxspan) / float(groups - 1)
+	var q := 0.25 * (d - gap - maxspan)
+	for i in groups:
+		var span_i := step * float(int(sizes[i]) - 1)
+		var s_i := clampf(a + d * float(i) + q * (2.0 * rng.next_float() - 1.0), a, b - span_i)
+		for j in int(sizes[i]):
+			times.append(s_i + step * float(j))
+			gid.append(i)
+	return [times, gid]
 
 
 ## A slot with counts left: the beat's own slots first, weighted by what is left (P2); a victim who died under 2 s ago or twice in
@@ -466,3 +519,193 @@ func play_of_the_game() -> String:
 			bv = v
 			best = k
 	return best
+
+
+# ---- the Fight pass: health bars, heals, the decisive kill, the beat clock (11.4, 11.5) ------------------------------------
+
+## When each hero is down as the map plays it: [death t, rise t] (a second fall inside the respawn time shows as one, as Choreo).
+func downs_of(key: String) -> Array:
+	var side := key.substr(0, 1)
+	var slot := key.substr(2)
+	var out: Array = []
+	var until := -INF
+	for e in kill_events:
+		if other(String(e["side"])) == side and String(e["victim"]) == slot and float(e["t"]) >= until:
+			until = float(e["t"]) + Choreo.DEAD_FOR
+			out.append([float(e["t"]), until])
+	return out
+
+
+## The stretches in which a hero trades blows: its lane trade (laners) and every group fight, each with its floor range.
+func _phases(side: String, slot: String) -> Array:
+	var out: Array = []
+	var lanes := ["top", "mid_lane", "bot"]
+	for i in lanes.size():
+		var k: String = lanes[i]
+		if (BEAT_SLOTS[k] as Array).has(slot):
+			var who := "winner" if String(contests[k]["win"]) == side else "loser"
+			out.append([5.0 + 0.4 * float(i), float(RESOLVE[k]), _hp_rules["lane_floor"][who]])
+	var fights: Dictionary = ArenaActions.data()["fights"]
+	for k2 in fights:
+		var who2 := "winner" if String(contests[k2]["win"]) == side else "loser"
+		out.append([float(fights[k2]["from"]), float(fights[k2]["fight_to"]), _hp_rules["fight_floor"][who2]])
+	return out
+
+
+func _hp() -> void:
+	_hp_rules = ArenaActions.data()["hp"]
+	var rng := Pcg32.contest_stream(int(res["mseed"]), "show:hp")
+	var ramp := float(_hp_rules["death_ramp_s"])
+	var regen := float(_hp_rules["regen_s"])
+	for side in ["B", "R"]:
+		for slot in SLOTS:
+			var key: String = side + "." + slot
+			var pieces: Array = []    # [t0, t1, target, kind]
+			var blocked: Array = []
+			var prev_rise := 0.0
+			for dn in downs_of(key):
+				var r0 := maxf(float(dn[0]) - ramp, prev_rise)
+				pieces.append([r0, float(dn[0]), 0.0, "hit"])
+				pieces.append([float(dn[0]), float(dn[1]), 0.0, "down"])
+				blocked.append([r0, float(dn[1])])
+				prev_rise = float(dn[1])
+			for ph in _phases(side, slot):
+				var fl := lerpf(float(ph[2][0]), float(ph[2][1]), rng.next_float())
+				var parts: Array = [[float(ph[0]), float(ph[1])]]
+				for bl in blocked:
+					var nxt: Array = []
+					for pt in parts:
+						if float(bl[1]) <= float(pt[0]) or float(bl[0]) >= float(pt[1]):
+							nxt.append(pt)
+							continue
+						if float(bl[0]) > float(pt[0]):
+							nxt.append([float(pt[0]), float(bl[0])])
+						if float(bl[1]) < float(pt[1]):
+							nxt.append([float(bl[1]), float(pt[1])])
+					parts = nxt
+				for pt2 in parts:
+					if float(pt2[1]) - float(pt2[0]) > 0.05:
+						pieces.append([float(pt2[0]), float(pt2[1]), fl, "hit"])
+			pieces.sort_custom(func(a: Array, b: Array) -> bool: return float(a[0]) < float(b[0]) or (float(a[0]) == float(b[0]) and String(a[3]) == "hit"))
+			var segs: Array = []
+			var h := 1.0
+			var te := 0.0
+			for p in pieces:
+				var t0 := maxf(float(p[0]), te)
+				var t1 := float(p[1])
+				if t1 <= t0 and String(p[3]) != "down":
+					continue
+				var h0 := minf(1.0, h + (t0 - te) / regen)
+				if String(p[3]) == "down":
+					segs.append([float(p[0]), t1, 0.0, 0.0, "down"])
+					h = 1.0
+				else:
+					var h1 := minf(h0, float(p[2]))    # a survivor never rises in a fight; 0 exactly at a death
+					segs.append([t0, t1, h0, h1, "hit"])
+					h = h1
+				te = t1
+			hp_segs[key] = segs
+
+
+## The bar without the menders' lifts: stepped falls in a fight (one step per hit_step_s), 0 while down, refilling out of fights.
+func hp_base(key: String, t: float) -> float:
+	var step := float(_hp_rules["hit_step_s"])
+	var regen := float(_hp_rules["regen_s"])
+	var h := 1.0
+	var te := 0.0
+	for sg in hp_segs.get(key, []):
+		if t < float(sg[0]):
+			break
+		if t < float(sg[1]):
+			if String(sg[4]) == "down":
+				return 0.0
+			var seg_len := float(sg[1]) - float(sg[0])
+			var n := maxi(1, ceili(seg_len / step))
+			return lerpf(float(sg[2]), float(sg[3]), floorf((t - float(sg[0])) / seg_len * float(n)) / float(n))
+		h = 1.0 if String(sg[4]) == "down" else float(sg[3])
+		te = float(sg[1])
+	return minf(1.0, h + (t - te) / regen)
+
+
+## The health bar of a hero at show time t (0 to 1): 0 only while the ledger has it down (11.4).
+func hp_at(key: String, t: float) -> float:
+	var b := hp_base(key, t)
+	if b <= 0.0:
+		return 0.0
+	var hl: Dictionary = ArenaActions.data()["actions"]["heal"]
+	var fade := float(hl["lift_fade_s"])
+	for e in heals:
+		var dt := t - float(e["t"])
+		if dt < 0.0:
+			break
+		if dt < fade and String(e["ally"]) == key:
+			b += float(hl["lift"]) * (1.0 - dt / fade)
+	return minf(1.0, b)
+
+
+func _down_between(key: String, a: float, b: float) -> bool:
+	for dn in downs_of(key):
+		if float(dn[0]) <= b and float(dn[1]) >= a:
+			return true
+	return false
+
+
+## Every heal_every_s in each group fight a living mender lifts its most hurt living ally (one that stays up through the lift).
+func _heals() -> void:
+	var hl: Dictionary = ArenaActions.data()["actions"]["heal"]
+	var fade := float(hl["lift_fade_s"])
+	var fights: Dictionary = ArenaActions.data()["fights"]
+	for k in fights:
+		for side in ["B", "R"]:
+			for slot in SLOTS:
+				if ArenaActions.action_of(res, side, slot) != "heal":
+					continue
+				var mk: String = side + "." + slot
+				var th := float(fights[k]["from"]) + 0.6
+				while th < float(fights[k]["fight_to"]):
+					if not _down_between(mk, th - 0.05, th + float(hl["pulse_s"])):
+						var best := ""
+						var bh := 2.0
+						for s2 in SLOTS:
+							var ak: String = side + "." + s2
+							var hb := hp_base(ak, th)
+							if hb <= 0.0 or hb >= 0.999 or _down_between(ak, th, th + fade + 0.1):
+								continue
+							if hb < bh:
+								bh = hb
+								best = ak
+						if best != "":
+							heals.append({"t": th, "by": mk, "ally": best})
+					th += float(hl["every_s"])
+	heals.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["t"]) < float(b["t"]))
+
+
+## 11.5: the game winner's last kill in the late fight; in a held game (or with none there) its last kill from 41.0 to 71.25 s.
+func _decisive() -> void:
+	var best := {}
+	if not held:
+		for e in kill_events:
+			if String(e["side"]) == winner and String(e["beat"]) == "fight_late":
+				best = e
+	if best.is_empty():
+		for e2 in kill_events:
+			if String(e2["side"]) == winner and float(e2["t"]) >= 41.0 and float(e2["t"]) <= 71.25:
+				best = e2
+	decisive = best
+
+
+## The beat clock (11.5): the map time drawn at show time t. From the decisive kill, slow_s of real time show slow_rate of it,
+## the next catch_up_s show the rest; the kill lands on its moment and 75 s stays 75 s. `on` false (Animations off): identity.
+func beat_t(t: float, on: bool = true) -> float:
+	if decisive.is_empty() or not on:
+		return t
+	var d: Dictionary = ArenaActions.data()["decisive"]
+	var td := float(decisive["t"])
+	var sl := float(d["slow_s"])
+	var r := float(d["slow_rate"])
+	var cu := float(d["catch_up_s"])
+	if t <= td or t >= td + sl + cu:
+		return t
+	if t <= td + sl:
+		return td + r * (t - td)
+	return td + r * sl + (t - td - sl) * (1.0 + sl * (1.0 - r) / cu)

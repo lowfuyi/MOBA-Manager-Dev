@@ -8,6 +8,13 @@ extends RefCounted
 ##   I8 size words are Report.margin_word                     I9 the held fight: l_7 > l_8 > 0, the step is 0.30 |c|, no flip there
 ##   plus: resolve stamps = Report.FEED_ORDER on the 75 s clock; every kill inside its beat's window; score_at is monotonic;
 ##   the same result builds the same show (A3); the arena code calls no simulation (A1, a grep).
+## Fight pass (Alpha 0.8.1, ACTION-VOCABULARY 11), on the first 60 results:
+##   spacing   kills of a beat are 0.4 s apart or in one group (a double or triple kill, steps of at most 0.12 s)
+##   arc       the group beats' kill windows equal arena_actions_v1.json; kills lie after the engage and before the fight ends
+##   hp        hp_at is 0 exactly while the map has the hero down (Choreo.alive), full just after each rise, never above 1
+##   heal      a mender's lift never lands on a hero who is down
+##   decisive  empty, or a kill of the game winner from 41.0 to 71.25 s (the late fight's when the winner won it)
+##   beat      beat_t is monotonic, equals t outside the 1.8 s after the decisive kill, lands the kill on its moment, ends at 75
 
 const N := 400
 
@@ -35,6 +42,9 @@ func run(check: Callable) -> void:
 		var s := ShowScript.build(res, side)
 		for bad in _invariants(s, res):
 			fails[bad] = int(fails.get(bad, 0)) + 1
+		if i < 60:
+			for bad2 in _fight_pass(s):
+				fails[bad2] = int(fails.get(bad2, 0)) + 1
 		held += 1 if s.held else 0
 		switched += 1 if String(s.plan_used.get("B", "default")) != "default" or String(s.plan_used.get("R", "default")) != "default" else 0
 		arcs[s.arc] = int(arcs.get(s.arc, 0)) + 1
@@ -43,7 +53,8 @@ func run(check: Callable) -> void:
 			if JSON.stringify(again.kill_events) != JSON.stringify(s.kill_events) or JSON.stringify(again.towers) != JSON.stringify(s.towers):
 				fails["A3 determinism"] = int(fails.get("A3 determinism", 0)) + 1
 	print("     show script: %d results in %d ms; held fights %d, plan switches %d, arcs %s" % [N, Time.get_ticks_msec() - t0, held, switched, str(arcs)])
-	for name in ["I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8", "I9", "stamps", "windows", "monotonic", "A3 determinism"]:
+	for name in ["I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8", "I9", "stamps", "windows", "monotonic", "A3 determinism",
+			"spacing", "arc", "hp", "heal", "decisive", "beat"]:
 		check.call(not fails.has(name), "show script %s holds on %d results (%d failures)" % [name, N, int(fails.get(name, 0))])
 	check.call(held > 0 and switched > 0 and arcs.size() >= 3, "the sample has held fights (%d), plan switches (%d) and at least three arcs %s" % [held, switched, str(arcs.keys())])
 	_grep(check)
@@ -116,6 +127,69 @@ func _invariants(s: ShowScript, res: Dictionary) -> Array:
 				if not bad.has("monotonic"):
 					bad.append("monotonic")
 		prev = cur
+	return bad
+
+
+func _fight_pass(s: ShowScript) -> Array:
+	var bad: Array = []
+	var sp: Dictionary = ArenaActions.data()["spacing"]
+	var by_beat := {}
+	for e in s.kill_events:
+		if not by_beat.has(e["beat"]):
+			by_beat[e["beat"]] = []
+		by_beat[e["beat"]].append(e)
+	for k in by_beat:
+		var ev: Array = by_beat[k]
+		for j in range(1, ev.size()):
+			var dt := float(ev[j]["t"]) - float(ev[j - 1]["t"])
+			var same := int(ev[j]["g"]) == int(ev[j - 1]["g"])
+			if not ((not same and dt >= float(sp["min_gap_s"]) - 1e-6) or (same and dt <= float(sp["multi_step_s"]) + 1e-6 and dt >= 0.0)):
+				if not bad.has("spacing"):
+					bad.append("spacing")
+	var fights: Dictionary = ArenaActions.data()["fights"]
+	for k2 in fights:
+		var kw: Array = fights[k2]["kills"]
+		var ok := absf(float(ShowScript.KILL_WINDOW[k2][0]) - float(kw[0])) < 1e-9 and absf(float(ShowScript.KILL_WINDOW[k2][1]) - float(kw[1])) < 1e-9
+		ok = ok and float(kw[0]) >= float(fights[k2]["engage_to"]) and float(kw[1]) <= float(fights[k2]["fight_to"])
+		if not ok and not bad.has("arc"):
+			bad.append("arc")
+	var c := Choreo.build(s)
+	for key in c.heroes:
+		var t := 0.0
+		while t < 75.0:
+			var h := s.hp_at(key, t)
+			if (h <= 0.0) == c.alive(key, t) or h > 1.0 + 1e-9:
+				if not bad.has("hp"):
+					bad.append("hp")
+			t += 0.1
+		for d in c.heroes[key]["deaths"]:
+			var up_after := c.alive(key, float(d["rise"]) + 0.01)    # a hero can fall again at once after rising (the ledger's pairing)
+			if (up_after and s.hp_at(key, float(d["rise"]) + 0.01) < 0.999) or s.hp_at(key, float(d["t"])) != 0.0:
+				if not bad.has("hp"):
+					bad.append("hp")
+	for e2 in s.heals:
+		if not c.alive(String(e2["ally"]), float(e2["t"])) or not c.alive(String(e2["by"]), float(e2["t"])):
+			if not bad.has("heal"):
+				bad.append("heal")
+	var dk := s.decisive
+	if not dk.is_empty():
+		var okd := String(dk["side"]) == s.winner and float(dk["t"]) >= 41.0 and float(dk["t"]) <= 71.25 and s.kill_events.has(dk)
+		if not s.held and s.kill_events.any(func(e3: Dictionary) -> bool: return String(e3["side"]) == s.winner and String(e3["beat"]) == "fight_late"):
+			okd = okd and String(dk["beat"]) == "fight_late"
+		if not okd:
+			bad.append("decisive")
+		var prev := -1.0
+		var t2 := 0.0
+		while t2 <= 75.0:
+			var b := s.beat_t(t2)
+			if b < prev - 1e-9 or (absf(b - t2) > 1e-9 and (t2 < float(dk["t"]) or t2 > float(dk["t"]) + 1.8)):
+				if not bad.has("beat"):
+					bad.append("beat")
+			prev = b
+			t2 += 0.01
+		if absf(s.beat_t(float(dk["t"])) - float(dk["t"])) > 1e-9 or absf(s.beat_t(75.0) - 75.0) > 1e-9 or s.beat_t(50.0, false) != 50.0:
+			if not bad.has("beat"):
+				bad.append("beat")
 	return bad
 
 
