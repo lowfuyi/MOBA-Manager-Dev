@@ -166,14 +166,15 @@ func _draw() -> void:
 		var guard := not bool(t.get("scoreboard", false))
 		draw_texture_rect_region(tex, Rect2(at - half, half * 2.0), strip_rect(ICON[key]), Color(1, 1, 1, opa if guard else 1.0))
 	_draw_sprites(tex, sprites_under, vs, box)
+	_draw_sprites(tex, sprites, vs, box)
+	_draw_sprites(tex, sprites_over, vs, box)
+	# the progress rings after every sprite (one texture run above stays unbroken; A-08): they circle the pit, outside the tokens
 	for a in arcs:
 		var ac := to_view(a[0])
 		var col: Color = UI.ACCENT if String(a[4]) == "you" else UI.CORAL
 		draw_arc(ac, float(a[1]) * vs.x, -PI / 2.0, -PI / 2.0 + TAU, 48, Color(UI.VOID, 0.6), 6.0 * vs.x, true)
 		if float(a[3]) > 0.0:
 			draw_arc(ac, float(a[1]) * vs.x, -PI / 2.0 + TAU * float(a[2]), -PI / 2.0 + TAU * float(a[3]), 48, col, 5.0 * vs.x, true)
-	_draw_sprites(tex, sprites, vs, box)
-	_draw_sprites(tex, sprites_over, vs, box)
 	var f := UI.font("Bold")
 	for l in visible_labels():
 		var r: Rect2 = l["rect"]

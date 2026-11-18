@@ -95,7 +95,7 @@ func _ready() -> void:
 	ok(42.0 + feed_longest + 18.0 + 16.0 * 3.0 + 5.0 <= 626.0 - 48.0, "the longest feed line with three dots fits the large-text strip (%.0f px)" % (42.0 + feed_longest + 71.0))
 	var src := FileAccess.get_file_as_string("res://src/arena/arena_hud.gd")
 	var rx := RegEx.new()
-	rx.compile("CardKit\\.text\\(self, [^,]+, ([^,]+),")
+	rx.compile("q\\.text\\([^,]+, ([^,]+),")    # A-08: the HUD queues text through CardKit.Ops (q.text(font, size, ...))
 	var used := {}
 	for m in rx.search_all(src):
 		used[m.get_string(1).strip_edges()] = true

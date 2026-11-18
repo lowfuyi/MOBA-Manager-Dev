@@ -114,10 +114,18 @@ class Board extends Control:
 		var w := minf(672.0, size.x - 48.0)
 		return Rect2((size.x - w) / 2.0, c.get_center().y - 10.0, w, 20.0)
 
-	func _glyph(key: String, r: Rect2, a: float = 1.0) -> void:
-		draw_texture_rect_region(tex, r, ArenaMap.cell_rect(key), Color(1, 1, 1, a))
+	func _glyph(gl: Array, key: String, r: Rect2, a: float = 1.0) -> void:
+		gl.append([tex, r, ArenaMap.cell_rect(key), Color(1, 1, 1, a)])
 
 	func _draw() -> void:
+		var q := CardKit.Ops.new()
+		var gl: Array = []
+		_paint(q, gl)
+		for g in gl:    # the arena-texture glyphs in one run, then icons, then text by font (one batch each)
+			draw_texture_rect_region(g[0], g[1], g[2], g[3])
+		q.flush(self)
+
+	func _paint(q: CardKit.Ops, gl: Array) -> void:
 		if s == null:
 			return
 		var v := ArenaHud.board_values(s, t)
@@ -128,35 +136,35 @@ class Board extends Control:
 		# row A: banners and the centre numbers
 		var a: Rect2 = R[0]
 		var cy := a.get_center().y
-		Icons.draw(self, "side_you", Rect2(pad, cy - 16.0, 32, 32), UI.ACCENT)
-		CardKit.text(self, f26, UI.S_SMALL, names[0], pad + 40.0, cy, 150.0, UI.TEXT)
-		Icons.draw(self, "side_them", Rect2(size.x - pad - 32.0, cy - 16.0, 32, 32), UI.CORAL)
-		CardKit.text(self, f26, UI.S_SMALL, names[1], size.x - pad - 40.0 - 150.0, cy, 150.0, UI.TEXT, 2)
+		q.icon("side_you", Rect2(pad, cy - 16.0, 32, 32), UI.ACCENT)
+		q.text(f26, UI.S_SMALL, names[0], pad + 40.0, cy, 150.0, UI.TEXT)
+		q.icon("side_them", Rect2(size.x - pad - 32.0, cy - 16.0, 32, 32), UI.CORAL)
+		q.text(f26, UI.S_SMALL, names[1], size.x - pad - 40.0 - 150.0, cy, 150.0, UI.TEXT, 2)
 		var clock := String(v["clock"])
 		var gold_t := String(v["gold_text"])
 		var cw := CardKit.text_w(fnum, UI.S_BODY, clock)
 		var gw := CardKit.text_w(fnum, UI.S_BODY, gold_t) + (36.0 if v["gold_leader"] != "" else 0.0)
 		var x0 := (size.x - (cw + 24.0 + gw)) / 2.0
-		CardKit.text(self, fnum, UI.S_BODY, clock, x0, cy, cw + 4.0, UI.TEXT)
+		q.text(fnum, UI.S_BODY, clock, x0, cy, cw + 4.0, UI.TEXT)
 		var gx := x0 + cw + 24.0
 		if v["gold_leader"] != "":
 			var you := String(v["gold_leader"]) == "you"
-			Icons.draw(self, "side_you" if you else "side_them", Rect2(gx, cy - 14.0, 28, 28), UI.ACCENT if you else UI.CORAL)
+			q.icon("side_you" if you else "side_them", Rect2(gx, cy - 14.0, 28, 28), UI.ACCENT if you else UI.CORAL)
 			gx += 36.0
-		CardKit.text(self, fnum, UI.S_BODY, gold_t, gx, cy, 200.0, UI.WARN if _flash() else UI.TEXT)
+		q.text(fnum, UI.S_BODY, gold_t, gx, cy, 200.0, UI.WARN if _flash() else UI.TEXT)
 		# row B: kills and towers per side, the phase chip in the centre
 		var b: Rect2 = R[1]
 		var by := b.get_center().y
 		var k_you := str(v["kills_you"])
 		var k_them := str(v["kills_them"])
-		_glyph("skull", Rect2(pad, by - 16.0, 32, 32))
-		CardKit.text(self, fnum, UI.S_BODY, k_you, pad + 38.0, by, 60.0, UI.TEXT)
-		_glyph("tower_plain", Rect2(pad + 96.0, by - 16.0, 32, 32))
-		CardKit.text(self, fnum, UI.S_BODY, str(v["towers_you"]), pad + 134.0, by, 40.0, UI.TEXT)
-		_glyph("skull", Rect2(size.x - pad - 32.0, by - 16.0, 32, 32))
-		CardKit.text(self, fnum, UI.S_BODY, k_them, size.x - pad - 38.0 - 60.0, by, 60.0, UI.TEXT, 2)
-		_glyph("tower_plain", Rect2(size.x - pad - 128.0, by - 16.0, 32, 32))
-		CardKit.text(self, fnum, UI.S_BODY, str(v["towers_them"]), size.x - pad - 134.0 - 40.0, by, 40.0, UI.TEXT, 2)
+		_glyph(gl, "skull", Rect2(pad, by - 16.0, 32, 32))
+		q.text(fnum, UI.S_BODY, k_you, pad + 38.0, by, 60.0, UI.TEXT)
+		_glyph(gl, "tower_plain", Rect2(pad + 96.0, by - 16.0, 32, 32))
+		q.text(fnum, UI.S_BODY, str(v["towers_you"]), pad + 134.0, by, 40.0, UI.TEXT)
+		_glyph(gl, "skull", Rect2(size.x - pad - 32.0, by - 16.0, 32, 32))
+		q.text(fnum, UI.S_BODY, k_them, size.x - pad - 38.0 - 60.0, by, 60.0, UI.TEXT, 2)
+		_glyph(gl, "tower_plain", Rect2(size.x - pad - 128.0, by - 16.0, 32, 32))
+		q.text(fnum, UI.S_BODY, str(v["towers_them"]), size.x - pad - 134.0 - 40.0, by, 40.0, UI.TEXT, 2)
 		var chip := Strings.t(String(v["phase"]))
 		var tag: Dictionary = labels.at(t)["tag"] if labels != null else {}
 		var is_tag := not tag.is_empty()
@@ -168,8 +176,8 @@ class Board extends Control:
 		draw_rect(chip_r, UI.PANEL3 if not is_tag else Color(UI.WARN, 0.22))
 		if is_tag:
 			var mine := String(tag["side"]) == s.my_side
-			Icons.draw(self, "side_you" if mine else "side_them", Rect2(chip_r.position.x + 12.0, by - 13.0, 26, 26), UI.ACCENT if mine else UI.CORAL)
-		CardKit.text(self, UI.font("SemiBold"), UI.S_CAPTION, chip, chip_r.position.x + 16.0 + glyph_w, by, chw - 24.0 - glyph_w, UI.TEXT)
+			q.icon("side_you" if mine else "side_them", Rect2(chip_r.position.x + 12.0, by - 13.0, 26, 26), UI.ACCENT if mine else UI.CORAL)
+		q.text(UI.font("SemiBold"), UI.S_CAPTION, chip, chip_r.position.x + 16.0 + glyph_w, by, chw - 24.0 - glyph_w, UI.TEXT)
 		# row C: the lead graph
 		var g := graph_rect()
 		draw_rect(g, Color(UI.VOID, 0.7))
@@ -194,9 +202,9 @@ class Board extends Control:
 		for ob in [["stone", 0.45, "stone"], ["moon", 0.80, "moon"]]:
 			var mx := g.position.x + g.size.x * float(ob[1])
 			var owner := String(v[ob[2]])
-			_glyph(String(ob[0]), Rect2(mx - 14.0, g.get_center().y - 14.0, 28, 28), 1.0 if owner != "" else 0.4)
+			_glyph(gl, String(ob[0]), Rect2(mx - 14.0, g.get_center().y - 14.0, 28, 28), 1.0 if owner != "" else 0.4)
 			if owner != "":
-				_glyph("glyph_" + owner, Rect2(mx + 6.0, g.get_center().y - 22.0, 18, 18))
+				_glyph(gl, "glyph_" + owner, Rect2(mx + 6.0, g.get_center().y - 22.0, 18, 18))
 
 	func _graph_pt(g: Rect2, at: float) -> Vector2:
 		var gold := float(s.gold_at(at, s.my_side))
@@ -237,6 +245,14 @@ class Feed extends Control:
 		return ls
 
 	func _draw() -> void:
+		var q := CardKit.Ops.new()
+		var gl: Array = []
+		_paint(q, gl)
+		for g in gl:    # the arena-texture glyphs in one run, then icons, then text by font (one batch each)
+			draw_texture_rect_region(g[0], g[1], g[2], g[3])
+		q.flush(self)
+
+	func _paint(q: CardKit.Ops, gl: Array) -> void:
 		if s == null:
 			return
 		var h := size.y if size.y > 0.0 else 80.0
@@ -244,7 +260,7 @@ class Feed extends Control:
 		if not banner.is_empty():    # a banner takes over the block: a solid band, amber edge, TEXT words, 26 px
 			draw_rect(Rect2(0, 0, size.x, h), UI.PANEL3)
 			draw_rect(Rect2(0, 0, 8, h), UI.WARN)
-			CardKit.text(self, UI.font("SemiBold"), UI.S_SMALL, String(banner["text"]), 24.0, h / 2.0, size.x - 40.0, UI.TEXT)
+			q.text(UI.font("SemiBold"), UI.S_SMALL, String(banner["text"]), 24.0, h / 2.0, size.x - 40.0, UI.TEXT)
 			return
 		var ls := lines()
 		var line_h := h / 2.0 if not UI.large else h
@@ -255,19 +271,19 @@ class Feed extends Control:
 			var cy := line_h * (float(i) + 0.5)
 			var kind := String(ln["kind"])
 			if kind == "end":
-				Icons.draw(self, "trophy" if bool(ln["won"]) else "flag_red", Rect2(0, cy - 18.0, 36, 36), UI.WARN if bool(ln["won"]) else UI.BAD)
-				CardKit.text(self, UI.font("Bold"), UI.S_BODY, String(ln["text"]), 48.0, cy, size.x - 48.0, UI.TEXT)
+				q.icon("trophy" if bool(ln["won"]) else "flag_red", Rect2(0, cy - 18.0, 36, 36), UI.WARN if bool(ln["won"]) else UI.BAD)
+				q.text(UI.font("Bold"), UI.S_BODY, String(ln["text"]), 48.0, cy, size.x - 48.0, UI.TEXT)
 			elif kind == "end2":
-				CardKit.text(self, UI.font("Medium"), UI.S_SMALL, String(ln["text"]), 0.0, cy, size.x, UI.TEXT2)
+				q.text(UI.font("Medium"), UI.S_SMALL, String(ln["text"]), 0.0, cy, size.x, UI.TEXT2)
 			elif kind == "start":
-				CardKit.text(self, UI.font("Medium"), UI.S_SMALL, String(ln["text"]), 0.0, cy, size.x, UI.TEXT2)
+				q.text(UI.font("Medium"), UI.S_SMALL, String(ln["text"]), 0.0, cy, size.x, UI.TEXT2)
 			else:
 				var fresh := i == 0 and t - float(ln["t"]) < 4.0
 				var col := UI.TEXT if fresh else Color(UI.TEXT2, 0.75)
-				Icons.draw(self, "tick" if bool(ln["mine"]) else "cross", Rect2(0, cy - 15.0, 30, 30), col)
+				q.icon("tick" if bool(ln["mine"]) else "cross", Rect2(0, cy - 15.0, 30, 30), col)
 				var f := UI.font("SemiBold" if fresh else "Medium")
 				var w := CardKit.text_w(f, UI.S_SMALL, String(ln["text"]))
-				CardKit.text(self, f, UI.S_SMALL, String(ln["text"]), 42.0, cy, size.x - 120.0, col)
+				q.text(f, UI.S_SMALL, String(ln["text"]), 42.0, cy, size.x - 120.0, col)
 				for d in int(ArenaHud.SIZE_DOTS[String(ln["size"])]):
 					draw_circle(Vector2(42.0 + w + 18.0 + 16.0 * float(d), cy), 5.0, col)
 
@@ -306,6 +322,14 @@ class Strip extends Control:
 			plan_tapped.emit()
 
 	func _draw() -> void:
+		var q := CardKit.Ops.new()
+		var gl: Array = []
+		_paint(q, gl)
+		for g in gl:    # the arena-texture glyphs in one run, then icons, then text by font (one batch each)
+			draw_texture_rect_region(g[0], g[1], g[2], g[3])
+		q.flush(self)
+
+	func _paint(q: CardKit.Ops, gl: Array) -> void:
 		if labels == null or t >= ShowScript.WATCH:
 			return
 		var f := UI.font("SemiBold")
@@ -319,12 +343,12 @@ class Strip extends Control:
 				var lit := bool(ib["fired"]) and t >= 21.0
 				var ib_r := Rect2(size.x - ib_w, 2, ib_w, 40)
 				draw_rect(ib_r, Color(UI.WARN, 0.25) if lit else Color(UI.PANEL2, 0.6))
-				CardKit.text(self, f, UI.S_CAPTION, ib_t, ib_r.position.x + 16.0, 22.0, ib_w, UI.TEXT if lit else UI.TEXT_OFF)
+				q.text(f, UI.S_CAPTION, ib_t, ib_r.position.x + 16.0, 22.0, ib_w, UI.TEXT if lit else UI.TEXT_OFF)
 			var room := size.x - ib_w - 12.0 - 32.0
 			var pt := plan_text(room)
 			var pw := minf(CardKit.text_w(f, UI.S_CAPTION, pt) + 32.0, room + 32.0)
 			draw_rect(Rect2(0, 2, pw, 40), UI.PANEL2)
-			CardKit.text(self, f, UI.S_CAPTION, pt, 16.0, 22.0, pw - 24.0, UI.TEXT)
+			q.text(f, UI.S_CAPTION, pt, 16.0, 22.0, pw - 24.0, UI.TEXT)
 		# intent row
 		var pair: Dictionary = labels.at(t, fast)["pair"]
 		if pair.is_empty():
@@ -335,8 +359,8 @@ class Strip extends Control:
 			var yt := String(you["text"])
 			var yw := CardKit.text_w(f, UI.S_CAPTION, yt) + 32.0 + 32.0
 			draw_rect(Rect2(0, cy - 22.0, yw, 44), Color(UI.ACCENT, 0.16))
-			Icons.draw(self, "side_you", Rect2(10, cy - 12.0, 24, 24), UI.ACCENT)
-			CardKit.text(self, f, UI.S_CAPTION, yt, 42.0, cy, yw - 48.0, UI.TEXT)
+			q.icon("side_you", Rect2(10, cy - 12.0, 24, 24), UI.ACCENT)
+			q.text(f, UI.S_CAPTION, yt, 42.0, cy, yw - 48.0, UI.TEXT)
 		var them: Dictionary = pair["them"]
 		if String(pair.get("show", "both")) == "both" and not them.is_empty():
 			var tt := String(them["text"])
@@ -345,5 +369,5 @@ class Strip extends Control:
 			if yw2 + 12.0 + tw <= size.x:    # the pair must fit its row, else only yours shows (6.7.2)
 				var r := Rect2(size.x - tw, cy - 22.0, tw, 44)
 				draw_rect(r, Color(UI.CORAL, 0.16))
-				CardKit.text(self, f, UI.S_CAPTION, tt, r.position.x + 16.0, cy, tw - 48.0, UI.TEXT)
-				Icons.draw(self, "side_them", Rect2(r.end.x - 34.0, cy - 12.0, 24, 24), UI.CORAL)
+				q.text(f, UI.S_CAPTION, tt, r.position.x + 16.0, cy, tw - 48.0, UI.TEXT)
+				q.icon("side_them", Rect2(r.end.x - 34.0, cy - 12.0, 24, 24), UI.CORAL)

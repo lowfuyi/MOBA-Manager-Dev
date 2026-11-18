@@ -254,7 +254,7 @@ func arcs_at(t: float) -> Array:
 		var col := who(init)
 		if init != w and frac >= 0.9:    # a steal: the ring flips to the winner in its last 10 percent
 			col = who(w)
-		out.append([ArenaData.node(String(GROUP[k])), 66.0, 0.0, frac, col])    # round the whole pit: the tokens stand inside it
+		out.append([ArenaData.node(String(GROUP[k])), 76.0, 0.0, frac, col])    # round the whole pit, clear of the two ranks (54 px + a token)
 	return out
 
 
