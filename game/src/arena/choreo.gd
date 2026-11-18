@@ -309,7 +309,9 @@ func _hero(side: String, slot: String) -> Dictionary:
 					k += 1
 				queue.insert(k, r)
 			"rise":
-				segs.append({"t0": t, "t1": t, "pts": PackedVector2Array([pad]), "cum": [0.0], "v": 1.0})
+				# HF3: in held_island nobody walks, so a hero that falls there rises at its own formation point
+				var at := last_target if variant == "held_island" and t >= 61.0 else pad
+				segs.append({"t0": t, "t1": t, "pts": PackedVector2Array([at]), "cum": [0.0], "v": 1.0})
 				_go(segs, pad, t, last_target, RUSH)
 				catching_until = float(segs[segs.size() - 1]["t1"])
 	return {"side": side, "slot": slot, "pad": pad, "segs": segs, "deaths": deaths}

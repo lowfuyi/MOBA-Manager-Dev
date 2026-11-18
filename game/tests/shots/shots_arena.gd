@@ -3,8 +3,8 @@ extends RefCounted
 ## with the numbers of the frame (PERF-BUDGET 3.1a, hard limits 100 draw calls and 200 nodes for the whole frame):
 ##   ARENA|<variant>|<state>|nodes=..|draw_calls=..
 ## States: blue (you are Blue, zoom 1.0), red (you are Red: the picture is mirrored), focus (zoom 1.3 on Stoneback with four
-## towers down: place names show), island (zoom 1.3 on the Moonhulk isle); then one real game (A-03) at t = 3, 13, 32.5, 44,
-## 66 and 73.5 s: the tokens, minion waves, deaths and fallen towers of that moment (play_<t>).
+## towers down: place names show), island (zoom 1.3 on the Moonhulk isle); then one real game with every layer (A-03
+## tokens, A-04 effects and camera) at t = 3, 13.8, 32.9, 34.1, 44, 45.3, 66, 72.8 and 74.3 s (play_<t>).
 
 const HARD_CALLS := 100
 const HARD_NODES := 200
@@ -15,6 +15,30 @@ static func _count(n: Node) -> int:
 	for c in n.get_children():
 		total += _count(c)
 	return total
+
+
+## The whole match layout (UI-PASS-2 6.7.2; 6.7.7 in large text) with a board and a feed at show time t (A-05).
+static func _full(ctx, sc: ShowScript, ch: Choreo, fx: ArenaFx, t: float) -> ArenaMap:
+	var m := _stage(ctx, sc.my_side)
+	var vw: float = ctx.get_viewport().get_visible_rect().size.x
+	var large := UI.large
+	var safe := 48.0
+	var board_h := 122.0 if large else 142.0
+	m.size = Vector2(vw, vw * 760.0 / 720.0)
+	m.position = Vector2(0, safe + board_h)
+	var board := ArenaHud.Board.new(sc, m.texture(), "Northreach Corsairs", "Ironvale Wardens")
+	board.position = Vector2(0, safe)
+	board.size = Vector2(vw, board_h)
+	m.get_parent().add_child(board)
+	var feed := ArenaHud.Feed.new(sc, "Corsairs")
+	var strip_y := m.position.y + m.size.y
+	feed.position = Vector2(24, strip_y + (8.0 if large else 108.0))
+	feed.size = Vector2(vw - 48.0, 38.0 if large else 80.0)
+	m.get_parent().add_child(feed)
+	fx.apply(m, t)
+	board.show_at(t)
+	feed.show_at(t)
+	return m
 
 
 static func _stage(ctx, side: String) -> ArenaMap:
@@ -65,13 +89,15 @@ static func run(ctx) -> void:
 	var sc := ShowScript.build(res, "B")
 	var ch := Choreo.build(sc)
 	print("ARENA|game|winner %s held %s variant %s kills %s" % [sc.winner, sc.held, ch.variant, str(sc.kill_count)])
-	for t in [3.0, 13.0, 32.5, 44.0, 66.0, 73.5]:
-		m = _stage(ctx, "B")
-		for tw in sc.towers:
-			if float(tw["t"]) <= t:
-				m.fallen[String(tw["id"])] = true
-		m.sprites = ch.sprites_at(t, "B")
+	var fx := ArenaFx.build(sc, ch, "B")
+	for t in [3.0, 13.8, 32.9, 34.1, 44.0, 45.3, 66.0, 72.8, 74.3, 75.0]:
+		m = _full(ctx, sc, ch, fx, t)
 		await _measure(ctx, m, "play_%s" % str(t).replace(".", "_"))
+	# the other seat: the same game seen from Red (the loser here or the winner), mid-game
+	var sc_r := ShowScript.build(res, "R")
+	var ch_r := Choreo.build(sc_r)
+	m = _full(ctx, sc_r, ch_r, ArenaFx.build(sc_r, ch_r, "R"), 46.0)
+	await _measure(ctx, m, "seat_red_46")
 	for c in ctx.get_children():
 		if c.name == "ArenaStage":
 			c.queue_free()

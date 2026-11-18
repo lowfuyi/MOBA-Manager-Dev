@@ -14,13 +14,18 @@ const STRIP_X := 752.0          # the icon strip right of the map in the baked t
 const CELL := 64.0
 const BAKE := Vector2i(752 + 64 * 6, 768)
 ## icon strip cells (column, row; 6 columns by 12 rows): towers and rubble, minion dots (row 0), hero tokens with the slot letter
-## (row 1 yours: teal circles; row 2 theirs: coral flat-top hexagons). Rows 3 and on are free for A-04 (effects).
+## (row 1 yours: teal circles; row 2 theirs: coral flat-top hexagons), effects (rows 3 to 6, A-04). Rows 7 and on are free.
 const ICON := {"tower_you": Vector2i(0, 0), "tower_them": Vector2i(1, 0), "rubble_you": Vector2i(2, 0), "rubble_them": Vector2i(3, 0),
 		"minion_you": Vector2i(4, 0), "minion_them": Vector2i(5, 0),
 		"hero_you_top": Vector2i(0, 1), "hero_you_jg": Vector2i(1, 1), "hero_you_mid": Vector2i(2, 1), "hero_you_bot": Vector2i(3, 1), "hero_you_sup": Vector2i(4, 1),
-		"hero_them_top": Vector2i(0, 2), "hero_them_jg": Vector2i(1, 2), "hero_them_mid": Vector2i(2, 2), "hero_them_bot": Vector2i(3, 2), "hero_them_sup": Vector2i(4, 2)}
-## the size each kind is baked at (px); a sprite drawn at size px is scaled from it
+		"hero_them_top": Vector2i(0, 2), "hero_them_jg": Vector2i(1, 2), "hero_them_mid": Vector2i(2, 2), "hero_them_bot": Vector2i(3, 2), "hero_them_sup": Vector2i(4, 2),
+		"spark": Vector2i(0, 3), "ring_magic": Vector2i(1, 3), "skull": Vector2i(2, 3), "motes": Vector2i(3, 3), "flash": Vector2i(4, 3), "dust": Vector2i(5, 3),
+		"aura_you": Vector2i(0, 4), "aura_them": Vector2i(1, 4), "ring_you": Vector2i(2, 4), "ring_them": Vector2i(3, 4), "arrow_up_you": Vector2i(4, 4), "arrow_down_you": Vector2i(5, 4),
+		"arrow_up_them": Vector2i(0, 5), "arrow_down_them": Vector2i(1, 5), "burst_amber": Vector2i(2, 5), "burst_pale": Vector2i(3, 5), "glyph_you": Vector2i(4, 5), "glyph_them": Vector2i(5, 5),
+		"ruin": Vector2i(0, 6), "crack": Vector2i(1, 6), "stone": Vector2i(2, 6), "moon": Vector2i(3, 6), "tower_plain": Vector2i(4, 6)}
+## the size each kind is baked at (px); a sprite drawn at size px is scaled from it (effects: 56 px, rows 3 to 6)
 const BAKED_PX := {"hero": 40.0, "minion": 14.0}
+const FX_PX := 56.0
 const LETTER := {"top": "T", "jg": "J", "mid": "M", "bot": "B", "sup": "S"}
 const LABEL_SIZE := 24
 const LABEL_OUTLINE := 5
@@ -32,6 +37,9 @@ var zoom := 1.0
 var focus := MAP / 2.0           # the camera centre, arena px of the view frame (already flipped)
 var fallen: Dictionary = {}
 var sprites: Array = []         # [ICON key, canonical point, size px, alpha], drawn after the towers (Choreo.sprites_at)
+var sprites_under: Array = []   # drawn under the tokens (auras, winner rings; ArenaFx.under_at)
+var sprites_over: Array = []    # drawn over the tokens (sparks, pings, towers falling; ArenaFx.over_at)
+var arcs: Array = []            # [canonical centre, radius px, from, to, "you"/"them"] objective progress rings
 var _vp: SubViewport
 var _art: _Bake
 
@@ -41,6 +49,7 @@ func _init(p_my_side: String = "B") -> void:
 	flip = p_my_side == "R"
 	custom_minimum_size = MAP
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip_contents = true    # zoomed, tokens and towers near the edge must not spill over the scoreboard or the text strip
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_vp = SubViewport.new()
 	_vp.size = BAKE
@@ -111,6 +120,12 @@ func to_view(p: Vector2) -> Vector2:
 	return arena_to_local(arena_px(p))
 
 
+## The strip cell of an ICON key (for other controls that draw from texture(), e.g. the HUD glyphs).
+static func cell_rect(key: String) -> Rect2:
+	var cell: Vector2i = ICON[key]
+	return Rect2(Vector2(STRIP_X + float(cell.x) * CELL, float(cell.y) * CELL), Vector2(CELL, CELL))
+
+
 func strip_rect(cell: Vector2i) -> Rect2:
 	return Rect2(Vector2(STRIP_X + float(cell.x) * CELL, float(cell.y) * CELL), Vector2(CELL, CELL))
 
@@ -150,19 +165,35 @@ func _draw() -> void:
 		var key := ("rubble_" if fallen.has(String(t["id"])) else "tower_") + who
 		var guard := not bool(t.get("scoreboard", false))
 		draw_texture_rect_region(tex, Rect2(at - half, half * 2.0), strip_rect(ICON[key]), Color(1, 1, 1, opa if guard else 1.0))
-	for sp in sprites:
-		var at2 := to_view(sp[1])
-		var key2 := String(sp[0])
-		var baked := float(BAKED_PX["hero" if key2.begins_with("hero") else "minion"])
-		var half2 := Vector2(CELL, CELL) * vs * (float(sp[2]) / baked) / 2.0
-		if box.grow(CELL).has_point(at2):
-			draw_texture_rect_region(tex, Rect2(at2 - half2, half2 * 2.0), strip_rect(ICON[key2]), Color(1, 1, 1, float(sp[3])))
+	_draw_sprites(tex, sprites_under, vs, box)
+	for a in arcs:
+		var ac := to_view(a[0])
+		var col: Color = UI.ACCENT if String(a[4]) == "you" else UI.CORAL
+		draw_arc(ac, float(a[1]) * vs.x, -PI / 2.0, -PI / 2.0 + TAU, 48, Color(UI.VOID, 0.6), 6.0 * vs.x, true)
+		if float(a[3]) > 0.0:
+			draw_arc(ac, float(a[1]) * vs.x, -PI / 2.0 + TAU * float(a[2]), -PI / 2.0 + TAU * float(a[3]), 48, col, 5.0 * vs.x, true)
+	_draw_sprites(tex, sprites, vs, box)
+	_draw_sprites(tex, sprites_over, vs, box)
 	var f := UI.font("Bold")
 	for l in visible_labels():
 		var r: Rect2 = l["rect"]
 		var base := Vector2(r.position.x + float(LABEL_OUTLINE), r.position.y + r.size.y / 2.0 + f.get_ascent(LABEL_SIZE) / 2.0 - 2.0)
 		draw_string_outline(f, base, String(l["text"]), HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_SIZE, LABEL_OUTLINE * 2, UI.VOID)
 		draw_string(f, base, String(l["text"]), HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_SIZE, UI.TEXT)
+
+
+func _draw_sprites(tex: Texture2D, list: Array, vs: Vector2, box: Rect2) -> void:
+	for sp in list:
+		var at := to_view(sp[1])
+		var key := String(sp[0])
+		var baked := FX_PX
+		if key.begins_with("hero"):
+			baked = float(BAKED_PX["hero"])
+		elif key.begins_with("minion"):
+			baked = float(BAKED_PX["minion"])
+		var half := Vector2(CELL, CELL) * vs * (float(sp[2]) / baked) / 2.0
+		if box.grow(half.x + CELL).has_point(at) and float(sp[3]) > 0.0:
+			draw_texture_rect_region(tex, Rect2(at - half, half * 2.0), strip_rect(ICON[key]), Color(1, 1, 1, clampf(float(sp[3]), 0.0, 1.0)))
 
 
 ## The one-time drawing of the terrain and the icon strip (inside the SubViewport).
@@ -320,6 +351,100 @@ class _Bake extends Node2D:
 				var ink := UI.INK_TEAL if who == "you" else UI.INK_CORAL
 				var sz := lf.get_string_size(letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 24)
 				draw_string(lf, hc + Vector2(-sz.x / 2.0, lf.get_ascent(24) / 2.0 - 3.0), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 24, ink)
+		_bake_fx()
+
+	func _cell(key: String) -> Vector2:
+		return owner_map.strip_rect(ArenaMap.ICON[key]).get_center()
+
+	## Effect art (A-04), each about 56 px in its 64 px cell. Hit colours per ACTION-VOCABULARY 3.1: physical = WARN mixed toward
+	## TEXT (a sharp spark), magic = TEXT2 (a soft ring); never teal or coral, which mean the two sides.
+	func _bake_fx() -> void:
+		var phys := UI.WARN.lerp(UI.TEXT, 0.4)
+		var c := _cell("spark")
+		var star := PackedVector2Array()
+		for i in 8:
+			var a := TAU * float(i) / 8.0
+			star.append(c + Vector2.from_angle(a) * (26.0 if i % 2 == 0 else 8.0))
+		draw_colored_polygon(star, phys)
+		c = _cell("ring_magic")
+		draw_arc(c, 22.0, 0.0, TAU, 40, Color(UI.TEXT2, 0.9), 5.0, true)
+		draw_arc(c, 14.0, 0.0, TAU, 32, Color(UI.TEXT2, 0.4), 3.0, true)
+		c = _cell("skull")
+		draw_circle(c + Vector2(0, -3), 14.0, UI.TEXT)
+		draw_rect(Rect2(c + Vector2(-8, 6), Vector2(16, 9)), UI.TEXT)
+		draw_circle(c + Vector2(-5, -4), 4.0, UI.VOID)
+		draw_circle(c + Vector2(5, -4), 4.0, UI.VOID)
+		draw_rect(Rect2(c + Vector2(-1, 9), Vector2(2, 6)), UI.VOID)
+		c = _cell("motes")
+		for m in [Vector2(-12, 8), Vector2(0, -6), Vector2(11, 4), Vector2(-4, -18), Vector2(8, -16)]:
+			draw_circle(c + m, 3.5, Color(UI.TEXT, 0.85))
+		c = _cell("flash")
+		draw_circle(c, 26.0, Color(UI.TEXT, 0.25))
+		draw_circle(c, 17.0, Color(UI.TEXT, 0.5))
+		draw_circle(c, 9.0, Color(UI.TEXT, 0.9))
+		c = _cell("dust")
+		draw_arc(c, 20.0, 0.0, TAU, 32, Color(UI.TEXT_OFF, 0.8), 8.0, true)
+		for side in ["you", "them"]:
+			var col := UI.ACCENT if side == "you" else UI.CORAL
+			c = _cell("aura_" + side)
+			if side == "you":
+				draw_circle(c, 26.0, Color(col, 0.18))
+				draw_arc(c, 24.0, 0.0, TAU, 40, Color(col, 0.7), 4.0, true)
+			else:
+				draw_colored_polygon(_hex(c, 27.0), Color(col, 0.18))
+				var hx := _hex(c, 25.0)
+				hx.append(hx[0])
+				draw_polyline(hx, Color(col, 0.7), 4.0, true)
+			c = _cell("ring_" + side)
+			if side == "you":
+				draw_arc(c, 25.0, 0.0, TAU, 48, col, 4.0, true)
+			else:
+				var hx2 := _hex(c, 27.0)
+				hx2.append(hx2[0])
+				draw_polyline(hx2, col, 4.0, true)
+			for dir in ["up", "down"]:
+				c = _cell("arrow_%s_%s" % [dir, side])
+				var sgn := -1.0 if dir == "up" else 1.0
+				var tip := c + Vector2(0, 24.0 * sgn)
+				draw_colored_polygon(PackedVector2Array([tip, c + Vector2(-16, 4.0 * sgn), c + Vector2(16, 4.0 * sgn)]), col)
+				draw_rect(Rect2(c + Vector2(-6, -24.0 if dir == "down" else 4.0), Vector2(12, 20)), col)
+			c = _cell("glyph_" + side)
+			if side == "you":
+				draw_circle(c, 24.0, UI.VOID)
+				draw_circle(c, 18.0, col)
+			else:
+				draw_colored_polygon(_hex(c, 26.0), UI.VOID)
+				draw_colored_polygon(_hex(c, 20.0), col)
+		for b in [["burst_amber", UI.WARN], ["burst_pale", UI.TEXT2]]:
+			c = _cell(String(b[0]))
+			draw_arc(c, 22.0, 0.0, TAU, 40, b[1], 5.0, true)
+			for i2 in 8:
+				var a2 := TAU * float(i2) / 8.0
+				draw_line(c + Vector2.from_angle(a2) * 24.0, c + Vector2.from_angle(a2) * 30.0, b[1], 3.0, true)
+		c = _cell("ruin")
+		draw_circle(c, 26.0, UI.VOID)
+		for st in [[Vector2(-9, 6), 7.0], [Vector2(8, 8), 6.0], [Vector2(-2, -6), 5.0], [Vector2(12, -4), 4.0]]:
+			draw_circle(c + st[0], st[1], UI.TEXT_OFF)
+		# scoreboard glyphs (A-05): Stoneback, Moonhulk and a plain tower, in neutral colours (the owner's shape goes beside them)
+		c = _cell("stone")
+		var rh := PackedVector2Array([c + Vector2(0, -24), c + Vector2(24, 0), c + Vector2(0, 24), c + Vector2(-24, 0)])
+		draw_colored_polygon(rh, UI.VOID)
+		rh.append(rh[0])
+		draw_polyline(rh, UI.WARN, 4.0, true)
+		c = _cell("moon")
+		draw_circle(c, 24.0, UI.VOID)
+		draw_arc(c, 22.0, 0.0, TAU, 40, UI.TEXT2, 4.0, true)
+		draw_circle(c + Vector2(-3, 0), 12.0, UI.TEXT)
+		draw_circle(c + Vector2(3, -3), 11.0, UI.VOID)
+		c = _cell("tower_plain")
+		draw_rect(Rect2(c + Vector2(-8, -12), Vector2(16, 30)), UI.TEXT)
+		draw_rect(Rect2(c + Vector2(-13, -20), Vector2(26, 10)), UI.TEXT)
+		draw_rect(Rect2(c + Vector2(-3, 6), Vector2(6, 12)), UI.VOID)
+		c = _cell("crack")
+		var zz := PackedVector2Array([c + Vector2(-4, -22), c + Vector2(4, -10), c + Vector2(-5, 0), c + Vector2(5, 10), c + Vector2(-2, 22)])
+		draw_polyline(zz, UI.TEXT, 3.0, true)
+		draw_line(c + Vector2(-5, 0), c + Vector2(-16, 6), UI.TEXT, 2.5, true)
+		draw_line(c + Vector2(4, -10), c + Vector2(15, -14), UI.TEXT, 2.5, true)
 
 	func _hex(c: Vector2, r: float) -> PackedVector2Array:
 		var pts := PackedVector2Array()
