@@ -22,6 +22,8 @@ static func run(ctx) -> void:
 	await ctx.shot("settings_on")
 	_scroll(ctx, 700)    # Alpha 0.8.1: the Frame rate card under Animations
 	await ctx.shot("settings_fps")
+	_scroll(ctx, 1000)    # Alpha 0.8.2: the Sound and vibration card under Frame rate
+	await ctx.shot("settings_sound")
 	App.set_colorblind(false)
 	gs.set_quick(false)
 	App.go(ScreenFinance.new())

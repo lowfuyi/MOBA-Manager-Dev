@@ -225,6 +225,25 @@ func fps() -> int:
 	return int(v) if (v is int) and FPS_CHOICES.has(int(v)) else FPS_DEFAULT
 
 
+## Sound and vibration (Alpha 0.8.2, section [audio]): both on unless switched off; anything that is not true or false reads as on.
+func sound() -> bool:
+	var v = _load().get_value("audio", "sound", true)
+	return v if v is bool else true
+
+
+func set_sound(on: bool) -> void:
+	_write("audio", "sound", on)
+
+
+func haptics() -> bool:
+	var v = _load().get_value("audio", "haptics", true)
+	return v if v is bool else true
+
+
+func set_haptics(on: bool) -> void:
+	_write("audio", "haptics", on)
+
+
 func set_fps(n: int) -> bool:
 	if not FPS_CHOICES.has(n):
 		return false

@@ -49,6 +49,16 @@ func _rebuild() -> void:
 	m.add_child(_toggle(Strings.t("settings.held_gate"), dev.arena_held() == "held_gate", func(v): dev.set_arena_held("held_gate" if v else "")))
 	m.add_child(UI.label(Strings.t("settings.held_gate_hint"), UI.S_SMALL, UI.DIM))
 	_fps_card()
+	var au := UI.card(body)
+	au.add_child(UI.label(Strings.t("settings.sound_h"), UI.S_BODY, UI.ACCENT))
+	var dv := HelpSheet.device()
+	var st := _toggle(Strings.t("settings.sound"), dv.sound(), func(v): App.set_sound(v))
+	st.name = "SoundToggle"
+	au.add_child(st)
+	var ht := _toggle(Strings.t("settings.haptics"), dv.haptics(), func(v): App.set_haptics(v))
+	ht.name = "HapticsToggle"
+	au.add_child(ht)
+	au.add_child(UI.label(Strings.t("settings.sound_hint"), UI.S_SMALL, UI.DIM))
 	var acc := UI.card(body)
 	acc.add_child(UI.label(Strings.t("settings.access_h"), UI.S_BODY, UI.ACCENT))
 	acc.add_child(_toggle(Strings.t("settings.large_text"), App.large_text(), func(v): App.set_large_text(v)))

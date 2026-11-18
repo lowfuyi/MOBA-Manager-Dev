@@ -457,6 +457,8 @@ static func button(text: String, cb: Callable, kind: String = "normal", min_h: i
 	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART    # a long caption wraps instead of widening the page (large text)
 	b.focus_mode = Control.FOCUS_NONE
 	b.mouse_filter = Control.MOUSE_FILTER_PASS    # lets a swipe that starts on a button scroll the page
+	var snd := "confirm" if kind == "primary" or kind == "play" else "tap"    # placeholder sounds (Alpha 0.8.2), silent when off
+	b.pressed.connect(func() -> void: App.sound(snd))
 	match kind:
 		"primary":
 			b.add_theme_stylebox_override("normal", box(ACCENT.darkened(0.15), R_BTN, 18))

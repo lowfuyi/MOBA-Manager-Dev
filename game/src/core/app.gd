@@ -28,6 +28,11 @@ func _ready() -> void:
 	UI.set_colorblind(bool(_read_setting("colorblind", false)))
 	apply_large_text(bool(_read_setting("large_text", false)))
 	apply_fps(DeviceState.new().fps())
+	sfx = Sfx.new()
+	sfx.name = "Sfx"
+	add_child(sfx)
+	sfx.on = DeviceState.new().sound()
+	haptics_on = DeviceState.new().haptics()
 
 
 ## Called by Main once the first screen is up.
@@ -76,6 +81,40 @@ func _read_setting(key: String, default: Variant) -> Variant:
 	if cf.load(SETTINGS_PATH) != OK:
 		return default
 	return cf.get_value("ui", key, default)
+
+
+var sfx: Sfx                 # placeholder sounds (Alpha 0.8.2); a child of App, never a static var
+var haptics_on := true
+var buzzed: Array = []       # vibration lengths asked for while haptics are on (last 100), for tests
+var vibrate_on_device := DisplayServer.get_name() != "headless"
+
+
+## Play a placeholder sound if Sound is on (Settings). Returns whether it played. Nothing needs sound to be understood.
+func sound(sound_name: String) -> bool:
+	return sfx != null and sfx.play(sound_name)
+
+
+## A short vibration (ms) if Vibration is on: kills and results only (Alpha 0.8.2; Android VIBRATE permission in the preset).
+func buzz(ms: int) -> bool:
+	if not haptics_on:
+		return false
+	buzzed.append(ms)
+	if buzzed.size() > 100:
+		buzzed.pop_front()
+	if vibrate_on_device:
+		Input.vibrate_handheld(ms)
+	return true
+
+
+func set_sound(on: bool) -> void:
+	HelpSheet.device().set_sound(on)
+	if sfx != null:
+		sfx.on = on
+
+
+func set_haptics(on: bool) -> void:
+	HelpSheet.device().set_haptics(on)
+	haptics_on = on
 
 
 var fps_cap_on := DisplayServer.get_name() != "headless"    # the headless test engine stays uncapped; a test may switch it on
@@ -151,6 +190,7 @@ func debug_info() -> String:
 	lines.append("startup=%d ms  mem=%.0f MB  text=%s  colours=%s" % [startup_ms, float(Performance.get_monitor(Performance.MEMORY_STATIC)) / 1048576.0,
 			"large" if large_text() else "normal", "colour-blind" if UI.colorblind else "default"])
 	lines.append("fps cap=%d" % HelpSheet.device().fps())
+	lines.append("sound=%s haptics=%s" % ["on" if HelpSheet.device().sound() else "off", "on" if HelpSheet.device().haptics() else "off"])
 	if not last_game.is_empty():
 		lines.append("last=" + str(last_game.get("id", "")))
 	return "\n".join(lines)

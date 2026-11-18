@@ -119,6 +119,7 @@ I did not see the reference recording; I rely on `UI-UX-REFERENCE-v1.md`. Ideas,
 
 | Date | Asset | Source and URL | Licence | Where it ships | Required text | Status |
 |---|---|---|---|---|---|---|
+| 2026-11-18 | Placeholder sound effects: tap, confirm, hit, kill, objective, victory, defeat (Alpha 0.8.2) | Made in house: generated in code at start-up by `game/src/core/sfx.gd` (sine and triangle tones, a fixed noise sequence); no audio file, sample, library or tool output is used | Ours (no third-party licence) | Built at run time, nothing shipped as a file | None | Done. Any later recorded or licensed sound must get its own row here before it ships (Audio Director's licence log) |
 | 2026-11-08 | Barlow Semi Condensed (Regular, Medium, SemiBold, Bold, ExtraBold), planned | `https://github.com/jpt/barlow` (OFL.txt retrieved from master, 2026-11-08); also `https://fonts.google.com/specimen/Barlow+Semi+Condensed` | SIL OFL 1.1 | Godot `res://` fonts folder, Android package | Copyright line and licence text from the shipped `OFL.txt` | Verified from source; not yet imported; log final file hashes at import |
 
 ## I. Open items and who acts

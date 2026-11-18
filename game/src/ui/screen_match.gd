@@ -25,6 +25,7 @@ var _watch_t := 0.0           # real seconds spent watching (pace log)
 var _skipped := false
 var _used_fast := false
 var _finished := false
+var _last_hit := -1.0
 var _stage: Control
 var _map: ArenaMap
 var _board: ArenaHud.Board
@@ -153,8 +154,10 @@ func _process(delta: float) -> void:
 	if BottomSheet.is_open() and not BottomSheet.current().is_closing:
 		return    # any sheet (help, the plan) pauses the show (6.7.6); the result was decided before it, so nothing changes
 	_watch_t += delta
+	var was := script_.beat_t(show_t, UI.animate)
 	show_t = ScreenMatch.advance(show_t, delta, _fast)
 	_apply()
+	_cues(was, script_.beat_t(show_t, UI.animate))
 	if show_t >= ShowScript.WATCH:
 		_end()
 
@@ -181,6 +184,32 @@ func _apply() -> void:
 	_shown = n
 
 
+## Sounds and vibration for what happened between two beat times (Alpha 0.8.2): a kill (sound and a short buzz; longer on the
+## decisive kill), a hit of an action (sound, at most one per 0.25 s), an objective taken (sound). A jump (Skip) plays nothing
+## of what it passed. All of it is optional: the screen already shows every one of these moments.
+func _cues(a: float, b: float) -> void:
+	if b <= a or b - a > 0.5:
+		return
+	for e in script_.kill_events:
+		var t := float(e["t"])
+		if t > a and t <= b:
+			App.sound("kill")
+			App.buzz(60 if e == script_.decisive else 25)
+	for k in ["obj_mid", "obj_late"]:
+		var rt := float(ShowScript.RESOLVE[k])
+		if rt > a and rt <= b:
+			App.sound("objective")
+	if b - _last_hit >= 0.25:
+		for ac in fx.actions:
+			if float(ac["t0"]) > b:
+				break
+			var th := float(ac["th"])
+			if th > a and th <= b and not bool(ac["kill"]) and String(ac["kind"]) != "heal":
+				App.sound("hit")
+				_last_hit = b
+				break
+
+
 static func _mmss(minutes: float) -> String:
 	var s := int(minutes * 60.0)
 	return "%02d:%02d" % [s / 60, s % 60]
@@ -197,6 +226,9 @@ func _end() -> void:
 	_speed_btn.visible = false
 	_skip_btn.visible = false
 	_go_btn.visible = true
+	var won := script_.winner == my_side
+	App.sound("victory" if won else "defeat")
+	App.buzz(150 if won else 90)
 	_raise("match:end")
 
 

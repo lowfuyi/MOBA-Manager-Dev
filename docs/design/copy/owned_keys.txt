@@ -814,3 +814,7 @@ arena.comment.held_w.3
 arena.comment.held_u.1
 arena.comment.held_u.2
 arena.comment.held_u.3
+settings.sound_h
+settings.sound
+settings.haptics
+settings.sound_hint
