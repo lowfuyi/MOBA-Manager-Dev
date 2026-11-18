@@ -259,6 +259,8 @@ func _build() -> void:
 		var dtx := Strings.t("arena.tag.decisive")
 		var dt0 := float(s.decisive["t"])
 		items.append({"kind": "tag", "t": dt0, "until": dt0 + TAG_S, "words": word_count(dtx), "id": "decisive", "text": dtx, "side": s.winner})
+	if not large:
+		_comments()
 	if s.arc == "close":
 		var tc := _label("tag_close", me)
 		items.append({"kind": "tag", "t": 62.0, "until": 62.0 + TAG_S, "words": int(tc["words"]), "id": tc["id"], "text": tc["text"], "side": me})
@@ -274,6 +276,46 @@ func _build() -> void:
 	_schedule()
 
 
+## Commentary (Alpha 0.8.2, UI-PASS-2 6.7.4 row 7, ESPORTS-NOTES 4; lines by the Narrative Designer, arena.comment.*): a caster
+## line in feed line 2, in a calm slot, never in large text, at most COMMENTS a game. Candidates in priority order: after the
+## Mossback fight (47.5 s), before the late fight (66.0 s; in a held game the "lead holds" line after it instead, 71.6 s), the
+## gathering at Mossback (39.5 s), the lanes' outcome (26.75 s). Every line states something the show has already played.
+const COMMENTS := 2
+const COMMENT_KEYS := {
+	"lanes_you": ["arena.comment.lanes_you.1", "arena.comment.lanes_you.2", "arena.comment.lanes_you.3"],
+	"lanes_them": ["arena.comment.lanes_them.1", "arena.comment.lanes_them.2", "arena.comment.lanes_them.3"],
+	"lanes_even": ["arena.comment.lanes_even.1", "arena.comment.lanes_even.2", "arena.comment.lanes_even.3"],
+	"gather": ["arena.comment.gather.1", "arena.comment.gather.2", "arena.comment.gather.3"],
+	"mid_you": ["arena.comment.mid_you.1", "arena.comment.mid_you.2", "arena.comment.mid_you.3"],
+	"mid_them": ["arena.comment.mid_them.1", "arena.comment.mid_them.2", "arena.comment.mid_them.3"],
+	"late_close": ["arena.comment.late_close.1", "arena.comment.late_close.2", "arena.comment.late_close.3"],
+	"late_you": ["arena.comment.late_you.1", "arena.comment.late_you.2", "arena.comment.late_you.3"],
+	"late_them": ["arena.comment.late_them.1", "arena.comment.late_them.2", "arena.comment.late_them.3"],
+	"held_w": ["arena.comment.held_w.1", "arena.comment.held_w.2", "arena.comment.held_w.3"],
+	"held_u": ["arena.comment.held_u.1", "arena.comment.held_u.2", "arena.comment.held_u.3"]}
+const COMMENT_S := 2.5
+
+
+func _comments() -> void:
+	var rng := Pcg32.contest_stream(int(s.res["mseed"]), "show:comment")
+	var sm := ShowScript.sgn(me)
+	var cands: Array = []
+	cands.append([47.5, "mid_you" if String(s.contests["fight_mid"]["win"]) == me else "mid_them"])
+	if s.held:
+		cands.append([71.6, "held_w" if s.winner == me else "held_u"])
+	else:
+		var l6 := sm * float(s.ladder[6])
+		cands.append([66.0, "late_close" if absf(l6) < 0.05 else ("late_you" if l6 > 0.0 else "late_them")])
+	cands.append([39.5, "gather"])
+	var l3 := sm * float(s.ladder[2])
+	cands.append([26.75, "lanes_even" if absf(l3) < 0.02 else ("lanes_you" if l3 > 0.0 else "lanes_them")])
+	for p in cands.size():
+		var keys: Array = COMMENT_KEYS[cands[p][1]]
+		var text := Strings.t(String(keys[int(rng.next_float() * 3.0) % 3]))
+		items.append({"kind": "comment", "t": float(cands[p][0]), "until": float(cands[p][0]) + COMMENT_S, "words": word_count(text),
+				"text": text, "id": String(cands[p][1]), "prio": p})
+
+
 ## Admission (6.7.4): banner, feed, tag, pair, yours only; an item is admitted if no WINDOW-second span that contains its start
 ## then holds more than WORDS new words. A wipe banner replaces its fight's feed line (2 words for 5). Feed lines always pass.
 func _schedule() -> void:
@@ -282,7 +324,7 @@ func _schedule() -> void:
 	for it in items:
 		if String(it["kind"]) == "banner" and it.has("replaces_feed"):
 			replaced[String(it["replaces_feed"])] = true
-	var rank := {"banner": 0, "feed": 1, "tag": 2, "pair": 3}
+	var rank := {"banner": 0, "feed": 1, "tag": 2, "pair": 3, "comment": 4}
 	var order: Array = items.duplicate()
 	order.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		if rank[a["kind"]] != rank[b["kind"]]:
@@ -290,6 +332,8 @@ func _schedule() -> void:
 		return float(a["t"]) < float(b["t"]))
 	for it2 in order:
 		var kind := String(it2["kind"])
+		if kind == "comment":
+			continue    # commentary goes last, in its own priority order (below)
 		if kind == "feed":
 			if replaced.has(String(it2["beat"])):
 				continue
@@ -311,6 +355,13 @@ func _schedule() -> void:
 			y["show"] = "you"
 			y["words"] = int(it2["words_you"])
 			admitted.append(y)
+	var com: Array = items.filter(func(x: Dictionary) -> bool: return String(x["kind"]) == "comment")
+	com.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a["prio"]) < int(b["prio"]))
+	var said := 0
+	for cm in com:
+		if said < COMMENTS and not _under_banner(float(cm["t"]), float(cm["until"])) and _fits(float(cm["t"]), int(cm["words"])):
+			admitted.append(cm)
+			said += 1
 	admitted.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["t"]) < float(b["t"]))
 
 
@@ -357,7 +408,7 @@ func max_words() -> int:
 
 ## What shows at t: {pair: item or {}, tag: item or {}, banner: item or {}}; `fast` (x2) hides the pairs.
 func at(t: float, fast: bool = false) -> Dictionary:
-	var out := {"pair": {}, "tag": {}, "banner": {}}
+	var out := {"pair": {}, "tag": {}, "banner": {}, "comment": {}}
 	for a in admitted:
 		if t < float(a["t"]) or t >= float(a["until"]):
 			continue
@@ -368,6 +419,8 @@ func at(t: float, fast: bool = false) -> Dictionary:
 			out["tag"] = a
 		elif kind == "banner":
 			out["banner"] = a
+		elif kind == "comment":
+			out["comment"] = a
 	return out
 
 

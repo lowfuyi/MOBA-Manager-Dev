@@ -24,6 +24,7 @@ func run(check: Callable) -> void:
 	var shown_both := 0
 	var windows := 0
 	var held_seen := 0
+	var comments_total := 0
 	for i in N:
 		var a: String = w.club_ids[i % w.club_ids.size()]
 		var b: String = w.club_ids[(i * 5 + 3) % w.club_ids.size()]
@@ -53,6 +54,21 @@ func run(check: Callable) -> void:
 				wipes += 1 if String(it["kind"]) == "banner" and String(it.get("id", "")) == "wipe" else 0
 			if feeds + wipes < 8:
 				fails["feed kept"] = int(fails.get("feed kept", 0)) + 1
+			# commentary (Alpha 0.8.2): at most 2 a game, none in large text, 8 words or fewer, in its slot, never under a banner
+			var said := 0
+			for it3 in l.admitted:
+				if String(it3["kind"]) != "comment":
+					continue
+				said += 1
+				var okc := ArenaLabels.word_count(String(it3["text"])) <= 8 and [26.75, 39.5, 47.5, 66.0, 71.6].has(float(it3["t"]))
+				okc = okc and not l._under_banner(float(it3["t"]), float(it3["until"])) and not String(it3["text"]).begins_with("arena.")
+				if String(it3["id"]).begins_with("held") and not s.held:
+					okc = false
+				if not okc:
+					fails["comment"] = int(fails.get("comment", 0)) + 1
+			comments_total += said
+			if said > ArenaLabels.COMMENTS or (large and said > 0):
+				fails["comment"] = int(fails.get("comment", 0)) + 1
 			var t := 0.0
 			while t < 75.0:
 				var now := l.at(t)
@@ -100,10 +116,11 @@ func run(check: Callable) -> void:
 				if JSON.stringify(l2.admitted) != JSON.stringify(l.admitted):
 					fails["R4"] = int(fails.get("R4", 0)) + 1
 	print("     arena labels: %d results x 2; worst %d new words in 2.5 s; both labels in %d of %d admitted windows; held games %d" % [N, worst_words, shown_both, windows, held_seen])
-	for name in ["budget", "feed kept", "items at once", "R1", "R5", "large", "HF5", "chip", "R4"]:
+	for name in ["budget", "feed kept", "items at once", "R1", "R5", "large", "HF5", "chip", "R4", "comment"]:
 		check.call(not fails.has(name), "arena labels %s holds (%d failures)" % [name, int(fails.get(name, 0))])
 	check.call(windows > 0 and float(shown_both) / float(windows) >= 0.4, "the budget still leaves both labels in a fair share of windows (%d of %d)" % [shown_both, windows])
 	check.call(held_seen > 0, "the sample has held fights (%d)" % held_seen)
+	check.call(comments_total >= N / 2, "commentary lines are admitted in the normal layout (%d over %d shows)" % [comments_total, N])
 	_variants(check)
 
 

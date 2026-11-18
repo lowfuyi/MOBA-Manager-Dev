@@ -264,6 +264,9 @@ class Feed extends Control:
 			return
 		var ls := lines()
 		var line_h := h / 2.0 if not UI.large else h
+		var said: Dictionary = labels.at(t)["comment"] if labels != null and not UI.large and t < ShowScript.WATCH else {}
+		if not said.is_empty():    # commentary takes feed line 2 in a calm gap (UI-PASS-2 6.7.4 row 7)
+			ls = [ls[0], {"kind": "comment", "text": String(said["text"])}]
 		for i in 2:
 			var ln: Dictionary = ls[i]
 			if ln.is_empty():
@@ -274,6 +277,8 @@ class Feed extends Control:
 				q.icon("trophy" if bool(ln["won"]) else "flag_red", Rect2(0, cy - 18.0, 36, 36), UI.WARN if bool(ln["won"]) else UI.BAD)
 				q.text(UI.font("Bold"), UI.S_BODY, String(ln["text"]), 48.0, cy, size.x - 48.0, UI.TEXT)
 			elif kind == "end2":
+				q.text(UI.font("Medium"), UI.S_SMALL, String(ln["text"]), 0.0, cy, size.x, UI.TEXT2)
+			elif kind == "comment":
 				q.text(UI.font("Medium"), UI.S_SMALL, String(ln["text"]), 0.0, cy, size.x, UI.TEXT2)
 			elif kind == "start":
 				q.text(UI.font("Medium"), UI.S_SMALL, String(ln["text"]), 0.0, cy, size.x, UI.TEXT2)
