@@ -45,6 +45,7 @@ var sprites_under: Array = []   # drawn under the tokens (auras, winner rings; A
 var sprites_over: Array = []    # drawn over the tokens (sparks, pings, towers falling; ArenaFx.over_at)
 var arcs: Array = []            # [canonical centre, radius px, from, to, "you"/"them"] objective progress rings
 var bars: Array = []            # [canonical point (the token), hp 0 to 1, "you"/"them", alpha] health bars (ArenaFx.bars_at)
+var arche := {"you": {}, "them": {}}    # slot -> archetype of the hero each side played (set_heroes; else the slot fallback)
 var _vp: SubViewport
 var _art: _Bake
 
@@ -65,6 +66,19 @@ func _init(p_my_side: String = "B") -> void:
 	_art.owner_map = self
 	_vp.add_child(_art)
 	add_child(_vp)
+
+
+## The archetype of every token (Alpha 0.8.2): call before the map is first drawn (the strip is baked once).
+func set_heroes(res: Dictionary) -> void:
+	for side in ["B", "R"]:
+		for slot in LETTER:
+			arche[side_word(side)][slot] = ArenaActions.archetype(res, side, slot)
+	rebake()
+
+
+func archetype_of(who: String, slot: String) -> String:
+	var a := String(arche.get(who, {}).get(slot, ""))
+	return a if a != "" else String(ArenaActions.data()["slot_fallback"][slot])
 
 
 func texture() -> Texture2D:
@@ -378,10 +392,15 @@ class _Bake extends Node2D:
 					draw_colored_polygon(hx, UI.CORAL)
 					hx.append(hx[0])
 					draw_polyline(_hex(hc, 19.5) + PackedVector2Array([_hex(hc, 19.5)[0]]), rim, 3.0, true)
-				var letter: String = ArenaMap.LETTER[slot]
+				# Alpha 0.8.2: the archetype silhouette in ink, the slot letter kept as a small badge (colour-blind and quick reading)
 				var ink := UI.INK_TEAL if who == "you" else UI.INK_CORAL
-				var sz := lf.get_string_size(letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 24)
-				draw_string(lf, hc + Vector2(-sz.x / 2.0, lf.get_ascent(24) / 2.0 - 3.0), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 24, ink)
+				_glyph(hc + Vector2(-2, -2), owner_map.archetype_of(who, slot), ink)
+				var bc := hc + Vector2(13, 13)
+				draw_circle(bc, 9.5, UI.VOID)
+				draw_arc(bc, 9.0, 0.0, TAU, 20, rim, 1.5, true)
+				var letter: String = ArenaMap.LETTER[slot]
+				var sz := lf.get_string_size(letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 15)
+				draw_string(lf, bc + Vector2(-sz.x / 2.0, lf.get_ascent(15) / 2.0 - 2.0), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, UI.TEXT)
 		_bake_fx()
 
 	func _cell(key: String) -> Vector2:
@@ -518,6 +537,38 @@ class _Bake extends Node2D:
 		draw_rect(Rect2(c - Vector2(26, 26), Vector2(52, 52)), UI.VOID)
 		c = _cell("bar_fill")
 		draw_rect(Rect2(c - Vector2(26, 26), Vector2(52, 52)), Color.WHITE)
+
+	## Archetype silhouettes (ACTION-VOCABULARY 11, Alpha 0.8.2): simple original shapes about 26 px, no shape of any existing game's
+	## hero or class icon (IP-RISK-LOG Scan 2): hammer (bruiser), shield (bulwark), blade (shade), star (spellcaster), linked rings
+	## (binder), sight (gunner), sprout (mender).
+	func _glyph(c: Vector2, arch: String, ink: Color) -> void:
+		match arch:
+			"bruiser":
+				draw_rect(Rect2(c + Vector2(-9, -11), Vector2(18, 9)), ink)
+				draw_rect(Rect2(c + Vector2(-2, -3), Vector2(4, 15)), ink)
+			"bulwark":
+				draw_colored_polygon(PackedVector2Array([c + Vector2(-10, -11), c + Vector2(10, -11), c + Vector2(10, 1), c + Vector2(0, 12), c + Vector2(-10, 1)]), ink)
+			"shade":
+				draw_colored_polygon(PackedVector2Array([c + Vector2(0, -13), c + Vector2(4, 2), c + Vector2(0, 7), c + Vector2(-4, 2)]), ink)
+				draw_rect(Rect2(c + Vector2(-7, 6), Vector2(14, 3)), ink)
+				draw_rect(Rect2(c + Vector2(-1.5, 9), Vector2(3, 5)), ink)
+			"spellcaster":
+				var st := PackedVector2Array()
+				for i in 8:
+					st.append(c + Vector2.from_angle(-PI / 2.0 + TAU * float(i) / 8.0) * (12.0 if i % 2 == 0 else 4.5))
+				draw_colored_polygon(st, ink)
+			"binder":
+				draw_arc(c + Vector2(-4.5, 0), 6.5, 0.0, TAU, 20, ink, 3.5, true)
+				draw_arc(c + Vector2(4.5, 0), 6.5, 0.0, TAU, 20, ink, 3.5, true)
+			"gunner":
+				draw_arc(c, 8.5, 0.0, TAU, 24, ink, 3.0, true)
+				for d in [Vector2(0, -1), Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0)]:
+					draw_line(c + d * 6.0, c + d * 13.0, ink, 3.0, true)
+				draw_circle(c, 2.5, ink)
+			_:    # mender: a sprout (a stem and two leaves)
+				draw_rect(Rect2(c + Vector2(-1.5, -2), Vector2(3, 14)), ink)
+				draw_colored_polygon(_oval(c + Vector2(-6, -4), 6.0, 3.5), ink)
+				draw_colored_polygon(_oval(c + Vector2(6, -7), 6.0, 3.5), ink)
 
 	func _hex(c: Vector2, r: float) -> PackedVector2Array:
 		var pts := PackedVector2Array()

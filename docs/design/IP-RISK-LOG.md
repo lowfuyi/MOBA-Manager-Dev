@@ -141,3 +141,25 @@ I did not see the reference recording; I rely on `UI-UX-REFERENCE-v1.md`. Ideas,
 | MOBA Manager / MOBA Esports (title) | Gloamline | en.json app.title, project.godot, export label, README, GDD | name search as in DECISIONS.md; trademark search still open |
 
 Scan 2 still to run: role glyphs (pass 2b), flags, rhombus, style tile, the new names above, and the 18 label lines that use the `{place}` placeholder (Scan 1 counted 11).
+
+# Scan 2: Alpha 0.7 to 0.8.2 shapes, glyphs and names (2026-11-18)
+
+Run by the Producer in the IP and Originality Checker role (no sub-agent; no web, store or trademark search in this session, so
+name collisions below are judged from knowledge only and stay open for the Founder's trademark search). Images looked at twice:
+the style tile, the role glyph SVGs, the arena fight frames and the new token silhouettes (normal and colour-blind).
+
+| Item | Verdict | Reason | Action |
+|---|---|---|---|
+| Role glyphs (pass 2b "Lane Bows": three vertical strokes from the Wrenfell lanes, the role's stroke lit; jungle pockets, support beside the bot bow) | **Clear** (was Change in Scan 1) | No longer a square lane map with a diagonal: drawn from our own oval map, which has no diagonal and no river. The concept "light the role's lane" is generic; the drawing is ours | None. Keep it away from any square frame |
+| Side flags (Blue: a plain pennant; Red: a swallowtail) | Clear | Basic vexillology shapes, used only as a word plus glyph (Founder rule) | None |
+| Stoneback rhombus (dark diamond, amber rim, three-stroke shell fan) | Clear | A plain diamond with a simple mark; no resemblance to a known objective icon | None |
+| Style tile (`docs/design/art/style-tile.png`) | Clear | Palette, type, cards, badges and portraits are the project's own; the Barlow font is OFL (logged in H) | None |
+| New names: Wrenfell (map), Orlund, Tarskel (heroes), Gloamline (game) | Watch | Invented or uncommon words; no known game uses them as far as known here, but nothing was searched in this scan | Founder: trademark and store search before release (ALPHA-EXIT-FOUNDER-TODO) |
+| The 18 intent label lines with `{place}` (Heading for, Starting, Contesting, Defending, Last stand at, ...) | Clear | Plain English verbs with our own place names (Stoneback, Moonhulk, Mossback, the Cairn); no catchphrase of a known caster or game | None |
+| Fight pass action cells (bolt, slash, burst ring, charge glow, heal plus, tether dots, motion dashes, root ring) | Clear | Generic effect shapes in neutral colours; no signature effect of a known hero | None |
+| Archetype silhouettes on the tokens (hammer, shield, blade, star, linked rings, sight, sprout) with a slot-letter badge | Clear | Simple common symbols drawn in code; no class icon set of a known game is copied (the set and its pairing to archetypes are ours) | Re-check if they are ever redrawn as detailed art |
+| Placeholder sounds (generated tones) | Clear | Made in code; logged in H | Any recorded or licensed sound gets its own H row |
+| Commentary lines (33) | Clear | Original short lines, no names, no known caster phrase (ESPORTS-NOTES 5 do-not list followed) | None |
+
+Still open after Scan 2: the trademark search (Founder), the Hollowmere-era "Watch" names Moonhulk and Mossback (kept; Watch),
+and the side-by-side look at ESMO's map (section G) that needs a person with the reference.

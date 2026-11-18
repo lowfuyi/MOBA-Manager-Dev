@@ -24,6 +24,7 @@ func _ready() -> void:
 	_data()
 	_flip_and_camera()
 	_labels_and_bake()
+	_silhouettes()
 	print(" %d checks, %d failures" % [checks, fails])
 	get_tree().quit(1 if fails > 0 else 0)
 
@@ -110,3 +111,22 @@ func _labels_and_bake() -> void:
 	var n := 1 + m.get_child_count() + m.get_child(0).get_child_count()
 	ok(n <= 4, "the map costs %d nodes" % n)
 	m.queue_free()
+
+
+## Alpha 0.8.2: each token shows the archetype of the hero its side played (res.picks), in the player's frame (you / them);
+## a slot without a pick falls back to the slot's archetype.
+func _silhouettes() -> void:
+	var w := World.load_default()
+	var res := MatchRunner.auto(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[3]), w.make_meta("sil"), 4040, "sil", false, {})
+	var m := ArenaMap.new("R")
+	m.set_heroes(res)
+	var ok_all := true
+	for slot in ArenaMap.LETTER:
+		var want_you := String(w.heroes[res["picks"]["R"][slot]]["archetype"])
+		var want_them := String(w.heroes[res["picks"]["B"][slot]]["archetype"])
+		ok_all = ok_all and m.archetype_of("you", slot) == want_you and m.archetype_of("them", slot) == want_them
+	ok(ok_all, "silhouettes: each token takes its own side's pick's archetype (seat Red)")
+	var m2 := ArenaMap.new("B")
+	ok(m2.archetype_of("you", "bot") == "gunner" and m2.archetype_of("them", "sup") == "mender", "silhouettes: no pick falls back to the slot's archetype")
+	m.free()
+	m2.free()

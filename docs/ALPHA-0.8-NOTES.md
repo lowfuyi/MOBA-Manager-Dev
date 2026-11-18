@@ -1,5 +1,16 @@
 # Alpha 0.8 "Arena" - install and test notes
 
+## Update 0.8.2 (2026-11-18): Polish
+- **Hero shapes on the tokens.** Each token shows its hero's type as a small shape (hammer = bruiser, shield = bulwark,
+  blade = shade, star = spellcaster, linked rings = binder, sight = gunner, sprout = mender), with the role letter kept as a
+  small badge in the corner.
+- **Commentary.** At most two short caster lines a game, in quiet moments under the map (not in large text).
+- **Sound and vibration** (More > Settings > Sound and vibration, both on by default): simple sounds made by the game itself
+  for taps, hits, kills, objectives and the result, and a short vibration on kills and at the result. Everything is also on
+  screen, so playing silently loses nothing. **Not tested on a phone:** whether the sounds play well on a phone speaker and
+  whether the vibration feels right.
+- Not changed, on purpose: the kill rate and the default ending for the held fight (island); both wait for tester scores.
+
 ## Update 0.8.1 (2026-11-18): Fight pass
 Build: `build/gloamline-0.8.1-alpha.apk` (25.3 MB, sha256 2acbc82d..., versionCode 12, same debug key; installs over 0.8.0 and 0.8.0b and keeps your save).
 Your four decisions were applied as recommended: a short slow-down on the deciding kill, crowded kills grouped as double and

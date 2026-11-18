@@ -35,6 +35,7 @@ static func _full(ctx, sc: ShowScript, ch: Choreo, fx: ArenaFx, t: float) -> Are
 	feed.position = Vector2(24, strip_y + (8.0 if large else 108.0))
 	feed.size = Vector2(vw - 48.0, 38.0 if large else 80.0)
 	m.get_parent().add_child(feed)
+	m.set_heroes(sc.res)
 	fx.apply(m, t)
 	board.show_at(t)
 	feed.show_at(t)

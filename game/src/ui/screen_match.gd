@@ -67,6 +67,7 @@ func _ready() -> void:
 	body.add_child(_stage)
 	var opp_id: String = game["red"] if my_side == "B" else game["blue"]
 	_map = ArenaMap.new(my_side)
+	_map.set_heroes(res)    # archetype silhouettes on the tokens (Alpha 0.8.2)
 	_stage.add_child(_map)
 	_board = ArenaHud.Board.new(script_, _map.texture(), App.gs.club_name(App.gs.club()), App.gs.club_name(opp_id))
 	_stage.add_child(_board)
