@@ -68,6 +68,19 @@ func run(check: Callable) -> void:
 		for a in f2.actions:
 			kinds[a["kind"]] = true
 	check.call(kinds.size() == 6, "arena fx actions: dash, shot, burst, tether, heal and engage all occur on 8 more results %s" % str(kinds.keys()))
+	# intent_ping (0.9.2): a ring at the label's zone, circle for yours, hexagon for theirs only when both show; none without a zone
+	var ws := ShowScript.build(MatchRunner.auto(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[2]), meta, 7070, "ping", false, {}), "B")
+	var wc := Choreo.build(ws)
+	var wf := ArenaFx.build(ws, wc, "B")
+	var lab := {"text": "x"}
+	var p1 := wf.pings_at({"window": "lane_top", "t": 5.0, "you": lab, "them": lab, "show": "both"}, 6.0)
+	var p2 := wf.pings_at({"window": "stone", "t": 31.0, "you": lab, "them": lab, "show": "you"}, 32.0)
+	var p3 := wf.pings_at({"window": "plan", "t": 21.2, "you": lab, "them": {}, "show": "you"}, 22.0)
+	var p4 := wf.pings_at({"window": "moon", "t": 57.0, "you": lab, "them": {}, "show": "you"}, 59.6)
+	var okp := p1.size() == 2 and String(p1[0][0]) == "ring_you" and String(p1[1][0]) == "ring_them" and (p1[0][1] as Vector2).distance_to(wc.lane_point("top", wc.clash_s_at("top", 6.0))) < 1e-6
+	okp = okp and p2.size() == 1 and String(p2[0][0]) == "ring_you" and (p2[0][1] as Vector2) == ArenaData.node("N.stoneback")
+	okp = okp and p3.is_empty() and p4.is_empty() and wf.pings_at({}, 10.0).is_empty()
+	check.call(okp, "intent_ping: a circle for your label and a hexagon for theirs at the label's zone, gone after 2.5 s, none without a zone")
 	for name in ["resolve", "H5", "towers", "objective", "camera", "budget", "HF3", "A3", "actions", "lunge", "bars", "rings", "retreat"]:
 		check.call(not fails.has(name), "arena fx %s holds (%d failures)" % [name, int(fails.get(name, 0))])
 

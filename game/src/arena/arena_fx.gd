@@ -322,6 +322,40 @@ func _action_cues(t: float, room: int) -> Array:
 	return out
 
 
+## intent_ping (ACTION-VOCABULARY 3.2 and R3, UI-PASS-2 P6; Alpha 0.9.2): while an intent label shows, a ring at the zone it
+## is about, no line to the label: a circle for your label, a hexagon for theirs (the pill's own shape). Windows with no single
+## zone (the opening, the plan check, the pushes, the close) have no ping. `pair` is ArenaLabels.at(t)["pair"] (empty at x2).
+const PING_AT := {"lane_top": "lane:top", "lane_mid": "lane:mid", "lane_bot": "lane:bot", "jungle": "N.mossback",
+		"rotate": "N.stoneback", "stone": "N.stoneback", "fight_mid": "N.mossback", "rot_late": "N.moonhulk", "moon": "N.moonhulk",
+		"fight_late": "late"}
+const PING_S := 2.5
+
+
+func pings_at(pair: Dictionary, t: float) -> Array:
+	var out: Array = []
+	if pair.is_empty() or not PING_AT.has(String(pair.get("window", ""))):
+		return out
+	var where := String(PING_AT[pair["window"]])
+	var at: Vector2
+	if where.begins_with("lane:"):
+		var ln := where.substr(5)
+		at = c.lane_point(ln, c.clash_s_at(ln, t))
+	elif where == "late":
+		at = fight_late_at
+	else:
+		at = ArenaData.node(where)
+	var k := clampf((t - float(pair["t"])) / PING_S, 0.0, 1.0)
+	var dt := t - float(pair["t"])
+	var a := 0.85 * clampf(dt / 0.2, 0.0, 1.0) * clampf((PING_S - dt) / 0.8, 0.0, 1.0)    # in fast, held, out over the last 0.8 s
+	if a <= 0.0:
+		return out
+	if not (pair.get("you", {}) as Dictionary).is_empty():
+		out.append(["ring_you", at, 64.0 + 16.0 * k, a])
+	if String(pair.get("show", "both")) == "both" and not (pair.get("them", {}) as Dictionary).is_empty():
+		out.append(["ring_them", at, 80.0 + 16.0 * k, a])
+	return out
+
+
 func _ease(x: float) -> float:
 	return ShowScript.ease01(x)
 

@@ -175,6 +175,7 @@ static func advance(t: float, delta: float, fast: bool) -> float:
 func _apply() -> void:
 	var bt := script_.beat_t(show_t, UI.animate)
 	fx.apply(_map, bt, not UI.animate)
+	_map.sprites_under.append_array(fx.pings_at(labels.at(bt, _fast)["pair"], bt))    # intent_ping rings (0.9.2)
 	_board.show_at(bt)
 	_feed.show_at(bt)
 	_strip.show_at(bt, _fast)
