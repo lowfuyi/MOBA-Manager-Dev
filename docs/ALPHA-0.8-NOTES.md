@@ -1,5 +1,28 @@
 # Alpha 0.8 "Arena" - install and test notes
 
+## Update 0.8.1 (2026-11-18): Fight pass
+Build: `build/gloamline-0.8.1-alpha.apk` (25.3 MB, sha256 2acbc82d..., versionCode 12, same debug key; installs over 0.8.0 and 0.8.0b and keeps your save).
+Your four decisions were applied as recommended: a short slow-down on the deciding kill, crowded kills grouped as double and
+triple kills, Speed x2 kept, and the role letters kept on the tokens (hero silhouettes come in 0.8.2).
+- **Fights now look like fights.** Each group fight has an engage (one hero charges in), a trade (both sides hit, health bars
+  fall), kills spaced out across the fight (or a quick double or triple kill, with a tag), then the losers run back and, after
+  the Mossback fight, the winners chase.
+- **Heroes act by type:** melee heroes dash in and recoil, gunners fire bolts, spellcasters wind up and burst, binders tether,
+  menders send a green plus that lifts an ally's bar.
+- **Health bars** above each token while it is hurt. A bar reaches zero only on a real kill; it refills on respawn and slowly
+  outside fights.
+- **No filling ring in teamfights.** At Stoneback and Moonhulk the fight comes first; the ring shows only afterwards, for about
+  1.5 seconds, while the winners take it.
+- **The deciding kill** gets a small shake, a quick zoom and a brief slow-down (made up straight after, so the game still lasts
+  75 seconds), plus the tag "The deciding kill". With Settings > Animations off: no shake, zoom or slow-down; the flash and tag
+  stay.
+- Nothing about results changed: same simulator, same kills, towers and objectives as the Report (checked on hundreds of games).
+- **Not measured: nothing has run on a phone.** Frame time, heat and battery with the extra effects are unknown. The busiest
+  fight frame is 44 draw calls on the computer (0.8 was 40; the budget is 60).
+
+What to test: do fights read as fights now? Can you tell who is winning a fight before the kill? Is the slow-down on the
+deciding kill nice or annoying? Does x2 still feel too quick?
+
 ## Update 0.8.0b (2026-11-18): Frame rate setting
 Build: `build/gloamline-0.8.0b-alpha.apk` (25.3 MB, sha256 f9853e17..., versionCode 11, same debug key; installs over 0.8.0 and keeps your save).
 - **Settings > Frame rate**: "30 (saves battery)" or "60 (smoother)". 60 is the default. It is kept on the phone, not in your save.

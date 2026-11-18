@@ -89,7 +89,11 @@
     "nodes": 52
    },
    "draws": 50,
-   "nodes": 60
+   "nodes": 80,
+   "raise": {
+    "reason": "0.8.0b added the Frame rate card (62 nodes measured against 60) and 0.8.2 adds the Sound and vibration card (about 5 more); allowance 80, still far under the 120 target and the 200 hard limit",
+    "approved_by": "Producer (Technical Director to confirm)"
+   }
   },
   "05_roster": {
    "status": "redesigned",
@@ -267,7 +271,11 @@
     "nodes": 73
    },
    "draws": 50,
-   "nodes": 85
+   "nodes": 95,
+   "raise": {
+    "reason": "the same two Settings cards (Frame rate 0.8.0b, Sound and vibration 0.8.2): 83 nodes measured before the sound card; allowance 95",
+    "approved_by": "Producer (Technical Director to confirm)"
+   }
   },
   "19_hub_after": {
    "status": "redesigned",
