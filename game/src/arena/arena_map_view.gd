@@ -12,9 +12,16 @@ extends Control
 const MAP := Vector2(720, 760)
 const STRIP_X := 752.0          # the icon strip right of the map in the baked texture (nothing on the map reaches past x 720)
 const CELL := 64.0
-const BAKE := Vector2i(752 + 64 * 4, 768)
-## icon strip cells (column, row; 4 columns by 12 rows): tower intact and rubble for you and them; the rest is free for A-03 (tokens) and A-04 (effects)
-const ICON := {"tower_you": Vector2i(0, 0), "tower_them": Vector2i(1, 0), "rubble_you": Vector2i(2, 0), "rubble_them": Vector2i(3, 0)}
+const BAKE := Vector2i(752 + 64 * 6, 768)
+## icon strip cells (column, row; 6 columns by 12 rows): towers and rubble, minion dots (row 0), hero tokens with the slot letter
+## (row 1 yours: teal circles; row 2 theirs: coral flat-top hexagons). Rows 3 and on are free for A-04 (effects).
+const ICON := {"tower_you": Vector2i(0, 0), "tower_them": Vector2i(1, 0), "rubble_you": Vector2i(2, 0), "rubble_them": Vector2i(3, 0),
+		"minion_you": Vector2i(4, 0), "minion_them": Vector2i(5, 0),
+		"hero_you_top": Vector2i(0, 1), "hero_you_jg": Vector2i(1, 1), "hero_you_mid": Vector2i(2, 1), "hero_you_bot": Vector2i(3, 1), "hero_you_sup": Vector2i(4, 1),
+		"hero_them_top": Vector2i(0, 2), "hero_them_jg": Vector2i(1, 2), "hero_them_mid": Vector2i(2, 2), "hero_them_bot": Vector2i(3, 2), "hero_them_sup": Vector2i(4, 2)}
+## the size each kind is baked at (px); a sprite drawn at size px is scaled from it
+const BAKED_PX := {"hero": 40.0, "minion": 14.0}
+const LETTER := {"top": "T", "jg": "J", "mid": "M", "bot": "B", "sup": "S"}
 const LABEL_SIZE := 24
 const LABEL_OUTLINE := 5
 const EDGE_LINE := Color(1, 1, 1, 0.18)    # ART-BIBLE 3.9; lanes use it pre-blended (EDGE_SOLID) so overlapping segments show no seams
@@ -24,6 +31,7 @@ var flip := false
 var zoom := 1.0
 var focus := MAP / 2.0           # the camera centre, arena px of the view frame (already flipped)
 var fallen: Dictionary = {}
+var sprites: Array = []         # [ICON key, canonical point, size px, alpha], drawn after the towers (Choreo.sprites_at)
 var _vp: SubViewport
 var _art: _Bake
 
@@ -142,6 +150,13 @@ func _draw() -> void:
 		var key := ("rubble_" if fallen.has(String(t["id"])) else "tower_") + who
 		var guard := not bool(t.get("scoreboard", false))
 		draw_texture_rect_region(tex, Rect2(at - half, half * 2.0), strip_rect(ICON[key]), Color(1, 1, 1, opa if guard else 1.0))
+	for sp in sprites:
+		var at2 := to_view(sp[1])
+		var key2 := String(sp[0])
+		var baked := float(BAKED_PX["hero" if key2.begins_with("hero") else "minion"])
+		var half2 := Vector2(CELL, CELL) * vs * (float(sp[2]) / baked) / 2.0
+		if box.grow(CELL).has_point(at2):
+			draw_texture_rect_region(tex, Rect2(at2 - half2, half2 * 2.0), strip_rect(ICON[key2]), Color(1, 1, 1, float(sp[3])))
 	var f := UI.font("Bold")
 	for l in visible_labels():
 		var r: Rect2 = l["rect"]
@@ -282,6 +297,36 @@ class _Bake extends Node2D:
 				ring(c2, tr - 1.5, 2.0, Color(col, 0.45))
 				draw_rect(Rect2(c2 + Vector2(-6, 2), Vector2(5, 4)), UI.TEXT_OFF)
 				draw_rect(Rect2(c2 + Vector2(1, 0), Vector2(5, 6)), UI.TEXT_OFF)
+		# minion dots: a circle for you, a small hexagon for them (shape and colour, rule H6)
+		var mc2 := owner_map.strip_rect(ArenaMap.ICON["minion_you"]).get_center()
+		draw_circle(mc2, 7.0, UI.ACCENT)
+		draw_colored_polygon(_hex(owner_map.strip_rect(ArenaMap.ICON["minion_them"]).get_center(), 7.5), UI.CORAL)
+		# hero tokens (ARENA-MAP 9.2): you a solid teal circle, them a solid coral flat-top hexagon, a 3 px TEXT rim at 70 percent,
+		# the slot letter in ink
+		var lf := UI.font("Bold")
+		var rim := Color(UI.TEXT, 0.7)
+		for slot in ["top", "jg", "mid", "bot", "sup"]:
+			for who in ["you", "them"]:
+				var hc := owner_map.strip_rect(ArenaMap.ICON["hero_%s_%s" % [who, slot]]).get_center()
+				if who == "you":
+					draw_circle(hc, 20.0, UI.ACCENT)
+					draw_arc(hc, 18.5, 0.0, TAU, 40, rim, 3.0, true)
+				else:
+					var hx := _hex(hc, 21.0)
+					draw_colored_polygon(hx, UI.CORAL)
+					hx.append(hx[0])
+					draw_polyline(_hex(hc, 19.5) + PackedVector2Array([_hex(hc, 19.5)[0]]), rim, 3.0, true)
+				var letter: String = ArenaMap.LETTER[slot]
+				var ink := UI.INK_TEAL if who == "you" else UI.INK_CORAL
+				var sz := lf.get_string_size(letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 24)
+				draw_string(lf, hc + Vector2(-sz.x / 2.0, lf.get_ascent(24) / 2.0 - 3.0), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 24, ink)
+
+	func _hex(c: Vector2, r: float) -> PackedVector2Array:
+		var pts := PackedVector2Array()
+		for i in 6:
+			var a := TAU * float(i) / 6.0
+			pts.append(c + Vector2(cos(a), sin(a)) * r)
+		return pts
 
 	func _oval(c: Vector2, rx: float, ry: float) -> PackedVector2Array:
 		var pts := PackedVector2Array()
