@@ -211,3 +211,22 @@ func set_arena_held(id: String) -> bool:
 		return false
 	_write("arena", "held", id)
 	return true
+
+
+# ------------------------------------------------------------------ [display] (Alpha 0.8.1)
+## The frame-rate cap (Settings, "Frame rate"): 30 or 60 frames a second, 60 when unset or unreadable. A device setting, not
+## part of the save (R6): it changes only how often the screen redraws, never what is shown at a given moment.
+const FPS_CHOICES := [30, 60]
+const FPS_DEFAULT := 60
+
+
+func fps() -> int:
+	var v = _load().get_value("display", "fps", FPS_DEFAULT)
+	return int(v) if (v is int) and FPS_CHOICES.has(int(v)) else FPS_DEFAULT
+
+
+func set_fps(n: int) -> bool:
+	if not FPS_CHOICES.has(n):
+		return false
+	_write("display", "fps", n)
+	return true

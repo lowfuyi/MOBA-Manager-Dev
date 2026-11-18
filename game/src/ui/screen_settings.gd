@@ -48,6 +48,7 @@ func _rebuild() -> void:
 	var dev := HelpSheet.device()
 	m.add_child(_toggle(Strings.t("settings.held_gate"), dev.arena_held() == "held_gate", func(v): dev.set_arena_held("held_gate" if v else "")))
 	m.add_child(UI.label(Strings.t("settings.held_gate_hint"), UI.S_SMALL, UI.DIM))
+	_fps_card()
 	var acc := UI.card(body)
 	acc.add_child(UI.label(Strings.t("settings.access_h"), UI.S_BODY, UI.ACCENT))
 	acc.add_child(_toggle(Strings.t("settings.large_text"), App.large_text(), func(v): App.set_large_text(v)))
@@ -74,6 +75,21 @@ func _rebuild() -> void:
 	else:
 		r.add_child(UI.button(Strings.t("settings.reset"), func(): _confirm_reset = true; _rebuild(), "danger", 76))
 	body.add_child(UI.button(Strings.t("hub.about"), func(): App.go(ScreenAbout.new())))
+
+
+## Frame rate (Alpha 0.8.1): two plain choices, the chosen one filled. A device setting; the game plays the same at both.
+func _fps_card() -> void:
+	var c := UI.card(body)
+	c.add_child(UI.label(Strings.t("settings.fps_h"), UI.S_BODY, UI.ACCENT))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	var cur := HelpSheet.device().fps()
+	for n in DeviceState.FPS_CHOICES:
+		var b := UI.button(Strings.t("settings.fps_30" if n == 30 else "settings.fps_60"), func(): App.set_fps(n); _rebuild(), "primary" if n == cur else "normal")
+		b.name = "Fps%d" % n
+		row.add_child(b)
+	c.add_child(row)
+	c.add_child(UI.label(Strings.t("settings.fps_hint"), UI.S_SMALL, UI.DIM))
 
 
 func _toggle(text: String, on: bool, cb: Callable) -> CheckButton:

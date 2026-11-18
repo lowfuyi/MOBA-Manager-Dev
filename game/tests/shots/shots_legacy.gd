@@ -20,6 +20,8 @@ static func run(ctx) -> void:
 	App.set_colorblind(true)
 	ctx.cur()._rebuild()
 	await ctx.shot("settings_on")
+	_scroll(ctx, 700)    # Alpha 0.8.1: the Frame rate card under Animations
+	await ctx.shot("settings_fps")
 	App.set_colorblind(false)
 	gs.set_quick(false)
 	App.go(ScreenFinance.new())

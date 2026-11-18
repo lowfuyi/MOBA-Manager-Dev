@@ -153,10 +153,16 @@ func _process(delta: float) -> void:
 	if BottomSheet.is_open() and not BottomSheet.current().is_closing:
 		return    # any sheet (help, the plan) pauses the show (6.7.6); the result was decided before it, so nothing changes
 	_watch_t += delta
-	show_t = minf(ShowScript.WATCH, show_t + delta * (2.0 if _fast else 1.0))
+	show_t = ScreenMatch.advance(show_t, delta, _fast)
 	_apply()
 	if show_t >= ShowScript.WATCH:
 		_end()
+
+
+## The show clock: elapsed real time (x2 at Speed x2), never a frame count, so 30 and 60 fps reach every moment at the same
+## real second (Alpha 0.8.1 frame-rate setting); clamped to the end of the show.
+static func advance(t: float, delta: float, fast: bool) -> float:
+	return minf(ShowScript.WATCH, t + delta * (2.0 if fast else 1.0))
 
 
 ## Every layer at the current show time: the map (towers, tokens, effects, camera), the scoreboard and the feed.

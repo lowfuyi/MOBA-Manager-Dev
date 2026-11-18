@@ -773,3 +773,7 @@ arena.plan.if_behind
 arena.end.decided
 arena.banner.wipe
 arena.plan.jungle
+settings.fps_h
+settings.fps_30
+settings.fps_60
+settings.fps_hint

@@ -27,6 +27,7 @@ func _ready() -> void:
 	UI.animate = bool(_read_setting("animate", true))
 	UI.set_colorblind(bool(_read_setting("colorblind", false)))
 	apply_large_text(bool(_read_setting("large_text", false)))
+	apply_fps(DeviceState.new().fps())
 
 
 ## Called by Main once the first screen is up.
@@ -75,6 +76,23 @@ func _read_setting(key: String, default: Variant) -> Variant:
 	if cf.load(SETTINGS_PATH) != OK:
 		return default
 	return cf.get_value("ui", key, default)
+
+
+var fps_cap_on := DisplayServer.get_name() != "headless"    # the headless test engine stays uncapped; a test may switch it on
+
+
+## The frame-rate cap (Settings, Alpha 0.8.1): Engine.max_fps at startup and when changed; low-processor mode stays on.
+## Everything that moves runs on elapsed time (delta, tweens, timers), so 30 is less smooth, never slower.
+func apply_fps(n: int) -> void:
+	if fps_cap_on:
+		Engine.max_fps = n
+
+
+func set_fps(n: int) -> bool:
+	if not HelpSheet.device().set_fps(n):
+		return false
+	apply_fps(n)
+	return true
 
 
 func set_animate(v: bool) -> void:
@@ -132,6 +150,7 @@ func debug_info() -> String:
 			lines.append(tl)
 	lines.append("startup=%d ms  mem=%.0f MB  text=%s  colours=%s" % [startup_ms, float(Performance.get_monitor(Performance.MEMORY_STATIC)) / 1048576.0,
 			"large" if large_text() else "normal", "colour-blind" if UI.colorblind else "default"])
+	lines.append("fps cap=%d" % HelpSheet.device().fps())
 	if not last_game.is_empty():
 		lines.append("last=" + str(last_game.get("id", "")))
 	return "\n".join(lines)

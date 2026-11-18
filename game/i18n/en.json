@@ -1377,5 +1377,9 @@
   "arena.plan.if_behind": "If behind",
   "arena.end.decided": "Decided by: {factor}",
   "arena.banner.wipe": "Team wiped",
-  "arena.plan.jungle": "Jungle: {lane}"
+  "arena.plan.jungle": "Jungle: {lane}",
+  "settings.fps_h": "Frame rate",
+  "settings.fps_30": "30 (saves battery)",
+  "settings.fps_60": "60 (smoother)",
+  "settings.fps_hint": "How often the screen redraws when something moves. 30 uses less battery and may keep the phone cooler. Matches play the same at both, only less smoothly at 30."
 }

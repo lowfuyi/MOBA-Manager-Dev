@@ -16,6 +16,7 @@ func run(check: Callable) -> void:
 	_other_sections_survive(check)
 	_garbage(check)
 	_home_offer_flow(check)
+	_fps(check)
 	_clean()
 
 
@@ -239,3 +240,19 @@ func _home_offer_flow(check: Callable) -> void:
 	# the 'Delete save and start over' path: device flags stay, so the second club gets the inline card
 	var again := TutorialState.new_state()
 	check.call(d.home_offer(again) == "returning_card", "Delete save and start over: device flags stay, the new club gets the inline card")
+
+
+## Alpha 0.8.1 [display] fps: 60 by default, 30 or 60 only, kept across instances, garbage reads as 60, other sections kept.
+func _fps(check: Callable) -> void:
+	_clean()
+	var d := DeviceState.new(PATH)
+	check.call(d.fps() == 60, "fps: 60 when nothing is stored")
+	d.set_arena_held("held_gate")
+	check.call(d.set_fps(30) and DeviceState.new(PATH).fps() == 30, "fps: 30 is stored and a fresh instance reads it")
+	check.call(not d.set_fps(45) and not d.set_fps(0) and DeviceState.new(PATH).fps() == 30, "fps: 45 and 0 are refused, 30 stays")
+	check.call(d.arena_held() == "held_gate", "fps: writing the rate keeps the other device sections")
+	var cf := _cf()
+	cf.set_value("display", "fps", "fast")
+	cf.save(PATH)
+	check.call(d.fps() == 60, "fps: a hand-written bad value reads as 60")
+	check.call(d.set_fps(60) and d.fps() == 60, "fps: 60 is stored")
