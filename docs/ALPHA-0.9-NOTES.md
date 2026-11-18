@@ -1,0 +1,29 @@
+# Alpha 0.9 "Exit hardening" - install and test notes
+
+Build: `build/gloamline-0.9.0-alpha.apk` (25.3 MB, sha256 54ecaa12..., versionCode 13, Android 5.0+, arm64, debug-signed with the
+same key as 0.6 to 0.8, so it installs over any of them and keeps your save). It asks for one permission only: vibration.
+This is a testing build: the debug key must never go to a store.
+
+**Nothing in this build has run on a phone.** Every number below comes from the computer.
+
+## What is in it (since 0.8.0)
+- 0.8.0b: Frame rate setting, 30 or 60.
+- 0.8.1 Fight pass: heroes act by type, health bars, real fight arcs with retreat and chase, the ring only after objective
+  fights, and a beat on the deciding kill (details in `ALPHA-0.8-NOTES.md`).
+- 0.8.2 Polish: hero shapes on the tokens (the role letter stays as a badge), up to two commentary lines a game, placeholder
+  sounds and vibration (Settings > Sound and vibration).
+- 0.9: no new features. Checks, fixes to the check tools, old saves tested, the tester pack, and the exit lists.
+- Not changed, on purpose: the kill rate and the held-fight ending (island). Both wait for tester scores.
+
+## What was checked on the computer
+- Full check exit 0: 2,591 logic checks, ui smoke 208, every screen and touch check, pytest 133, calibration 0 out of band,
+  golden vectors unchanged, perf gate 0 failures, art picture checks under a renderer 37.
+- 125 simulated seasons (5 careers of 25 seasons), 25,605 checks, 0 failures.
+- Saves made by the real 0.6, 0.7 and 0.8 builds open, keep the guide state and plans, and play into the next season (219 checks).
+- 864 pictures in four layouts (normal, large text, colour-blind, tall), every group looked at on contact sheets. One known
+  exception: a lesson card over the old Chemistry screen in the tall layout draws 136 times per frame (limit 100). Chemistry is
+  the one screen still waiting for its redesign.
+
+## What you need to do
+See `docs/ALPHA-EXIT-FOUNDER-TODO.md` (phone tests, seasons, a first-time player, other phones, tester scores, key and
+distribution, trademark search). For testers: `docs/TESTER-PACK.md`.

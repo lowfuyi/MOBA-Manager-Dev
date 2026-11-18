@@ -6,9 +6,9 @@ Purpose: the gate between Alpha (founder-only testing, features still being adde
 
 Status words: **Done** (evidence given), **Partly**, **Not started**, **Founder** (only the Founder can do or judge it), **Phone** (needs a real phone, cannot be measured on a computer).
 
-Last updated: 2026-11-08 (end of Alpha 0.6 work).
+Last updated: 2026-11-18 (Alpha 0.9 "Exit hardening"). The 0.6 groups 1 to 7 below are kept and updated; the releases since 0.6 have their own group 8.
 
-**Where it stands.** Everything that can be finished and proven on a computer is Done: groups 1 and 3 completely, the computer side of group 2, and the build work of group 6. What is left for the end of Alpha needs a real phone or the Founder: 2.5 (seasons played on phones), 3.7 and 4.1 to 4.4 (the pace log and a first-time player), and 5.1 to 5.3 (phone performance). Group 6 still needs 6.4 and 6.5 from the Founder before the first outside tester, and group 7 waits for a chosen name (7.1) and the later reviews.
+**Where it stands (2026-11-18).** Everything that can be finished and proven on a computer is Done, with evidence below and in `company/DECISIONS.md`. What is left before the Founder can sign is listed, with exact steps, in `docs/ALPHA-EXIT-FOUNDER-TODO.md`: phone tests (smoothness, heat, battery, 30 vs 60, sound and vibration), seasons played on phones, a first-time player, a second and a low-end phone, the testers' island-or-gate scores, the release key and distribution decision, and the trademark and name checks. **Nothing has run on a phone except the Founder's own tests of 0.7 and 0.8.**
 
 ## 1. Feature-complete for Phase 1 (GDD section 12)
 
@@ -29,11 +29,11 @@ Last updated: 2026-11-08 (end of Alpha 0.6 work).
 
 | ID | Item | Status | Evidence or next step |
 |---|---|---|---|
-| 2.1 | All automated checks pass (data, strings, Python tests, calibration, logic, UI smoke, touch) | Done | Alpha 0.6 full run: 1,794 logic checks, 220 UI smoke checks, 50 touch checks, 48 Python tests, data and strings checks, calibration 0 out of band at 40,000 matches per row, short soak 1,176 invariant checks. All pass |
+| 2.1 | All automated checks pass (data, strings, Python tests, calibration, logic, UI smoke, touch) | Done | Alpha 0.9 full run (see 8.9); Alpha 0.6 full run: 1,794 logic checks, 220 UI smoke checks, 50 touch checks, 48 Python tests, data and strings checks, calibration 0 out of band at 40,000 matches per row, short soak 1,176 invariant checks. All pass |
 | 2.2 | No known crash or save-loss bug | Done on the computer | None known; 125-season soak clean (2.4). Phone sessions (2.5) can still find device-only problems |
-| 2.3 | Older saves still open after each update (migration tested) | Done for 0.6 | Unit tests open a save without any 0.6 key (Form Ratings, career, practice) and play on; repeat for every new field |
+| 2.3 | Older saves still open after each update (migration tested) | Done | `check_save_compat` 219 checks: real saves written by the 0.6, 0.7.0 and 0.8.0 code (fixtures generated in git worktrees of those releases) load, keep the guide state and plan, play, survive save and reload, finish the season and start the next one. GameState.VERSION never bumped |
 | 2.4 | Headless soak: at least 20 full seasons on varied seeds, all features, no engine error, no invalid state | Done | `game/tests/soak.gd`: 5 clubs x 25 seasons = 125 seasons with random training, lineup, Game Plan, practice, signing, release and renewal choices and a save round trip every season: 25,654 invariant checks, 0 failures, about 3.6 s a season. A short version (3 seasons x 2 clubs) is part of `tools/run_all_checks.sh` |
-| 2.5 | At least 5 full seasons played on real phones without a crash (3 by the Founder, proposed) | Phone, Founder | Needs the Founder's play |
+| 2.5 | At least 5 full seasons played on real phones without a crash (3 by the Founder, proposed) | Phone, Founder | FOUNDER-TODO items 4 and 5 |
 
 ## 3. Balance
 
@@ -45,13 +45,13 @@ Last updated: 2026-11-08 (end of Alpha 0.6 work).
 | 3.4 | Game Plan joint test rerun with chemistry (9.2.1) | Done, with a ruling | Mean joint gain +0.75; the maximum +4.30 is the single 10 percent underdog matchup (same as Alpha 0.2); balanced matchups gain 0.0 to 0.5. The 3-point limit is read as applying within 30 rating points. Producer decision, Founder may overrule |
 | 3.5 | Multi-season run with bonds, form and morale: strength still predicts results, no runaway club | Done | Spearman 0.81 on 20 splits, same as the old model; ten-season runs and the soak show no runaway club (CALIBRATION-9.1 addendum) |
 | 3.6 | 10-season economy run: no bankruptcy for sensible play, no snowball | Done, two observations | 0 of 10 dismissed for passive and sensible active play; the Win Bonus all-in gamble loses 5 of 10. Observations for play-testers: titles concentrate in the two strongest clubs, and cash piles up at the top because AI clubs have nothing to spend on |
-| 3.7 | Match length: average game about 5 minutes or less including the draft | Partly | 75-second watch window in 0.5; Phone data from the pace log needed |
+| 3.7 | Match length: average game about 5 minutes or less including the draft | Phone, Founder | 75-second watch (37.5 s at x2) unchanged through 0.8.2 (beat clock keeps 75 s, tested); pace log from phones needed (FOUNDER-TODO 4) |
 
 ## 4. Ease of use (needs real play)
 
 | ID | Item | Status | Evidence or next step |
 |---|---|---|---|
-| 4.1 | A new player finishes a first game and a first season without asking for help | Phone, Founder | Test with someone who has not seen the game |
+| 4.1 | A new player finishes a first game and a first season without asking for help | Phone, Founder | Guided first game built in 0.7 (0 fallbacks); FOUNDER-TODO 6 |
 | 4.2 | Pace log: median total time per game about 5 minutes or less; fewer than half of live feeds skipped | Phone, Founder | Settings -> Pace log |
 | 4.3 | A non-developer can say why they lost from the result screen (GDD exit criterion) | Partly | Payoff screen and "why" section built in 0.5; needs a person to judge |
 | 4.4 | No screen the Founder could not work out | Phone, Founder | Alpha 0.5 questions in ALPHA-0.5-NOTES |
@@ -60,28 +60,43 @@ Last updated: 2026-11-08 (end of Alpha 0.6 work).
 
 | ID | Item | Status | Evidence or next step |
 |---|---|---|---|
-| 5.1 | Smooth on 2 to 3 different Android phones, one of them low-end | Phone | Founder's phone plus borrowed phones |
+| 5.1 | Smooth on 2 to 3 different Android phones, one of them low-end | Phone | Computer side: perf gate 0 failures at 0.9, busiest arena frame 44 draw calls; FOUNDER-TODO 1 and 7 |
 | 5.2 | No long loading; start-up time recorded | Phone | Done on the computer side: Debug info now shows start-up time (to the first screen) and memory. The numbers that matter come from a phone |
-| 5.3 | No overheating or heavy battery drain in a 30-minute session | Phone | Founder |
+| 5.3 | No overheating or heavy battery drain in a 30-minute session | Phone | Frame rate setting (30 or 60) and low-processor mode exist; heat and battery unmeasured: FOUNDER-TODO 2 and 3 |
 
 ## 6. Ready for outside testers
 
 | ID | Item | Status | Evidence or next step |
 |---|---|---|---|
-| 6.1 | First-game tutorial that can be dismissed | Done, light version | Three one-time tips (Home, before a game, after a game), each dismissed with one tap and remembered on the device; Settings can show them again. A step-by-step guided first game is not built; add it if testers still get lost |
+| 6.1 | First-game tutorial that can be dismissed | Done | Alpha 0.7: guided first game, help on every screen, glossary, eight lessons (replaces the 0.6 light version). |
 | 6.2 | Text size option and colour-blind-safe option | Done | Settings -> Comfort: larger text and buttons (+15 percent, every screen tested to fit the narrower layout), colour-blind friendly colours (blue and orange for good and bad). Not yet tried by a colour-blind person |
 | 6.3 | Privacy line in the app (nothing leaves the phone in Alpha) and a simple feedback route | Done | Settings shows a privacy line and a "Copy feedback note" button (a short template plus the debug lines). The note says to send it to "whoever gave you this build": the contact for outside testers is the Alpha feedback form (see ALPHA-FEEDBACK-FORM.md); the Founder runs the script once to create it, then sends the link with the APK |
-| 6.4 | Closed-beta distribution set up (Play Console closed track or direct APK) | Founder | Needs a developer account decision |
-| 6.5 | Signed with a proper release key (debug key must never ship) | Founder | Key kept by the Founder |
+| 6.4 | Closed-beta distribution set up (Play Console closed track or direct APK) | Founder | Tester pack ready (`docs/TESTER-PACK.md`); the route is the Founder's decision: FOUNDER-TODO 9 |
+| 6.5 | Signed with a proper release key (debug key must never ship) | Founder | FOUNDER-TODO 9 |
 
 ## 7. Legal and content (before launch)
 
 | ID | Item | Status | Evidence or next step |
 |---|---|---|---|
-| 7.1 | Game-name and trademark search | Not started | Needs a chosen name first (Founder) |
-| 7.2 | IP check of hero, player and club names | Partly | Block list and IP-RISK-LOG exist; final names are still placeholders |
+| 7.1 | Game-name and trademark search | Founder | Name chosen (Gloamline); search not done: FOUNDER-TODO 10 |
+| 7.2 | IP check of hero, player and club names | Partly | Scan 1 and Scan 2 (2026-11-18) done in IP-RISK-LOG; names stay Watch until the trademark search (FOUNDER-TODO 10) |
 | 7.3 | Second independent review of the design document (v1.4 to latest) | Not started | A fresh reviewer with no sight of how it was written |
 | 7.4 | Store policy review (age rating, data, monetization) | Not started | Before the first store upload |
+
+## 8. Releases since 0.6 (each row: Done with evidence, Phone, Founder, or Not started)
+
+| ID | Release and item | Status | Evidence or next step |
+|---|---|---|---|
+| 8.1 | 0.7 "Guide and Look": redesigned screens, guided first game, help, glossary, lessons | Done | I-00 to I-25, full check exit 0 (I-25), 72 pictures looked at twice; Founder played 0.7 on his phone |
+| 8.2 | 0.8 "Arena": live match map, scoreboard, labels, endings | Done | A-01 to A-08, full check exit 0, 40 draw calls; Founder played 0.8 on his phone (feedback led to 0.8.1) |
+| 8.3 | 0.8.0b Frame rate setting (30 or 60) | Done, Phone | check_frame_rate 21 (same results at both rates); heat and battery: FOUNDER-TODO 3 |
+| 8.4 | 0.8.1 "Fight pass": actions by archetype, health bars, fight arc, retreat and chase, ring only after objectives, decisive kill | Done, Phone | F-01 to F-06, full check (one recorded raise), 44 draw calls; how fights feel: FOUNDER-TODO 1 |
+| 8.5 | 0.8.2 "Polish": commentary, sound and vibration, hero silhouettes, IP Scan 2 | Done, Phone | 0.8.2a to 0.8.2c, check_sound 20; sound on a speaker and vibration feel: FOUNDER-TODO 1 |
+| 8.6 | Kill-rate retune and held-ending default | Founder (testers) | Deliberately not changed; waits for tester scores: FOUNDER-TODO 8 |
+| 8.7 | Technical Director sign-off: I-22 re-baseline, 02_about raise, Settings raises | Done | Review 2026-11-18 (DECISIONS): approve; conditions applied (measured values, probe re-run 0 failures) |
+| 8.8 | Owed housekeeping: GDD "coach" wording, TUTORIAL 6.1 `new` row, PERF-BUDGET 3.1a rule 2, Xvfb check_art in the full check | Done | Alpha 0.9 commit; `game_plan.gd` line 3 comment left as is: `src/sim` is frozen (R1) |
+| 8.9 | 0.9 "Exit hardening": full gate, 25-season soak, save compat 0.6 to 0.8, perf probe, screenshot matrix in four variants | Done | Full check exit 0 (2,591 logic checks, perf 0 failures, check_art 37 under Xvfb); 125 seasons 25,605 checks 0 failures; save compat 219; 864 pictures, one named exception (lesson 4 over legacy Chemistry, tall, 136 draw calls) |
+| 8.10 | Tester pack (install guide, feedback route, what to test) | Done | `docs/TESTER-PACK.md`; feedback form script not yet run in a Google account (Founder: FOUNDER-TODO 9) |
 
 ## Sign-off
 
