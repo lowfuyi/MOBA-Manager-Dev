@@ -9,7 +9,7 @@ All numbers in this document are **v0 placeholders** unless marked otherwise. Th
 
 ## 1. Vision
 
-A mobile esports **manager** game, MOBA only. The player is the club owner and head coach. They scout and sign players, train them, build a roster, and win matches through preparation and draft decisions. Matches are simulated; the player never controls a hero.
+A mobile esports **manager** game, MOBA only. The player is the club owner and manager (the "Coach" in the app is the helper that suggests plans, never the player). They scout and sign players, train them, build a roster, and win matches through preparation and draft decisions. Matches are simulated; the player never controls a hero.
 
 **One-line pitch:** Build a team from unknown talents into a world champion by out-thinking rivals in the draft.
 
@@ -275,7 +275,7 @@ Familiarity: +3 per match played with the hero, +1.5 x (1 + 0.1 x CoachLevel) pe
 **Implementation notes (Alpha 0.2, 2026-11-08; constants in `game/data/training_v0.json`).**
 - One calendar tick is one match day (half a week): weekly values are halved, so a starter who trains nets +2.5 fatigue per match day, +5 per week, as in the text above (Facility 2).
 - Coach and Facility are fixed at level 2 for every club until staff and facilities exist (D-007).
-- Training focus options in Alpha 0.2: one of the eight stats, one hero's familiarity, or **Rest** (no training, no training fatigue). **Team scrim** (added in Alpha 0.4) trains no stat and tires like any training; its only effect is Bond (7.7). The default is the coach's pick: the stat with the largest (slot weight x room below Potential) for the player's main role. Every AI player always uses it.
+- Training focus options in Alpha 0.2: one of the eight stats, one hero's familiarity, or **Rest** (no training, no training fatigue). **Team scrim** (added in Alpha 0.4) trains no stat and tires like any training; its only effect is Bond (7.7). The default is the suggested pick (the Coach's suggestion): the stat with the largest (slot weight x room below Potential) for the player's main role. Every AI player always uses it.
 - Fatigue enters the match rating through `Cond` exactly as in 4.4 (`-0.15 x max(0, Fatigue - 25)`); since Alpha 0.4 `Cond` carries all three terms of 4.4: `Form x 0.4 + (Morale - 50) x 0.06 - fatigue penalty`.
 - AI lineups rotate: start from the best lineup, then a bench player replaces a starter when his rating here minus his own fatigue penalty is higher. With no fatigue this is exactly the best lineup. AI clubs refresh their best lineup on patch days.
 - Ageing happens at the start of the next season: everybody is one year older, MEC -1 from age 29, TFT and SEN -0.5 from age 31 (ages as of the season just finished), fatigue resets to 0.
@@ -337,7 +337,7 @@ Chemistry is no longer one hidden number. Each pair of starters has a **Bond** a
 - **Team scrim** is a training focus. Both players need it; a pair gains `base x (100 - Bond)/70 x growth` with base 1.5 per week, applied as 0.75 per match day. **This is half of the +3 per scrim week stated above.** At +3 the scrim route (two games and a scrim a week) would be 37 percent faster than playing alone, which breaks the document's own limit in 9.2 test 2 (at most 20 percent). At +1.5 it is 9 percent over a split (18 percent on the very first day). Test 9.2.2 is the binding rule, so the number was changed, not the test.
 - **Not built:** Exhibition and Quick Match (their +2 Bond), per-pair bond for computer-run squads, the staff bonus, Morale in contract talks.
 
-### 7.8 Game Plan (the coach's second lever besides the draft)
+### 7.8 Game Plan (the manager's second lever besides the draft)
 
 A **Game Plan** is a set of 8 controls (7 sliders from -100 to +100 and one 4-way choice; default 0 / none = neutral) with an optional **trigger**. A player keeps one default plan plus up to 3 triggered plans (convenience, never extra strength: section 11). The plan acts on the simulator only through three hooks that the simulator input already carries (section 8.1): `contest_mod` (a fraction added to the team's rating entering one named contest), `contest_var` (a multiplier on the team's noise in one contest) and `variance_mult` (noise in every contest). **Plans never change the contest weights**, so all weights still sum to 1.00 and the carry-over term keeps its meaning.
 

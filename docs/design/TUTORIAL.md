@@ -461,7 +461,8 @@ Reachable from Settings, from every sheet footer and from the word chips. One sc
 
 | Data | Where | Why there |
 |---|---|---|
-| Tutorial progress for this club | **Save**: `gs.d["tutorial"] = {"v": 1, "state": "running" / "done" / "skipped" / "legacy", "step": "<id>", "game": {"live": bool, "n": int, "plan": {...}}}` | A new save is a new club, so it gets its own offer. The sandbox plan belongs to a game in flight. |
+| Tutorial progress for this club | **Save**: `gs.d["tutorial"] = {"v": 1, "state": "new" / "running" / "done" / "skipped" / "legacy", "step": "<id>", "game": {"live": bool, "n": int, "plan": {...}}}` | A new save is a new club, so it gets its own offer. The sandbox plan belongs to a game in flight. |
+| State `new` (added at I-14, recorded here at Alpha 0.9) | **Save**: `gs.d["tutorial"]["state"] = "new"` | A save made by New game before the welcome modal is answered: the guide has not started and was not refused. Home shows the welcome (first device) or the "Welcome back" card; Start makes it `running`, Skip makes it `skipped`. A save with `v` greater than 1 or no `tutorial` key reads as `legacy`; `new` is carried into `next_season` unchanged. |
 | "I have seen the welcome", "finished once", "skipped once", "dismissed the legacy offer" | **Device**: `settings.cfg`, section `[tutorial]` | A returning player on a new save is not nagged. |
 | Lesson status per lesson: absent, `offered`, `snoozed:<n>`, `dismissed`, `done` | **Device**: `settings.cfg`, section `[lessons]` | A lesson learned once is not offered again on the next save. |
 | "?" dots (sheet opened on this screen) | **Device**: `settings.cfg`, section `[help]` (old `[tips]` keys map across) | Same pattern as today's tips. |

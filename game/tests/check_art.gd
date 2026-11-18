@@ -31,6 +31,7 @@ func ok(cond: bool, what: String) -> void:
 
 
 func _ready() -> void:
+	OS.low_processor_usage_mode = false    # the game sleeps when idle (I-25); the picture checks wait for drawn frames
 	get_window().size = Vector2i(720, 1280)    # a headless window is 100 x 100 until told otherwise
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("sheets="):

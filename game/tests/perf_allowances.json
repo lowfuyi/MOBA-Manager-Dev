@@ -38,14 +38,14 @@
   "02_about": {
    "status": "legacy",
    "measured": {
-    "draws": 12,
+    "draws": 16,
     "nodes": 24
    },
    "draws": 20,
    "nodes": 30,
    "raise": {
     "reason": "I-24 added the Licences card to About (the Barlow credit and a button that shows the OFL text): 16 draw calls measured against 15; allowance 20",
-    "approved_by": "Producer (Technical Director to confirm)"
+    "approved_by": "Technical Director (review 2026-11-18)"
    }
   },
   "03_clubselect": {
@@ -86,13 +86,13 @@
    "status": "legacy",
    "measured": {
     "draws": 42,
-    "nodes": 52
+    "nodes": 68
    },
    "draws": 50,
-   "nodes": 80,
+   "nodes": 75,
    "raise": {
-    "reason": "0.8.0b added the Frame rate card (62 nodes measured against 60) and 0.8.2 adds the Sound and vibration card (about 5 more); allowance 80, still far under the 120 target and the 200 hard limit",
-    "approved_by": "Producer (Technical Director to confirm)"
+    "reason": "0.8.0b Frame rate card and 0.8.2 Sound and vibration card: 68 nodes measured after both (was 52); measured + 10 percent rounded up = 75",
+    "approved_by": "Technical Director (review 2026-11-18)"
    }
   },
   "05_roster": {
@@ -268,13 +268,13 @@
    "status": "legacy",
    "measured": {
     "draws": 42,
-    "nodes": 73
+    "nodes": 89
    },
    "draws": 50,
-   "nodes": 95,
+   "nodes": 100,
    "raise": {
-    "reason": "the same two Settings cards (Frame rate 0.8.0b, Sound and vibration 0.8.2): 83 nodes measured before the sound card; allowance 95",
-    "approved_by": "Producer (Technical Director to confirm)"
+    "reason": "the same two Settings cards: 89 nodes measured after both (was 73); measured + 10 percent rounded up = 100, under the 120 target",
+    "approved_by": "Technical Director (review 2026-11-18)"
    }
   },
   "19_hub_after": {

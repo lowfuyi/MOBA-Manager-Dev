@@ -49,6 +49,15 @@ if [ -n "$G" ] && [ -x "$G" ]; then
   want=$(grep '^GOLDEN_SHA256=' tools/check_fast.sh | cut -d= -f2)
   got=$(cd game/tests/golden && LC_ALL=C sha256sum $(ls | LC_ALL=C sort) | sha256sum | cut -d' ' -f1)
   if [ "$got" = "$want" ]; then echo "golden vectors unchanged"; else echo "FAIL: golden vectors changed ($got, recorded $want)"; fail=1; fi
+  # check_art picture checks (I-05): the headless run above SKIPS them; under Xvfb the art is drawn and checked (Alpha 0.9).
+  if command -v xvfb-run >/dev/null 2>&1; then
+    out=$(cd game && timeout 600 xvfb-run -a -s "-screen 0 720x1280x24" "$G" --rendering-driver opengl3 res://tests/check_art.tscn 2>&1)
+    echo "check_art (Xvfb): $(echo "$out" | grep -E " [0-9]+ checks, " | tail -1)"
+    echo "$out" | grep -qE " [0-9]+ checks, 0 failures" || fail=1
+    echo "$out" | grep -q "SKIPPED" && { echo "FAIL: check_art under Xvfb still skipped picture checks"; fail=1; }
+  else
+    echo "SKIPPED: check_art picture checks (no xvfb-run)"
+  fi
   # Perf gate (PERF-BUDGET.md 3.1a): needs a renderer, so Xvfb with software OpenGL. Visits the 49 tour states and judges
   # them against game/tests/perf_allowances.json (legacy rows are limits, no row = hard limits, redesigned = target or
   # waiver). Prints NO ROW and "tighten to N" notes. Any PERF FAIL line, a missing summary line or a nonzero count fails.

@@ -10,6 +10,9 @@ extends Node
 ## key, and a key with tutorial.v = 99 is left untouched in the save and read as legacy.
 
 const FIXTURES := ["save_0_6_a.json", "save_0_6_b.json", "save_0_6_c.json", "save_0_6_d.json"]
+## Alpha 0.9: real saves written by the 0.7.0 and 0.8.0 code (tests/fixtures/gen_later_fixtures.gd, run in worktrees of
+## 239620d and 5bb1b13): a new game (guide "new"), mid-season with a trigger plan (guide "done"), season over (guide "skipped").
+const LATER := ["save_0_7_a.json", "save_0_7_b.json", "save_0_7_c.json", "save_0_8_a.json", "save_0_8_b.json", "save_0_8_c.json"]
 const TUTORIAL_STATE_SCRIPT := "res://src/tutorial/tutorial_state.gd"
 
 var checks := 0
@@ -29,6 +32,8 @@ func _ready() -> void:
 		_one(f, false)
 	_one("save_0_6_b.json", true)
 	_future_tutorial_state()
+	for f2 in LATER:
+		_later(f2)
 	print("save compat: %d checks, %d failures" % [checks, fails])
 	get_tree().quit(1 if fails > 0 else 0)
 
@@ -152,3 +157,34 @@ func _future_tutorial_state() -> void:
 	ok(int(future["v"]) == 99 and String(future["state"]) == "running", "the future save's tutorial dictionary is not modified")
 	var bad: Dictionary = scr.call("migrate", {"v": 1, "state": "weird"})
 	ok(String(bad.get("state", "")) == "legacy", "a malformed state falls back to legacy")
+
+
+## A 0.7 or 0.8 save: it loads with its guide state kept (not turned into legacy), plays a game, survives a save and reload,
+## finishes the season, starts the next one with the guide state carried, and plays again after a reload.
+func _later(name: String) -> void:
+	var data := _read(name)
+	ok(not data.is_empty() and data.has("tutorial"), name + ": fixture reads and has the 0.7 tutorial key")
+	if data.is_empty():
+		return
+	ok(int(data.get("version", 0)) == GameState.VERSION, name + ": same GameState.VERSION (no bump since 0.6)")
+	var want := String(data["tutorial"]["state"])
+	var gs := GameState.from_dict(World.load_default(), data)
+	ok(gs.club() == String(data["club"]) and gs.roster_players().size() == 10, name + ": club and roster kept")
+	ok(_tutorial_state(gs) == want, name + ": guide state kept (%s)" % want)
+	var plan_in := JSON.stringify(data.get("plan", {}))
+	ok(JSON.stringify(gs.d.get("plan", {})) == plan_in, name + ": the plan set is kept as saved")
+	var g := gs.next_game()
+	if String(gs.d["phase"]) != "done":
+		ok(not g.is_empty() and gs.auto_game(g).has("final"), name + ": a game is due and plays")
+		gs.record_human_game(g, gs.auto_game(g))
+	var gs2 := _roundtrip(gs)
+	ok(gs2 != null and _tutorial_state(gs2) == want, name + ": save and reload keep the guide state")
+	if gs2 == null:
+		return
+	gs2.autoplay(true)
+	ok(String(gs2.d["phase"]) == "done" and String(gs2.d["champion"]) != "", name + ": the season finishes with a champion")
+	var nxt := gs2.next_season()
+	ok(nxt != null and String(nxt.d["phase"]) == "league" and _tutorial_state(nxt) == want, name + ": next season opens, guide state carried")
+	var gs3 := _roundtrip(nxt)
+	var g3 := gs3.next_game() if gs3 != null else {}
+	ok(gs3 != null and not g3.is_empty() and gs3.auto_game(g3).has("final"), name + ": the reloaded new season plays a game")
