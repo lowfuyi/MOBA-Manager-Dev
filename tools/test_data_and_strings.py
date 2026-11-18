@@ -50,3 +50,16 @@ def test_gdscript_validators_match_python_constants():
     for token in ['"mec", "sen", "lan", "tft", "mac", "com", "con", "clu"', '"top", "jg", "mid", "bot", "sup"',
                   '"professional", "balanced", "casual", "temperamental"', "144 + 3 * d"]:
         assert token in gd
+
+
+def test_arena_actions_check_catches_errors():
+    import json, copy
+    doc = json.loads((ROOT / "game/data/arena_actions_v1.json").read_text())
+    heroes = json.loads((ROOT / "game/data/heroes.json").read_text())
+    assert V.check_arena_actions(doc, heroes) == []
+    bad = copy.deepcopy(doc); del bad["archetype_action"]["gunner"]
+    assert any("gunner" in e for e in V.check_arena_actions(bad, heroes))
+    bad = copy.deepcopy(doc); bad["fights"]["obj_mid"]["take"] = [32.0, 33.75]
+    assert any("out of order" in e for e in V.check_arena_actions(bad, heroes))
+    bad = copy.deepcopy(doc); bad["hp"]["fight_floor"]["loser"] = [0.0, 0.5]
+    assert any("never reaches 0" in e for e in V.check_arena_actions(bad, heroes))

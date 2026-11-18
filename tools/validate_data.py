@@ -186,6 +186,42 @@ def check_tutorial(doc, schema, strings=None):
     return errs
 
 
+
+ACTION_KINDS = {"dash", "shot", "burst", "tether", "heal"}
+FIGHT_BEATS = ["obj_mid", "fight_mid", "obj_late", "fight_late"]
+
+def check_arena_actions(doc, heroes):
+    """Alpha 0.8.1 Fight pass table (ACTION-VOCABULARY 11): every archetype of heroes.json has an action, timings are ordered."""
+    errs = []
+    aa = doc.get("archetype_action", {})
+    for a in sorted({h.get("archetype", "") for h in heroes}):
+        if aa.get(a) not in ACTION_KINDS: errs.append(f"archetype {a!r} has no action of {sorted(ACTION_KINDS)}")
+    for slot, a in doc.get("slot_fallback", {}).items():
+        if a not in aa: errs.append(f"slot_fallback {slot}: {a!r} is not an archetype")
+    if set(doc.get("slot_fallback", {})) != {"top", "jg", "mid", "bot", "sup"}: errs.append("slot_fallback must name the five slots")
+    for k in ACTION_KINDS:
+        if k not in doc.get("actions", {}): errs.append(f"actions: {k} missing")
+    prev = 0.0
+    for b in FIGHT_BEATS:
+        f = doc.get("fights", {}).get(b)
+        if f is None:
+            errs.append(f"fights: {b} missing"); continue
+        seq = [f["from"], f["engage_to"], f["kills"][0], f["kills"][1], f["fight_to"]] + (f["take"] if "take" in f else [])
+        if any(seq[i] > seq[i + 1] for i in range(len(seq) - 1)) or seq[0] < prev:
+            errs.append(f"fights: {b} times out of order {seq}")
+        if "take" in f and f["take"][1] - f["take"][0] < 1.0: errs.append(f"fights: {b} take ring shorter than 1 s")
+        prev = seq[-1]
+    sp = doc.get("spacing", {})
+    if not (0.3 <= sp.get("min_gap_s", 0) <= 1.0): errs.append("spacing.min_gap_s outside 0.3 to 1.0")
+    hp = doc.get("hp", {})
+    for k in ("lane_floor", "fight_floor"):
+        for side in ("winner", "loser"):
+            lo, hi = hp.get(k, {}).get(side, [0, 0])
+            if not (0.15 <= lo <= hi <= 0.95): errs.append(f"hp.{k}.{side} must be within 0.15 to 0.95 (a survivor never reaches 0)")
+    d = doc.get("decisive", {})
+    if not (0 < d.get("slow_rate", 0) < 1) or d.get("catch_up_s", 0) <= 0: errs.append("decisive: slow_rate in (0,1) and catch_up_s > 0")
+    return errs
+
 def validate_dir(data_dir):
     data_dir = pathlib.Path(data_dir)
     hs, ps = load(data_dir / "schema/hero.schema.json"), load(data_dir / "schema/player.schema.json")
@@ -204,6 +240,8 @@ def validate_dir(data_dir):
         b = load(data_dir / "names/block_list.json")
         block = [x.lower() for x in b["handles"] + b["orgs"] + b["reference_hero_names"]]
         errs += check_world(load(top["heroes"]), load(top["players"]), load(top["clubs"]), block)
+        if (data_dir / "arena_actions_v1.json").exists():
+            errs += [f"arena_actions_v1.json: {e}" for e in check_arena_actions(load(data_dir / "arena_actions_v1.json"), load(top["heroes"]))]
     return errs
 
 if __name__ == "__main__":

@@ -719,3 +719,75 @@ The Esports addendum is asked to agree with these two, or to say which number it
 | 6 | IP & Originality Checker | The 52 intents (156 lines), names in section 4.3 and the placeholder names. |
 | 7 | Art Director | Done in ART-BIBLE 3.8 and 3.9 and now followed here (`BAD` only on the end card Defeat glyph, hit colours `WARN` mixed to `TEXT` and `TEXT2`). Check that sections 2.2 and 3.1 agree. |
 | 8 | Technical Designer | Key choreography data on the beat ids of 2.1, the cue ids of 3.2 and the map ids of 2.3; use acceptance tests 10 to 12. |
+
+## 11. Fight pass (Alpha 0.8.1)
+
+Written 2026-11-18 by the producer working in the Gameplay / Champion Designer and VFX Artist roles (no separate agents ran;
+the producer reviewed the result as usual). It answers the Founder's 0.8 phone test: "heroes gather, a ring fills, the fight is
+over". Founder decisions applied (all four recommendations): a slow-down of about 0.6 s on the decisive kill, made up after it;
+crowded kills grouped into double and triple kills; Speed x2 kept; tokens keep the role letter in 0.8.1 (silhouettes follow in
+0.8.2). The data is `game/data/arena_actions_v1.json`, checked by `tools/validate_data.py` (`check_arena_actions`).
+
+### 11.1 Rules that do not move
+- The result is decided before the first frame. Kills, deaths per hero (Report.kda), towers and objectives equal the Report.
+  Only *when inside its fight* a kill lands, and how the fight looks, are staging.
+- A1 to A3 hold: no simulation calls in `src/arena`; randomness only from the `show` streams (`show:timing`, `show:fx`,
+  `show:hp`, `show:act`); the same result gives the same show.
+- Every action is drawn from the one icon strip (batched with the tokens). Live action cues are capped at 24.
+- Animations off: no shake, no zoom, no slow-down; actions still play (they are information, not decoration).
+
+### 11.2 Action per archetype (section 3.1, made concrete)
+| Archetype | Action | On the map | Lead before the hit |
+|---|---|---|---|
+| Bruiser, Bulwark, Shade (melee) | `dash` | The token lunges 18 px at the target, a slash mark lands on it, the token recoils back over 0.2 s | 0.15 s |
+| Gunner (ranged) | `shot` | A bolt with two trailing dots flies from the shooter to the target; a spark on arrival | 0.25 s |
+| Spellcaster (caster) | `burst` | A charge glow on the caster, then a burst ring on the target area (0.35 s) | 0.3 s |
+| Binder (caster) | `tether` | A line of five dots between binder and target held 0.4 s, a root ring at the target | 0.2 s |
+| Mender (support) | `heal` | Every 1.1 s in a fight: a rising plus on the most hurt living ally, whose bar lifts by 0.14 and fades back over 1.2 s | none |
+
+Every hit cue of 0.8 now has an attacker: in the lanes the lane opponent, in group beats a living foe from the `show:fx`
+stream. Every ledger kill is played as the killer's action ending on the victim at the kill's moment. An action is skipped (the
+plain spark stays) when the attacker is down at its start or the target is down before the hit. Heroes without a pick (none in
+normal play) use the slot fallback: top bruiser, jungle shade, mid spellcaster, bot gunner, support mender.
+
+### 11.3 The fight arc (every group beat)
+| Beat | Engage | Kills | Fight ends | Then |
+|---|---|---|---|---|
+| Stoneback (obj_mid) | 31.0 to 31.5 s | 31.6 to 32.15 s | 32.25 s | losers retreat; the winners take it, ring 32.25 to 33.75 s |
+| Mossback fight (fight_mid) | 41.2 to 41.9 s | 42.0 to 44.8 s | 45.0 s | losers retreat, winners chase |
+| Moonhulk (obj_late) | 57.0 to 57.5 s | 57.6 to 58.4 s | 58.5 s | losers retreat; ring 58.5 to 60.0 s |
+| Late fight (fight_late) | 66.0 to 66.8 s | 66.9 to 71.0 s | 71.25 s | the ending staging (clean gate or held island) as in 0.8 |
+
+- **Engage:** the initiator side's front hero (bulwark, then bruiser, then the top laner) charges 46 px across the gap with speed
+  lines, 0.8 s.
+- **Trade, then spaced kills:** the loser's kills tend to come first (the trade), the winner's later (the clean-up). Kills are at
+  least 0.4 s apart. When a window cannot hold them at that gap, kills are grouped: two or three land 0.12 s apart as a double or
+  triple kill (a short tag; more than three still share one group). Counts never change.
+- **Retreat and chase:** 0.2 s after the fight's last kill (or at its end), the losing side's survivors run 0.07 map units
+  toward their base at rush speed; after the Mossback fight the winners follow 0.04. Objective winners stay in the pit to take it.
+- **Rings:** the objective ring appears only after the objective fight, for 1.5 s; teamfights never show a ring.
+
+### 11.4 Health bars
+`ShowScript.hp_at(hero, t)` is a pure function of show time, from the ledger and the `show:hp` stream:
+- 1.0 at the start and after every respawn. A bar is drawn (34 x 6 px, 26 px above the token, side colour on dark) only while it
+  is below full.
+- In a lane trade (5 s to the lane's resolve) the two laners fall in steps (one step per 0.35 s) to a floor: winner 0.6 to 0.9,
+  loser 0.4 to 0.7. In a group fight every living hero falls to a floor: winner 0.45 to 0.85, loser 0.22 to 0.55.
+- A hero the ledger kills falls in steps from where it was to exactly 0 at the kill's moment (over at most 3 s). **A bar reaches
+  0 only at a ledger death**, never otherwise (floors are 0.22 or more; heal lifts only add).
+- Out of a fight a bar refills over 5 s.
+
+### 11.5 The decisive kill
+The decisive kill is the game winner's last kill in the late fight; in a held game (the winner lost the late fight) the winner's
+last kill of the game; none when the winner has no kill after 41 s (the Cairn's fall stays the only beat).
+- **Slow-down:** on the beat clock, `beat_t = remap(show_t)`: from the kill, 0.6 s of real time show 0.3 s of the map (half
+  speed); the next 1.2 s show 1.5 s (catch up). The kill lands exactly on its moment, the game still ends at 75 s, and the
+  scoreboard, words and map all read the beat clock, so they agree. Skip, pause and x2 stay exact (remap is pure).
+- **Shake and punch-in:** a 6 px camera shake decaying over 0.45 s and a zoom 0.15 above the focus zoom, out over 0.9 s.
+- **Animations off:** no remap, shake or zoom; a still flash on the victim and the tag only.
+
+### 11.6 Tests that hold it (F-02 to F-05)
+Per-hero kills and deaths equal Report.kda; every kill lies in its beat's kill window; spacing (0.4 s, or a group of at most
+0.12 s steps); `hp_at` is 0 only during a ledger death and 1 after each rise; every action starts at a living attacker and ends at
+a living target; no ring during the Mossback or the late fight; the objective ring starts after the beat's last kill; the beat clock
+ends at 75 s at 30 and 60 fps and at x2; with Animations off there is no remap, no shake and no zoom above the focus zoom.
