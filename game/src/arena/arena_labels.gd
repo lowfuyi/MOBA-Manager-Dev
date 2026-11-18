@@ -254,6 +254,11 @@ func _build() -> void:
 		var mt := Strings.t(String(mkey[mid]))
 		items.append({"kind": "tag", "t": float(mg["t"]), "until": float(mg["t"]) + TAG_S, "words": word_count(mt), "id": "multi_" + mid,
 				"text": mt, "side": mg["side"]})
+	# the decisive kill (11.5): its tag, with or without animations
+	if not s.decisive.is_empty():
+		var dtx := Strings.t("arena.tag.decisive")
+		var dt0 := float(s.decisive["t"])
+		items.append({"kind": "tag", "t": dt0, "until": dt0 + TAG_S, "words": word_count(dtx), "id": "decisive", "text": dtx, "side": s.winner})
 	if s.arc == "close":
 		var tc := _label("tag_close", me)
 		items.append({"kind": "tag", "t": 62.0, "until": 62.0 + TAG_S, "words": int(tc["words"]), "id": tc["id"], "text": tc["text"], "side": me})

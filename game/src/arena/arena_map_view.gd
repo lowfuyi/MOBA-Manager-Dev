@@ -37,6 +37,7 @@ const EDGE_LINE := Color(1, 1, 1, 0.18)    # ART-BIBLE 3.9; lanes use it pre-ble
 var my_side := "B"
 var flip := false
 var zoom := 1.0
+var punch := 0.0                 # the decisive kill's punch-in on top of zoom (0 to 0.15, ArenaFx.camera_at; 0.8.1)
 var focus := MAP / 2.0           # the camera centre, arena px of the view frame (already flipped)
 var fallen: Dictionary = {}
 var sprites: Array = []         # [ICON key, canonical point, size px, alpha], drawn after the towers (Choreo.sprites_at)
@@ -101,7 +102,7 @@ func reset_camera() -> void:
 
 ## The part of the arena (px of the view frame) that is on screen: centred on focus, clamped to the map.
 func window() -> Rect2:
-	var sz := MAP / zoom
+	var sz := MAP / (zoom + maxf(0.0, punch))
 	var pos := focus - sz / 2.0
 	pos.x = clampf(pos.x, 0.0, MAP.x - sz.x)
 	pos.y = clampf(pos.y, 0.0, MAP.y - sz.y)

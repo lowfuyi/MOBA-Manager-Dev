@@ -1384,5 +1384,6 @@
   "settings.fps_hint": "How often the screen redraws when something moves. 30 uses less battery and may keep the phone cooler. Matches play the same at both, only less smoothly at 30.",
   "arena.tag.multi.double": "Double kill",
   "arena.tag.multi.triple": "Triple kill",
-  "arena.tag.multi.more": "Kills pile up"
+  "arena.tag.multi.more": "Kills pile up",
+  "arena.tag.decisive": "The deciding kill"
 }

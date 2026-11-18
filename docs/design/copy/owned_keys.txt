@@ -780,3 +780,4 @@ settings.fps_hint
 arena.tag.multi.double
 arena.tag.multi.triple
 arena.tag.multi.more
+arena.tag.decisive

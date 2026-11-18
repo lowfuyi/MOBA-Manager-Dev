@@ -176,7 +176,8 @@ func _check_one(f: ArenaFx, s: ShowScript, c: Choreo, me: String) -> Array:
 		if live > ArenaFx.MAX_CUES + 10 and not bad.has("budget"):    # + respawn rings, which are not hit cues
 			bad.append("budget")
 		var cam := f.camera_at(t)
-		if float(cam[1]) < 1.0 - 1e-9 or float(cam[1]) > 1.3 + 1e-9 or float(f.camera_at(t, true)[1]) != 1.0:
+		var calm := f.camera_at(t, true)
+		if float(cam[1]) < 1.0 - 1e-9 or float(cam[1]) > 1.3 + 1e-9 or float(calm[1]) != 1.0 or float(calm[2]) != 0.0 or float(cam[2]) < 0.0 or float(cam[2]) > 0.15 + 1e-9 or (s.decisive.is_empty() and float(cam[2]) != 0.0):
 			if not bad.has("camera"):
 				bad.append("camera")
 		if s.held and t >= 66.0 and float(cam[1]) != 1.0 and not bad.has("camera"):

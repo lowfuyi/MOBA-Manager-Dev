@@ -341,11 +341,33 @@ func cairn_down(t: float) -> bool:
 	return t >= ShowScript.CAIRN_T
 
 
-## [canonical focus, zoom] at t; `reduced` (reduced motion) keeps the whole map.
+## [canonical focus, zoom, punch] at t; `reduced` (reduced motion) keeps the whole map, with no shake and no punch.
+## The decisive kill (ACTION-VOCABULARY 11.5) adds a shake (decaying) and a punch-in on top of the focus zoom.
 func camera_at(t: float, reduced: bool = false) -> Array:
 	var centre := Vector2(0.5, 0.5)
 	if reduced:
-		return [centre, 1.0]
+		return [centre, 1.0, 0.0]
+	var cam := _focus_at(t)
+	if s.decisive.is_empty():
+		cam.append(0.0)
+		return cam
+	var d: Dictionary = ArenaActions.data()["decisive"]
+	var dt := t - float(s.decisive["t"])
+	var punch := 0.0
+	var at: Vector2 = cam[0]
+	if dt >= 0.0 and dt < float(d["punch_s"]):
+		var k := minf(1.0, dt / 0.08) * (1.0 - _ease(dt / float(d["punch_s"])))
+		punch = float(d["punch_zoom"]) * k
+		var victim := ShowScript.other(String(s.decisive["side"])) + "." + String(s.decisive["victim"])
+		at = at.lerp(c.pos(victim, float(s.decisive["t"])), 0.5 * k)
+	if dt >= 0.0 and dt < float(d["shake_s"]):
+		var amp := float(d["shake_px"]) * (1.0 - dt / float(d["shake_s"]))
+		at += Vector2(sin(dt * 55.0) * amp / ArenaData.W, cos(dt * 47.0) * amp / ArenaData.H)
+	return [at, cam[1], punch]
+
+
+func _focus_at(t: float) -> Array:
+	var centre := Vector2(0.5, 0.5)
 	var zmax := float(ArenaData.data()["camera"]["focus"]["max_zoom"])
 	for f in focus:
 		var a := float(f["from"])
@@ -393,6 +415,12 @@ func over_at(t: float) -> Array:
 		if dt < 0.2 and live < MAX_CUES and c.alpha(String(sp["key"]), t) >= 1.0:
 			out.append(["spark" if not bool(sp["magic"]) else "ring_magic", c.pos(String(sp["key"]), t), 30.0, 1.0 - dt / 0.2])
 			live += 1
+	# the decisive kill (11.5): a still flash on the victim (also with Animations off)
+	if not s.decisive.is_empty():
+		var dd := t - float(s.decisive["t"])
+		if dd >= 0.0 and dd < 0.5:
+			var vk := ShowScript.other(String(s.decisive["side"])) + "." + String(s.decisive["victim"])
+			out.append(["flash", c.pos(vk, t), 84.0, 0.9 * (1.0 - dd / 0.5)])
 	# the actions (Fight pass): the rest of the live-cue budget
 	out.append_array(_action_cues(t, MAX_CUES - live))
 	# kills: killer flash 0.3 s, skull 0.6 s and motes 0.5 s at the victim
@@ -486,4 +514,5 @@ func apply(m: ArenaMap, t: float, reduced: bool = false) -> void:
 	m.sprites_over = over_at(t)
 	m.arcs = arcs_at(t)
 	var cam := camera_at(t, reduced)
+	m.punch = float(cam[2])
 	m.look_at_point(m.arena_px(cam[0]), float(cam[1]))

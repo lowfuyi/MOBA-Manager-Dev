@@ -165,15 +165,18 @@ static func advance(t: float, delta: float, fast: bool) -> float:
 	return minf(ShowScript.WATCH, t + delta * (2.0 if fast else 1.0))
 
 
-## Every layer at the current show time: the map (towers, tokens, effects, camera), the scoreboard and the feed.
+## Every layer at the current show time: the map (towers, tokens, effects, camera), the scoreboard and the feed. All of them
+## read the beat clock (ACTION-VOCABULARY 11.5: the decisive kill's slow-down, made up after it, so 75 s stays 75 s and every
+## layer agrees); with Animations off the beat clock is the show clock.
 func _apply() -> void:
-	fx.apply(_map, show_t, not UI.animate)
-	_board.show_at(show_t)
-	_feed.show_at(show_t)
-	_strip.show_at(show_t, _fast)
+	var bt := script_.beat_t(show_t, UI.animate)
+	fx.apply(_map, bt, not UI.animate)
+	_board.show_at(bt)
+	_feed.show_at(bt)
+	_strip.show_at(bt, _fast)
 	var n := 0
 	for item in Report.FEED_ORDER:
-		if float(item[1]) * ShowScript.WATCH <= show_t + 1e-9:
+		if float(item[1]) * ShowScript.WATCH <= bt + 1e-9:
 			n += 1
 	_shown = n
 
