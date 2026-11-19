@@ -544,6 +544,8 @@ func _find_all() -> bool:
 		var r := ctl.get_global_rect()
 		if r.size.x < 1.0 or r.size.y < 1.0:
 			return false
+		if covered(ctl):
+			return false    # under an open sheet: a tap there lands on the sheet, so wait for it to close (or fall back)
 		_ctrls.append(ctl)
 		if first:
 			_rect = r
@@ -551,6 +553,13 @@ func _find_all() -> bool:
 		else:
 			_rect = _rect.merge(r)
 	return true
+
+
+## True when an open bottom sheet covers `ctl`: the sheet's scrim takes every tap outside its panel, so a target on the page
+## behind cannot be pressed. A target inside the sheet itself is not covered.
+static func covered(ctl: Control) -> bool:
+	var sh := BottomSheet.current()
+	return sh != null and not sh.is_ancestor_of(ctl)
 
 
 func _tick_wait(delta: float) -> void:
@@ -597,8 +606,8 @@ func _tick_follow() -> void:
 		var u := Rect2()
 		var first := true
 		for ctl in _ctrls:
-			if not is_instance_valid(ctl) or not (ctl as Control).is_visible_in_tree():
-				_enter_wait()    # the screen was rebuilt: find the new control
+			if not is_instance_valid(ctl) or not (ctl as Control).is_visible_in_tree() or covered(ctl as Control):
+				_enter_wait()    # the screen was rebuilt (find the new control) or a sheet now covers the target
 				return
 			var r := (ctl as Control).get_global_rect()
 			u = r if first else u.merge(r)

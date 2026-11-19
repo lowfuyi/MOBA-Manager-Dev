@@ -66,6 +66,7 @@ func _ready() -> void:
 	await _set_variant("normal")
 	await _fresh_main()
 	await _geometry()
+	await _under_sheet()
 	await _fallback_run()
 	await _flow()
 	await _cost()
@@ -433,6 +434,55 @@ func _geometry() -> void:
 
 
 # ---- all targets missing: the tutorial can still be finished ---------------------------------------------------------------------------
+
+## A target on the page under an open sheet cannot be tapped (the scrim takes the tap): the step waits with nothing drawn, comes
+## back when the sheet closes, and falls back when the sheet stays. A target inside the sheet is shown as usual.
+func _under_sheet() -> void:
+	var b := UI.button("under", func() -> void: pass, "normal", 96)
+	b.size = Vector2(300, 96)
+	b.position = Vector2(100, 400)
+	UI.tag(b, "t.under", false)
+	_main.add_child(b)
+	var o := _plain_overlay()
+	o.wait_s = 1.0
+	o.show_step(_card("under", ["t.under"]), "Tap me.")
+	await until(func() -> bool: return o.mode == "shown", 20)
+	ok(o.mode == "shown", "sheet: the uncovered target is shown")
+	BottomSheet.open("Cover", Callable(), Callable(), "M", "t")
+	await frames(4)
+	ok(CoachOverlay.covered(b), "sheet: covered() is true for a page control while a sheet is open")
+	ok(o.mode == "wait" and not o.card.visible and not o.is_fallback(), "sheet: a sheet opened over the target puts the step back to waiting (mode %s)" % o.mode)
+	BottomSheet.current().close()
+	await until(func() -> bool: return o.mode == "shown", 40)
+	ok(o.mode == "shown" and not o.is_fallback() and o.hole_rect() == b.get_global_rect().grow(8.0), "sheet: when the sheet closes the step comes back on the target")
+	o.clear()
+	BottomSheet.open("Cover", Callable(), Callable(), "M", "t")
+	await frames(3)
+	o.show_step(_card("under2", ["t.under"]), "Tap me.")
+	await frames(10)
+	ok(o.mode == "wait" and not o.card.visible, "sheet: a step that starts under an open sheet shows nothing at first")
+	await until_s(func() -> bool: return o.is_fallback(), 2.0)
+	ok(o.is_fallback() and o.button_ids().has("next"), "sheet: a sheet that stays open ends in the fallback card with Next")
+	o.clear()
+	# a target inside the open sheet is not covered
+	var inner := UI.button("inner", func() -> void: pass, "normal", 96)
+	UI.tag(inner, "t.inner", false)
+	BottomSheet.current().close()
+	await frames(6)
+	BottomSheet.open("Inside", func(c: VBoxContainer) -> void: c.add_child(inner), Callable(), "M", "t")
+	await frames(6)
+	ok(not CoachOverlay.covered(inner), "sheet: a control inside the open sheet is not covered")
+	o.show_step(_card("inner", ["t.inner"]), "Tap inside.")
+	await until(func() -> bool: return o.mode == "shown", 40)
+	ok(o.mode == "shown" and not o.is_fallback(), "sheet: a target inside the sheet is shown")
+	o.clear()
+	BottomSheet.current().close()
+	await frames(6)
+	ok(not CoachOverlay.covered(b), "sheet: covered() is false again once the sheet is closed")
+	o.queue_free()
+	b.queue_free()
+	await frames(2)
+
 
 func _fallback_run() -> void:
 	await _fresh_main()
