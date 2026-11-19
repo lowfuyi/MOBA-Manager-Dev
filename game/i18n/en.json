@@ -1422,5 +1422,7 @@
   "settings.sound_h": "Sound and vibration",
   "settings.sound": "Sound effects",
   "settings.haptics": "Vibrate on kills and results",
-  "settings.sound_hint": "Simple placeholder sounds. Everything also shows on screen, so playing silently loses nothing."
+  "settings.sound_hint": "Simple placeholder sounds. Everything also shows on screen, so playing silently loses nothing.",
+  "card.age": "Age {n}",
+  "card.banned": "Banned"
 }

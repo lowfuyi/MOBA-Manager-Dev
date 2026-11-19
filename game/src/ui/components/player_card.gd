@@ -18,7 +18,7 @@ extends Control
 ## `tappable` makes it take its own tap with the S1 rule (a release within 12 px of the press, in screen space; a drag that starts
 ## on it scrolls the page) and emit `pressed`; tap:<tut_id> goes on the bus. Built once, `set_*` change it in place
 ## (an equal value changes nothing: `applied` and `draw_count` do not move). The width comes from `size`, never from 720.
-## Strings: only existing keys (role.short.*, fa.sort.age, gl.rating.name, squad.now_playing, fatigue.*, mood.*, contract.*).
+## Strings: role.short.*, card.age (0.9.3; was the sort label fa.sort.age), gl.rating.name, squad.now_playing, fatigue.*, mood.*, contract.*).
 
 signal pressed
 
@@ -270,7 +270,7 @@ func _role_pill(x: float, cy: float) -> float:
 
 
 func _age_text() -> String:
-	return "%s %d" % [Strings.t("fa.sort.age"), int(opts["age"])] if int(opts["age"]) > 0 else ""
+	return Strings.f("card.age", {"n": int(opts["age"])}) if int(opts["age"]) > 0 else ""
 
 
 ## The size the name is drawn at: Body 32, else Small 26, else Caption 24 (the floor) when the room is short; only after that is

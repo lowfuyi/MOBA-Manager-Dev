@@ -21,7 +21,7 @@ extends RefCounted
 ##   arrow  "up" | "down" | "flat" | "": the patch arrow, with `delta` the text beside it ("+1.6")
 ##   num    the number chip at the bottom right (familiarity), "" = none
 ## State cues (never colour alone, ART-BIBLE 3.6 and 3.8): selected = accent outline + a tick in a disc; banned = grey portrait,
-## a cross over it and the word "Ban"; picked by you = a teal CIRCLE badge with a tick and a teal side stripe; picked by them = a
+## a cross over it and the word "Banned" (card.banned); picked by you = a teal CIRCLE badge with a tick and a teal side stripe; picked by them = a
 ## coral HEXAGON badge with a tick and a coral stripe; recommended = a coral outline and a star. Banned and picked are not tappable.
 
 const PASS_CARD := 0
@@ -180,7 +180,7 @@ static func _marks(ci: CanvasItem, r: Rect2, st: Dictionary, s: String) -> void:
 			IconHook.draw(ci, "cross", Rect2(c - Vector2(20, 20), Vector2(40, 40)), UI.BAD)
 	if bool(st["rec"]):
 		IconHook.draw(ci, "star", Rect2(r.position + Vector2(10, 10), Vector2(28, 28)), UI.CORAL)
-	var arrow := String(st["arrow"])
+	var arrow := String(st["arrow"]) if String(st["s"]) != "banned" else ""    # a banned hero shows the word "Banned" in that row
 	if arrow != "":
 		IconHook.draw(ci, "arrow_" + arrow, Rect2(r.position + Vector2(14, 148), Vector2(28, 36)), _arrow_colour(arrow))
 
@@ -201,10 +201,12 @@ static func _text24(ci: CanvasItem, r: Rect2, st: Dictionary, s: String) -> void
 		var pr := _pill_rect(r, CardKit.text_w(f, UI.S_CAPTION, num))
 		CardKit.text(ci, f, UI.S_CAPTION, num, pr.position.x, pr.get_center().y, pr.size.x, UI.TEXT if s != "banned" else UI.TEXT_OFF, 1)
 	var delta := String(st["delta"])
-	if delta != "" and String(st["arrow"]) != "":
+	if delta != "" and String(st["arrow"]) != "" and s != "banned":
 		CardKit.text(ci, f, UI.S_CAPTION, delta, r.position.x + 46.0, r.position.y + 166.0, 70.0, _arrow_colour(String(st["arrow"])), 0)
 	if s == "banned":
-		CardKit.text(ci, f, UI.S_CAPTION, Strings.t("draft.kind.ban").capitalize(), r.end.x - 70.0, r.position.y + 26.0, 62.0, UI.TEXT2, 2)
+		# the word sits in the bottom row on the left (where the patch arrow goes), clear of the portrait ring and the number chip
+		var room := r.size.x - 28.0 - (_pill_rect(r, CardKit.text_w(f, UI.S_CAPTION, num)).size.x + 12.0 if num != "" else 0.0)
+		CardKit.text(ci, f, UI.S_CAPTION, Strings.t("card.banned"), r.position.x + 16.0, r.position.y + 166.0, room, UI.TEXT2, 0)
 
 
 ## The width the name needs at 26 SemiBold (what a fit test compares with the card's text room).

@@ -235,7 +235,7 @@ func _slot(side: String, r: Rect2) -> void:
 			_ops.text(f, UI.S_SMALL, str(hp["name"]), tx, line1_cy, room, UI.TEXT_OFF if banned else UI.TEXT, align)
 		if banned:
 			_ops.icon("cross", Rect2(pr.get_center() - Vector2(14, 14), Vector2(28, 28)), UI.BAD)
-			_ops.text(f, UI.S_CAPTION, Strings.t("draft.kind.ban").capitalize(), tx, line2_cy, room, UI.TEXT2, align)
+			_ops.text(f, UI.S_CAPTION, Strings.t("card.banned"), tx, line2_cy, room, UI.TEXT2, align)
 		elif player != "":
 			_ops.text(f, UI.S_CAPTION, player, tx, line2_cy, room, UI.TEXT2, align)
 

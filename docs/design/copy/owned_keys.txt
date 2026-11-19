@@ -818,3 +818,5 @@ settings.sound_h
 settings.sound
 settings.haptics
 settings.sound_hint
+card.age
+card.banned
