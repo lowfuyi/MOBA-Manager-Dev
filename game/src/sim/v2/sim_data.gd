@@ -59,6 +59,16 @@ static func item(iid: String) -> Dictionary:
 	return items()[iid]
 
 
+static var _bal: Dictionary = {}
+
+
+static func balance(hid: String) -> float:
+	if _bal.is_empty():
+		var d = DataLoader.load_json("res://data/hero_balance_v2.json")
+		_bal = d["scale"] if d is Dictionary else {"_": 1.0}
+	return float(_bal.get(hid, 1.0))
+
+
 static func heroes() -> Dictionary:
 	if _heroes.is_empty():
 		for h in DataLoader.load_json("res://data/heroes.json"):
@@ -239,10 +249,10 @@ static func lane_node_near(lane: String, s: float) -> String:
 static var _nn_cache: Dictionary = {}
 
 
-## Nearest graph node to a canonical point (cached on a 0.005 grid; the answer for a cell is computed from the cell's
-## first point exactly, so the cache never changes a result already computed for that point).
+## Nearest graph node to a canonical point, cached by the exact point only (a cache by grid cell made the answer depend on
+## which point of the cell came first in the process: a determinism bug found by the golden vectors).
 static func nearest_node(p: Vector2) -> String:
-	var ck := int(p.x * 2000.0) * 100000 + int(p.y * 2000.0)
+	var ck := p
 	if _nn_cache.has(ck):
 		return _nn_cache[ck]
 	var id := _nearest_node(p)

@@ -45,6 +45,7 @@ func run(check: Callable) -> void:
 	_items(check, w)
 	_levers(check)
 	_interim_show(check, w, meta)
+	_golden(check)
 
 
 func _determinism(check: Callable, g: Array) -> void:
@@ -225,6 +226,24 @@ func _interim_show(check: Callable, w: World, meta: Dictionary) -> void:
 		var kd := Report.kda(res)
 		ok = ok and int(kd["team"]["B"]["k"]) == int(res["sim"]["team_kills"]["B"])
 	check.call(ok, "interim: the Alpha 0.8 show builds from a v2 result and the kills are the v2 kills")
+
+
+## The v2 golden vectors (tests/golden/sim_v2_vectors.json, GoldenV2): every case reproduces exactly, event log included.
+func _golden(check: Callable) -> void:
+	var d = DataLoader.load_json("res://tests/golden/sim_v2_vectors.json")
+	check.call(d is Dictionary and (d["cases"] as Array).size() == 24, "v2 golden: 24 cases load")
+	if not (d is Dictionary):
+		return
+	var bad: Array = []
+	for item in d["cases"]:
+		var got := GoldenV2.run_case(item["case"])
+		var want: Dictionary = item["expect"]
+		for k in ["blue_won", "events", "log_sha256"]:
+			if str(got[k]) != str(want[k]):
+				bad.append("%s %s" % [want["id"], k])
+		if absf(float(got["len_s"]) - float(want["len_s"])) > 1e-9 or JSON.stringify(got["kills"]) != JSON.stringify(want["kills"]):
+			bad.append("%s numbers" % want["id"])
+	check.call(bad.is_empty(), "v2 golden: every case reproduces exactly (winner, length, kills, log hash) %s" % str(bad))
 
 
 func _levers(check: Callable) -> void:

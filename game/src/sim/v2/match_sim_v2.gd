@@ -34,6 +34,7 @@ var var_mult := {"B": 1.0, "R": 1.0}
 var ev: Array = []               # [t, type, ...]
 var track: Dictionary = {}       # key -> PackedFloat32Array [x, y, hp_frac, alive] per second
 var fronts: Dictionary = {}      # lane -> PackedFloat32Array front s per second
+var gold_track := {"B": PackedFloat32Array(), "R": PackedFloat32Array()}   # team gold earned, per sample
 var winner := ""
 var end_reason := ""
 var fight_n := 0
@@ -43,6 +44,7 @@ var team_kills := {"B": 0, "R": 0}
 var first_blood := ""
 var rngs: Dictionary = {}
 var bonds := {"B": 50.0, "R": 50.0}
+var form := {"B": 1.0, "R": 1.0}  # each team's form on the day (CON: a reliable team varies less; design 5.1)
 var trade_next: Dictionary = {}
 var vision := {"B": {}, "R": {}}  # zone -> until
 var _next_track := 0.0
@@ -112,6 +114,8 @@ func _setup(ta: Dictionary, tb: Dictionary, p_mseed: int, sets: Dictionary, ctx:
 		hooks[side] = GamePlan.hooks(set_["default"])
 		var r := float(set_["default"].get("r", 0)) / 100.0
 		var_mult[side] = float(teams[side].get("variance_mult", 1.0)) * (1.0 + 0.20 * r)
+		var con0 := float(teams[side].get("con", 50.0))
+		form[side] = maxf(0.6, 1.0 + float(p["noise_game"]) * MatchSim.noise_scale(con0) * float(var_mult[side]) * SimData.ih_normal(rng("form:" + side)))
 	var m := SimData.map()
 	for side in ["B", "R"]:
 		var team: Dictionary = teams[side]
@@ -131,6 +135,9 @@ func _setup(ta: Dictionary, tb: Dictionary, p_mseed: int, sets: Dictionary, ctx:
 			for ph in ["early", "mid", "late"]:
 				h.q[ph] = float(team["ratings"][ph][slot]) * (1.0 + tm) / float(p["q_ref"])
 			h.init_kit(h.kit)
+			h.qe_early *= float(form[side])
+			h.qe_mid *= float(form[side])
+			h.qe_late *= float(form[side])
 			var b: Array = ctx.get("builds", {}).get(side, {}).get(slot, [])
 			if not Items.is_legal(b):
 				var enemy: Array = []
@@ -275,6 +282,10 @@ func _sample() -> void:
 		var fr: PackedFloat32Array = fronts[ln]
 		fr.append(float(lanes[ln]["front"]))
 		fronts[ln] = fr
+	for side in ["B", "R"]:
+		var gt: PackedFloat32Array = gold_track[side]
+		gt.append(_team_gold(side))
+		gold_track[side] = gt
 
 
 func call_lead_s() -> float:
@@ -328,9 +339,13 @@ func _gank_watch() -> void:
 # ---------------------------------------------------------------- economy and levels
 func _economy(dt: float) -> void:
 	if t >= float(p["gold_passive_from"]):
+		var lead_b := _team_gold("B") - _team_gold("R")
 		for h in heroes:
 			var hh: SimHero = h
 			var g := float(p["gold_passive"]) + (float(p["gold_passive_sup"]) if hh.slot == "sup" else 0.0)
+			var behind := -lead_b if hh.side == "B" else lead_b
+			if behind > float(p["catchup_gold_from"]):
+				g += float(p["catchup_gold"])
 			give_gold(hh, g * dt)
 	for side in ["B", "R"]:
 		for b in buffs[side].keys():
@@ -366,6 +381,13 @@ func give_gold(h: SimHero, g: float) -> void:
 func give_xp(h: SimHero, x: float) -> void:
 	if h.level >= int(p["max_level"]):
 		return
+	# catch-up: a hero below the enemy's average level learns faster (up to +75 percent)
+	var lv := 0.0
+	for e in side_heroes(SimData.other(h.side)):
+		lv += float(e.level)
+	var behind := lv / 5.0 - float(h.level)
+	if behind > 0.0:
+		x *= 1.0 + minf(0.75, float(p["xp_catchup"]) * behind)
 	h.xp += x
 	while h.level < int(p["max_level"]):
 		var need := float(p["xp_base"]) + float(p["xp_step"]) * float(h.level)
@@ -874,6 +896,10 @@ func on_kill(killer: SimHero, victim: SimHero, assists: Array, at_t: float) -> v
 	var bounty := minf(float(p["kill_gold_max"]), float(p["kill_gold"]) + float(p["kill_streak_step"]) * float(maxi(0, victim.streak - 1)))
 	if victim.streak == 0 and victim.deaths > 2:
 		bounty *= 0.7
+	# a kill on the team that leads in gold pays more (comeback bounty)
+	var lead := _team_gold(victim.side) - _team_gold(killer.side)
+	if lead > 0.0:
+		bounty *= 1.0 + clampf(lead / float(p["comeback_lead"]), 0.0, float(p["comeback_max"]))
 	victim.streak = 0
 	killer.kills += 1
 	killer.streak += 1
@@ -965,6 +991,8 @@ func fight_factor(side: String, kind: String, n: int, at_t: float, frng: Pcg32) 
 	if at_t < 480.0 and kind in ["skirmish", "gank"]:
 		ctx = "jungle" if kind == "gank" else "top"
 	k *= 1.0 + float(hooks[side]["contest_mod"][ctx]) * float(p["plan_k"])
+	if buffs[side].has("stoneback"):
+		k *= 1.0 + float(p["buffs"]["stoneback"].get("dmg", 0.0))
 	var con := float(team.get("con", 50.0))
 	var sigma := float(p["noise_base"]) * MatchSim.noise_scale(con) * float(var_mult[side]) * float(hooks[side]["contest_var"][ctx])
 	k *= 1.0 + sigma * SimData.ih_normal(frng) * float(p["noise_con"])
@@ -1115,7 +1143,7 @@ func _result() -> Dictionary:
 		per[hh.key] = {"hero": hh.hid, "player": hh.player_id, "k": hh.kills, "d": hh.deaths, "a": hh.assists, "gold": int(hh.gold_total),
 				"cs_gold": int(hh.cs_gold), "level": hh.level, "dmg": int(hh.dmg_heroes), "taken": int(hh.dmg_taken), "healed": int(hh.healed),
 				"objectives": hh.objectives, "towers": hh.towers, "items": hh.owned.duplicate(), "build": hh.build.duplicate(),
-				"gold_8": int(gold_at_8.get(hh.key, 0))}
+				"gold_8": int(gold_at_8.get(hh.key, 0)), "ganks": hh.ganks, "wards": int(hh.vision)}
 	var towers_down := {"B": 0, "R": 0}
 	for tw in towers:
 		if not tw["alive"] and String(tw["tier"]) in ["outer", "inner"]:
@@ -1124,7 +1152,7 @@ func _result() -> Dictionary:
 			"contests": contests, "noise": {}, "plan_used": plan_used.duplicate(), "v": 2, "len_s": t, "end_reason": end_reason,
 			"team_kills": team_kills.duplicate(), "towers": towers_down, "per": per, "first_blood": first_blood,
 			"gold": {"B": int(_team_gold("B")), "R": int(_team_gold("R"))},
-			"log": {"v": 2, "len_s": t, "ev": ev, "track": track, "fronts": fronts, "track_every": TRACK_EVERY}}
+			"log": {"v": 2, "len_s": t, "ev": ev, "track": track, "fronts": fronts, "gold": gold_track, "track_every": TRACK_EVERY}}
 
 
 ## v1-shaped contest values (signed for Blue, -1 to 1) read from the game, so readers of the v1 keys keep working.

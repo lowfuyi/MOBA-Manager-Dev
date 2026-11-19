@@ -70,8 +70,14 @@ static func team_calls(sim: MatchSimV2) -> void:
 			sim.calls[side] = {}
 			call = {}
 		if not call.is_empty():
-			if String(call["kind"]) == "group" and not bool(sim.objs[String(call["target"])]["alive"]) and t > float(call["from"]) + 50.0:
-				sim.calls[side] = {}
+			# a gathering ends as soon as the objective has fallen (it is down and not due back soon)
+			if String(call["kind"]) == "group":
+				var oc: Dictionary = sim.objs[String(call["target"])]
+				if not bool(oc["alive"]) and float(oc["respawn_at"]) - t > float(sim.call_lead_s()) * 1.5:
+					sim.calls[side] = {}
+					for h in sim.side_heroes(side):
+						if h.intent == "group":
+							h.next_decide = t
 			continue
 		var caller := _caller(sim, side)
 		var mac := caller.p_mac / 100.0
@@ -86,7 +92,7 @@ static func team_calls(sim: MatchSimV2) -> void:
 				continue
 			var want := 0.45 + 0.15 * float(alive_me - alive_them) + 0.25 * mac
 			want += (plan(sim, side, "m") if oid == "stoneback" else plan(sim, side, "l")) * 0.35
-			want += 0.15 * plan(sim, side, "g")
+			want += 0.035 * plan(sim, side, "g")
 			if oid == "moonhulk" and t < float(sim.p["group_from_s"]):
 				want -= 0.2
 			if want >= 0.5 and _r(sim, caller).next_float() < 0.6:
@@ -100,7 +106,7 @@ static func team_calls(sim: MatchSimV2) -> void:
 			if lane != "":
 				_make_call(sim, side, "siege", lane, t + 45.0)
 				continue
-		if t >= float(sim.p["group_from_s"]) and alive_me >= alive_them and _r(sim, caller).next_float() < 0.04 + 0.04 * plan(sim, side, "g"):
+		if t >= float(sim.p["group_from_s"]) and alive_me >= alive_them and _r(sim, caller).next_float() < 0.04 + 0.02 * plan(sim, side, "g"):
 			var lane2 := _siege_lane(sim, side)
 			if lane2 != "":
 				_make_call(sim, side, "siege", lane2, t + 45.0)
@@ -212,7 +218,7 @@ static func decide(sim: MatchSimV2, h: SimHero) -> void:
 		if not h.has_meta("call") or String(h.get_meta("call")) != cid:
 			h.set_meta("call", cid)
 			var bond := float(sim.bonds.get(h.side, 50.0)) / 100.0
-			var pr := float(p["answer_base"]) + float(p["answer_com"]) * h.p_com / 100.0 + float(p["answer_bond"]) * bond + 0.2 * plan(sim, h.side, "g")
+			var pr := float(p["answer_base"]) + float(p["answer_com"]) * h.p_com / 100.0 + float(p["answer_bond"]) * bond + 0.05 * plan(sim, h.side, "g")
 			if h.slot == "top" and t < 840.0:
 				pr -= 0.25
 			h.set_meta("answer", r.next_float() < pr)
@@ -291,7 +297,7 @@ static func _laner(sim: MatchSimV2, h: SimHero, r: Pcg32, lane: String) -> void:
 			h.target = _split_lane(sim, h)
 			_to_lane(sim, h, h.target)
 			return
-		if r.next_float() < 0.35 + 0.3 * plan(sim, h.side, "g"):
+		if r.next_float() < 0.35 + 0.08 * plan(sim, h.side, "g"):
 			h.intent = "farm_lane"
 			h.target = "mid"
 			_to_lane(sim, h, "mid")
@@ -513,7 +519,7 @@ static func joins(sim: MatchSimV2, h: SimHero, center: Vector2) -> bool:
 			allies += 1
 	if allies == 0:
 		return false
-	var pr := 0.45 + 0.35 * h.p_com / 100.0 + 0.15 * h.p_sen / 100.0 + (0.15 if h.slot in ["jg", "sup"] else 0.0) + 0.15 * plan(sim, h.side, "g")
+	var pr := 0.45 + 0.35 * h.p_com / 100.0 + 0.15 * h.p_sen / 100.0 + (0.15 if h.slot in ["jg", "sup"] else 0.0) + 0.035 * plan(sim, h.side, "g")
 	return _r(sim, h).next_float() < pr
 
 

@@ -131,6 +131,7 @@ var qe_early := 1.0
 var qe_mid := 1.0
 var qe_late := 1.0
 var player_id := ""
+var bal := 1.0                   # per-hero balance multiplier (hero_balance_v2.json)
 var build: Array = []            # six finished item ids (boots first)
 var owned: Array = []            # item ids held (components and finished)
 var gold := 0.0                  # unspent
@@ -215,6 +216,7 @@ func init_kit(p_kit: Dictionary) -> void:
 	p_clu = float(pstats.get("clu", 50.0))
 	if q_k < 0.0:
 		q_k = SimData.f("q_k")
+	bal = SimData.balance(hid)
 	qe_early = 1.0 + q_k * (float(q["early"]) - 1.0)
 	qe_mid = 1.0 + q_k * (float(q["mid"]) - 1.0)
 	qe_late = 1.0 + q_k * (float(q["late"]) - 1.0)
@@ -271,6 +273,7 @@ func _refresh() -> void:
 		if pas.trigger == "aura" and pas.stat == "armor":
 			s["armor"] = float(s["armor"]) + pas.amount * 0.5
 	s["haste"] = minf(40.0, float(s["haste"]))
+	s["hp"] = float(s["hp"]) * (0.5 + 0.5 * bal)
 	s["effects"] = effects
 	s["item_value"] = iv
 	_stat_cache = s

@@ -1,0 +1,1063 @@
+{
+ "cases": [
+  {
+   "case": {
+    "a": [
+     50,
+     50,
+     0.08,
+     "skirmish",
+     0
+    ],
+    "b": [
+     50,
+     50,
+     0,
+     "skirmish",
+     0
+    ],
+    "ctl": "",
+    "edit": false,
+    "id": "g00",
+    "pa": 0,
+    "pb": 1,
+    "seed": 424242,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": false,
+    "events": 1847,
+    "gold": {
+     "B": 30583,
+     "R": 32354
+    },
+    "id": "g00",
+    "kills": {
+     "B": 8,
+     "R": 19
+    },
+    "len_s": 880,
+    "log_sha256": "ebde3c6f251240c37d43a0f63e6f2639c448852ff8f8a2a6ba73001eb194c0df",
+    "towers": {
+     "B": 3,
+     "R": 2
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     55,
+     20,
+     0,
+     "dive",
+     0.1
+    ],
+    "b": [
+     50,
+     20,
+     0,
+     "skirmish",
+     0
+    ],
+    "ctl": "g",
+    "edit": false,
+    "id": "g01",
+    "pa": 1,
+    "pb": 2,
+    "seed": 432161,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2428,
+    "gold": {
+     "B": 31707,
+     "R": 33289
+    },
+    "id": "g01",
+    "kills": {
+     "B": 11,
+     "R": 14
+    },
+    "len_s": 994,
+    "log_sha256": "c565b01d5a3c5c2a5952ed40f8446c81c966dc968a2fa35cebff71274627e67a",
+    "towers": {
+     "B": 4,
+     "R": 2
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     60,
+     80,
+     0,
+     "siege",
+     0
+    ],
+    "b": [
+     50,
+     80,
+     0,
+     "skirmish",
+     0
+    ],
+    "ctl": "t",
+    "edit": false,
+    "id": "g02",
+    "pa": 2,
+    "pb": 3,
+    "seed": 440080,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": false,
+    "events": 3104,
+    "gold": {
+     "B": 40169,
+     "R": 42758
+    },
+    "id": "g02",
+    "kills": {
+     "B": 15,
+     "R": 21
+    },
+    "len_s": 1194,
+    "log_sha256": "444995d2976542d58b0ff984c889627d1eeb92ac7aa350dac016570ac6538262",
+    "towers": {
+     "B": 2,
+     "R": 6
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     70,
+     50,
+     0,
+     "protect",
+     0
+    ],
+    "b": [
+     50,
+     50,
+     0,
+     "skirmish",
+     0
+    ],
+    "ctl": "m",
+    "edit": true,
+    "id": "g03",
+    "pa": 3,
+    "pb": 0,
+    "seed": 447999,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 1990,
+    "gold": {
+     "B": 34495,
+     "R": 31309
+    },
+    "id": "g03",
+    "kills": {
+     "B": 12,
+     "R": 9
+    },
+    "len_s": 968,
+    "log_sha256": "ad90dfad84bd730525a306dd8516837151b5c1acc862321cbde0fe3b4646d0c0",
+    "towers": {
+     "B": 5,
+     "R": 2
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     50,
+     20,
+     0,
+     "skirmish",
+     0
+    ],
+    "b": [
+     50,
+     20,
+     0,
+     "siege",
+     0
+    ],
+    "ctl": "l",
+    "edit": false,
+    "id": "g04",
+    "pa": 0,
+    "pb": 1,
+    "seed": 455918,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2720,
+    "gold": {
+     "B": 39484,
+     "R": 37896
+    },
+    "id": "g04",
+    "kills": {
+     "B": 22,
+     "R": 18
+    },
+    "len_s": 1144,
+    "log_sha256": "2b9de8ef437b89dfbe7172bf9527cbf2f41fc63fd7e597c6642209bba43afb4f",
+    "towers": {
+     "B": 4,
+     "R": 2
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     55,
+     80,
+     0.08,
+     "dive",
+     0
+    ],
+    "b": [
+     50,
+     80,
+     0,
+     "siege",
+     0
+    ],
+    "ctl": "a",
+    "edit": false,
+    "id": "g05",
+    "pa": 1,
+    "pb": 2,
+    "seed": 463837,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": false,
+    "events": 1888,
+    "gold": {
+     "B": 28045,
+     "R": 29171
+    },
+    "id": "g05",
+    "kills": {
+     "B": 14,
+     "R": 20
+    },
+    "len_s": 850,
+    "log_sha256": "b4bcc09ce2a085e28c876a617bde3855ad7f0dc869367ab45e43314be0bce381",
+    "towers": {
+     "B": 3,
+     "R": 2
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     60,
+     50,
+     0,
+     "siege",
+     0
+    ],
+    "b": [
+     50,
+     50,
+     0,
+     "siege",
+     0
+    ],
+    "ctl": "s",
+    "edit": false,
+    "id": "g06",
+    "pa": 2,
+    "pb": 3,
+    "seed": 471756,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2147,
+    "gold": {
+     "B": 31269,
+     "R": 30851
+    },
+    "id": "g06",
+    "kills": {
+     "B": 23,
+     "R": 12
+    },
+    "len_s": 870,
+    "log_sha256": "50b860fe4c9fd1f2c140f70f3178253854a58ea97e3ee6b05ffa8942de07bedd",
+    "towers": {
+     "B": 3,
+     "R": 3
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     70,
+     20,
+     0,
+     "protect",
+     0.1
+    ],
+    "b": [
+     50,
+     20,
+     0,
+     "siege",
+     0
+    ],
+    "ctl": "r",
+    "edit": false,
+    "id": "g07",
+    "pa": 3,
+    "pb": 0,
+    "seed": 479675,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": false,
+    "events": 1505,
+    "gold": {
+     "B": 26154,
+     "R": 28672
+    },
+    "id": "g07",
+    "kills": {
+     "B": 9,
+     "R": 14
+    },
+    "len_s": 796,
+    "log_sha256": "146f30aaac2c47f952351915617cfe0bc1cd55a676c508d454881f5643de2208",
+    "towers": {
+     "B": 2,
+     "R": 3
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     50,
+     80,
+     0,
+     "skirmish",
+     0
+    ],
+    "b": [
+     50,
+     80,
+     0,
+     "protect",
+     0
+    ],
+    "ctl": "",
+    "edit": false,
+    "id": "g08",
+    "pa": 0,
+    "pb": 1,
+    "seed": 487594,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": false,
+    "events": 2163,
+    "gold": {
+     "B": 29499,
+     "R": 29906
+    },
+    "id": "g08",
+    "kills": {
+     "B": 14,
+     "R": 15
+    },
+    "len_s": 858,
+    "log_sha256": "22142553f7876067b27f170cc7d0c47cf8fe9c7504471660a62e83929abdf400",
+    "towers": {
+     "B": 4,
+     "R": 4
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     55,
+     50,
+     0,
+     "dive",
+     0
+    ],
+    "b": [
+     50,
+     50,
+     0,
+     "protect",
+     0
+    ],
+    "ctl": "g",
+    "edit": false,
+    "id": "g09",
+    "pa": 1,
+    "pb": 2,
+    "seed": 495513,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": false,
+    "events": 1562,
+    "gold": {
+     "B": 21399,
+     "R": 25953
+    },
+    "id": "g09",
+    "kills": {
+     "B": 4,
+     "R": 17
+    },
+    "len_s": 726,
+    "log_sha256": "2f3315a670513fef312ac667c0cbe0dca21f818ab4936d72071b57d19852f094",
+    "towers": {
+     "B": 2,
+     "R": 2
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     60,
+     20,
+     0.08,
+     "siege",
+     0
+    ],
+    "b": [
+     50,
+     20,
+     0,
+     "protect",
+     0
+    ],
+    "ctl": "t",
+    "edit": true,
+    "id": "g10",
+    "pa": 2,
+    "pb": 3,
+    "seed": 503432,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2049,
+    "gold": {
+     "B": 35259,
+     "R": 33061
+    },
+    "id": "g10",
+    "kills": {
+     "B": 18,
+     "R": 8
+    },
+    "len_s": 990,
+    "log_sha256": "52fff287735a0190ed32280885fe493688733486b659b4327ad5ab3d338f938f",
+    "towers": {
+     "B": 4,
+     "R": 3
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     70,
+     80,
+     0,
+     "protect",
+     0
+    ],
+    "b": [
+     50,
+     80,
+     0,
+     "protect",
+     0
+    ],
+    "ctl": "m",
+    "edit": false,
+    "id": "g11",
+    "pa": 3,
+    "pb": 0,
+    "seed": 511351,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2508,
+    "gold": {
+     "B": 40691,
+     "R": 37249
+    },
+    "id": "g11",
+    "kills": {
+     "B": 24,
+     "R": 10
+    },
+    "len_s": 1096,
+    "log_sha256": "c0963a967d8270c72546c3b78d87d34f692315c1ad10a5b6c28db0b733b2efe8",
+    "towers": {
+     "B": 6,
+     "R": 3
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     50,
+     50,
+     0,
+     "skirmish",
+     0
+    ],
+    "b": [
+     50,
+     50,
+     0,
+     "dive",
+     0
+    ],
+    "ctl": "l",
+    "edit": false,
+    "id": "g12",
+    "pa": 0,
+    "pb": 1,
+    "seed": 519270,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": false,
+    "events": 1915,
+    "gold": {
+     "B": 25634,
+     "R": 27199
+    },
+    "id": "g12",
+    "kills": {
+     "B": 11,
+     "R": 11
+    },
+    "len_s": 828,
+    "log_sha256": "f7b74c49cf6dd93abfda0587f57e5122c9b2cc44bdd0a58835852cdf917f84f5",
+    "towers": {
+     "B": 2,
+     "R": 2
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     55,
+     20,
+     0,
+     "dive",
+     0.1
+    ],
+    "b": [
+     50,
+     20,
+     0,
+     "dive",
+     0
+    ],
+    "ctl": "a",
+    "edit": false,
+    "id": "g13",
+    "pa": 1,
+    "pb": 2,
+    "seed": 527189,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2423,
+    "gold": {
+     "B": 34494,
+     "R": 32365
+    },
+    "id": "g13",
+    "kills": {
+     "B": 17,
+     "R": 15
+    },
+    "len_s": 984,
+    "log_sha256": "8ac226638c6f8b2237aec92acc7ec679299d0266678e6276a42923cf63c37aac",
+    "towers": {
+     "B": 5,
+     "R": 3
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     60,
+     80,
+     0,
+     "siege",
+     0
+    ],
+    "b": [
+     50,
+     80,
+     0,
+     "dive",
+     0
+    ],
+    "ctl": "s",
+    "edit": false,
+    "id": "g14",
+    "pa": 2,
+    "pb": 3,
+    "seed": 535108,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2878,
+    "gold": {
+     "B": 40659,
+     "R": 38701
+    },
+    "id": "g14",
+    "kills": {
+     "B": 24,
+     "R": 19
+    },
+    "len_s": 1152,
+    "log_sha256": "3ec9a99ca3590eac41c392c03ef2e304118a826d6a4c5c0face8ffee884406f0",
+    "towers": {
+     "B": 5,
+     "R": 2
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     70,
+     50,
+     0.08,
+     "protect",
+     0
+    ],
+    "b": [
+     50,
+     50,
+     0,
+     "dive",
+     0
+    ],
+    "ctl": "r",
+    "edit": false,
+    "id": "g15",
+    "pa": 3,
+    "pb": 0,
+    "seed": 543027,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 1682,
+    "gold": {
+     "B": 31377,
+     "R": 29949
+    },
+    "id": "g15",
+    "kills": {
+     "B": 13,
+     "R": 8
+    },
+    "len_s": 892,
+    "log_sha256": "c7afdf985d86a3fa93a15c560b792254acea048912f06960bd8c254a4d41a54b",
+    "towers": {
+     "B": 3,
+     "R": 5
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     50,
+     20,
+     0,
+     "skirmish",
+     0
+    ],
+    "b": [
+     50,
+     20,
+     0,
+     "skirmish",
+     0
+    ],
+    "ctl": "",
+    "edit": false,
+    "id": "g16",
+    "pa": 0,
+    "pb": 1,
+    "seed": 550946,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2018,
+    "gold": {
+     "B": 32096,
+     "R": 28998
+    },
+    "id": "g16",
+    "kills": {
+     "B": 18,
+     "R": 9
+    },
+    "len_s": 908,
+    "log_sha256": "4949033aa6bb41b7af892c876c177fa91c35b6af5fae43e2e83fe9561b005f60",
+    "towers": {
+     "B": 4,
+     "R": 3
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     55,
+     80,
+     0,
+     "dive",
+     0
+    ],
+    "b": [
+     50,
+     80,
+     0,
+     "skirmish",
+     0
+    ],
+    "ctl": "g",
+    "edit": true,
+    "id": "g17",
+    "pa": 1,
+    "pb": 2,
+    "seed": 558865,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 1846,
+    "gold": {
+     "B": 30464,
+     "R": 28215
+    },
+    "id": "g17",
+    "kills": {
+     "B": 15,
+     "R": 14
+    },
+    "len_s": 854,
+    "log_sha256": "0afa45d9b2866bef7a099fc40d9e578d36eb338008c0b03f1712272b3c6fbaf3",
+    "towers": {
+     "B": 4,
+     "R": 1
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     60,
+     50,
+     0,
+     "siege",
+     0
+    ],
+    "b": [
+     50,
+     50,
+     0,
+     "skirmish",
+     0
+    ],
+    "ctl": "t",
+    "edit": false,
+    "id": "g18",
+    "pa": 2,
+    "pb": 3,
+    "seed": 566784,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2090,
+    "gold": {
+     "B": 29402,
+     "R": 28640
+    },
+    "id": "g18",
+    "kills": {
+     "B": 17,
+     "R": 14
+    },
+    "len_s": 906,
+    "log_sha256": "6e7d7b7a461c45f4a75f680162cf7ef219a95d9f851197ca3c111610cff6462c",
+    "towers": {
+     "B": 3,
+     "R": 2
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     70,
+     20,
+     0,
+     "protect",
+     0.1
+    ],
+    "b": [
+     50,
+     20,
+     0,
+     "skirmish",
+     0
+    ],
+    "ctl": "m",
+    "edit": false,
+    "id": "g19",
+    "pa": 3,
+    "pb": 0,
+    "seed": 574703,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 1551,
+    "gold": {
+     "B": 33819,
+     "R": 29954
+    },
+    "id": "g19",
+    "kills": {
+     "B": 13,
+     "R": 8
+    },
+    "len_s": 914,
+    "log_sha256": "6f84be508cabf7d523c50b0123c66f4ce9989198055cc967579ae19d2f7045b9",
+    "towers": {
+     "B": 5,
+     "R": 1
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     50,
+     80,
+     0.08,
+     "skirmish",
+     0
+    ],
+    "b": [
+     50,
+     80,
+     0,
+     "siege",
+     0
+    ],
+    "ctl": "l",
+    "edit": false,
+    "id": "g20",
+    "pa": 0,
+    "pb": 1,
+    "seed": 582622,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2181,
+    "gold": {
+     "B": 29839,
+     "R": 26603
+    },
+    "id": "g20",
+    "kills": {
+     "B": 15,
+     "R": 9
+    },
+    "len_s": 896,
+    "log_sha256": "8412fe5009b06c0928fb65ab75400f05df5558ef981745b6afe1dcff0b2661dd",
+    "towers": {
+     "B": 4,
+     "R": 2
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     55,
+     50,
+     0,
+     "dive",
+     0
+    ],
+    "b": [
+     50,
+     50,
+     0,
+     "siege",
+     0
+    ],
+    "ctl": "a",
+    "edit": false,
+    "id": "g21",
+    "pa": 1,
+    "pb": 2,
+    "seed": 590541,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2389,
+    "gold": {
+     "B": 37940,
+     "R": 34766
+    },
+    "id": "g21",
+    "kills": {
+     "B": 23,
+     "R": 15
+    },
+    "len_s": 1036,
+    "log_sha256": "a46e748c2ebe9abd51ebe2adc7873323a4a0c06ba187d4a7f165d25601cefda1",
+    "towers": {
+     "B": 4,
+     "R": 3
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     60,
+     20,
+     0,
+     "siege",
+     0
+    ],
+    "b": [
+     50,
+     20,
+     0,
+     "siege",
+     0
+    ],
+    "ctl": "s",
+    "edit": false,
+    "id": "g22",
+    "pa": 2,
+    "pb": 3,
+    "seed": 598460,
+    "val": 100
+   },
+   "expect": {
+    "blue_won": false,
+    "events": 3434,
+    "gold": {
+     "B": 45700,
+     "R": 44263
+    },
+    "id": "g22",
+    "kills": {
+     "B": 26,
+     "R": 21
+    },
+    "len_s": 1254,
+    "log_sha256": "fa14c860143124acc4253f640684940ff8124f962c5370e0a730a147f500398b",
+    "towers": {
+     "B": 4,
+     "R": 5
+    }
+   }
+  },
+  {
+   "case": {
+    "a": [
+     70,
+     80,
+     0,
+     "protect",
+     0
+    ],
+    "b": [
+     50,
+     80,
+     0,
+     "siege",
+     0
+    ],
+    "ctl": "r",
+    "edit": false,
+    "id": "g23",
+    "pa": 3,
+    "pb": 0,
+    "seed": 606379,
+    "val": -100
+   },
+   "expect": {
+    "blue_won": true,
+    "events": 2576,
+    "gold": {
+     "B": 40540,
+     "R": 34867
+    },
+    "id": "g23",
+    "kills": {
+     "B": 23,
+     "R": 4
+    },
+    "len_s": 1076,
+    "log_sha256": "d7c01c2651f99da5d3f19b38703e35496751cbbca7fa5be74f6741d66cc22444",
+    "towers": {
+     "B": 6,
+     "R": 3
+    }
+   }
+  }
+ ],
+ "note": "Generated by tests/gen_golden_v2.tscn; see tests/golden_v2.gd.",
+ "schema": "gloamline/sim-v2-golden",
+ "version": 1
+}

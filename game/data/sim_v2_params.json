@@ -28,7 +28,7 @@
  "max_level": 15,
  "respawn_base": 6.0,
  "respawn_lvl": 2.2,
- "kill_gold": 300,
+ "kill_gold": 250,
  "kill_streak_step": 50,
  "kill_gold_max": 700,
  "assist_share": 0.5,
@@ -58,7 +58,7 @@
    "first": 240,
    "respawn": 300,
    "hp": 5200,
-   "gold_each": 100,
+   "gold_each": 150,
    "xp_each": 200,
    "buff": "stoneback",
    "buff_s": 90
@@ -84,7 +84,8 @@
  },
  "buffs": {
   "stoneback": {
-   "move": 0.08
+   "move": 0.08,
+   "dmg": 0.05
   },
   "moonhulk": {
    "struct_dmg": 0.3,
@@ -141,9 +142,9 @@
  "retreat_hp_lo": 0.22,
  "retreat_hp_hi": 0.4,
  "hit_mec": 0.25,
- "comp_fight": 1.0,
- "style_fight": 1.0,
- "lane_counter": 1.0,
+ "comp_fight": 0.85,
+ "style_fight": 2.0,
+ "lane_counter": 0.2,
  "crit_mult": 1.75,
  "crit_amp": 0.35,
  "armor_k": 100.0,
@@ -151,15 +152,21 @@
  "dmg_scale": 1.0,
  "heal_scale": 1.0,
  "ult_scale": 1.0,
- "noise_con": 0.8,
- "noise_base": 0.18,
+ "noise_con": 1.0,
+ "noise_base": 0.3,
  "plan_k": 1.0,
  "early_end_s": 480,
- "trigger_lead_gold": 1500,
+ "trigger_lead_gold": 2400,
  "fortify_s": 360,
  "fortify_mult": 0.5,
- "q_k": 0.25,
+ "q_k": 0.36,
  "ai_games_v2": false,
- "final_struct": 0.025,
- "final_gold": 25000.0
+ "final_struct": 0.03,
+ "final_gold": 12000.0,
+ "comeback_lead": 4000.0,
+ "comeback_max": 1.5,
+ "noise_game": 0.06,
+ "xp_catchup": 0.25,
+ "catchup_gold_from": 2000.0,
+ "catchup_gold": 1.0
 }

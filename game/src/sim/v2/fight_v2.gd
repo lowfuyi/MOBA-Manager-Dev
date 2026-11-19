@@ -463,7 +463,7 @@ func _deal(att: SimHero, tgt: SimHero, raw: float, dtype: int, from_ability: boo
 	var ts: FS = st[tgt.key]
 	if t < ts.untarget:
 		return
-	var dmg := raw * att.qe(t) * team_k(att.side)
+	var dmg := raw * att.qe(t) * team_k(att.side) * att.bal
 	var p := tgt.pas
 	var frac := tgt.hp / maxf(1.0, tgt.max_hp)
 	if p.trigger == "low_hp" and p.stat == "dr" and frac > 0.5:
@@ -590,7 +590,7 @@ func _apply_support(h: SimHero, ally: SimHero, a: SimHero.Ability, s: FS) -> voi
 
 func _shield(h: SimHero, to: SimHero, a: SimHero.Ability, mult: float = 1.0) -> void:
 	var amt := a.shield + 8.0 * float(h.level) + a.ratio_def * (h.s_hp if h.front else h.s_ap)
-	amt *= (1.0 + h.s_shp) * h.qe(t) * mult * _heal_scale
+	amt *= (1.0 + h.s_shp) * h.qe(t) * mult * _heal_scale * h.bal
 	(st[to.key] as FS).shield += amt
 	h.healed += amt * 0.5
 
@@ -600,7 +600,7 @@ func _heal(h: SimHero, to: SimHero, amt: float) -> void:
 		return
 	if st.has(to.key) and (st[to.key] as FS).antiheal > t:
 		amt *= 0.6
-	amt *= h.qe(t)
+	amt *= h.qe(t) * h.bal
 	var before := to.hp
 	to.hp = minf(to.max_hp, to.hp + amt)
 	if h != to:
