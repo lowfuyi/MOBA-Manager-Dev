@@ -360,10 +360,14 @@ func _build() -> void:
 	choices.add_theme_constant_override("separation", 12)
 	UI.tag(choices, "draft.choices", false)
 	inner.add_child(choices)
-	coach_bar = DepthCard.new(0, UI.PANEL2, false, false, "draft.coach")
+	coach_bar = DepthCard.new(0, UI.PANEL2, false, false, "draft.coach", 8)    # 8 px, not 24: in large text the grid below needs the room (0.9.4c)
 	var row := UI.hbox()
 	row.add_theme_constant_override("separation", 12)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var inset := Control.new()    # the text keeps a 24 px inset (8 + 16) while the button sits close to the edge
+	inset.custom_minimum_size = Vector2(16, 0)
+	inset.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(inset)
 	coach_label = UI.label("", UI.S_BODY, UI.TEXT)
 	coach_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	coach_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER

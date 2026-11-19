@@ -210,6 +210,8 @@ func _fit_state(d: ScreenDraft, v: String, st: String) -> void:
 				short.append("%s %.0f" % [bb.name, bb.size.y])
 	ok(short.is_empty(), "fit_draft_%s_%s: every button is at least 96 px high %s" % [v, st, str(short)])
 	ok(_count(d) <= 120, "build_draft_%s_%s: %d nodes (target 120)" % [v, st, _count(d)])
+	if d.coach_bar.is_visible_in_tree():
+		ok(d.coach_bar.size.y <= float(UI.BTN_H) + 16.5 + 2.0, "fit_draft_%s_%s: the Coach bar is the button plus 8 px each side (%.0f px; the grid below needs the room, 0.9.4c)" % [v, st, d.coach_bar.size.y])
 
 
 func _build_and_fit(v: String) -> void:
