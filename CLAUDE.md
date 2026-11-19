@@ -49,10 +49,11 @@ Alpha 0.7 plan finished. **Alpha 0.8 "Arena" is complete** (2026-11-18, plan `do
 - Not run on a phone: touch, SVG/ThorVG on Android, fill rate, frame time, overlay draw cost.
 - Trademark search for "Gloamline"; IP Scan 2 (new glyphs, badges, silhouettes, icons listed by I-05).
 - Re-baseline `perf_allowances.json` after I-04 (QA owns it). Add an Xvfb step for `check_art` picture checks to `run_all_checks.sh`.
-- Copy: dedicated keys for card age, "rating here", banned/picked words; the "dot" icon for the All filter; `chem.pentagon_hint` release after Chemistry line styles; held keys listed in `hold_0_7.json` (draft.meta_hint at I-16, about.* at I-24/I-25).
+- Copy: card age and Banned have their own keys since 0.9.3 ("rating here" ruled not needed); still open: the "dot" icon for the All filter (placeholder acceptable).
 - GDD still says "coach" in lines 12, 340, 278 and a comment in `game_plan.gd` line 3 (Lead Game Designer to rename); TUTORIAL 6.1 needs a `new` state row; PERF-BUDGET 3.1a rule 2 to be reworded for the `redesigned` status.
 - Not applied: kill-rate retune (`docs/design/KILL-RATE-PROPOSAL.md`); held-fight staging and closing-push density wait for tester scores.
-- Squad: names above Top/Bot tokens; show about 10 PlayerCards or fewer (about 8 draw calls each).
+- Squad: show about 10 PlayerCards or fewer (about 8 draw calls each). (Names above the Top/Bot tokens: done, checked on the 0.9.4 pictures.)
+- After 0.9.3 (2026-11-19, commits 0.9.4a to c, no new APK yet): a tutorial target under an open sheet waits or falls back; Home's "?" scrolls with the page; the Draft Coach bar is 32 px shorter. Still short: large-text Draft grid on 16:9 (about 25 px; needs a shorter lane board) and the large-text Game Plan control area.
 - Testers: two testers have the Alpha 0.6 link; the Founder is looking for more. Feedback form: `docs/ALPHA-FEEDBACK-FORM.md`.
 
 ## The "company" of roles
