@@ -44,10 +44,6 @@ func _rebuild() -> void:
 	ab.toggled.connect(func(v): App.set_animate(v))
 	m.add_child(ab)
 	m.add_child(UI.label(Strings.t("settings.animate_hint"), UI.S_SMALL, UI.DIM))
-	# testers (Alpha 0.8 A-06, ARENA-MAP 7.3): which staging the arena uses when the winner loses the last fight
-	var dev := HelpSheet.device()
-	m.add_child(_toggle(Strings.t("settings.held_gate"), dev.arena_held() == "held_gate", func(v): dev.set_arena_held("held_gate" if v else "")))
-	m.add_child(UI.label(Strings.t("settings.held_gate_hint"), UI.S_SMALL, UI.DIM))
 	_fps_card()
 	var au := UI.card(body)
 	au.add_child(UI.label(Strings.t("settings.sound_h"), UI.S_BODY, UI.ACCENT))

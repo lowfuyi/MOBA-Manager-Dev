@@ -124,8 +124,8 @@ func _play(g: Dictionary, res: Dictionary, skip: bool) -> ScreenMatch:
 		m._skip()
 	else:
 		var steps := 0
-		while not m._finished and steps < 10000:
-			m._process(1.0 / 60.0)
+		while not m._finished and steps < 20000:
+			m._process(0.05)
 			steps += 1
 	return m
 
@@ -142,17 +142,15 @@ func _match() -> void:
 	var res := App.gs.auto_game(g)
 	var res_text := JSON.stringify(res)
 	var m: ScreenMatch = await _play(g, res.duplicate(true), false)
-	var kills := m.script_.kill_events.size()
-	var won := m.script_.winner == m.my_side
+	var kills := m.player.kills.size()
+	var won := m.player.winner == m.my_side
 	var played: Array = App.sfx.played.duplicate()
 	var buzzed: Array = App.buzzed.duplicate()
 	ok(_count(played, "kill") == kills, "match: one kill sound per ledger kill (%d of %d)" % [_count(played, "kill"), kills])
-	var long := 1 if not m.script_.decisive.is_empty() else 0
-	ok(buzzed.size() == kills + 1 and _count(buzzed, 60) == long, "match: one buzz per kill (%d), %d long on the decisive kill, plus the result" % [kills, long])
-	ok(_count(played, "objective") == 2, "match: two objective sounds")
+	ok(buzzed.size() == kills + 1, "match: one buzz per kill (%d), plus the result" % kills)
+	ok(_count(played, "objective") == m.player.objs.size(), "match: one objective sound per objective taken (%d)" % m.player.objs.size())
 	ok(_count(played, "victory" if won else "defeat") == 1 and _count(played, "defeat" if won else "victory") == 0, "match: the result sound once (%s)" % ("victory" if won else "defeat"))
-	ok(_count(played, "hit") > 5, "match: hit sounds during the fights (%d)" % _count(played, "hit"))
-	var board := JSON.stringify(ArenaHud.board_values(m.script_, 75.0))
+	var board := JSON.stringify(ArenaHud2.board_values(m.player, m.player.end_t))
 	ok(JSON.stringify(m.res) == res_text, "match: the result is unchanged (R7)")
 	await _play(g, res.duplicate(true), true)
 	ok(App.sfx.played == ["victory" if won else "defeat"], "match: Skip plays only the result %s" % str(App.sfx.played))
@@ -160,7 +158,7 @@ func _match() -> void:
 	App.set_haptics(false)
 	var m2: ScreenMatch = await _play(g, res.duplicate(true), false)
 	ok(App.sfx.played.is_empty() and App.buzzed.is_empty(), "silent: with both off a whole match plays no sound and no buzz")
-	ok(JSON.stringify(ArenaHud.board_values(m2.script_, 75.0)) == board and JSON.stringify(m2.res) == res_text, "silent: the same board and result with sound off")
+	ok(JSON.stringify(ArenaHud2.board_values(m2.player, m2.player.end_t)) == board and JSON.stringify(m2.res) == res_text, "silent: the same board and result with sound off")
 	App.set_sound(true)
 	App.set_haptics(true)
 

@@ -1,36 +1,33 @@
 class_name ScreenMatch
 extends Screen
-## The live arena (Alpha 0.8 A-06; UI-PASS-2 6.7, ARENA-MAP, ACTION-VOCABULARY). Pure playback of the already-decided result:
-## the show script, the walks and the effects are built once from `res` before the first frame, and every frame is a function of
-## the show time (H4), so Speed x2, Skip, a pause and the end all show the same truthful numbers. Nothing here feeds back (R7).
-## Layout at 720 x 1280 (6.7.2): safe 48, scoreboard 142, arena 720 x 760, text strip 198 (plan and intent rows come with A-07,
-## the feed block at its foot), controls 132 (Speed 200, Skip, "?"). Large text (626 x 1113, 6.7.7): scoreboard 122, arena
-## 626 x 661, text strip 150 with one feed line. Quick mode skips the watch as before; the tutorial game always plays it.
+## The live arena, Arena v2 (Phase 4; MATCH-SIM-V2-DESIGN 10 and 11). Pure playback of the already-played game: Match Sim v2
+## wrote an event log, ArenaPlayer reads it, ArenaView draws the tilted map with a follow camera and a minimap, ArenaHud2 the
+## scoreboard, the feed and what your team is doing. Every frame is a function of the show time, so Speed, Skip, a pause and
+## the end show the same truthful numbers. Nothing here feeds back (R7, A1).
+## Show length: one tunable value (sim_v2_params.json show_seconds, real seconds for a median game at Speed x1); quiet
+## stretches play faster (ArenaPlayer pacing). Speed x1, x2, x4 and Skip are always there.
+## Layout at 720 x 1280: safe 48, scoreboard 142, arena (the rest), notes 48, feed 80, controls 132 (Speed, Skip, "?").
+## Quick mode skips the watch as before; the tutorial game always plays it.
 
-const WATCH_SECONDS := 75.0   # real seconds of watching at normal speed, whatever the game length (Alpha 0.5)
 const SAFE := 48.0
+const SPEEDS := [1.0, 2.0, 4.0]
 
 var game: Dictionary
 var res: Dictionary
 var my_side := "B"
 var show_t := 0.0
-var script_: ShowScript
-var choreo: Choreo
-var fx: ArenaFx
-var labels: ArenaLabels
+var player: ArenaPlayer
+var view: ArenaView
 var decided := ""             # "Decided by: <factor>" for the end card (Report.attribution, once, at the end)
-var _shown := 0               # results revealed so far (0 to 8), read by tests and the tutorial walk
-var _fast := false
+var _speed_i := 0
 var _watch_t := 0.0           # real seconds spent watching (pace log)
 var _skipped := false
 var _used_fast := false
 var _finished := false
-var _last_hit := -1.0
 var _stage: Control
-var _map: ArenaMap
-var _board: ArenaHud.Board
-var _feed: ArenaHud.Feed
-var _strip: ArenaHud.Strip
+var _board: ArenaHud2.Board
+var _feed: ArenaHud2.Feed
+var _notes: ArenaHud2.Notes
 var _controls: Control
 var _speed_btn: Button
 var _skip_btn: Button
@@ -45,7 +42,7 @@ func _init(g: Dictionary = {}, r: Dictionary = {}) -> void:
 
 func go_back() -> void:
 	if _finished:
-		_continue()    # Android Back after the show: See the report (6.7.6)
+		_continue()    # Android Back after the show: See the report
 	else:
 		_skip()
 
@@ -55,10 +52,7 @@ func _ready() -> void:
 	if TutorialGame.quick_applies(App.gs, game):   # Quick mode is ignored in the tutorial game (I-13)
 		call_deferred("_continue")
 		return
-	script_ = ShowScript.build(res, my_side)
-	choreo = Choreo.build(script_, ScreenMatch.held_variant())
-	fx = ArenaFx.build(script_, choreo, my_side)
-	labels = ArenaLabels.build(script_, UI.large)
+	player = ArenaPlayer.build(res, my_side)
 	setup("", Callable(), false)
 	_stage = Control.new()
 	_stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -66,18 +60,15 @@ func _ready() -> void:
 	_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	body.add_child(_stage)
 	var opp_id: String = game["red"] if my_side == "B" else game["blue"]
-	_map = ArenaMap.new(my_side)
-	_map.set_heroes(res)    # archetype silhouettes on the tokens (Alpha 0.8.2)
-	_stage.add_child(_map)
-	_board = ArenaHud.Board.new(script_, _map.texture(), App.gs.club_name(App.gs.club()), App.gs.club_name(opp_id))
+	view = ArenaView.new(player, my_side)
+	view.reduced_motion = not UI.animate
+	_stage.add_child(view)
+	_board = ArenaHud2.Board.new(player, App.gs.club_name(App.gs.club()), App.gs.club_name(opp_id))
 	_stage.add_child(_board)
-	_feed = ArenaHud.Feed.new(script_, ArenaHud.last_word(App.gs.club_name(App.gs.club())))
+	_notes = ArenaHud2.Notes.new(player)
+	_stage.add_child(_notes)
+	_feed = ArenaHud2.Feed.new(player, App.gs.club_name(App.gs.club()), App.gs.club_name(opp_id))
 	_stage.add_child(_feed)
-	_board.labels = labels
-	_feed.labels = labels
-	_strip = ArenaHud.Strip.new(labels)
-	_strip.plan_tapped.connect(_open_plan)
-	_stage.add_child(_strip)
 	_controls = Control.new()
 	_controls.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_stage.add_child(_controls)
@@ -86,11 +77,10 @@ func _ready() -> void:
 	_controls.add_child(_speed_btn)
 	_controls.add_child(_skip_btn)
 	UI.tag(_controls, "match.controls", false)    # tutorial step 19: Speed and Skip together (I-21a)
-	_go_btn = UI.button(Strings.t("match.report"), _continue, "play", UI.BTN_H)    # the only coral on the screen (6.7.6)
+	_go_btn = UI.button(Strings.t("match.report"), _continue, "play", UI.BTN_H)    # the only coral on the screen
 	UI.tag(_go_btn, "match.report_btn")    # tutorial step 20
 	_go_btn.visible = false
 	_stage.add_child(_go_btn)
-	# the "?" sits at the right end of the controls row (6.7.6), not top right: the scoreboard owns the top
 	if help_slot != null and help_slot.get_parent() != null:
 		help_slot.get_parent().remove_child(help_slot)
 		help_slot.set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -103,37 +93,32 @@ func _ready() -> void:
 	_apply()
 
 
-## The held-fight staging the tester switch asks for ("" = the data's default, held_island; ARENA-MAP 7.3).
-static func held_variant() -> String:
-	return HelpSheet.device().arena_held()
+func show_len() -> float:
+	return player.show_len if player != null else 0.0
 
 
-## Full bleed: the arena is the width of the window, so the layout is in window coordinates (the page margins of the app are
-## stepped over by an offset). The stack is anchored to the bottom; on a tall phone the extra height is air above the
-## scoreboard (6.7.7), and the controls stay at the thumb.
+## Full bleed: the arena is the width of the window; the stack is anchored to the bottom, the controls stay at the thumb.
 func _layout() -> void:
 	if _stage == null or not is_inside_tree():
 		return
-	var view := get_viewport().get_visible_rect().size
-	var o := -_stage.get_global_rect().position    # window origin in the stage's frame
-	var w := view.x
-	var h := view.y
+	var vsz := get_viewport().get_visible_rect().size
+	var o := -_stage.get_global_rect().position
+	var w := vsz.x
+	var h := vsz.y
 	var large := UI.large
 	var board_h := 122.0 if large else 142.0
-	var ah := w * ArenaMap.MAP.y / ArenaMap.MAP.x
-	var strip_h := 150.0 if large else 198.0
-	var stack := SAFE + board_h + ah + strip_h + 132.0
-	var top := o.y + maxf(0.0, h - stack)
-	_board.position = Vector2(o.x, top + SAFE)
-	_board.size = Vector2(w, board_h)
-	_map.position = Vector2(o.x, top + SAFE + board_h)
-	_map.size = Vector2(w, ah)
-	var strip_y := top + SAFE + board_h + ah
+	var notes_h := 48.0
+	var feed_h := 80.0
 	var ctrl_y := o.y + h - 24.0 - UI.BTN_H
-	var feed_h := 38.0 if large else 80.0
-	_strip.position = Vector2(o.x + 24.0, strip_y)    # plan row 44, gap 8, intent row 48 (6.7.2; the same in large text)
-	_strip.size = Vector2(w - 48.0, 100.0)
-	_feed.position = Vector2(o.x + 24.0, strip_y + 108.0)
+	var arena_top := o.y + SAFE + board_h
+	var arena_bot := ctrl_y - 12.0 - feed_h - notes_h
+	_board.position = Vector2(o.x, o.y + SAFE)
+	_board.size = Vector2(w, board_h)
+	view.position = Vector2(o.x, arena_top)
+	view.size = Vector2(w, maxf(200.0, arena_bot - arena_top))
+	_notes.position = Vector2(o.x + 24.0, arena_bot)
+	_notes.size = Vector2(w - 48.0, notes_h)
+	_feed.position = Vector2(o.x + 24.0, arena_bot + notes_h)
 	_feed.size = Vector2(w - 48.0, feed_h)
 	var help_w := UI.BTN_H
 	_controls.position = Vector2(o.x + 24.0, ctrl_y)
@@ -150,66 +135,40 @@ func _layout() -> void:
 
 
 func _process(delta: float) -> void:
-	if _finished or script_ == null:
+	if _finished or player == null:
 		return
 	if BottomSheet.is_open() and not BottomSheet.current().is_closing:
-		return    # any sheet (help, the plan) pauses the show (6.7.6); the result was decided before it, so nothing changes
+		return    # any sheet pauses the show; the result was decided before it, so nothing changes
 	_watch_t += delta
-	var was := script_.beat_t(show_t, UI.animate)
-	show_t = ScreenMatch.advance(show_t, delta, _fast)
+	var was := player.game_t(show_t)
+	show_t = minf(player.show_len, show_t + delta * float(SPEEDS[_speed_i]))
 	_apply()
-	_cues(was, script_.beat_t(show_t, UI.animate))
-	if show_t >= ShowScript.WATCH:
+	_cues(was, player.game_t(show_t))
+	if show_t >= player.show_len - 1e-6:
 		_end()
 
 
-## The show clock: elapsed real time (x2 at Speed x2), never a frame count, so 30 and 60 fps reach every moment at the same
-## real second (Alpha 0.8.1 frame-rate setting); clamped to the end of the show.
-static func advance(t: float, delta: float, fast: bool) -> float:
-	return minf(ShowScript.WATCH, t + delta * (2.0 if fast else 1.0))
-
-
-## Every layer at the current show time: the map (towers, tokens, effects, camera), the scoreboard and the feed. All of them
-## read the beat clock (ACTION-VOCABULARY 11.5: the decisive kill's slow-down, made up after it, so 75 s stays 75 s and every
-## layer agrees); with Animations off the beat clock is the show clock.
+## Every layer at the current show time (the map, the scoreboard, the notes and the feed read the same game time).
 func _apply() -> void:
-	var bt := script_.beat_t(show_t, UI.animate)
-	fx.apply(_map, bt, not UI.animate)
-	_map.sprites_under.append_array(fx.pings_at(labels.at(bt, _fast)["pair"], bt))    # intent_ping rings (0.9.2)
-	_board.show_at(bt)
-	_feed.show_at(bt)
-	_strip.show_at(bt, _fast)
-	var n := 0
-	for item in Report.FEED_ORDER:
-		if float(item[1]) * ShowScript.WATCH <= bt + 1e-9:
-			n += 1
-	_shown = n
+	var gt := player.game_t(show_t)
+	view.show_game(gt)
+	_board.show_at(gt)
+	_notes.show_at(gt)
+	_feed.show_at(gt)
 
 
-## Sounds and vibration for what happened between two beat times (Alpha 0.8.2): a kill (sound and a short buzz; longer on the
-## decisive kill), a hit of an action (sound, at most one per 0.25 s), an objective taken (sound). A jump (Skip) plays nothing
-## of what it passed. All of it is optional: the screen already shows every one of these moments.
+## Sounds and vibration for what happened between two game times: a kill, a tower, an objective. A jump (Skip) plays nothing
+## of what it passed. All optional: the screen already shows every one of these moments.
 func _cues(a: float, b: float) -> void:
-	if b <= a or b - a > 0.5:
+	if b <= a or b - a > 12.0:
 		return
-	for e in script_.kill_events:
-		var t := float(e["t"])
-		if t > a and t <= b:
+	for k in player.kills:
+		if float(k[0]) > a and float(k[0]) <= b:
 			App.sound("kill")
-			App.buzz(60 if e == script_.decisive else 25)
-	for k in ["obj_mid", "obj_late"]:
-		var rt := float(ShowScript.RESOLVE[k])
-		if rt > a and rt <= b:
+			App.buzz(25)
+	for o in player.objs:
+		if float(o[0]) > a and float(o[0]) <= b:
 			App.sound("objective")
-	if b - _last_hit >= 0.25:
-		for ac in fx.actions:
-			if float(ac["t0"]) > b:
-				break
-			var th := float(ac["th"])
-			if th > a and th <= b and not bool(ac["kill"]) and String(ac["kind"]) != "heal":
-				App.sound("hit")
-				_last_hit = b
-				break
 
 
 static func _mmss(minutes: float) -> String:
@@ -221,20 +180,25 @@ func _end() -> void:
 	if _finished:
 		return
 	_finished = true
-	show_t = ShowScript.WATCH
+	show_t = player.show_len
 	decided = ScreenMatch.decided_text(res, my_side)
+	var won := player.winner == my_side
+	var sc := player.score(player.end_t)
+	var me := my_side
+	var them := "R" if me == "B" else "B"
+	var score := "%d–%d" % [int(sc["kills"][me]), int(sc["kills"][them])]
+	_feed.end_text = Strings.f("match.result.won" if won else "match.result.lost", {"team": App.gs.club_name(App.gs.club()), "score": score})
 	_feed.decided = decided
 	_apply()
 	_speed_btn.visible = false
 	_skip_btn.visible = false
 	_go_btn.visible = true
-	var won := script_.winner == my_side
 	App.sound("victory" if won else "defeat")
 	App.buzz(150 if won else 90)
 	_raise("match:end")
 
 
-## "Decided by: <the biggest factor>", the same factor the Report leads with (UI-PASS-2 6.7.5).
+## "Decided by: <the biggest factor>", the same factor the Report leads with.
 static func decided_text(r: Dictionary, side: String) -> String:
 	var att := Report.attribution(r, side)
 	var best := {}
@@ -246,37 +210,20 @@ static func decided_text(r: Dictionary, side: String) -> String:
 	return Strings.f("arena.end.decided", {"factor": Strings.t("factor." + String(best["id"]))})
 
 
-## The plan row tapped: a read-only sheet with the plan in force and the "If behind" plan; the show pauses while it is open.
-func _open_plan() -> void:
-	BottomSheet.open(Strings.t("gp.title"), _plan_body, Callable(), "S", "match_plan")
-
-
-func _plan_body(c: VBoxContainer) -> void:
-	for part in labels.plan_parts(show_t):
-		c.add_child(UI.label(String(part), UI.S_BODY, UI.TEXT))
-	var ib := labels.if_behind()
-	if bool(ib["has"]):
-		var when := String(ib["when"])
-		var hint := ("gp.trigger_hint." + when) if when == "behind_early" or when == "ahead_early" else ("gp.switch.short." + when)
-		var l := UI.label(Strings.t(hint), UI.S_SMALL, UI.TEXT2)
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		c.add_child(l)
-
-
 func _toggle_speed() -> void:
-	_fast = not _fast
-	_used_fast = _used_fast or _fast
-	_speed_btn.text = Strings.t("match.speed2" if _fast else "match.speed1")
-	_raise("match:speed", {"fast": _fast})
+	_speed_i = (_speed_i + 1) % SPEEDS.size()
+	_used_fast = _used_fast or _speed_i > 0
+	_speed_btn.text = Strings.t(["match.speed1", "match.speed2", "match.speed4"][_speed_i])
+	_raise("match:speed", {"fast": _speed_i > 0, "speed": float(SPEEDS[_speed_i])})
 
 
-## Skip to the end: one tap, no confirm; the scoreboard shows its final state in one frame (6.7.6).
+## Skip to the end: one tap, no confirm; the scoreboard shows its final state in one frame.
 func _skip() -> void:
-	if _finished or script_ == null:
+	if _finished or player == null:
 		return
 	_skipped = true
 	_raise("match:skip")
-	show_t = ShowScript.WATCH
+	show_t = player.show_len
 	_end()
 
 

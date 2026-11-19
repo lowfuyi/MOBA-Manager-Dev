@@ -50,7 +50,7 @@ func _run() -> void:
 		ok(App.main._tabbar.visible, "tab bar visible on tab " + tab)
 	ok(UI.signed(1.04, 1) == "+1.0" and UI.signed(-0.5, 1) == "-0.5" and UI.signed(0.01, 1) == "0.0" and UI.signed(-0.01, 0) == "0", "UI.signed formats changes")
 	ok(UI.delta_color(1.0) == UI.GOOD and UI.delta_color(-1.0) == UI.BAD and UI.delta_color(0.0) == UI.DIM and UI.delta_color(1.0, false) == UI.BAD, "UI.delta_color follows the sign")
-	ok(ScreenMatch.WATCH_SECONDS == 75.0, "watch window is 75 s")
+	ok(float(SimData.params()["show_seconds"]) >= 60.0, "the show length is one tunable value (sim_v2_params show_seconds, the 75 s window lifted)")
 	App.toast("test", UI.TEXT, "Undo", func(): pass)
 	await get_tree().process_frame
 	ok(App.main._toasts.get_child_count() == 1, "toast with an action shows")
@@ -345,7 +345,7 @@ func _play_with_ui(g: Dictionary, manual: bool) -> void:
 		m._process(0.5)
 		await get_tree().process_frame
 	ok(m._finished, "feed plays to the end")
-	ok(m._shown == 8, "all eight feed events shown")
+	ok(m.player != null and is_equal_approx(m.show_t, m.show_len()), "the show played to its end")
 	m._continue()
 	await get_tree().process_frame
 	ok(cur() is ScreenReport, "report after the match")

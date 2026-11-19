@@ -1,9 +1,9 @@
 extends RefCounted
-## Matrix module "match" (Alpha 0.8 A-06): the real Match screen (the arena) on the fixed-seed save's next game, at four show
-## times and the end, with the frame's numbers (PERF-BUDGET 3.1a: target 60 draw calls and 120 nodes, hard 100 and 200):
+## Matrix module "match" (Arena v2, Phase 4): the real Match screen (the tilted arena playing the v2 log) on the fixed-seed
+## save's next game, at four points of the show and the end, with the frame's numbers (PERF-BUDGET 3.1a: target 60 draw calls
+## and 120 nodes, hard 100 and 200):
 ##   MATCH|<variant>|<state>|nodes=..|draw_calls=..
-## States: t14 (lanes resolving), t33 (Stoneback, zoomed), t45 (the mid fight), t70 (the late fight), end (Skip: end card and
-## See the report).
+## States: p10, p35, p60, p85 (percent of the show length), end (Skip: end card and See the report).
 
 static func _count(n: Node) -> int:
 	var total := 1
@@ -31,9 +31,9 @@ static func run(ctx) -> void:
 	var m := ScreenMatch.new(g, res)
 	App.go(m)
 	await ctx.settle()
-	for t in [14.0, 33.0, 45.0, 70.0]:
-		m.show_t = t
+	for f in [0.10, 0.35, 0.60, 0.85]:
+		m.show_t = f * m.show_len()
 		m._apply()
-		await _measure(ctx, m, "t%d" % int(t))
+		await _measure(ctx, m, "p%d" % int(f * 100.0))
 	m._skip()
 	await _measure(ctx, m, "end")
