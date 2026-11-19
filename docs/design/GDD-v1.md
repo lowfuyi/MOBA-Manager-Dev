@@ -1,6 +1,6 @@
-# Game Design Document v1.11
+# Game Design Document v1.12
 
-Status: DRAFT v1.11. v1.11 records how Exhibition, Quick Match, the Form Rating, the career log, derived kills/deaths/assists and the stat help were implemented in Alpha 0.6 (sections 4.2, 7.9, 10.1, Implementation notes), the Alpha exit checklist (`docs/ALPHA-EXIT-CHECKLIST.md`) and the comfort options (large text, colour-blind colours, one-time tips; section 17). v1.10 records the Founder-approved UI direction (Arena Dusk, bottom tab bar, payoff screen, preview-before-commit) and fixes the watch time of one game at about 75 seconds (sections 8.7 and 17; Alpha 0.5). v1.9 records how Team Bonds, Form and Morale were implemented in Alpha 0.4 (sections 4.2, 7.3, 7.7, 8.6, Implementation notes) and settles one conflict inside the document (the scrim bonus, below). v1.8 records how recruitment of free agents, contracts, the cash ledger and the sponsor were implemented in Alpha 0.3 (sections 7.2 and 7.6, Implementation notes). v1.7 records how training, fatigue and ageing were implemented in Alpha 0.2 (section 7.3, Implementation notes) and the Game Plan QA result (CALIBRATION-9.1 addendum). v1.6 adds the Founder's match formats and pacing rule (section 8.7). v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 to v1.11 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
+Status: DRAFT v1.12. **v1.12 records the Founder decisions of 2026-11-19 (section 18): Match Sim v2 with full hero kits, items and role-driven players; Arena v2; a tunable show length. Where section 18 conflicts with an earlier section, section 18 wins.** v1.11 v1.11 records how Exhibition, Quick Match, the Form Rating, the career log, derived kills/deaths/assists and the stat help were implemented in Alpha 0.6 (sections 4.2, 7.9, 10.1, Implementation notes), the Alpha exit checklist (`docs/ALPHA-EXIT-CHECKLIST.md`) and the comfort options (large text, colour-blind colours, one-time tips; section 17). v1.10 records the Founder-approved UI direction (Arena Dusk, bottom tab bar, payoff screen, preview-before-commit) and fixes the watch time of one game at about 75 seconds (sections 8.7 and 17; Alpha 0.5). v1.9 records how Team Bonds, Form and Morale were implemented in Alpha 0.4 (sections 4.2, 7.3, 7.7, 8.6, Implementation notes) and settles one conflict inside the document (the scrim bonus, below). v1.8 records how recruitment of free agents, contracts, the cash ledger and the sponsor were implemented in Alpha 0.3 (sections 7.2 and 7.6, Implementation notes). v1.7 records how training, fatigue and ageing were implemented in Alpha 0.2 (section 7.3, Implementation notes) and the Game Plan QA result (CALIBRATION-9.1 addendum). v1.6 adds the Founder's match formats and pacing rule (section 8.7). v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 to v1.11 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
 Next: Founder review. Done: P-001 (skeleton), P-002 (simulator with golden tests), content data, P-003 first pass (9.1). Open: paired lever tests, Phase 1 rating-scale calibration, joint Game Plan test.
 
 All numbers in this document are **v0 placeholders** unless marked otherwise. They exist so the rules can be tested. QA & Balance tunes them against the targets in section 9, using `tools/proto_sim.py` as the reference model.
@@ -56,7 +56,7 @@ Original names (all **placeholders pending IP Checker name search**):
 | Lanes | Top, Mid, Bot |
 | Playable characters | Heroes |
 
-The map is an abstraction in v1: the simulator reasons about lanes, the jungle and objectives, not coordinates. A minimap view is a presentation layer added later.
+The map is an abstraction in v1: the simulator reasons about lanes, the jungle and objectives, not coordinates. A minimap view is a presentation layer added later. **Superseded by section 18 (2026-11-19):** Match Sim v2 places heroes on a map graph and Arena v2 draws an original tilted map.
 
 ---
 
@@ -158,7 +158,7 @@ Rating(phase) = (PhaseBase + Cond) * HeroFactor * Fit
 
 ## 5. Heroes
 
-Heroes are **data**: attributes and tags. Names and visual identity are created by the Content Lead and screened by the IP Checker. In v1 a hero's abilities are summarized as tags; full ability text is not needed for the simulation.
+Heroes are **data**: attributes and tags. Names and visual identity are created by the Content Lead and screened by the IP Checker. In v1 a hero's abilities are summarized as tags; full ability text is not needed for the simulation. **Superseded by section 18 (2026-11-19):** every hero has a passive and four abilities (three basic, one ultimate) that the simulation uses.
 
 ### 5.1 Archetypes (original names) and default tags
 
@@ -360,7 +360,7 @@ The exact numbers live in `game/data/game_plan_v0.json` (task D-009), and a unit
 
 **AI clubs** get plans generated from their roster and composition. **Reports** state which control mattered, by the same counterfactual method as the draft edge (section 8.5).
 
-**QA requirements (section 9.2):** no control or combination of controls beats neutral by more than 3 win-rate points on held-out seeds, and the best plan differs between rosters and opponents. Out of scope in v1: items, spells, per-hero micro positioning, vision.
+**QA requirements (section 9.2):** no control or combination of controls beats neutral by more than 3 win-rate points on held-out seeds, and the best plan differs between rosters and opponents. Out of scope in v1: items, spells, per-hero micro positioning, vision. **Section 18 (2026-11-19) brings items, abilities and positions into Match Sim v2.**
 
 ### 7.9 Exhibition and Quick Match
 
@@ -476,7 +476,7 @@ Form moves toward the result (+/-2), morale +/-5 to 10 based on result and playi
 
 A best-of-3 series is therefore about 8 to 12 minutes and a best-of-5 final about 15 to 20 minutes, or seconds in Quick mode. Players can always choose to sim a series instead of watching.
 
-**Watch window (Founder question, answered by the Producer in Alpha 0.5).** The player can do nothing while the feed plays, so its real length is fixed rather than following the game clock: **every game's feed takes about 75 seconds at normal speed, whatever its cosmetic length (9 to 16 game minutes)**, with 2x speed and Skip always available. A short game therefore plays slower per game minute and a long game faster, which removes "this one dragged" without touching the result. The game clock shown on screen and in the report still reads 9 to 16 minutes. Where the player acts (draft, Game Plan, training, contracts) is where the time goes: casual and league game about 2.5 minutes in total, tournament game about 3.5 (revised from 3 and 4.5 above). The app keeps a local pace log (Settings) of the real time from Play to the report, how often the feed is skipped or sped up and how many games are auto-played, so the first playtests can confirm or change the 75 seconds; if testers skip most feeds the next step is a shorter window, not a longer one. The fixed window lives in `ScreenMatch.WATCH_SECONDS`.
+**Lifted by the Founder on 2026-11-19 (section 18):** the 5-minute rule above and the fixed 75-second window below no longer apply; the show length is one tunable value. **Watch window (Founder question, answered by the Producer in Alpha 0.5).** The player can do nothing while the feed plays, so its real length is fixed rather than following the game clock: **every game's feed takes about 75 seconds at normal speed, whatever its cosmetic length (9 to 16 game minutes)**, with 2x speed and Skip always available. A short game therefore plays slower per game minute and a long game faster, which removes "this one dragged" without touching the result. The game clock shown on screen and in the report still reads 9 to 16 minutes. Where the player acts (draft, Game Plan, training, contracts) is where the time goes: casual and league game about 2.5 minutes in total, tournament game about 3.5 (revised from 3 and 4.5 above). The app keeps a local pace log (Settings) of the real time from Play to the report, how often the feed is skipped or sped up and how many games are auto-played, so the first playtests can confirm or change the 75 seconds; if testers skip most feeds the next step is a shorter window, not a longer one. The fixed window lives in `ScreenMatch.WATCH_SECONDS`.
 
 **Consequences to check.** (1) The short draft removes two bans, so 9.1 must be re-run with the short profile; the effect on the draft lever is expected to be small. (2) The playback target for the presentation phase was about 7 to 8 seconds of feed per game minute (the 8x clock); since Alpha 0.5 it is the fixed 75-second window above. (3) Multiplayer edition (public matching): human timers apply to both drafters, and what happens when no opponent is found (a bot opponent after a short wait is the plan) is decided in that edition's design.
 
@@ -626,6 +626,7 @@ Founder questions are in `company/DECISIONS.md`. Parameters still to define are 
 | 2026-11-08 | v1.9 implementation notes for 4.2, 7.3, 7.7 and 8.6 (Team Bonds, Form, Morale, Team scrim); scrim bonus set to +1.5 a week to satisfy the 20 percent bond-farming limit of 9.2 test 2 | Systems Lead |
 | 2026-11-08 | v1.10 Founder-approved UI direction (Arena Dusk, bottom tab bar, payoff screen, preview-before-commit, section 17); fixed 75-second watch window per game and a local pace log (8.7) | Producer, UI/UX |
 | 2026-11-08 | v1.11 implementation notes for 4.2 (career record, derived KDA, stat help), 7.9 (Exhibition, Quick Match), 10.1 (Form Rating, trophy cabinet) and comfort options (17); Alpha exit checklist | Producer, Systems Lead |
+| 2026-11-19 | v1.12 Founder decisions of 2026-11-19 (section 18): scope opened for hero kits and items; full kits for 40 heroes; coach-suggested, manager-editable builds; show length tunable (75 s window and 5-minute game lifted); Arena v2 tilted follow camera with an original layout; role-driven players; Match Sim v2 approved with new golden vectors replacing R1 and the golden hash | Producer (recording the Founder) |
 
 ---
 
@@ -644,3 +645,21 @@ Source: the two-pass analysis of the reference videos in `docs/design/UI-UX-REFE
 **Still to do (backlog):** lane-based chemistry layout (UI-5), story-first match view (UI-6), draft redesign (UI-8), dismissible hints (UI-9), text size and colour-blind options (UI-10), sound and haptics (UI-11), a usability test on a real phone with the Founder (UI-12).
 
 **Comfort options (Alpha 0.6, 2026-11-08).** Settings -> Comfort: *Larger text and buttons* scales the whole interface by 15 percent (the layout width shrinks to 626 design pixels, so every screen is tested to fit it); *Colour-blind friendly colours* replaces green and red with sky blue and vermillion for good and bad results (signs and words always accompany colour); *Show the welcome tips again*. One-time tips (Home, pre-match, report) are small cards that are dismissed for good and remembered on the device, not in the save. Settings also holds a privacy line (the game stores everything on the device and sends nothing) and a "Copy feedback note" button that copies a short template plus the debug lines (version, season, pace, start-up time, memory, text size and colours). Answers UI-9 and UI-10 of the UI reference.
+
+---
+
+## 18. Founder decisions of 2026-11-19: Match Sim v2
+
+Recorded by the Producer from the Founder's message of 2026-11-19. Where this section conflicts with an earlier one, this section wins. The design is in `docs/design/MATCH-SIM-V2-DESIGN.md`.
+
+1. **Scope opens now** for hero identity and items, before the art phase. Art stays placeholder (the Arena Dusk style) until the Founder chooses an art route.
+2. **Full kits.** Each of the 40 heroes gets a passive and four abilities: three basic and one ultimate, all original (names and effects screened by the IP & Originality Checker).
+3. **Builds.** Items are bought during the game from a build. The coach suggests a build per hero and slot; the manager can edit it before the game (Phase 5).
+4. **Show length** is no longer fixed. The 75-second window and the 5-minute game rule (8.7) are lifted. The show length is one tunable value.
+5. **Match map.** A steep, tilted camera that follows the action with a corner minimap; material zones (stone, dirt, grass, water); upright units with thin team-coloured bars; team-colour glow only at structures and floor emblems; a floating rounded island in fog. The layout, landmarks and shapes are ORIGINAL. The orientation (portrait or landscape) is the Producer's call, logged in `company/DECISIONS.md`.
+6. **Players act out their roles.** Each player follows a role behaviour (top, jungle, mid, bot, support) inside the simulation, not scripted orders.
+7. **Quality is the priority, not time.**
+8. **Match Sim v2 is approved.** Rule R1 (no change to `src/sim/`) and the golden hash are lifted for this work only and replaced by new golden vectors by design.
+
+What stays: the draft (section 6), the Game Plan's eight controls and triggers (7.8, re-mapped onto the role behaviours), Team Bonds (7.7), Form and Morale (4.2), formats (sudden death; Bo3, finals Bo5), derived statistics that never contradict the result (9.2 test 6, now read from the event log), and determinism given a seed (8.4).
+
