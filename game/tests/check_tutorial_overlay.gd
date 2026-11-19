@@ -537,12 +537,36 @@ func _flow() -> void:
 	r.undo()
 	await frames(3)
 	ok(r.m.state() == "skipped" and App.main.overlay_layer.get_child_count() == 0, "undo: after the toast is gone the tutorial stays skipped")
-	# Back key
+	# Back key (0.9.3): the "Leave the tutorial?" question first
 	await _at_step("tab_squad")
 	var sc0: Control = App.main._current
 	App.main.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	await frames(3)
-	ok(r.m.state() == "skipped" and App.main._current == sc0 and App.main.overlay_layer.get_child_count() == 0, "back: Back on a step is Skip tutorial; the page behind did not move")
+	var ov := _overlay()
+	ok(r.m.state() == "running" and ov != null and ov.asking and ov.ask_scrim.visible and App.main._current == sc0,
+			"back: Back on a step asks first (the tutorial still runs; the page behind did not move)")
+	var t_lbl := ov.ask_card.find_child("AskTitle", true, false) as Label if ov != null else null
+	var b_lbl := ov.ask_card.find_child("AskBody", true, false) as Label if ov != null else null
+	ok(t_lbl != null and UI.plain(t_lbl.text) == Strings.t("tut.back.h") and b_lbl != null and UI.plain(b_lbl.text) == Strings.t("tut.back.body"),
+			"back: the question reads \"%s\" with \"%s\"" % [Strings.t("tut.back.h"), Strings.t("tut.back.body")])
+	ok(ov != null and ov.button_ids() == ["skip", "keep"], "back: its buttons are Skip tutorial and Keep going (%s)" % [str(ov.button_ids()) if ov != null else "-"])
+	var kb := ov.ask_card.find_child("AskBtn_keep", true, false) as Button if ov != null else null
+	var vp := Vector2(get_window().size)
+	ok(kb != null and kb.size.y >= UI.BTN_H and Rect2(Vector2.ZERO, vp).encloses(ov.ask_card.get_global_rect()), "back: the question card is on screen with full-height buttons")
+	App.main.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	await frames(3)
+	ok(r.m.state() == "running" and r.m.step_id() == "tab_squad" and not ov.asking and ov.ask_scrim == null and ov.is_showing() and _count_nodes(ov) <= 24,
+			"back: Back again closes the question (its nodes are freed); the same step is still up")
+	App.main.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	await frames(3)
+	ok(ov.press("keep"), "back: Keep going can be pressed")
+	await frames(3)
+	ok(r.m.state() == "running" and r.m.step_id() == "tab_squad" and not ov.asking and ov.button_ids().has("skip"), "back: Keep going closes the question and the step card is back")
+	App.main.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	await frames(3)
+	ok(ov.press("skip"), "back: Skip tutorial can be pressed on the question")
+	await frames(3)
+	ok(r.m.state() == "skipped" and App.main._current == sc0 and App.main.overlay_layer.get_child_count() == 0, "back: Skip tutorial on the question skips; the page behind did not move")
 	ok(App.main._toasts.get_child_count() >= 1, "back: with the Undo toast")
 	# Back with a sheet open and a step up: the tutorial first, the sheet stays; then Back closes the sheet
 	r.undo()
@@ -552,10 +576,13 @@ func _flow() -> void:
 	await frames(5)
 	App.main.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	await frames(3)
-	ok(r.m.state() == "skipped" and BottomSheet.is_open(), "back: with a sheet open the first Back skips the tutorial and the sheet stays")
+	ok(_overlay() != null and _overlay().asking and BottomSheet.is_open(), "back: with a sheet open the first Back asks and the sheet stays")
+	_overlay().press("skip")
+	await frames(3)
+	ok(r.m.state() == "skipped" and BottomSheet.is_open(), "back: skipping from the question leaves the sheet open")
 	App.main.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	await frames(6)
-	ok(not BottomSheet.is_open(), "back: the second Back closes the sheet")
+	ok(not BottomSheet.is_open(), "back: the next Back closes the sheet")
 	ok(not r.handle_back(), "back: with no card on screen the runner does not take the press")
 	# Back on the closing card acts as Go to Home
 	await _fresh_main()

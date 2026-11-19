@@ -62,6 +62,14 @@ var mark: _Mark
 var card: PanelContainer
 var skip_button: Button
 var primary_button: Button
+## Alpha 0.9.3: the "Leave the tutorial?" question (TUTORIAL 3.4) that Android Back raises over the step card. While it is up the
+## step card stays as it was underneath; a scrim takes every tap; its buttons emit button_pressed("keep") or ("skip"). Its nodes are
+## built when Back raises it and freed when it goes (the overlay's node budget is for the step card alone).
+var asking := false
+var ask_scrim: ColorRect
+var ask_card: PanelContainer
+var _ask_center: CenterContainer
+var _ask_buttons: HBoxContainer
 
 var _c: Dictionary = {}
 var _text := ""
@@ -216,6 +224,80 @@ func _build_card() -> void:
 	col.add_child(_buttons)
 
 
+func _build_ask() -> void:
+	if ask_scrim != null:
+		return
+	ask_scrim = ColorRect.new()
+	ask_scrim.name = "AskScrim"
+	ask_scrim.color = Color(0, 0, 0, 0.6)
+	ask_scrim.mouse_filter = Control.MOUSE_FILTER_STOP
+	ask_scrim.visible = false
+	ask_scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(ask_scrim)
+	_ask_center = CenterContainer.new()
+	_ask_center.name = "Ask"
+	_ask_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ask_center.visible = false
+	_ask_center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_ask_center)
+	ask_card = PanelContainer.new()
+	ask_card.name = "AskCard"
+	ask_card.mouse_filter = Control.MOUSE_FILTER_STOP
+	ask_card.add_theme_stylebox_override("panel", UI.box(UI.PANEL3, UI.R_CARD, 24, Color(UI.ACCENT, 0.7), 2))
+	_ask_center.add_child(ask_card)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 16)
+	ask_card.add_child(col)
+	var h := UI.label(Strings.t("tut.back.h"), UI.S_HEAD, UI.TEXT)
+	h.name = "AskTitle"
+	col.add_child(h)
+	var body := UI.label(Strings.t("tut.back.body"), UI.S_BODY, UI.TEXT2)
+	body.name = "AskBody"
+	col.add_child(body)
+	_ask_buttons = HBoxContainer.new()
+	_ask_buttons.add_theme_constant_override("separation", 12)
+	col.add_child(_ask_buttons)
+	var skip := UI.button(Strings.t("tut.skip"), _on_button.bind("skip"), "flat", UI.BTN_H)
+	skip.name = "AskBtn_skip"
+	skip.add_theme_font_size_override("font_size", UI.S_BODY)    # explicit: a CanvasLayer drops Main's theme
+	var sb := UI.box(Color(0, 0, 0, 0), 14, 10, Color(UI.TEXT2, 0.5), 2)
+	for st in ["normal", "hover", "pressed"]:
+		skip.add_theme_stylebox_override(st, sb)
+	skip.add_theme_color_override("font_color", UI.TEXT)
+	skip.size_flags_stretch_ratio = 40.0
+	_ask_buttons.add_child(skip)
+	var keep := UI.button(Strings.t("tut.back.keep"), _on_button.bind("keep"), "primary", UI.BTN_H)
+	keep.name = "AskBtn_keep"
+	keep.add_theme_font_size_override("font_size", UI.S_BODY)
+	keep.size_flags_stretch_ratio = 60.0
+	_ask_buttons.add_child(keep)
+
+
+## Raise the "Leave the tutorial?" question over the step on screen (the step itself is not touched).
+func ask_leave() -> void:
+	_build_ask()
+	asking = true
+	ask_card.custom_minimum_size.x = minf(680.0, _vp().x - 2.0 * SIDE)
+	ask_scrim.visible = true
+	_ask_center.visible = true
+	ask_scrim.move_to_front()
+	_ask_center.move_to_front()
+
+
+## Take the question away (Keep going, Back again, or a new step): the step card is as it was.
+func end_ask() -> void:
+	asking = false
+	if ask_scrim != null:
+		remove_child(ask_scrim)
+		ask_scrim.queue_free()
+		remove_child(_ask_center)
+		_ask_center.queue_free()
+	ask_scrim = null
+	ask_card = null
+	_ask_center = null
+	_ask_buttons = null
+
+
 func _fill_card() -> void:
 	var total := maxi(1, TutorialState.STEP_IDS.size())
 	var step_no := int(_c.get("step_no", 1))
@@ -289,7 +371,7 @@ func _emit_button(id: String) -> void:
 
 ## Test hook: the same as a finger on the button.
 func press(id: String) -> bool:
-	var b := _buttons.get_node_or_null("Btn_" + id) as Button
+	var b := (_ask_buttons.get_node_or_null("AskBtn_" + id) if asking else _buttons.get_node_or_null("Btn_" + id)) as Button
 	if b == null or not b.is_visible_in_tree():
 		return false
 	b.pressed.emit()
@@ -298,8 +380,8 @@ func press(id: String) -> bool:
 
 func button_ids() -> Array:
 	var out: Array = []
-	for b in _buttons.get_children():
-		out.append(String(b.name).trim_prefix("Btn_"))
+	for b in (_ask_buttons if asking else _buttons).get_children():
+		out.append(String(b.name).trim_prefix("AskBtn_").trim_prefix("Btn_"))
 	return out
 
 
@@ -359,6 +441,7 @@ func animating() -> bool:
 ## Show the step described by `c` (a TutorialState.card() dictionary, plus optional "screen" and "screen_now" for the
 ## missing-target timeout) with `text` as the coach line.
 func show_step(c: Dictionary, text: String) -> void:
+	end_ask()
 	_snap_final()
 	_c = c.duplicate(true)
 	step_id = String(c.get("id", ""))
@@ -386,6 +469,7 @@ func show_step(c: Dictionary, text: String) -> void:
 
 ## No step: nothing on screen, nothing running.
 func clear() -> void:
+	end_ask()
 	_kill_tw()
 	mode = "idle"
 	step_id = ""

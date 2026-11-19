@@ -228,7 +228,12 @@ func _on_button(id: String) -> void:
 	if m == null:
 		return
 	match id:
+		"keep":
+			if overlay != null and is_instance_valid(overlay):
+				overlay.end_ask()    # Keep going: the step card is back as it was
 		"skip":
+			if overlay != null and is_instance_valid(overlay):
+				overlay.end_ask()
 			_carry(m.skip())
 		"next":
 			if overlay != null and is_instance_valid(overlay) and bool(overlay.card_data().get("compact", false)) and BottomSheet.is_open():
@@ -361,13 +366,16 @@ func set_game_plan(plan: Dictionary) -> void:
 
 
 ## Android back (Main asks this BEFORE BottomSheet.handle_back). True when the press was used. While a card is on screen: on any
-## step with a Skip it is Skip tutorial with Undo (a sheet the player opened stays open); on the closing card, which has no Skip, it
-## acts as Go to Home. While nothing is on screen (the target is still being found) the press goes on to the page as usual.
+## step with a Skip it raises the "Leave the tutorial?" question (TUTORIAL 3.4: Keep going, or Skip tutorial with Undo; a sheet the
+## player opened stays open) and Back again closes the question; on the closing card, which has no Skip, it acts as Go to Home.
+## While nothing is on screen (the target is still being found) the press goes on to the page as usual.
 func handle_back() -> bool:
 	if m == null or overlay == null or not is_instance_valid(overlay) or not overlay.is_showing():
 		return false
-	if m.can_skip():
-		_carry(m.skip())
+	if overlay.asking:
+		overlay.end_ask()    # Back again = Keep going
+	elif m.can_skip():
+		overlay.ask_leave()
 	else:
 		_on_button("go_home")
 	return true

@@ -3,6 +3,7 @@ extends RefCounted
 ## real BottomSheet, in every variant the runner is given (the plan asks for normal and large):
 ##   info      step 3 (the tab bar, an info step: ring, pointer, Next and Skip, the hole is blocked)
 ##   tap       step 4 (the Squad tab, a tap step: Skip only, the hole is open)
+##   leave     step 4 after Android Back: the "Leave the tutorial?" question over the step (0.9.3)
 ##   sheet     step 6 (a compact card above a real BottomSheet, the hole on the sheet's header)
 ##   shortcut  step 15 (Auto-finish: Skip and the one-tap "Let the Coach finish")
 ##   fallback  step 2 on a Home that has no `home.next_card` yet: the fallback card at the bottom, no hole
@@ -45,6 +46,11 @@ static func run(ctx) -> void:
 	await ctx.shot("info")
 	await _at(ctx, "tab_squad")
 	await ctx.shot("tap")
+	App.main.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	await ctx.settle()
+	await ctx.shot("leave")
+	App.tutorial.overlay.end_ask()
+	await ctx.settle()
 	# sheet: a real BottomSheet with a player-card header tagged roster.card.head
 	var s := BottomSheet.open("Player card", func(c: VBoxContainer) -> void:
 		var head := PanelContainer.new()
