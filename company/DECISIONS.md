@@ -322,3 +322,10 @@ Rulings made under the Founder's delegation (each is section-referenced in the d
 - D-3 Ability and item names and texts live in the data files (like hero names in `heroes.json` since Alpha 0.1), not in `en.json`: they are content, translated with the data when localisation starts. UI words around them stay in `en.json` through `merge_copy.py`.
 - D-4 IP review `docs/design/IP-REVIEW-KITS-ITEMS.md`: name screen tool `tools/ip_names.py` (about 600 denied names; 291 of ours; 0 open flags; 5 cleared with reasons), kit-shape review (9 kits changed: Orlund, Bastrel, Ottomere, Gravenstone, Sootwing, Veshra, Cindrel, Maurelle, Lanthorn). Not a trademark search.
 - D-5 Every hero tag is visible in its kit (`tools/test_kits_items.py`), so the draft's composition tags and the simulated kits agree.
+
+## Producer log 2026-11-19: Match Sim v2 Phase 3, increment S-A (simulator core, not wired yet)
+
+- S-A-1 The core (`src/sim/v2/`: SimData, SimHero, Items, FightV2, RoleAI, MatchSimV2; `data/sim_v2_params.json`) is committed before it is wired into MatchRunner, with its own tests (`tests/sim_v2_tests.gd`: determinism, log invariants over 16 games, six role-behaviour checks, items, a lever check), so the wiring increment (S-B) changes only call sites and their tests.
+- S-A-2 Macro steps of 2 s instead of an event queue (design 16). Effectiveness linear with q_k 0.25 (first calibration inside the GDD 9 bands at 200 games per row).
+- S-A-3 Measured speed 180 to 260 ms per game on this desktop, over the design's target. Recorded as owed (S6 optimisation pass; worker threads as fallback). Not measured on a phone.
+- S-A-4 The hero's rating still carries every v1 management lever (Form, Morale, Fatigue, familiarity, fit, hero power, MetaMod, TeamMod); comp_mod, the style edge, lane counters and the Game Plan hooks enter fights, farming and trades (design 5.1, 5.3).

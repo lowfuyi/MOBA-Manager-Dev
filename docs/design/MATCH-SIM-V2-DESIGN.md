@@ -387,3 +387,12 @@ Budget: ground 1, sprites about 8 to 15 (atlas batches broken by text), minimap 
 | 200 abilities hide an IP clash | Two-stage review (names by tool, kit shapes by the checker) and a commit-time name test. |
 | The log is too big for memory on a phone | Compact arrays (about 150 to 400 KB a game); only the watched game keeps its log. |
 | Existing screens read v1 fields | v2 fills every v1 key (9.1); every call site migrated in S5 with its tests. |
+
+## 16. Implementation notes (Phase 3, increment S-A, 2026-11-19)
+
+- **Clock.** Approach B is built as fixed macro steps of `dt` = 2 s (agents act by intents and re-decide only at decision points) instead of a priority queue; fights run in 0.25 s steps. Simpler, the same behaviour, and the event log is identical in kind. The acting order of the ten heroes is reshuffled every step (stream `v2:order`) and the encounter loop alternates sides, so neither side moves first.
+- **Player quality.** Effectiveness is linear: `qe = 1 + q_k x (q - 1)` with `q_k` = 0.25, used by fights, farming and every decision-time power estimate (design Q1 rules out `pow`). First calibration, 200 side-alternated games per row with random role-correct drafts: rating gap +5 wins 57.5 percent (target 60), +10 69.0 (70), +20 83.5 (84), each inside the plus or minus 3 band. Game length median about 14 game minutes (9 to 21), team kills median about 25 to 30.
+- **Side bias found and fixed.** The first build had Blue winning 84 percent of identical drafts played from both sides: the loader converted Red's tower positions a second time (the map data already measures them from Blue's gate). After the fix the same test gives 26 to 24.
+- **The log** is sorted by time at the end (fights write ahead), cut at the Cairn's fall (kills, deaths and assists recounted from what remains), and the position track's alive flag is rewritten from the kill and respawn times.
+- **Speed, measured** (headless desktop, `tests/sim_v2_tests.gd` and the lab runs): about 180 to 260 ms per game. This is **over the 15 ms target and the 40 ms ceiling of Q3**. Fights are about 20 percent, decisions about 20 percent, the rest is the per-step world (lanes, movement, calls). An optimisation pass is owed in S6; the fallback is to run AI-vs-AI games on worker threads (the simulator holds only plain data). Not measured on a phone; at 5 to 8 times slower a game would take about 1 to 2 s there.
+- **Calibration harness:** `tests/calib_v2.tscn` (offline; env CAL_GAP, CAL_N, CAL_SEED, CAL_CON_A, CAL_CON_B, CAL_COMP).

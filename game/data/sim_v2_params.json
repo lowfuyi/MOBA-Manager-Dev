@@ -1,0 +1,162 @@
+{
+ "version": "v2.0",
+ "note": "Match Sim v2 constants (MATCH-SIM-V2-DESIGN sections 4 to 6). v0 placeholders; tuned only by tools/calibrate_v2 sweeps. Distances in map units (the arena is 1 unit tall), times in game seconds.",
+ "show_seconds": 180,
+ "show_median_len_s": 840,
+ "show_quiet_max": 2.5,
+ "dt": 2.0,
+ "fight_dt": 0.25,
+ "fight_max_s": 14.0,
+ "safety_stop_s": 2100,
+ "q_ref": 50.0,
+ "gold_passive_from": 90,
+ "gold_passive": 2.4,
+ "gold_passive_sup": 1.2,
+ "start_gold": 500,
+ "wave_first": 45,
+ "wave_every": 30,
+ "wave_gold": 210,
+ "wave_xp": 300,
+ "wave_hp": 1800,
+ "wave_dps": 60,
+ "wave_speed_u_s": 0.022,
+ "push_rate": 0.009,
+ "lasthit_floor": 0.55,
+ "lane_share_sup": 0.12,
+ "xp_base": 140,
+ "xp_step": 70,
+ "max_level": 15,
+ "respawn_base": 6.0,
+ "respawn_lvl": 2.2,
+ "kill_gold": 300,
+ "kill_streak_step": 50,
+ "kill_gold_max": 700,
+ "assist_share": 0.5,
+ "kill_xp_base": 150,
+ "kill_xp_lvl": 20,
+ "camp_respawn": 90,
+ "camp_first": 30,
+ "camps": {
+  "moss": {
+   "gold": 80,
+   "xp": 120,
+   "hp": 1400
+  },
+  "bramble": {
+   "gold": 100,
+   "xp": 140,
+   "hp": 1800
+  },
+  "mossback": {
+   "gold": 120,
+   "xp": 160,
+   "hp": 2600
+  }
+ },
+ "objectives": {
+  "stoneback": {
+   "first": 240,
+   "respawn": 300,
+   "hp": 5200,
+   "gold_each": 100,
+   "xp_each": 200,
+   "buff": "stoneback",
+   "buff_s": 90
+  },
+  "moonhulk": {
+   "first": 720,
+   "respawn": 360,
+   "hp": 11000,
+   "gold_each": 150,
+   "xp_each": 300,
+   "buff": "moonhulk",
+   "buff_s": 120
+  },
+  "mossback": {
+   "first": 180,
+   "respawn": 180,
+   "hp": 2600,
+   "gold_each": 0,
+   "xp_each": 0,
+   "buff": "",
+   "buff_s": 0
+  }
+ },
+ "buffs": {
+  "stoneback": {
+   "move": 0.08
+  },
+  "moonhulk": {
+   "struct_dmg": 0.3,
+   "wave_mult": 1.6
+  }
+ },
+ "towers": {
+  "outer": {
+   "hp": 4800,
+   "dmg": 220,
+   "gold_team": 250,
+   "gold_local": 100
+  },
+  "inner": {
+   "hp": 5200,
+   "dmg": 260,
+   "gold_team": 250,
+   "gold_local": 100
+  },
+  "guard": {
+   "hp": 5000,
+   "dmg": 300,
+   "gold_team": 200,
+   "gold_local": 50
+  },
+  "cairn": {
+   "hp": 6500,
+   "dmg": 0
+  }
+ },
+ "tower_range_u": 0.06,
+ "tower_armor": 60,
+ "wave_tower_dps": 30,
+ "hero_struct_mult": 1.0,
+ "recall_s": 6.0,
+ "recall_hp": 0.35,
+ "engage_u": 0.07,
+ "join_u": 0.16,
+ "fight_center_u": 0.09,
+ "vision_ward_s": 90,
+ "decide_min_s": 3.0,
+ "decide_max_s": 7.0,
+ "trade_every_s": 8.0,
+ "trade_dmg": 0.11,
+ "gank_threshold": 0.55,
+ "gank_from_s": 150,
+ "roam_threshold": 0.6,
+ "group_from_s": 780,
+ "split_from_s": 900,
+ "call_lead_s": 35,
+ "answer_base": 0.55,
+ "answer_com": 0.35,
+ "answer_bond": 0.1,
+ "retreat_hp_lo": 0.22,
+ "retreat_hp_hi": 0.4,
+ "hit_mec": 0.25,
+ "comp_fight": 1.0,
+ "style_fight": 1.0,
+ "lane_counter": 1.0,
+ "crit_mult": 1.75,
+ "crit_amp": 0.35,
+ "armor_k": 100.0,
+ "ap_ratio_scale": 1.0,
+ "dmg_scale": 1.0,
+ "heal_scale": 1.0,
+ "ult_scale": 1.0,
+ "noise_con": 0.8,
+ "noise_base": 0.18,
+ "plan_k": 1.0,
+ "early_end_s": 480,
+ "trigger_lead_gold": 1500,
+ "fortify_s": 360,
+ "fortify_mult": 0.5,
+ "q_k": 0.25
+}
