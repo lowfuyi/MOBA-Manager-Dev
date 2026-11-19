@@ -6,6 +6,17 @@ This is a testing build: the debug key must never go to a store.
 
 **Nothing in this build has run on a phone.** Every number below comes from the computer.
 
+## Update 0.9.3 (2026-11-19, made while you test 0.9.2)
+Build: `gloamline-0.9.3-alpha.apk` (versionCode 15, same key; installs over 0.9.2 and keeps your save). Nothing here changes how
+matches play.
+- **Back during the guided first game now asks first.** Before, the phone's Back gesture skipped the tutorial at once (with Undo).
+  Now it asks "Leave the tutorial?" with Keep going and Skip tutorial; Back again closes the question.
+- **Draft hero grid no longer goes blank.** The grid draws only the rows you can see; when something above it changed height (or
+  the text size changed) without a scroll, rows could stay empty until you scrolled. Fixed and tested.
+- **Wording:** player cards say "Age 23" (was "age 23"); a banned hero says "Banned" under its name; twelve older texts that called
+  every player "he" now say "they" or "this player".
+- Still not run on a phone.
+
 ## Update 0.9.2 (2026-11-18, made while you test 0.9.0)
 Build: `build/gloamline-0.9.2-alpha.apk` (25.3 MB, sha256 15453d95..., versionCode 14, same key; installs over 0.9.0 and keeps your save). Optional: finish
 your 0.9.0 test first if you like; nothing here changes how matches play.

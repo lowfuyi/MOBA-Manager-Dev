@@ -2,7 +2,7 @@
 
 Everything that can be built and proven on a computer is done (see `docs/ALPHA-EXIT-CHECKLIST.md`). These are the only things
 left before Alpha can be signed. **Nothing below has been measured yet: nothing has run on a phone except your own tests of 0.7
-and 0.8.** Use the latest APK, `gloamline-0.9.2-alpha.apk` (in your Downloads). It installs over any earlier build and keeps your
+and 0.8.** Use the latest APK, `gloamline-0.9.3-alpha.apk` (in your Downloads). It installs over any earlier build and keeps your
 save. Before each test, open More (Settings) and tap **Copy feedback note**; paste it with your answers so we know the build and
 settings.
 
