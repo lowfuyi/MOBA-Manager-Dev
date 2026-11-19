@@ -43,10 +43,11 @@ func _ready() -> void:
 	var pv: String = Strings.t("plan.practice.busy") if gs.practice_in_progress() else Strings.t("plan.practice.ready" if gs.practice_available() else "plan.practice.used")
 	var t3 := HomeKit.StatTile.new(Strings.t("plan.practice.h"), pv, Strings.t("plan.practice.sub"), "play", func(): App.go(ScreenPractice.new()))
 	t3.set_value_color(UI.TEAL_HI if live else UI.DIM)
-	var tiles := [t1, t2, t3]
+	var t4 := HomeKit.StatTile.new(Strings.t("plan.heroes.h"), Strings.t("plan.heroes.v"), Strings.t("plan.heroes.sub"), "star", func(): App.go(ScreenHeroes.new()))
+	var tiles := [t1, t2, t3, t4]
 	for i in tiles.size():
 		grid.add_child(tiles[i])
-		UI.tag(tiles[i], ["plan.tile.training", "plan.tile.chem", "plan.tile.practice"][i])
+		UI.tag(tiles[i], ["plan.tile.training", "plan.tile.chem", "plan.tile.practice", "plan.tile.heroes"][i])
 	var c := DepthCard.new()
 	c.content.add_child(UI.label(Strings.t("plan.gp.h"), UI.S_SMALL, UI.TEAL_HI, HORIZONTAL_ALIGNMENT_LEFT, "SemiBold"))
 	var custom := not GamePlan.is_neutral(gs.plan_set()["default"]) or not (gs.plan_set()["triggers"] as Array).is_empty()

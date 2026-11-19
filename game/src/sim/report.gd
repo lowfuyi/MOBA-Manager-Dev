@@ -145,6 +145,58 @@ static func _attribution_v2(result: Dictionary, my_side: String) -> Dictionary:
 	return {"factors": factors, "expected": e_actual * sgn}
 
 
+# ---------------------------------------------------------------- the post-match story (Phase 5, design 8.3)
+## One or two lines per player of `side` from the v2 log, picked by rules: the lane at 8:00 (gold against the opposite
+## player), ganks for a jungler, objectives and towers, the team's top damage, the healing of a support, else the KDA line.
+## {slot: [[copy key, args], ...]}; empty for a v1 result. Every number comes from the result. Report stays free of the Strings
+## autoload (it runs in the logic tests); the screen words the lines (story_text).
+static func story(result: Dictionary, side: String) -> Dictionary:
+	var out := {}
+	if not is_v2(result):
+		return out
+	var per: Dictionary = result["sim"]["per"]
+	var other := "R" if side == "B" else "B"
+	var top_dmg := ""
+	var best := -1
+	var team_dmg := 0
+	for s in SLOTS:
+		var d := int(per[side + "." + s]["dmg"])
+		team_dmg += d
+		if d > best:
+			best = d
+			top_dmg = s
+	for s in SLOTS:
+		var me: Dictionary = per[side + "." + s]
+		var opp: Dictionary = per[other + "." + s]
+		var name := String(SimData.heroes()[String(me["hero"])]["name"])
+		var lines: Array = []
+		var diff := int(me["gold_8"]) - int(opp["gold_8"])
+		if s != "jg" and s != "sup" and absi(diff) >= 300:
+			lines.append(["story.lane_won" if diff > 0 else "story.lane_lost", {"name": name, "gold": absi(diff), "lane_key": "arena.lane." + s}])
+		if s == "jg" and int(me.get("ganks", 0)) > 0:
+			lines.append(["story.ganks", {"name": name, "n": int(me["ganks"]), "k": int(me["k"]), "a": int(me["a"])}])
+		if int(me["objectives"]) > 0:
+			lines.append(["story.objectives", {"name": name, "n": int(me["objectives"])}])
+		if int(me["towers"]) > 0 and lines.size() < 2:
+			lines.append(["story.towers", {"name": name, "n": int(me["towers"])}])
+		if s == top_dmg and team_dmg > 0 and lines.size() < 2:
+			lines.append(["story.damage", {"name": name, "pct": "%d%%" % int(round(100.0 * float(best) / float(team_dmg)))}])
+		if s == "sup" and int(me["healed"]) > 0 and lines.size() < 2:
+			lines.append(["story.healed", {"name": name, "n": int(me["healed"])}])
+		if lines.is_empty():
+			lines.append(["story.kda", {"name": name, "k": int(me["k"]), "d": int(me["d"]), "a": int(me["a"])}])
+		out[s] = lines.slice(0, 2)
+	return out
+
+
+## Words one story line (in a screen, where the Strings autoload exists): [key, args] -> text.
+static func story_text(line: Array, strings: Object) -> String:
+	var args: Dictionary = (line[1] as Dictionary).duplicate()
+	if args.has("lane_key"):
+		args["lane"] = strings.call("t", String(args["lane_key"]))
+	return String(strings.call("f", String(line[0]), args))
+
+
 # ---------------------------------------------------------------- derived kills, deaths and assists (GDD 9.2 test 6)
 ## Display only, never fed back into any result. Drawn from their own stream ("kda") of the match seed, so the
 ## same game always shows the same lines. Rules: the winner always has more kills than the loser; one side's

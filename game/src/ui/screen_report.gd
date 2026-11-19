@@ -751,11 +751,16 @@ func _fill_dig() -> void:
 func _lines() -> void:
 	var w := App.world
 	var k := Report.kda(res)
+	var story := Report.story(res, my_side)    # Phase 5: what each player did, from the log
 	dig_box.add_child(UI.label(Strings.t("report.lines_head"), UI.S_SMALL, UI.DIM))
 	for s in GameState.SLOTS:
 		var l: Dictionary = k[my_side][s]
 		var p: Dictionary = w.players[res["lineups"][my_side][s]]
 		UI.kv_row(dig_box, "%s  %s" % [Strings.t("role.short." + s), p["name"]], "%d / %d / %d" % [int(l["k"]), int(l["d"]), int(l["a"])])
+		for line in story.get(s, []):
+			var sl := UI.label(Report.story_text(line, Strings), UI.S_SMALL, UI.TEXT2)
+			sl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			dig_box.add_child(sl)
 	var n := UI.label(Strings.t("report.lines_note"), UI.S_SMALL, UI.DIM)
 	n.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	dig_box.add_child(n)

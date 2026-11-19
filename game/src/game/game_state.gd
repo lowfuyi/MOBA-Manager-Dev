@@ -694,6 +694,25 @@ func builds() -> Dictionary:
 	return d.get("builds", {})
 
 
+## The build a player saved for a hero ([] = the coach's build).
+func build_for(pid: String, hid: String) -> Array:
+	return (builds().get(pid, {}) as Dictionary).get(hid, [])
+
+
+## Save (or with [] clear) a player's build for a hero. Only legal builds are kept (Items.is_legal).
+func set_build(pid: String, hid: String, build: Array) -> void:
+	if not d.has("builds"):
+		d["builds"] = {}
+	if not (d["builds"] as Dictionary).has(pid):
+		d["builds"][pid] = {}
+	if build.is_empty() or not Items.is_legal(build):
+		(d["builds"][pid] as Dictionary).erase(hid)
+		if (d["builds"][pid] as Dictionary).is_empty():
+			(d["builds"] as Dictionary).erase(pid)
+	else:
+		d["builds"][pid][hid] = build.duplicate()
+
+
 ## The plan set the screens edit: the tutorial game's sandbox while one is in flight, otherwise the saved plan (I-13).
 func plan_set() -> Dictionary:
 	return sandbox_plan if not sandbox_plan.is_empty() else saved_plan_set()

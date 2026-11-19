@@ -189,7 +189,7 @@
     "id": "dunmarrow.passive",
     "slot": "passive",
     "name": "Sunken Bell",
-    "text": "After each ability his next attack rings out, hurting enemies around him.",
+    "text": "After each ability their next attack rings out, hurting enemies around them.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 35,
@@ -337,7 +337,7 @@
    "id": "skarrow",
    "kit_version": 1,
    "title": "Pit Scavenger",
-   "lore": "A duelist who learned her trade picking over battlefields.",
+   "lore": "A duelist who learned their trade picking over battlefields.",
    "stats": {
     "hp": 650,
     "hp_lvl": 96,
@@ -438,7 +438,7 @@
      "id": "skarrow.a3",
      "slot": "a3",
      "name": "Picked Clean",
-     "text": "A cruel cut that heals her for part of the damage.",
+     "text": "A cruel cut that heals them for part of the damage.",
      "kind": [
       "damage",
       "heal"
@@ -469,7 +469,7 @@
      "id": "skarrow.ult",
      "slot": "ult",
      "name": "Last One Standing",
-     "text": "For a few seconds attacks faster and heals from her hits; a kill extends it.",
+     "text": "For a few seconds attacks faster and heals from their hits; a kill extends it.",
      "kind": [
       "buff"
      ],
@@ -522,7 +522,7 @@
     "id": "hegwin.passive",
     "slot": "passive",
     "name": "Long Reach",
-    "text": "Attacks from near the end of his range deal extra damage.",
+    "text": "Attacks from near the end of their range deal extra damage.",
     "trigger": "on_hit_nth",
     "every": 1,
     "bonus_dmg": 10,
@@ -634,7 +634,7 @@
      "id": "hegwin.ult",
      "slot": "ult",
      "name": "Drag Under",
-     "text": "Hooks an enemy, hauls them to him and stuns them briefly.",
+     "text": "Hooks an enemy, hauls them close and stuns them briefly.",
      "kind": [
       "damage",
       "cc"
@@ -667,7 +667,7 @@
    "id": "ottomere",
    "kit_version": 1,
    "title": "Light Keeper",
-   "lore": "Kept the lighthouse for forty winters; now he keeps his team.",
+   "lore": "Kept the lighthouse for forty winters; now they keep their team.",
    "stats": {
     "hp": 700,
     "hp_lvl": 106,
@@ -705,7 +705,7 @@
      "id": "ottomere.a1",
      "slot": "a1",
      "name": "Anchor Swing",
-     "text": "Swings his old anchor in an arc, hurting and slowing.",
+     "text": "Swings their old anchor in an arc, hurting and slowing.",
      "kind": [
       "damage",
       "cc"
@@ -736,7 +736,7 @@
      "id": "ottomere.a2",
      "slot": "a2",
      "name": "Beacon Pulse",
-     "text": "Lights the beacon on his back: nearby enemies are drawn to attack him.",
+     "text": "Lights the beacon on their back: nearby enemies are drawn to attack them.",
      "kind": [
       "cc"
      ],
@@ -833,7 +833,7 @@
    "id": "orrick",
    "kit_version": 1,
    "title": "Fen Swordsman",
-   "lore": "Lost his sight to marsh fever and trusts only the sound of the reeds.",
+   "lore": "Lost their sight to marsh fever and trusts only the sound of the reeds.",
    "stats": {
     "hp": 650,
     "hp_lvl": 96,
@@ -851,7 +851,7 @@
     "id": "orrick.passive",
     "slot": "passive",
     "name": "Listening Blade",
-    "text": "After a few seconds without being hit, his next attack is a sure critical.",
+    "text": "After a few seconds without being hit, their next attack is a sure critical.",
     "trigger": "out_of_combat",
     "every": 0,
     "bonus_dmg": 0,
@@ -871,7 +871,7 @@
      "id": "orrick.a1",
      "slot": "a1",
      "name": "Reed Cut",
-     "text": "Dashes through an enemy, cutting as he passes.",
+     "text": "Dashes through an enemy, cutting as they pass.",
      "kind": [
       "damage",
       "mobility"
@@ -902,7 +902,7 @@
      "id": "orrick.a2",
      "slot": "a2",
      "name": "Wading Sweep",
-     "text": "Sweeps the shallows around him, hurting and slowing enemies.",
+     "text": "Sweeps the shallows around them, hurting and slowing enemies.",
      "kind": [
       "damage",
       "cc"
@@ -933,7 +933,7 @@
      "id": "orrick.a3",
      "slot": "a3",
      "name": "Mire Guard",
-     "text": "A shield that is larger for every enemy close to him.",
+     "text": "A shield that is larger for every enemy close to them.",
      "kind": [
       "shield"
      ],
@@ -1015,7 +1015,7 @@
     "id": "vellgrim.passive",
     "slot": "passive",
     "name": "Cold Wake",
-    "text": "Enemies hurt by his abilities are briefly slowed.",
+    "text": "Enemies hurt by their abilities are briefly slowed.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 0,
@@ -1035,7 +1035,7 @@
      "id": "vellgrim.a1",
      "slot": "a1",
      "name": "Pole Vault",
-     "text": "Vaults to a spot and hurts enemies where he lands.",
+     "text": "Vaults to a spot and hurts enemies where they land.",
      "kind": [
       "damage",
       "mobility"
@@ -1097,7 +1097,7 @@
      "id": "vellgrim.a3",
      "slot": "a3",
      "name": "Rime Coat",
-     "text": "Coats himself in frost for a shield.",
+     "text": "Coats themselves in frost for a shield.",
      "kind": [
       "shield"
      ],
@@ -1127,7 +1127,7 @@
      "id": "vellgrim.ult",
      "slot": "ult",
      "name": "Crossing Toll",
-     "text": "Poles across to an area; after a short pause every enemy around him is stunned.",
+     "text": "Poles across to an area; after a short pause every enemy around them is stunned.",
      "kind": [
       "damage",
       "mobility",
@@ -1161,7 +1161,7 @@
    "id": "barrowick",
    "kit_version": 1,
    "title": "Gravedigger",
-   "lore": "Digs the barrow-fields and never forgets who owes him a burial.",
+   "lore": "Digs the barrow-fields and never forgets who owes them a burial.",
    "stats": {
     "hp": 650,
     "hp_lvl": 96,
@@ -1325,7 +1325,7 @@
    "id": "tuskal",
    "kit_version": 1,
    "title": "Boar Hunter",
-   "lore": "Wears the tusks of the first boar he ever brought down.",
+   "lore": "Wears the tusks of the first boar they ever brought down.",
    "stats": {
     "hp": 650,
     "hp_lvl": 96,
@@ -1395,7 +1395,7 @@
      "id": "tuskal.a2",
      "slot": "a2",
      "name": "Hide Bristle",
-     "text": "Raises his bristles for a shield and hurts enemies around him.",
+     "text": "Raises their bristles for a shield and hurts enemies around them.",
      "kind": [
       "damage",
       "shield"
@@ -1457,7 +1457,7 @@
      "id": "tuskal.ult",
      "slot": "ult",
      "name": "Tuskline Run",
-     "text": "Charges a long way in a line, hurting and slowing all enemies he passes.",
+     "text": "Charges a long way in a line, hurting and slowing all enemies they pass.",
      "kind": [
       "damage",
       "mobility",
@@ -1678,7 +1678,7 @@
     "id": "nimbrel.passive",
     "slot": "passive",
     "name": "Wingdust",
-    "text": "After a few seconds out of combat, fades from sight until he attacks.",
+    "text": "After a few seconds out of combat, fades from sight until they attack.",
     "trigger": "out_of_combat",
     "every": 0,
     "bonus_dmg": 0,
@@ -1761,7 +1761,7 @@
      "id": "nimbrel.a3",
      "slot": "a3",
      "name": "Moult",
-     "text": "Sheds his wings and dashes away, untouchable for a moment.",
+     "text": "Sheds their wings and dashes away, untouchable for a moment.",
      "kind": [
       "mobility",
       "buff"
@@ -1845,7 +1845,7 @@
     "id": "marrek.passive",
     "slot": "passive",
     "name": "Harvest Rhythm",
-    "text": "Each enemy hit by his abilities heals him a little.",
+    "text": "Each enemy hit by their abilities heals them a little.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 0,
@@ -1957,7 +1957,7 @@
      "id": "marrek.ult",
      "slot": "ult",
      "name": "Reaping Season",
-     "text": "Spins for three seconds, hurting everything near him; attacks faster afterwards.",
+     "text": "Spins for three seconds, hurting everything near them; attacks faster afterwards.",
      "kind": [
       "damage",
       "buff"
@@ -1992,7 +1992,7 @@
    "id": "quillith",
    "kit_version": 1,
    "title": "Quill Archer",
-   "lore": "Grows her own arrows and is very particular about who gets them.",
+   "lore": "Grows their own arrows and is very particular about who gets them.",
    "stats": {
     "hp": 590,
     "hp_lvl": 88,
@@ -2155,7 +2155,7 @@
    "id": "wyldrim",
    "kit_version": 1,
    "title": "Hart Warden",
-   "lore": "Leads the herds of the high meadow and defends them with his crown.",
+   "lore": "Leads the herds of the high meadow and defends them with their crown.",
    "stats": {
     "hp": 650,
     "hp_lvl": 96,
@@ -2173,7 +2173,7 @@
     "id": "wyldrim.passive",
     "slot": "passive",
     "name": "Herd Sense",
-    "text": "Allies near him gain a little armour.",
+    "text": "Allies near them gain a little armour.",
     "trigger": "aura",
     "every": 0,
     "bonus_dmg": 0,
@@ -2288,7 +2288,7 @@
      "id": "wyldrim.ult",
      "slot": "ult",
      "name": "Stag Guard",
-     "text": "Plants his crown: allies nearby gain a large shield and enemies are thrown back.",
+     "text": "Plants their crown: allies nearby gain a large shield and enemies are thrown back.",
      "kind": [
       "shield",
       "cc"
@@ -2339,7 +2339,7 @@
     "id": "sootwing.passive",
     "slot": "passive",
     "name": "Ash Brand",
-    "text": "Her abilities brand an enemy; her next attack on a branded enemy burns for extra damage.",
+    "text": "Their abilities brand an enemy; their next attack on a branded enemy burns for extra damage.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 40,
@@ -2504,7 +2504,7 @@
     "id": "veshra.passive",
     "slot": "passive",
     "name": "Slick",
-    "text": "After a dash her next attack deals extra damage.",
+    "text": "After a dash their next attack deals extra damage.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 35,
@@ -2524,7 +2524,7 @@
      "id": "veshra.a1",
      "slot": "a1",
      "name": "Eelcoil Lash",
-     "text": "Spins the blades around her, hurting everyone near; clears waves.",
+     "text": "Spins the blades around them, hurting everyone near; clears waves.",
      "kind": [
       "damage",
       "wave"
@@ -2668,7 +2668,7 @@
     "id": "ellowen.passive",
     "slot": "passive",
     "name": "Lilt",
-    "text": "Each ability she lands shortens her other cooldowns a little.",
+    "text": "Each ability they land shortens their other cooldowns a little.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 0,
@@ -2831,7 +2831,7 @@
     "id": "cindrel.passive",
     "slot": "passive",
     "name": "Fired Clay",
-    "text": "Each ability she casts hardens her skin with a small shield.",
+    "text": "Each ability they cast hardens their skin with a small shield.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 0,
@@ -2914,7 +2914,7 @@
      "id": "cindrel.a3",
      "slot": "a3",
      "name": "Kiln Door",
-     "text": "Steps back through a door of heat, leaving the ground behind her burning.",
+     "text": "Steps back through a door of heat, leaving the ground behind them burning.",
      "kind": [
       "mobility",
       "damage",
@@ -3160,7 +3160,7 @@
     "id": "maurelle.passive",
     "slot": "passive",
     "name": "Rockpool",
-    "text": "Allies near her slowly regain health.",
+    "text": "Allies near them slowly regain health.",
     "trigger": "aura",
     "every": 0,
     "bonus_dmg": 0,
@@ -3306,7 +3306,7 @@
    "id": "orisande",
    "kit_version": 1,
    "title": "Star Cartographer",
-   "lore": "Draws the maps by night and plots a course straight through her enemies.",
+   "lore": "Draws the maps by night and plots a course straight through their enemies.",
    "stats": {
     "hp": 580,
     "hp_lvl": 82,
@@ -3324,7 +3324,7 @@
     "id": "orisande.passive",
     "slot": "passive",
     "name": "Plotted Course",
-    "text": "Moves faster toward an enemy she has marked.",
+    "text": "Moves faster toward an enemy they have marked.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 0,
@@ -3404,7 +3404,7 @@
      "id": "orisande.a3",
      "slot": "a3",
      "name": "Waypoint",
-     "text": "Blinks to a point she has charted.",
+     "text": "Blinks to a point they have charted.",
      "kind": [
       "mobility"
      ],
@@ -3485,7 +3485,7 @@
     "id": "tessarine.passive",
     "slot": "passive",
     "name": "Tesserae",
-    "text": "Each ability adds a tile; with every tile her abilities hit harder.",
+    "text": "Each ability adds a tile; with every tile their abilities hit harder.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 0,
@@ -3505,7 +3505,7 @@
      "id": "tessarine.a1",
      "slot": "a1",
      "name": "Shard Fan",
-     "text": "Throws a fan of glass shards in front of her; clears waves.",
+     "text": "Throws a fan of glass shards in front of them; clears waves.",
      "kind": [
       "damage",
       "wave"
@@ -3792,7 +3792,7 @@
    "id": "embrel",
    "kit_version": 1,
    "title": "Ember Apprentice",
-   "lore": "Burns most of what he touches and is learning to choose.",
+   "lore": "Burns most of what they touch and is learning to choose.",
    "stats": {
     "hp": 560,
     "hp_lvl": 80,
@@ -3810,7 +3810,7 @@
     "id": "embrel.passive",
     "slot": "passive",
     "name": "Cinderdrift",
-    "text": "His attacks splash sparks on nearby minions.",
+    "text": "Their attacks splash sparks on nearby minions.",
     "trigger": "on_hit_nth",
     "every": 1,
     "bonus_dmg": 8,
@@ -3955,7 +3955,7 @@
    "id": "harkin",
    "kit_version": 1,
    "title": "Harpoon Gunner",
-   "lore": "Hunted the whales of the grey sea; now he hunts in lanes.",
+   "lore": "Hunted the whales of the grey sea; now they hunt in lanes.",
    "stats": {
     "hp": 580,
     "hp_lvl": 84,
@@ -3973,7 +3973,7 @@
     "id": "harkin.passive",
     "slot": "passive",
     "name": "Steady Aim",
-    "text": "Standing still raises his critical chance.",
+    "text": "Standing still raises their critical chance.",
     "trigger": "out_of_combat",
     "every": 0,
     "bonus_dmg": 0,
@@ -4135,7 +4135,7 @@
     "id": "pellam.passive",
     "slot": "passive",
     "name": "Shepherd's Count",
-    "text": "Every fourth attack heals her a little.",
+    "text": "Every fourth attack heals them a little.",
     "trigger": "on_hit_nth",
     "every": 4,
     "bonus_dmg": 0,
@@ -4378,7 +4378,7 @@
      "id": "tamsel.a3",
      "slot": "a3",
      "name": "Tolling Step",
-     "text": "Steps aside and shields herself and a nearby ally.",
+     "text": "Steps aside and shields themselves and a nearby ally.",
      "kind": [
       "mobility",
       "shield"
@@ -4541,7 +4541,7 @@
      "id": "jorreck.a3",
      "slot": "a3",
      "name": "Tarpaulin",
-     "text": "Throws a tarp over himself or an ally for a shield.",
+     "text": "Throws a tarp over themselves or an ally for a shield.",
      "kind": [
       "shield"
      ],
@@ -4603,7 +4603,7 @@
    "id": "brixley",
    "kit_version": 1,
    "title": "Mortar Mason",
-   "lore": "Lays bricks in peacetime; in war she lays them on people.",
+   "lore": "Lays bricks in peacetime; in war they lay them on people.",
    "stats": {
     "hp": 580,
     "hp_lvl": 84,
@@ -4926,7 +4926,7 @@
    "id": "ketterick",
    "kit_version": 1,
    "title": "Steam Gunner",
-   "lore": "Built his own boiler-rifle and only sometimes scalds himself.",
+   "lore": "Built their own boiler-rifle and only sometimes scalds themselves.",
    "stats": {
     "hp": 580,
     "hp_lvl": 84,
@@ -4944,7 +4944,7 @@
     "id": "ketterick.passive",
     "slot": "passive",
     "name": "Pressure",
-    "text": "Abilities build pressure; at full pressure his next attack stuns.",
+    "text": "Abilities build pressure; at full pressure their next attack stuns.",
     "trigger": "on_ability",
     "every": 3,
     "bonus_dmg": 0,
@@ -5107,7 +5107,7 @@
     "id": "sparrowe.passive",
     "slot": "passive",
     "name": "Flitting",
-    "text": "After a dash she attacks faster for a few seconds.",
+    "text": "After a dash they attack faster for a few seconds.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 0,
@@ -5269,7 +5269,7 @@
     "id": "sunnivah.passive",
     "slot": "passive",
     "name": "Noon Mark",
-    "text": "Her heals are stronger on badly hurt allies.",
+    "text": "Their heals are stronger on badly hurt allies.",
     "trigger": "low_hp",
     "every": 0,
     "bonus_dmg": 0,
@@ -5481,7 +5481,7 @@
      "id": "bastrel.a2",
      "slot": "a2",
      "name": "Pincer Grip",
-     "text": "Grips an enemy in his claw and holds them still.",
+     "text": "Grips an enemy in their claw and holds them still.",
      "kind": [
       "damage",
       "cc"
@@ -5512,7 +5512,7 @@
      "id": "bastrel.a3",
      "slot": "a3",
      "name": "Shell Up",
-     "text": "Pulls into his shell, taking much less damage.",
+     "text": "Pulls into their shell, taking much less damage.",
      "kind": [
       "buff"
      ],
@@ -5758,7 +5758,7 @@
     "id": "alderwyn.passive",
     "slot": "passive",
     "name": "Sap",
-    "text": "Healing she gives leaves a small shield.",
+    "text": "Healing they give leaves a small shield.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 0,
@@ -5922,7 +5922,7 @@
     "id": "corvane.passive",
     "slot": "passive",
     "name": "Raven's Eye",
-    "text": "His first hit on an enemy marks them; allies deal extra damage to the marked.",
+    "text": "Their first hit on an enemy marks them; allies deal extra damage to the marked.",
     "trigger": "on_hit_nth",
     "every": 1,
     "bonus_dmg": 0,
@@ -5974,7 +5974,7 @@
      "id": "corvane.a2",
      "slot": "a2",
      "name": "Caw",
-     "text": "A harsh cry: nearby enemies are forced to turn on him.",
+     "text": "A harsh cry: nearby enemies are forced to turn on them.",
      "kind": [
       "cc"
      ],
@@ -6004,7 +6004,7 @@
      "id": "corvane.a3",
      "slot": "a3",
      "name": "Feather Mantle",
-     "text": "Shields himself and an ally.",
+     "text": "Shields themselves and an ally.",
      "kind": [
       "shield"
      ],
@@ -6086,7 +6086,7 @@
     "id": "wyncote.passive",
     "slot": "passive",
     "name": "Vane Wake",
-    "text": "His dashes leave a gust that slows enemies.",
+    "text": "Their dashes leave a gust that slows enemies.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 0,
@@ -6247,7 +6247,7 @@
     "id": "oriel.passive",
     "slot": "passive",
     "name": "Dappled",
-    "text": "Her heals leave a small shield behind.",
+    "text": "Their heals leave a small shield behind.",
     "trigger": "on_ability",
     "every": 0,
     "bonus_dmg": 0,
