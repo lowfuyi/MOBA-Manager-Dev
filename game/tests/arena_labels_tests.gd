@@ -1,4 +1,6 @@
 extends RefCounted
+## Match Sim v2 interim (2026-11-19): this tests the Alpha 0.8 show, so its results come from MatchRunner.auto_v1 (the v1 contest
+## model the show was built for) until Arena v2 replaces the show with event-log playback (Phase 4).
 ## Alpha 0.8 A-07: the arena's words (ArenaLabels) on real results, both seats, normal and large text (UI-PASS-2 6.7.10, ACTION-
 ## VOCABULARY 4.1):
 ##   budget   at most 10 new words in any 2.5 s span; at most 3 transient items at once (pair, tag, feed block; 1 under a banner);
@@ -38,7 +40,7 @@ func run(check: Callable) -> void:
 			var behind := GamePlan.neutral()
 			behind["r"] = 80
 			plans = {"B": {"default": dflt, "triggers": [{"when": "behind_early", "plan": behind}]}, "R": "ai"}
-		var res := MatchRunner.auto(w, w.best_lineup(a), w.best_lineup(b), meta, 6100 + i, "labels:%d" % i, false, plans)
+		var res := MatchRunner.auto_v1(w, w.best_lineup(a), w.best_lineup(b), meta, 6100 + i, "labels:%d" % i, false, plans)
 		for large in [false, true]:
 			var me := "B" if (i + int(large)) % 2 == 0 else "R"
 			var s := ShowScript.build(res, me)
@@ -127,7 +129,7 @@ func run(check: Callable) -> void:
 ## R4: the k-th use of a pair draws the k-th value and never repeats the previous variant of that pair.
 func _variants(check: Callable) -> void:
 	var w := World.load_default()
-	var res := MatchRunner.auto(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[1]), w.make_meta("v"), 11, "v:1", false, {"B": "ai", "R": "ai"})
+	var res := MatchRunner.auto_v1(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[1]), w.make_meta("v"), 11, "v:1", false, {"B": "ai", "R": "ai"})
 	var l := ArenaLabels.new()
 	l.s = ShowScript.build(res, "B")
 	var prev := -1

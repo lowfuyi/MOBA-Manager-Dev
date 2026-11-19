@@ -1,4 +1,6 @@
 extends RefCounted
+## Match Sim v2 interim (2026-11-19): this tests the Alpha 0.8 show, so its results come from MatchRunner.auto_v1 (the v1 contest
+## model the show was built for) until Arena v2 replaces the show with event-log playback (Phase 4).
 ## Alpha 0.8 A-04: the beats on screen (ArenaFx) on real results, both seats:
 ##   resolve   at every contest's stamp a winner ring in the winner's shape (circle = you, hexagon = them) stands at its place
 ##   H5        a skull is shown only within 0.6 s after a kill event of the ledger, and every kill shows one
@@ -30,7 +32,7 @@ func run(check: Callable) -> void:
 		var b: String = w.club_ids[(i * 3 + 4) % w.club_ids.size()]
 		if a == b:
 			b = w.club_ids[(i + 1) % w.club_ids.size()]
-		var res := MatchRunner.auto(w, w.best_lineup(a), w.best_lineup(b), meta, 5300 + i, "fx:%d" % i, false, {"B": "ai", "R": "ai"})
+		var res := MatchRunner.auto_v1(w, w.best_lineup(a), w.best_lineup(b), meta, 5300 + i, "fx:%d" % i, false, {"B": "ai", "R": "ai"})
 		var me := "B" if i % 2 == 0 else "R"
 		var s := ShowScript.build(res, me)
 		var c := Choreo.build(s)
@@ -62,14 +64,14 @@ func run(check: Callable) -> void:
 		var b2: String = w.club_ids[(i2 * 5 + 2) % w.club_ids.size()]
 		if a2 == b2:
 			b2 = w.club_ids[(i2 + 1) % w.club_ids.size()]
-		var r2 := MatchRunner.auto(w, w.best_lineup(a2), w.best_lineup(b2), meta, 6100 + i2, "fxa:%d" % i2, false, {"B": "ai", "R": "ai"})
+		var r2 := MatchRunner.auto_v1(w, w.best_lineup(a2), w.best_lineup(b2), meta, 6100 + i2, "fxa:%d" % i2, false, {"B": "ai", "R": "ai"})
 		var s2 := ShowScript.build(r2, "B")
 		var f2 := ArenaFx.build(s2, Choreo.build(s2), "B")
 		for a in f2.actions:
 			kinds[a["kind"]] = true
 	check.call(kinds.size() == 6, "arena fx actions: dash, shot, burst, tether, heal and engage all occur on 8 more results %s" % str(kinds.keys()))
 	# intent_ping (0.9.2): a ring at the label's zone, circle for yours, hexagon for theirs only when both show; none without a zone
-	var ws := ShowScript.build(MatchRunner.auto(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[2]), meta, 7070, "ping", false, {}), "B")
+	var ws := ShowScript.build(MatchRunner.auto_v1(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[2]), meta, 7070, "ping", false, {}), "B")
 	var wc := Choreo.build(ws)
 	var wf := ArenaFx.build(ws, wc, "B")
 	var lab := {"text": "x"}

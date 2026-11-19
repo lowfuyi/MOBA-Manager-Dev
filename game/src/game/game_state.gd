@@ -248,7 +248,7 @@ func rank_of(club_id: String) -> int:
 # ---------------------------------------------------------------- playing games
 func _sim_fixture(f: Dictionary) -> void:
 	var meta := meta_for(int(f["round"]))
-	var r := MatchRunner.auto(world, lineup_for(f["blue"]), lineup_for(f["red"]), meta, int(d["save_seed"]), f["id"], false, {"B": "ai", "R": "ai"})
+	var r := MatchRunner.auto_ai(world, lineup_for(f["blue"]), lineup_for(f["red"]), meta, int(d["save_seed"]), f["id"], false, {"B": "ai", "R": "ai"})
 	f["played"] = true
 	f["final"] = float(r["final"])
 	f["winner"] = f["blue"] if r["blue_won"] else f["red"]
@@ -688,6 +688,12 @@ func plans_for(g: Dictionary) -> Dictionary:
 	return out
 
 
+## Manager-edited item builds (Match Sim v2): {player id: {hero id: [six item ids]}}. An additive save key, written only by
+## the build editor (Phase 5); a missing key means the coach's suggestion for every hero.
+func builds() -> Dictionary:
+	return d.get("builds", {})
+
+
 ## The plan set the screens edit: the tutorial game's sandbox while one is in flight, otherwise the saved plan (I-13).
 func plan_set() -> Dictionary:
 	return sandbox_plan if not sandbox_plan.is_empty() else saved_plan_set()
@@ -702,7 +708,7 @@ func saved_plan_set() -> Dictionary:
 
 func auto_game(g: Dictionary) -> Dictionary:
 	var meta := meta_for(int(g["round"]))
-	return MatchRunner.auto(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta, int(d["save_seed"]), g["id"], bool(g["full"]), plans_for(g))
+	return MatchRunner.auto(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta, int(d["save_seed"]), g["id"], bool(g["full"]), plans_for(g), builds())
 
 
 # ---------------------------------------------------------------- training
@@ -783,7 +789,7 @@ func advance_playoffs() -> void:
 			if s["done"] or s["a"] == club() or s["b"] == club():
 				continue
 			var g := _series_game(s)
-			var r := MatchRunner.auto(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta_for(0), int(d["save_seed"]), g["id"], bool(g["full"]), {"B": "ai", "R": "ai"})
+			var r := MatchRunner.auto_ai(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta_for(0), int(d["save_seed"]), g["id"], bool(g["full"]), {"B": "ai", "R": "ai"})
 			_add_series_game(s, g, g["blue"] if r["blue_won"] else g["red"], float(r["final"]))
 			progressed = true
 		var all_done := true

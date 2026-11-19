@@ -121,8 +121,12 @@ func _attribution_uses_played_plans(check: Callable, w: World, meta: Dictionary,
 		var sets := {"B": my_set, "R": GamePlan.suggest_set(ta, tb, p, "R")}
 		var ms := int(res["mseed"])
 		var played := float(res["final"])
-		replays = replays and GamePlan.simulate(ta, tb, ms, p, sets)["final"] == played
+		# Match Sim v2: the same game played again (same draft, plans and seed) gives the same final
+		var again := MatchRunner.auto(w, w.best_lineup(w.club_ids[i % 10]), w.best_lineup(w.club_ids[(i + 3) % 10]), meta, 321, "gp:attr-%d" % i, false, {"B": my_set, "R": "ai"})
+		replays = replays and float(again["final"]) == played
 		replays = replays and res.get("plans", {}) == sets
+		# v2 attribution: each factor is its edge going in (the noise-free analytic prediction with and without it)
+		var e_act := GamePlan.expected_final(ta, tb, p, sets)
 		for side in ["B", "R"]:
 			var sgn := 1.0 if side == "B" else -1.0
 			var att := Report.attribution(res, side)
@@ -140,15 +144,15 @@ func _attribution_uses_played_plans(check: Callable, w: World, meta: Dictionary,
 				var cf := ta.duplicate(true)
 				for ph in Report.PHASES:
 					cf["ratings"][ph][s] = tb["ratings"][ph][s]
-				var f_slot := float(GamePlan.simulate(cf, tb, ms, p, sets)["final"])
-				consistent = consistent and absf(float(by_id["slot." + s]["value"]) - (played - f_slot) * sgn) < 1e-12
-			var f_draft := float(GamePlan.simulate(Report._neutral(ta), Report._neutral(tb), ms, p, sets)["final"])
-			consistent = consistent and absf(float(by_id["draft"]["value"]) - (played - f_draft) * sgn) < 1e-12
+				var f_slot := GamePlan.expected_final(cf, tb, p, sets)
+				consistent = consistent and absf(float(by_id["slot." + s]["value"]) - (e_act - f_slot) * sgn) < 1e-12
+			var f_draft := GamePlan.expected_final(Report._neutral(ta), Report._neutral(tb), p, sets)
+			consistent = consistent and absf(float(by_id["draft"]["value"]) - (e_act - f_draft) * sgn) < 1e-12
 			if side == "B":
 				if by_id.has("plan"):
 					with_plan_factor += 1
-					var f_plain := float(GamePlan.simulate(ta, tb, ms, p, {"R": sets["R"]})["final"])
-					consistent = consistent and absf(float(by_id["plan"]["value"]) - (played - f_plain) * sgn) < 1e-12
+					var f_plain := GamePlan.expected_final(ta, tb, p, {"R": sets["R"]})
+					consistent = consistent and absf(float(by_id["plan"]["value"]) - (e_act - f_plain) * sgn) < 1e-12
 					if absf(float(by_id["plan"]["value"])) > 1e-9:
 						plan_nonzero += 1
 			else:
@@ -157,15 +161,16 @@ func _attribution_uses_played_plans(check: Callable, w: World, meta: Dictionary,
 				var r_active: bool = not (r_set["triggers"].is_empty() and GamePlan.is_neutral(r_set["default"]))
 				consistent = consistent and by_id.has("plan") == r_active
 	check.call(keyed, "result carries the played plan sets for both sides (S1)")
-	check.call(replays, "the played sets replay the played final, and the result carries exactly those sets (S1)")
+	check.call(replays, "the same game replays the same final, and the result carries exactly the played sets (S1)")
 	check.call(with_plan_factor == games, "attribution shows the plan factor when the player used a plan (%d of %d)" % [with_plan_factor, games])
 	check.call(plan_nonzero >= games - 1, "the plan factor is not zero for a strong plan (%d of %d)" % [plan_nonzero, games])
-	check.call(consistent, "attribution factors are (played final - counterfactual replay with the played plans)")
+	check.call(consistent, "attribution factors are the edges going in (noise-free prediction with and without each factor, played plans)")
 	check.call(shares_ok, "attribution shares sum to 1 in absolute value")
 	# no plans given: the key is present and empty, and the result equals the plain simulator (golden path)
 	var plain := MatchRunner.auto(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[1]), meta, 321, "gp:attr-plain", false, {})
 	check.call(plain.has("plans") and (plain["plans"] as Dictionary).is_empty(), "no plans given: result plans is empty")
-	check.call(plain["final"] == MatchSim.simulate(plain["team_a"], plain["team_b"], plain["mseed"], p)["final"], "no plans given: result equals the plain simulator")
+	var plain2 := MatchRunner.auto(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[1]), meta, 321, "gp:attr-plain", false, {})
+	check.call(plain["final"] == plain2["final"] and Report.is_v2(plain), "no plans given: a Match Sim v2 game, the same when played again")
 	# a neutral plan set shows no plan bar
 	var neutral_res := MatchRunner.auto(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[1]), meta, 321, "gp:attr-plain", false, {"B": GamePlan.neutral_set()})
 	var no_plan := true

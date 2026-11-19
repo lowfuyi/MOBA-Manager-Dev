@@ -1,4 +1,6 @@
 extends Node
+## Match Sim v2 interim (2026-11-19): this tests the Alpha 0.8 show, so its results come from MatchRunner.auto_v1 (the v1 contest
+## model the show was built for) until Arena v2 replaces the show with event-log playback (Phase 4).
 ## Alpha 0.8 A-06: the Match screen is the arena. Ends with "check_ui_match: N checks, M failures".
 ##   geometry  at 720 x 1280, large text (626 x 1113) and a tall phone (720 x 1560): scoreboard, arena, text strip and controls
 ##             in their order without overlap; the arena is full width (720 x 760, 626 x 661 large); buttons 96 px; "?" in
@@ -151,7 +153,7 @@ func _tester() -> void:
 	var meta := w.make_meta("ui-match")
 	var found := false
 	for i in 80:
-		var res := MatchRunner.auto(w, w.best_lineup(w.club_ids[i % 10]), w.best_lineup(w.club_ids[(i + 3) % 10]), meta, 3100 + i, "uim:%d" % i, false, {"B": "ai", "R": "ai"})
+		var res := MatchRunner.auto_v1(w, w.best_lineup(w.club_ids[i % 10]), w.best_lineup(w.club_ids[(i + 3) % 10]), meta, 3100 + i, "uim:%d" % i, false, {"B": "ai", "R": "ai"})
 		var s := ShowScript.build(res, "B")
 		if s.held:
 			found = true

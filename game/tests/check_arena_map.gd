@@ -1,4 +1,6 @@
 extends Node
+## Match Sim v2 interim (2026-11-19): this tests the Alpha 0.8 show, so its results come from MatchRunner.auto_v1 (the v1 contest
+## model the show was built for) until Arena v2 replaces the show with event-log playback (Phase 4).
 ## Alpha 0.8 A-02: the arena map view and its data helper. Headless (the bake does not render here; the pictures and the
 ## draw-call count come from tests/shots/shots_arena.gd under Xvfb). Ends with " N checks, M failures".
 ##   data: every lane is a chain of edges; every node is reachable; shortest walks exist from each spawn to its zone
@@ -117,7 +119,7 @@ func _labels_and_bake() -> void:
 ## a slot without a pick falls back to the slot's archetype.
 func _silhouettes() -> void:
 	var w := World.load_default()
-	var res := MatchRunner.auto(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[3]), w.make_meta("sil"), 4040, "sil", false, {})
+	var res := MatchRunner.auto_v1(w, w.best_lineup(w.club_ids[0]), w.best_lineup(w.club_ids[3]), w.make_meta("sil"), 4040, "sil", false, {})
 	var m := ArenaMap.new("R")
 	m.set_heroes(res)
 	var ok_all := true

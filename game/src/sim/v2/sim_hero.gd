@@ -1,7 +1,111 @@
 class_name SimHero
 extends RefCounted
 ## One hero-agent of Match Sim v2 (MATCH-SIM-V2-DESIGN 5): who plays it (stats, phase ratings), the kit, the build, level,
-## gold and items, position on the map and the current intent. Plain data plus the stat sums the fight resolver needs.
+## gold and items, position on the map and the current intent. Hot values are typed fields (not dictionary lookups): the
+## player's stats (p_*), the summed level and item stats (s_*, refreshed when the level, the items or the stacks change), the
+## item effects (e_*) and the kit as typed Ability objects.
+
+
+## One ability of the kit, as typed fields (built once from kits_v2.json).
+class Ability:
+	var id := ""
+	var slot := ""
+	var dmg_k := false
+	var cc_k := false
+	var mob := false
+	var shield_k := false
+	var heal_k := false
+	var buff_k := false
+	var zone := false
+	var execute := false
+	var stealth := false
+	var wave := false
+	var target := 0              # 0 enemy, 1 ally, 2 self, 3 area, 4 line
+	var cc := 0                  # 0 none, 1 stun/knockup/taunt, 2 root, 3 silence, 4 slow
+	var cc_s := 0.0
+	var dmg := 0.0
+	var dmg_lvl := 0.0
+	var ratio := 0.0
+	var magic := false
+	var shield := 0.0
+	var heal := 0.0
+	var ratio_def := 0.0
+	var radius := 0.0
+	var cd := 1.0
+	var cd_lvl := 0.0
+	var hit := 1.0
+	var dur := 0.0
+	var buff: Dictionary = {}
+	var exec_below := 0.0
+	var unlock := 1
+
+	static func from(a: Dictionary) -> Ability:
+		var x := Ability.new()
+		x.id = String(a["id"])
+		x.slot = String(a["slot"])
+		var k: Array = a["kind"]
+		x.dmg_k = "damage" in k
+		x.cc_k = "cc" in k
+		x.mob = "mobility" in k
+		x.shield_k = "shield" in k
+		x.heal_k = "heal" in k
+		x.buff_k = "buff" in k
+		x.zone = "zone" in k
+		x.execute = "execute" in k
+		x.stealth = "stealth" in k
+		x.wave = "wave" in k
+		x.target = {"enemy": 0, "ally": 1, "self": 2, "area": 3, "line": 4}[String(a["target"])]
+		x.cc = {"": 0, "stun": 1, "knockup": 1, "taunt": 1, "root": 2, "silence": 3, "slow": 4}[String(a["cc"])]
+		x.cc_s = float(a["cc_s"])
+		x.dmg = float(a["dmg"])
+		x.dmg_lvl = float(a["dmg_lvl"])
+		x.ratio = float(a["ratio"])
+		x.magic = String(a["dtype"]) == "magic"
+		x.shield = float(a["shield"])
+		x.heal = float(a["heal"])
+		x.ratio_def = float(a["ratio_def"])
+		x.radius = float(a["radius_u"])
+		x.cd = float(a["cd"])
+		x.cd_lvl = float(a["cd_lvl"])
+		x.hit = float(a["hit"])
+		x.dur = float(a["dur_s"])
+		x.buff = a["buff"]
+		x.exec_below = float(a["exec_below"])
+		x.unlock = int(a["unlock"])
+		return x
+
+
+## The passive, as typed fields.
+class Passive:
+	var trigger := ""
+	var every := 0
+	var bonus_dmg := 0.0
+	var ratio := 0.0
+	var heal := 0.0
+	var shield := 0.0
+	var stat := ""
+	var amount := 0.0
+	var max_stacks := 0
+	var cc := 0
+	var cc_s := 0.0
+	var cd := 0.0
+
+	static func from(p: Dictionary) -> Passive:
+		var x := Passive.new()
+		x.trigger = String(p["trigger"])
+		x.every = int(p["every"])
+		x.bonus_dmg = float(p["bonus_dmg"])
+		x.ratio = float(p["ratio"])
+		x.heal = float(p["heal"])
+		x.shield = float(p["shield"])
+		x.stat = String(p["stat"])
+		x.amount = float(p["amount"])
+		x.max_stacks = int(p["max_stacks"])
+		x.cc = {"": 0, "stun": 1, "knockup": 1, "taunt": 1, "root": 2, "silence": 3, "slow": 4}[String(p["cc"])]
+		x.cc_s = float(p["cc_s"])
+		x.cd = float(p["cd"])
+		return x
+
 
 var side := "B"
 var slot := "top"
@@ -10,8 +114,22 @@ var hid := ""
 var hero: Dictionary = {}
 var kit: Dictionary = {}
 var arch := ""
-var pstats: Dictionary = {}       # the player's visible stats (mec .. clu), 1 to 100
+var front := false               # bruiser or bulwark: the front row in fights
+var ranged := false              # attack range above melee
+var abil: Array = []             # Ability x4 (a1, a2, a3, ult)
+var pas: Passive
+var pstats: Dictionary = {}      # the player's visible stats (mec .. clu), 1 to 100
+var p_mec := 50.0
+var p_sen := 50.0
+var p_lan := 50.0
+var p_tft := 50.0
+var p_mac := 50.0
+var p_com := 50.0
+var p_clu := 50.0
 var q := {"early": 1.0, "mid": 1.0, "late": 1.0}   # effectiveness per phase, rating x (1 + TeamMod) / 50
+var qe_early := 1.0
+var qe_mid := 1.0
+var qe_late := 1.0
 var player_id := ""
 var build: Array = []            # six finished item ids (boots first)
 var owned: Array = []            # item ids held (components and finished)
@@ -24,7 +142,7 @@ var respawn_at := 0.0
 var hp := 1.0
 var max_hp := 1.0
 var pos := Vector2.ZERO
-var path: Array = []             # remaining node ids to walk
+var path: Array = []             # remaining node ids (or points) to walk
 var intent := "spawn"
 var target := ""                 # lane, camp, objective or hero key
 var busy_until := 0.0            # in a fight, recalling or clearing a camp until this time
@@ -46,8 +164,61 @@ var stacks := 0                  # passive stacks (on_kill, stacks_per_min)
 var revive_used := false
 var vision := 0.0                # wards placed (support, jungler)
 var cds := PackedFloat64Array([0.0, 0.0, 0.0, 0.0])   # absolute time each ability is ready again
-var _stat_cache: Dictionary = {}
+# summed stats (level + items + passive), refreshed by _refresh()
+var s_hp := 0.0
+var s_atk := 0.0
+var s_aspd := 0.0
+var s_armor := 0.0
+var s_resist := 0.0
+var s_ap := 0.0
+var s_crit := 0.0
+var s_haste := 0.0
+var s_ls := 0.0
+var s_ov := 0.0
+var s_move := 0.0
+var s_move_base := 0.0
+var s_pen_a := 0.0
+var s_pen_r := 0.0
+var s_shp := 0.0
+var s_hlp := 0.0
+var s_range := 0.0
+var s_item_value := 0.0
+var e_burn := false
+var e_antiheal := false
+var e_on_hit := false
+var e_crit_amp := false
+var e_spellblade := false
+var e_guard := false
+var e_revive := false
+var e_slow_hit := false
+var e_execute := false
+var e_splash := false
 var _dirty := true
+var _stat_cache: Dictionary = {}
+
+
+## Call once the kit, the player and the phase ratings are set.
+func init_kit(p_kit: Dictionary) -> void:
+	kit = p_kit
+	abil = []
+	for a in kit["abilities"]:
+		abil.append(Ability.from(a))
+	pas = Passive.from(kit["passive"])
+	front = arch == "bruiser" or arch == "bulwark"
+	ranged = float(kit["stats"]["range_u"]) > 0.02
+	p_mec = float(pstats.get("mec", 50.0))
+	p_sen = float(pstats.get("sen", 50.0))
+	p_lan = float(pstats.get("lan", 50.0))
+	p_tft = float(pstats.get("tft", 50.0))
+	p_mac = float(pstats.get("mac", 50.0))
+	p_com = float(pstats.get("com", 50.0))
+	p_clu = float(pstats.get("clu", 50.0))
+	if q_k < 0.0:
+		q_k = SimData.f("q_k")
+	qe_early = 1.0 + q_k * (float(q["early"]) - 1.0)
+	qe_mid = 1.0 + q_k * (float(q["mid"]) - 1.0)
+	qe_late = 1.0 + q_k * (float(q["late"]) - 1.0)
+	dirty()
 
 
 func ability(i: int) -> Dictionary:
@@ -58,21 +229,26 @@ func passive() -> Dictionary:
 	return kit["passive"]
 
 
-func stat(name: String) -> float:
-	if _dirty:
-		stats()
-	return float(_stat_cache.get(name, 0.0))
-
-
 ## Call after the level, the items or the passive stacks change.
 func dirty() -> void:
 	_dirty = true
+	if not kit.is_empty():
+		_refresh()
 
 
-## Level and item stats summed (cached until level or items change).
+func stat(name: String) -> float:
+	if _dirty:
+		_refresh()
+	return float(_stat_cache.get(name, 0.0))
+
+
 func stats() -> Dictionary:
-	if not _dirty:
-		return _stat_cache
+	if _dirty:
+		_refresh()
+	return _stat_cache
+
+
+func _refresh() -> void:
 	var b: Dictionary = kit["stats"]
 	var l := float(level - 1)
 	var s := {"hp": float(b["hp"]) + float(b["hp_lvl"]) * l, "atk": float(b["atk"]) + float(b["atk_lvl"]) * l,
@@ -89,35 +265,59 @@ func stats() -> Dictionary:
 			s[k] = float(s.get(k, 0.0)) + float(it["stats"][k])
 		if String(it["effect"]) != "":
 			effects[String(it["effect"])] = true
-	var p := passive()
-	if String(p["trigger"]) in ["stacks_per_min", "on_kill"] and String(p["stat"]) in s:
-		s[String(p["stat"])] = float(s[String(p["stat"])]) + float(p["amount"]) * float(mini(stacks, int(p["max_stacks"])))
-	if String(p["trigger"]) == "aura" and String(p["stat"]) == "armor":
-		s["armor"] = float(s["armor"]) + float(p["amount"]) * 0.5
+	if pas != null:
+		if (pas.trigger == "stacks_per_min" or pas.trigger == "on_kill") and s.has(pas.stat):
+			s[pas.stat] = float(s[pas.stat]) + pas.amount * float(mini(stacks, pas.max_stacks))
+		if pas.trigger == "aura" and pas.stat == "armor":
+			s["armor"] = float(s["armor"]) + pas.amount * 0.5
 	s["haste"] = minf(40.0, float(s["haste"]))
-	s["aspd"] = float(s["aspd"]) * (1.0 + float(s.get("aspd_bonus", 0.0))) + 0.0
 	s["effects"] = effects
 	s["item_value"] = iv
 	_stat_cache = s
+	s_hp = s["hp"]
+	s_atk = s["atk"]
+	s_aspd = s["aspd"]
+	s_armor = s["armor"]
+	s_resist = s["resist"]
+	s_ap = s["ap"]
+	s_crit = s["crit"]
+	s_haste = s["haste"]
+	s_ls = s["lifesteal"]
+	s_ov = s["omnivamp"]
+	s_move = s["move"]
+	s_move_base = s["move_u_s"]
+	s_pen_a = s["pen_armor"]
+	s_pen_r = s["pen_resist"]
+	s_shp = s["shield_power"]
+	s_hlp = s["heal_power"]
+	s_range = s["range_u"]
+	s_item_value = iv
+	e_burn = effects.has("burn")
+	e_antiheal = effects.has("antiheal")
+	e_on_hit = effects.has("on_hit")
+	e_crit_amp = effects.has("crit_amp")
+	e_spellblade = effects.has("spellblade")
+	e_guard = effects.has("guard")
+	e_revive = effects.has("revive_once")
+	e_slow_hit = effects.has("slow_on_hit")
+	e_execute = effects.has("execute")
+	e_splash = effects.has("splash")
 	_dirty = false
-	return s
 
 
 func has_effect(e: String) -> bool:
 	if _dirty:
-		stats()
+		_refresh()
 	return (_stat_cache["effects"] as Dictionary).has(e)
 
 
 ## Total item value carried (for the gold lead and the buy logic).
 func item_value() -> float:
-	if _dirty:
-		stats()
-	return float(_stat_cache["item_value"])
+	return s_item_value
 
 
 func move_speed() -> float:
-	return stat("move_u_s") * (1.0 + stat("move"))
+	return s_move_base * (1.0 + s_move)
 
 
 func phase_q(t: float) -> float:
@@ -133,9 +333,11 @@ static var q_k := -1.0
 
 
 func qe(t: float) -> float:
-	if q_k < 0.0:
-		q_k = SimData.f("q_k")
-	return 1.0 + q_k * (phase_q(t) - 1.0)
+	if t < 600.0:
+		return qe_early
+	if t < 1080.0:
+		return qe_mid
+	return qe_late
 
 
 func st(name: String) -> float:

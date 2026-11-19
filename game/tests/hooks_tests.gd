@@ -211,7 +211,7 @@ func _team_kills(check: Callable, w: World) -> void:
 	var gs := GameState.new_game(w, CLUB, 70606)
 	var sum_ok := true
 	var team_ok := true
-	var winner_ok := true
+	var winner_more := 0
 	var keys_ok := true
 	var n := 0
 	for i in 12:
@@ -230,9 +230,10 @@ func _team_kills(check: Callable, w: World) -> void:
 			sum_ok = sum_ok and int(tk[side]) == s
 			team_ok = team_ok and int(tk[side]) == int(k["team"][side]["k"])
 		var blue_more := int(tk["B"]) > int(tk["R"])
-		winner_ok = winner_ok and blue_more == bool(r["blue_won"])
+		if blue_more == bool(r["blue_won"]):
+			winner_more += 1
 		n += 1
 	check.call(n >= 10 and keys_ok, "team_kills returns {B, R} (%d games)" % n)
 	check.call(sum_ok, "team_kills equals the sum of the players' kills in Report.kda")
 	check.call(team_ok, "team_kills equals kda()['team'][side]['k']")
-	check.call(winner_ok, "team_kills: the winner always has more kills (score line agrees with the result)")
+	check.call(winner_more >= n / 2, "team_kills: the winner has more kills in at least half of these %d games (%d; Match Sim v2 kills are real events; the 60-game rate is in alpha6_tests)" % [n, winner_more])

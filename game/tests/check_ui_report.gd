@@ -263,7 +263,7 @@ func _truths(r: ScreenReport, label: String) -> void:
 	var opp := "R" if r.my_side == "B" else "B"
 	ok(r.score() == [int(tk[r.my_side]), int(tk[opp])] and r.result.kills == r.score() and sum_me == int(tk[r.my_side]) and r.result.score_text() == "%d - %d" % [tk[r.my_side], tk[opp]],
 			"score_%s: the score line is the team kills %s" % [label, r.result.score_text()])
-	ok((r.score()[0] > r.score()[1]) == r.won, "score_%s: the side with more kills is the winner" % label)
+	ok(r.won == ((r.my_side == "B") == bool(r.res["blue_won"])), "score_%s: the result is the simulated winner (Match Sim v2 kills are real events; the winner can have fewer)" % label)
 	var sgn := 1.0 if r.my_side == "B" else -1.0
 	var key := "report.story."
 	for ph in ["early", "mid", "late"]:
@@ -316,7 +316,8 @@ func _fixtures() -> void:
 			long_text = r.result.line
 		r._leave()
 		await frames(2)
-	ok(closest_word == "narrow", "fixtures: the closest of 10 games reads as a narrow game (|final| %.3f, %s)" % [closest, closest_word])
+	# Match Sim v2: about 25 percent of games are narrow, so 10 games can lack one; the closest must not read as decisive
+	ok(closest_word != "decisive" and closest < 0.25, "fixtures: the closest of 10 games reads as narrow or clear (|final| %.3f, %s)" % [closest, closest_word])
 	ok(long_text.contains(long_mmss), "fixtures: the longest game (%s) shows its clock in the summary" % long_mmss)
 	# a practice game: the practice card, no payoff, no tip
 	var g := App.gs.next_game()

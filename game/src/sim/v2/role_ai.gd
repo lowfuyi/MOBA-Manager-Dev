@@ -74,7 +74,7 @@ static func team_calls(sim: MatchSimV2) -> void:
 				sim.calls[side] = {}
 			continue
 		var caller := _caller(sim, side)
-		var mac := caller.st("mac") / 100.0
+		var mac := caller.p_mac / 100.0
 		var lead := float(sim.call_lead_s()) * (0.6 + 0.8 * mac)
 		var alive_me := _alive(sim, side)
 		var alive_them := _alive(sim, SimData.other(side))
@@ -105,7 +105,9 @@ static func team_calls(sim: MatchSimV2) -> void:
 			if lane2 != "":
 				_make_call(sim, side, "siege", lane2, t + 45.0)
 				continue
-		# defend a lane where three or more enemies push a tower
+		# defend a lane where three or more enemies push a tower (checked every 4 s)
+		if int(t) % 4 != 0:
+			continue
 		for lane3 in LANES:
 			var tw: Dictionary = sim.first_tower(lane3, side)
 			if tw.is_empty():
@@ -120,6 +122,10 @@ static func team_calls(sim: MatchSimV2) -> void:
 
 
 static func _alive(sim: MatchSimV2, side: String) -> int:
+	return int(sim.alive_n[side])
+
+
+static func _alive_count(sim: MatchSimV2, side: String) -> int:
 	var n := 0
 	for h in sim.side_heroes(side):
 		if h.alive:
@@ -128,10 +134,12 @@ static func _alive(sim: MatchSimV2, side: String) -> int:
 
 
 static func _caller(sim: MatchSimV2, side: String) -> SimHero:
+	if sim.caller.has(side):
+		return sim.caller[side]
 	var best: SimHero = null
 	for h in sim.side_heroes(side):
 		var hh: SimHero = h
-		if best == null or hh.st("mac") > best.st("mac"):
+		if best == null or hh.p_mac > best.p_mac:
 			best = hh
 	return best
 
@@ -173,7 +181,7 @@ static func _member(call: Dictionary, h: SimHero, t: float) -> bool:
 static func decide(sim: MatchSimV2, h: SimHero) -> void:
 	var t: float = sim.t
 	var r := _r(sim, h)
-	var sen := h.st("sen") / 100.0
+	var sen := h.p_sen / 100.0
 	var p: Dictionary = sim.p
 	h.next_decide = t + lerpf(float(p["decide_max_s"]), float(p["decide_min_s"]), sen) * (0.8 + 0.4 * r.next_float())
 	var frac := h.hp / maxf(1.0, h.max_hp)
@@ -204,7 +212,7 @@ static func decide(sim: MatchSimV2, h: SimHero) -> void:
 		if not h.has_meta("call") or String(h.get_meta("call")) != cid:
 			h.set_meta("call", cid)
 			var bond := float(sim.bonds.get(h.side, 50.0)) / 100.0
-			var pr := float(p["answer_base"]) + float(p["answer_com"]) * h.st("com") / 100.0 + float(p["answer_bond"]) * bond + 0.2 * plan(sim, h.side, "g")
+			var pr := float(p["answer_base"]) + float(p["answer_com"]) * h.p_com / 100.0 + float(p["answer_bond"]) * bond + 0.2 * plan(sim, h.side, "g")
 			if h.slot == "top" and t < 840.0:
 				pr -= 0.25
 			h.set_meta("answer", r.next_float() < pr)
@@ -296,7 +304,7 @@ static func _laner(sim: MatchSimV2, h: SimHero, r: Pcg32, lane: String) -> void:
 			var best := ""
 			var bs := float(sim.p["roam_threshold"])
 			for side_lane in ["top", "bot"]:
-				var sc := gank_score(sim, h, side_lane) * (0.7 + 0.6 * h.st("mac") / 100.0)
+				var sc := gank_score(sim, h, side_lane) * (0.7 + 0.6 * h.p_mac / 100.0)
 				if sc > bs:
 					bs = sc
 					best = side_lane
@@ -312,7 +320,7 @@ static func _laner(sim: MatchSimV2, h: SimHero, r: Pcg32, lane: String) -> void:
 			_to_lane(sim, h, h.target)
 		return
 	if h.intent == "farm_lane" and h.target == lane:
-		h.next_decide += 2.0
+		h.next_decide += 4.0
 	h.intent = "farm_lane"
 	h.target = lane
 	_to_lane(sim, h, lane)
@@ -338,14 +346,14 @@ static func _support(sim: MatchSimV2, h: SimHero, r: Pcg32) -> void:
 	var roam := plan(sim, h.side, "s")
 	var carry: SimHero = sim.by_key[h.side + ".bot"]
 	# ward the river now and then
-	if t >= 120.0 and t - float(h.get_meta("ward_t", -999.0)) >= float(sim.p["vision_ward_s"]) * (1.3 - 0.6 * h.st("mac") / 100.0):
+	if t >= 120.0 and t - float(h.get_meta("ward_t", -999.0)) >= float(sim.p["vision_ward_s"]) * (1.3 - 0.6 * h.p_mac / 100.0):
 		h.set_meta("ward_t", t)
 		sim.ward(h.side, "bot")
 		sim.ward(h.side, "river")
 		h.vision += 2.0
 		sim.log_ev([t, "ward", h.key, "river"])
 	if t >= 210.0 and h.intent != "roam":
-		var sc := gank_score(sim, h, "mid") * (0.6 + 0.5 * h.st("mac") / 100.0) + 0.3 * roam
+		var sc := gank_score(sim, h, "mid") * (0.6 + 0.5 * h.p_mac / 100.0) + 0.3 * roam
 		if sc > float(sim.p["roam_threshold"]) and r.next_float() < 0.4 + 0.3 * roam:
 			h.intent = "roam"
 			h.target = "mid"
@@ -386,7 +394,7 @@ static func _jungle(sim: MatchSimV2, h: SimHero, r: Pcg32) -> void:
 		var best := ""
 		var bs := float(sim.p["gank_threshold"]) * (1.0 - 0.15 * plan(sim, h.side, "t"))
 		for lane in LANES:
-			var sc := gank_score(sim, h, lane) * (0.7 + 0.6 * h.st("mac") / 100.0)
+			var sc := gank_score(sim, h, lane) * (0.7 + 0.6 * h.p_mac / 100.0)
 			if jungle_focus(sim, h.side) == lane:
 				sc += 0.2
 			if sc > bs:
@@ -443,11 +451,11 @@ static func gank_score(sim: MatchSimV2, h: SimHero, lane: String) -> float:
 	var front := float(sim.lanes[lane]["front"])
 	var over := (0.5 - front) if enemy == "R" else (front - 0.5)    # > 0: the enemy wave is on our half
 	var best := 0.0
-	for e in sim.heroes_in_lane(lane, enemy, 0.12):
+	for e in sim.heroes_in_lane(lane, enemy):
 		var ee: SimHero = e
 		var sc := 0.3 + 0.9 * maxf(0.0, over) + 0.3 * (1.0 - ee.hp / maxf(1.0, ee.max_hp)) + 0.05 * float(h.level - ee.level)
 		sc -= 0.25 * float(sim.has_vision(enemy, lane))
-		var allies := sim.heroes_in_lane(lane, h.side, 0.12)
+		var allies := sim.heroes_in_lane(lane, h.side)
 		if not allies.is_empty():
 			sc += 0.15
 		var tw: Dictionary = sim.first_tower(lane, enemy)
@@ -505,7 +513,7 @@ static func joins(sim: MatchSimV2, h: SimHero, center: Vector2) -> bool:
 			allies += 1
 	if allies == 0:
 		return false
-	var pr := 0.45 + 0.35 * h.st("com") / 100.0 + 0.15 * h.st("sen") / 100.0 + (0.15 if h.slot in ["jg", "sup"] else 0.0) + 0.15 * plan(sim, h.side, "g")
+	var pr := 0.45 + 0.35 * h.p_com / 100.0 + 0.15 * h.p_sen / 100.0 + (0.15 if h.slot in ["jg", "sup"] else 0.0) + 0.15 * plan(sim, h.side, "g")
 	return _r(sim, h).next_float() < pr
 
 
@@ -567,7 +575,7 @@ static func lane_trades(sim: MatchSimV2) -> void:
 		if wf < 0.5:
 			continue
 		var lead: SimHero = winners[0]
-		var pr := 0.3 + 0.3 * lead.st("lan") / 100.0 + 0.2 * plan(sim, win, "a") + 0.1 * plan(sim, win, "r") - 0.2 * float(sim.under_tower(low))
+		var pr := 0.3 + 0.3 * lead.p_lan / 100.0 + 0.2 * plan(sim, win, "a") + 0.1 * plan(sim, win, "r") - 0.2 * float(sim.under_tower(low))
 		if lr.next_float() < pr:
 			var parts := sim._participants((lead.pos + low.pos) / 2.0)
 			if parts.size() >= 2:
@@ -581,10 +589,10 @@ static func _trade_power(sim: MatchSimV2, hs: Array, lane: String, side: String)
 		var hh: SimHero = h
 		var kit_early := 0.0
 		for i in 3:
-			var a := hh.ability(i)
-			if "damage" in a["kind"] and hh.level >= int(a["unlock"]):
-				kit_early += float(a["dmg"]) / maxf(3.0, float(a["cd"]))
+			var a: SimHero.Ability = hh.abil[i]
+			if a.dmg_k and hh.level >= a.unlock:
+				kit_early += a.dmg / maxf(3.0, a.cd)
 		var w := 1.0 if hh.slot != "sup" else 0.6
-		v += w * power(sim, hh) * (1.0 + 0.004 * kit_early) * (0.85 + 0.3 * hh.st("lan") / 100.0)
+		v += w * power(sim, hh) * (1.0 + 0.004 * kit_early) * (0.85 + 0.3 * hh.p_lan / 100.0)
 	v *= 1.0 + float(lm.get(lane, 0.0)) * float(sim.p["lane_counter"])
 	return v

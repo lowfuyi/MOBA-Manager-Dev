@@ -14,8 +14,15 @@ const FEED_ORDER := [
 ]
 
 
-## Cosmetic game clock in minutes (GDD 8.5 / 8.7). Never feeds back into the result.
+## True for a result played by Match Sim v2 (its "sim" carries the event log and the per-hero lines).
+static func is_v2(result: Dictionary) -> bool:
+	return int((result.get("sim", {}) as Dictionary).get("v", 1)) == 2
+
+
+## Game clock in minutes. v2: the simulated length. v1 (old results): the cosmetic clock (GDD 8.5 / 8.7).
 static func game_minutes(result: Dictionary) -> float:
+	if is_v2(result):
+		return float(result["sim"]["len_s"]) / 60.0
 	var sim: Dictionary = result["sim"]
 	var mean_lead := (absf(float(sim["mid"])) + absf(float(sim["late"]))) / 2.0
 	var z := Pcg32.contest_stream(int(result["mseed"]), "length").next_normal()
@@ -69,6 +76,8 @@ static func _neutral(t: Dictionary) -> Dictionary:
 ## Counterfactual attribution. Returns {"factors": [{"id", "value", "share"}], "luck_share", "draft_share"}
 ## where value is the change in Final (positive helps `my_side`) and share is value / sum(|value|).
 static func attribution(result: Dictionary, my_side: String) -> Dictionary:
+	if is_v2(result):
+		return _attribution_v2(result, my_side)
 	var ta: Dictionary = result["team_a"]
 	var tb: Dictionary = result["team_b"]
 	var p := MatchRunner.sim_params()
@@ -101,6 +110,41 @@ static func attribution(result: Dictionary, my_side: String) -> Dictionary:
 		f["share"] = f["value"] / total if total > 0.0 else 0.0
 	return {"factors": factors}
 
+## v2 attribution (MATCH-SIM-V2-DESIGN 8.2): each factor is its EDGE GOING IN, the change in the noise-free analytic
+## prediction (the v1 contest model at sigma 0) when that factor is removed; "luck" is how far the real result was from that
+## prediction (the winner's side counts as +OUTCOME). Shares add to 100 percent; a factor's value is positive when it helped
+## `my_side`. Nothing here re-runs the v2 game, so it costs a few noise-free evaluations.
+const OUTCOME := 0.35
+
+
+static func _attribution_v2(result: Dictionary, my_side: String) -> Dictionary:
+	var ta: Dictionary = result["team_a"]
+	var tb: Dictionary = result["team_b"]
+	var p := MatchRunner.sim_params()
+	var sgn := 1.0 if my_side == "B" else -1.0
+	var plans: Dictionary = result.get("plans", {})
+	var e_actual := GamePlan.expected_final(ta, tb, p, plans)
+	var factors: Array = []
+	for s in SLOTS:
+		var cf := _dup_team(ta)
+		for ph in PHASES:
+			cf["ratings"][ph][s] = tb["ratings"][ph][s]
+		factors.append({"id": "slot." + s, "value": (e_actual - GamePlan.expected_final(cf, tb, p, plans)) * sgn})
+	factors.append({"id": "draft", "value": (e_actual - GamePlan.expected_final(_neutral(ta), _neutral(tb), p, plans)) * sgn})
+	if plans.has(my_side) and not (plans[my_side]["triggers"].is_empty() and GamePlan.is_neutral(plans[my_side]["default"])):
+		var without := plans.duplicate()
+		without.erase(my_side)
+		factors.append({"id": "plan", "value": (e_actual - GamePlan.expected_final(ta, tb, p, without)) * sgn})
+	var outcome := OUTCOME if bool(result["blue_won"]) else -OUTCOME
+	factors.append({"id": "luck", "value": (outcome - clampf(e_actual, -OUTCOME, OUTCOME)) * sgn})
+	var total := 0.0
+	for f in factors:
+		total += absf(f["value"])
+	for f in factors:
+		f["share"] = f["value"] / total if total > 0.0 else 0.0
+	return {"factors": factors, "expected": e_actual * sgn}
+
+
 # ---------------------------------------------------------------- derived kills, deaths and assists (GDD 9.2 test 6)
 ## Display only, never fed back into any result. Drawn from their own stream ("kda") of the match seed, so the
 ## same game always shows the same lines. Rules: the winner always has more kills than the loser; one side's
@@ -112,7 +156,11 @@ const KDA_LANE := {"top": "top", "jg": "jungle", "mid": "mid_lane", "bot": "bot"
 
 
 ## Returns {"B": {slot: {"k","d","a"}}, "R": {...}, "team": {"B": {"k","d","a"}, "R": {...}}}.
+## v2: counted from the event log's kills (a tower's execution of a hero nobody damaged is a death without a kill, so a
+## side's deaths are the other side's kills plus such executions). v1: drawn as before (display only).
 static func kda(result: Dictionary) -> Dictionary:
+	if is_v2(result):
+		return _kda_v2(result)
 	var rng := Pcg32.contest_stream(int(result["mseed"]), "kda")
 	var minutes := game_minutes(result)
 	var total := clampi(int(round(minutes * 2.2 + rng.next_normal() * 2.0)), 18, 44)
@@ -153,6 +201,24 @@ static func kda(result: Dictionary) -> Dictionary:
 			out[side][SLOTS[i]] = {"k": int(k_counts[side][i]), "d": int(deaths[i]), "a": int(assists[i])}
 			ta += int(assists[i])
 		out["team"][side] = {"k": team_k, "d": int(kills[other]), "a": ta}
+	return out
+
+
+static func _kda_v2(result: Dictionary) -> Dictionary:
+	var per: Dictionary = result["sim"]["per"]
+	var out := {"team": {}}
+	for side in ["B", "R"]:
+		out[side] = {}
+		var tk := 0
+		var td := 0
+		var ta := 0
+		for s in SLOTS:
+			var x: Dictionary = per[side + "." + s]
+			out[side][s] = {"k": int(x["k"]), "d": int(x["d"]), "a": int(x["a"])}
+			tk += int(x["k"])
+			td += int(x["d"])
+			ta += int(x["a"])
+		out["team"][side] = {"k": tk, "d": td, "a": ta}
 	return out
 
 

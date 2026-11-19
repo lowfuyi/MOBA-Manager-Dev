@@ -5,7 +5,7 @@
  "show_median_len_s": 840,
  "show_quiet_max": 2.5,
  "dt": 2.0,
- "fight_dt": 0.25,
+ "fight_dt": 0.5,
  "fight_max_s": 14.0,
  "safety_stop_s": 2100,
  "q_ref": 50.0,
@@ -125,8 +125,8 @@
  "join_u": 0.16,
  "fight_center_u": 0.09,
  "vision_ward_s": 90,
- "decide_min_s": 3.0,
- "decide_max_s": 7.0,
+ "decide_min_s": 4.0,
+ "decide_max_s": 9.0,
  "trade_every_s": 8.0,
  "trade_dmg": 0.11,
  "gank_threshold": 0.55,
@@ -158,5 +158,8 @@
  "trigger_lead_gold": 1500,
  "fortify_s": 360,
  "fortify_mult": 0.5,
- "q_k": 0.25
+ "q_k": 0.25,
+ "ai_games_v2": false,
+ "final_struct": 0.025,
+ "final_gold": 25000.0
 }

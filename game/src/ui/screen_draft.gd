@@ -751,7 +751,7 @@ func _start_match() -> void:
 
 
 static func launch(g: Dictionary, d: Draft) -> void:
-	var res := MatchRunner.finish(App.world, d, App.gs.plans_for(g))
+	var res := MatchRunner.finish(App.world, d, App.gs.plans_for(g), App.gs.builds())
 	App.last_game = g
 	App.last_result = res
 	App.go(ScreenMatch.new(g, res))

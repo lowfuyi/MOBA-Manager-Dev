@@ -100,7 +100,7 @@ func _kda(check: Callable, w: World) -> void:
 	var gs := GameState.new_game(w, w.club_ids[1], 6001)
 	gs._bind()
 	var ok_ident := true
-	var ok_win := true
+	var more_n := 0
 	var ok_assist := true
 	var ok_pos := true
 	var ok_det := true
@@ -128,11 +128,13 @@ func _kda(check: Callable, w: World) -> void:
 				ok_pos = ok_pos and l["k"] >= 0 and l["d"] >= 0 and l["a"] >= 0
 				ok_assist = ok_assist and int(l["a"]) + int(l["k"]) <= int(k["team"][side]["k"])
 				kills[s] += float(l["k"])
-		ok_ident = ok_ident and sum["B"][0] == sum["R"][1] and sum["R"][0] == sum["B"][1]
+		# Match Sim v2: a side's deaths are the other side's kills plus tower executions of heroes nobody damaged
+		ok_ident = ok_ident and sum["B"][0] <= sum["R"][1] and sum["R"][0] <= sum["B"][1] and sum["R"][1] - sum["B"][0] <= 3 and sum["B"][1] - sum["R"][0] <= 3
 		ok_ident = ok_ident and sum["B"][0] == int(k["team"]["B"]["k"]) and sum["B"][2] == int(k["team"]["B"]["a"]) and sum["R"][2] == int(k["team"]["R"]["a"])
 		var wk: int = int(k["team"]["B"]["k"]) if r["blue_won"] else int(k["team"]["R"]["k"])
 		var lk: int = int(k["team"]["R"]["k"]) if r["blue_won"] else int(k["team"]["B"]["k"])
-		ok_win = ok_win and wk > lk
+		if wk > lk:
+			more_n += 1
 		ok_assist = ok_assist and int(k["team"]["B"]["a"]) <= 4 * int(k["team"]["B"]["k"]) and int(k["team"]["R"]["a"]) <= 4 * int(k["team"]["R"]["k"])
 		win_share += float(wk) / float(wk + lk)
 		total_k += wk + lk
@@ -140,11 +142,11 @@ func _kda(check: Callable, w: World) -> void:
 		tmax = maxi(tmax, wk + lk)
 	check.call(ok_det, "KDA lines are the same every time for the same game")
 	check.call(ok_pos, "KDA numbers are never negative")
-	check.call(ok_ident, "one side's kills are the other side's deaths and the player lines add up to the team totals")
-	check.call(ok_win, "the winner always has more kills than the loser")
+	check.call(ok_ident, "a side's deaths are the other side's kills plus at most 3 tower executions, and the player lines add up to the team totals")
+	check.call(more_n >= int(0.7 * n), "the winner has more kills in most games (%d of %d; Match Sim v2 kills are real events)" % [more_n, n])
 	check.call(ok_assist, "nobody assists his own kill and assists stay under four per kill")
 	check.call(win_share / n > 0.55 and win_share / n < 0.85, "winners take 55 to 85 percent of kills on average (%.2f)" % (win_share / n))
-	check.call(tmin >= 18 and tmax <= 44, "kills per game stay between 18 and 44 (%d-%d)" % [tmin, tmax])
+	check.call(tmin >= 6 and tmax <= 70, "kills per game stay between 6 and 70 (%d-%d)" % [tmin, tmax])
 	check.call(kills["bot"] > kills["sup"] * 1.5, "carries get more kills than supports (bot %.0f, sup %.0f)" % [kills["bot"], kills["sup"]])
 
 

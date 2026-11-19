@@ -1,4 +1,6 @@
 extends RefCounted
+## Match Sim v2 interim (2026-11-19): this tests the Alpha 0.8 show, so its results come from MatchRunner.auto_v1 (the v1 contest
+## model the show was built for) until Arena v2 replaces the show with event-log playback (Phase 4).
 ## Alpha 0.8 A-03: the tokens' walks (Choreo) on real results, both held stagings and the clean ending:
 ##   arrival   at each group beat's resolve, every hero that has not died since the order is inside the beat's zone; laners stand
 ##             at their clash point at their resolve
@@ -25,7 +27,7 @@ func run(check: Callable) -> void:
 		var b: String = w.club_ids[(i * 5 + 2) % w.club_ids.size()]
 		if a == b:
 			b = w.club_ids[(i + 1) % w.club_ids.size()]
-		var res := MatchRunner.auto(w, w.best_lineup(a), w.best_lineup(b), meta, 9100 + i, "choreo:%d" % i, false, {"B": "ai", "R": "ai"})
+		var res := MatchRunner.auto_v1(w, w.best_lineup(a), w.best_lineup(b), meta, 9100 + i, "choreo:%d" % i, false, {"B": "ai", "R": "ai"})
 		var s := ShowScript.build(res, "B" if i % 2 == 0 else "R")
 		var variants := ["held_island", "held_gate"] if s.held else [""]
 		for v in variants:

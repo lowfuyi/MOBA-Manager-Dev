@@ -46,6 +46,9 @@ var bonds := {"B": 50.0, "R": 50.0}
 var trade_next: Dictionary = {}
 var vision := {"B": {}, "R": {}}  # zone -> until
 var _next_track := 0.0
+var caller: Dictionary = {}        # side -> the shot caller (highest MAC; fixed for the game)
+var alive_n := {"B": 5, "R": 5}    # heroes alive per side, this step
+var c_sb_move := 0.0
 var _front_pt: Dictionary = {}     # lane -> Vector2 (this tick)
 var _present: Dictionary = {}      # lane + side -> heroes at the front (radius 0.09, this tick)
 var _ft: Dictionary = {}           # lane + side -> first tower (cleared when a structure falls)
@@ -127,6 +130,7 @@ func _setup(ta: Dictionary, tb: Dictionary, p_mseed: int, sets: Dictionary, ctx:
 			var tm := float(team.get("team_mod", 0.0))
 			for ph in ["early", "mid", "late"]:
 				h.q[ph] = float(team["ratings"][ph][slot]) * (1.0 + tm) / float(p["q_ref"])
+			h.init_kit(h.kit)
 			var b: Array = ctx.get("builds", {}).get(side, {}).get(slot, [])
 			if not Items.is_legal(b):
 				var enemy: Array = []
@@ -173,11 +177,14 @@ func _setup(ta: Dictionary, tb: Dictionary, p_mseed: int, sets: Dictionary, ctx:
 	c_sup_share = float(p["lane_share_sup"])
 	c_plan_k = float(p["plan_k"])
 	c_tower_r = float(p["tower_range_u"])
+	c_sb_move = float(p["buffs"]["stoneback"]["move"])
+	for side in ["B", "R"]:
+		caller[side] = RoleAI._caller(self, side)
 	for h in heroes:
 		var lv := 99
-		for i in 4:
-			if "wave" in h.ability(i)["kind"]:
-				lv = mini(lv, int(h.ability(i)["unlock"]))
+		for a in h.abil:
+			if (a as SimHero.Ability).wave:
+				lv = mini(lv, (a as SimHero.Ability).unlock)
 		_wave_lvl[h.key] = lv
 
 
@@ -308,7 +315,7 @@ func _gank_watch() -> void:
 			if ee.has_meta(tag):
 				continue
 			ee.set_meta(tag, true)
-			var pr := 0.10 + 0.35 * ee.st("sen") / 100.0 + 0.25 * float(has_vision(ee.side, gg.target))
+			var pr := 0.10 + 0.35 * ee.p_sen / 100.0 + 0.25 * float(has_vision(ee.side, gg.target))
 			if rng(ee.key + ":dec").next_float() < pr:
 				ee.intent = "back_off"
 				var tw := first_tower(gg.target, ee.side)
@@ -338,7 +345,7 @@ func _economy(dt: float) -> void:
 		_next_min += 60.0
 		for h in heroes:
 			var hh: SimHero = h
-			if String(hh.passive()["trigger"]) == "stacks_per_min":
+			if hh.pas.trigger == "stacks_per_min":
 				hh.stacks += 1
 				hh.dirty()
 				_refresh_hp(hh)
@@ -395,7 +402,7 @@ func _move(dt: float) -> void:
 		var hh: SimHero = h
 		if not hh.alive or t < hh.busy_until or hh.recall_at >= 0.0:
 			continue
-		var budget := hh.move_speed() * dt * (1.0 + (float(p["buffs"]["stoneback"]["move"]) if buffs[hh.side].has("stoneback") else 0.0))
+		var budget := hh.move_speed() * dt * (1.0 + (c_sb_move if buffs[hh.side].has("stoneback") else 0.0))
 		# lane farming: follow the wave front
 		if LANE_INTENTS.has(hh.intent) and hh.path.is_empty() and lanes.has(hh.target):
 			var goal := lane_stand(hh, hh.target)
@@ -501,22 +508,21 @@ func _camps_clear(dt: float) -> void:
 		give_gold(hh, float(spec["gold"]))
 		hh.cs_gold += float(spec["gold"])
 		give_xp(hh, float(spec["xp"]))
-		var loss := 0.07 * (1.0 - 0.4 * minf(1.0, hh.stat("lifesteal") + hh.stat("omnivamp") + 0.1 * float(int(hh.kit["passive"]["heal"]) > 0)))
+		var loss := 0.07 * (1.0 - 0.4 * minf(1.0, hh.s_ls + hh.s_ov + 0.1 * float(hh.pas.heal > 0.0)))
 		hh.hp = maxf(hh.max_hp * 0.15, hh.hp - hh.max_hp * loss * (1.0 - 0.03 * float(hh.level)))
 		log_ev([t, "camp", hh.key, String(c["id"]), t + dur])
 
 
 ## Damage per second against monsters and structures (no armour), used for camps, objectives and sieges.
 func monster_dps(h: SimHero) -> float:
-	var d := h.stat("atk") * h.stat("aspd") * (1.0 + 0.5 * h.stat("crit"))
-	for i in 4:
-		var a := h.ability(i)
-		if h.level >= int(a["unlock"]) and ("damage" in a["kind"]):
-			var dmg := float(a["dmg"]) + float(a["dmg_lvl"]) * float(h.level - 1) + float(a["ratio"]) * (h.stat("ap") if String(a["dtype"]) == "magic" else h.stat("atk") * 0.5)
-			d += dmg / maxf(2.0, float(a["cd"]))
-	var pas := h.passive()
-	if String(pas["trigger"]) == "vs_structure":
-		d *= 1.0 + float(pas["amount"])
+	var d := h.s_atk * h.s_aspd * (1.0 + 0.5 * h.s_crit)
+	for x in h.abil:
+		var a: SimHero.Ability = x
+		if h.level >= a.unlock and a.dmg_k:
+			var dmg := a.dmg + a.dmg_lvl * float(h.level - 1) + a.ratio * (h.s_ap if a.magic else h.s_atk * 0.5)
+			d += dmg / maxf(2.0, a.cd)
+	if h.pas.trigger == "vs_structure":
+		d *= 1.0 + h.pas.amount
 	if h.slot == "jg":
 		d *= 1.35     # the jungler's monster bonus (no Smite spell, design 5.3)
 	return d * h.qe(t) * (1.0 + float(hooks[h.side]["contest_mod"]["jungle"]) * float(p["plan_k"]) * (1.0 if h.slot == "jg" else 0.0))
@@ -578,6 +584,10 @@ func _take_objective(oid: String, side: String, takers: Array) -> void:
 func _tick_cache() -> void:
 	_present.clear()
 	_stand.clear()
+	alive_n = {"B": 0, "R": 0}
+	for h in heroes:
+		if h.alive:
+			alive_n[h.side] += 1
 	for lane in lanes:
 		_front_pt[lane] = SimData.lane_point(lane, float(lanes[lane]["front"]))
 	var r2 := 0.09 * 0.09
@@ -682,7 +692,7 @@ func _lanes(dt: float) -> void:
 				var hh: SimHero = h
 				if hh.slot == "jg" and hh.intent != "farm_lane":
 					continue
-				var eff := c_floor + (1.0 - c_floor) * (0.5 * hh.st("lan") + 0.5 * hh.st("mec")) / 100.0
+				var eff := c_floor + (1.0 - c_floor) * (0.5 * hh.p_lan + 0.5 * hh.p_mec) / 100.0
 				var pressure := 1.0
 				if not opp.is_empty():
 					var mine_hp := hh.hp / maxf(1.0, hh.max_hp)
@@ -718,7 +728,7 @@ func _lanes(dt: float) -> void:
 					continue
 				dps += monster_dps(hh) * 0.7 * float(p["hero_struct_mult"]) * (1.0 + (float(p["buffs"]["moonhulk"]["struct_dmg"]) if buffs[side].has("moonhulk") else 0.0))
 				if present[enemy].is_empty() and String(tw2["tier"]) != "cairn" and float(push[side]) < 1.6:
-					hh.hp -= float(tw2["dmg"]) * 0.25 * dt * float(p["armor_k"]) / (float(p["armor_k"]) + hh.stat("armor"))
+					hh.hp -= float(tw2["dmg"]) * 0.25 * dt * float(p["armor_k"]) / (float(p["armor_k"]) + hh.s_armor)
 					if hh.hp <= 0.0:
 						hh.hp = 0.0
 						on_tower_kill(hh, enemy, t)
@@ -882,6 +892,22 @@ func on_kill(killer: SimHero, victim: SimHero, assists: Array, at_t: float) -> v
 
 
 func on_tower_kill(victim: SimHero, tower_side: String, at_t: float) -> void:
+	# a hero an enemy damaged in the last 10 s is that enemy's kill (assists as usual); otherwise a death without a kill
+	var killer: SimHero = null
+	var last_t := -INF
+	var assists: Array = []
+	for k in victim.last_hit_by:
+		if at_t - float(victim.last_hit_by[k]) <= 10.0 and by_key.has(k) and (by_key[k] as SimHero).side != victim.side:
+			assists.append(k)
+			if float(victim.last_hit_by[k]) > last_t:
+				last_t = float(victim.last_hit_by[k])
+				killer = by_key[k]
+	if killer != null:
+		assists.erase(killer.key)
+		assists.sort()
+		on_kill(killer, victim, assists, at_t)
+		log_ev([at_t, "kill", killer.key, victim.key, assists])
+		return
 	victim.alive = false
 	victim.hp = 0.0
 	victim.deaths += 1
@@ -1070,12 +1096,14 @@ func _result() -> Dictionary:
 	_cut_after_end()
 	_fix_track()
 	var a_won := winner == "B"
-	var gl := (_team_gold("B") - _team_gold("R")) / 10000.0
+	# the end margin, signed for Blue, on the v1 scale (|final| median about 0.34; narrow, clear, decisive about 25 / 40 / 35
+	# percent, so Report.result_word, the Form Rating and the standings margin keep their meaning; design 9.1)
+	var gl := (_team_gold("B") - _team_gold("R")) / float(p["final_gold"])
 	var structs := 0.0
 	for tw in towers:
 		if not tw["alive"]:
 			structs += -1.0 if String(tw["side"]) == "B" else 1.0
-	var final := clampf(structs * 0.06 + gl, -0.99, 0.99)
+	var final := clampf(structs * float(p["final_struct"]) + gl, -0.99, 0.99)
 	if a_won and final <= 0.0:
 		final = 0.01
 	if not a_won and final >= 0.0:

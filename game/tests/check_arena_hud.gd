@@ -1,4 +1,6 @@
 extends Node
+## Match Sim v2 interim (2026-11-19): this tests the Alpha 0.8 show, so its results come from MatchRunner.auto_v1 (the v1 contest
+## model the show was built for) until Arena v2 replaces the show with event-log playback (Phase 4).
 ## Alpha 0.8 A-05: the arena HUD (ArenaHud.Board and Feed) against the show script, headless. Ends with " N checks, M failures".
 ##   tie-out   at 75 s the board's kills are Report.kda's team kills, towers the ledger's, the gold leader the match winner (I2),
 ##             the objective owners the contest winners; the numbers never go down
@@ -31,7 +33,7 @@ func _ready() -> void:
 		var b: String = w.club_ids[(i * 7 + 1) % w.club_ids.size()]
 		if a == b:
 			b = w.club_ids[(i + 1) % w.club_ids.size()]
-		var res := MatchRunner.auto(w, w.best_lineup(a), w.best_lineup(b), meta, 7700 + i, "hud:%d" % i, false, {"B": "ai", "R": "ai"})
+		var res := MatchRunner.auto_v1(w, w.best_lineup(a), w.best_lineup(b), meta, 7700 + i, "hud:%d" % i, false, {"B": "ai", "R": "ai"})
 		var me := "B" if i % 2 == 0 else "R"
 		var s := ShowScript.build(res, me)
 		var kd := Report.kda(res)

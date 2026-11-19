@@ -99,7 +99,7 @@ func _drafts(w: World, g: Dictionary) -> void:
 					same = false
 					break
 		_check.call(same, "draft log " + id)
-		var r: Dictionary = MatchRunner.finish(w, d)
+		var r: Dictionary = MatchRunner.finish_v1(w, d)    # the golden pipeline vectors pin the v1 contest model (analytic predictor)
 		_check.call(_near(float(r["final"]), float(c["final"]), 1e-9) and bool(r["blue_won"]) == bool(c["a_won"]), "play final " + id)
 		_check.call(_near(float(r["comp"]["B"]), float(c["comp_b"])) and _near(float(r["comp"]["R"]), float(c["comp_r"])), "comp mods " + id)
 		_check.call(r["style"]["B"] == c["style_b"] and r["style"]["R"] == c["style_r"], "styles " + id)

@@ -1,4 +1,6 @@
 extends Node
+## Match Sim v2 interim (2026-11-19): this tests the Alpha 0.8 show, so its results come from MatchRunner.auto_v1 (the v1 contest
+## model the show was built for) until Arena v2 replaces the show with event-log playback (Phase 4).
 ## Alpha 0.8.1: the Frame rate setting (30 or 60). Ends with "check_frame_rate: N checks, M failures".
 ##   clock     ScreenMatch.advance at 1/30 and 1/60 s per frame reaches the same show time at the same real second, at x1 and x2;
 ##             the show ends within one 30 fps frame of the same real second (75 s, 37.5 s at x2)
@@ -106,7 +108,7 @@ func _same() -> void:
 		var b: String = w.club_ids[(i * 3 + 2) % w.club_ids.size()]
 		if a == b:
 			b = w.club_ids[(i + 1) % w.club_ids.size()]
-		var res := MatchRunner.auto(w, w.best_lineup(a), w.best_lineup(b), meta, 9100 + i, "fps:%d" % i, false, {"B": "ai", "R": "ai"})
+		var res := MatchRunner.auto_v1(w, w.best_lineup(a), w.best_lineup(b), meta, 9100 + i, "fps:%d" % i, false, {"B": "ai", "R": "ai"})
 		var res_text := JSON.stringify(res)
 		var me := "B" if i % 2 == 0 else "R"
 		var fast := i % 4 == 1

@@ -1,4 +1,6 @@
 extends RefCounted
+## Match Sim v2 interim (2026-11-19): this tests the Alpha 0.8 show, so its results come from MatchRunner.auto_v1 (the v1 contest
+## model the show was built for) until Arena v2 replaces the show with event-log playback (Phase 4).
 ## Alpha 0.8 A-01: the arena's show script (ACTION-VOCABULARY 5.4 invariants and section 8), on real results of auto games
 ## between the league's clubs with AI plans (so plan switches and held fights occur):
 ##   I1 the ladder ends at final; pressure B - R = final      I2 the winner's gold lead at 75 s is positive
@@ -37,7 +39,7 @@ func run(check: Callable) -> void:
 			var behind := GamePlan.neutral()
 			behind["g"] = 100
 			plans = {"B": {"default": GamePlan.neutral(), "triggers": [{"when": "behind_early", "plan": behind}, {"when": "ahead_early", "plan": behind}]}, "R": "ai"}
-		var res := MatchRunner.auto(w, w.best_lineup(a), w.best_lineup(b), meta, 4242 + i, "show:%d" % i, i % 3 == 0, plans)
+		var res := MatchRunner.auto_v1(w, w.best_lineup(a), w.best_lineup(b), meta, 4242 + i, "show:%d" % i, i % 3 == 0, plans)
 		var side := "B" if i % 2 == 0 else "R"
 		var s := ShowScript.build(res, side)
 		for bad in _invariants(s, res):

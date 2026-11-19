@@ -44,6 +44,7 @@ func run(check: Callable) -> void:
 	_roles(check, games)
 	_items(check, w)
 	_levers(check)
+	_interim_show(check, w, meta)
 
 
 func _determinism(check: Callable, g: Array) -> void:
@@ -210,6 +211,20 @@ func _items(check: Callable, w: World) -> void:
 	for iid in carry_b:
 		all_in = all_in and String(iid) in hero.owned
 	check.call(all_in and hero.owned.size() == 6, "v2 items: with enough gold the whole build is bought, six items")
+
+
+## Until Arena v2 (Phase 4), the live Match screen still builds the Alpha 0.8 show from the result: it must build from a v2
+## result (MatchRunner.finish) without failing, and its final score must be the v2 kills.
+func _interim_show(check: Callable, w: World, meta: Dictionary) -> void:
+	var ok := true
+	for i in 3:
+		var res := MatchRunner.auto(w, w.best_lineup(w.club_ids[i]), w.best_lineup(w.club_ids[(i + 4) % 10]), meta, 61 + i, "v2show:%d" % i, false, {"B": "ai", "R": "ai"})
+		var s := ShowScript.build(res, "B")
+		var c := Choreo.build(s)
+		ok = ok and s != null and c != null and Report.is_v2(res)
+		var kd := Report.kda(res)
+		ok = ok and int(kd["team"]["B"]["k"]) == int(res["sim"]["team_kills"]["B"])
+	check.call(ok, "interim: the Alpha 0.8 show builds from a v2 result and the kills are the v2 kills")
 
 
 func _levers(check: Callable) -> void:
