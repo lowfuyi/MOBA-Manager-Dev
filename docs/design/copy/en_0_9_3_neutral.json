@@ -1,0 +1,14 @@
+{
+  "season.contracts_hint": "These contracts end now. Tap a player to renew, or they leave when the new season starts.",
+  "chem.bench_hint": "A substitute starts from the bonds they have now. Swapping a starter costs chemistry until the new pairs have played together.",
+  "neg.pv.h_sign": "If you sign them",
+  "neg.pv.bench": "They would not start yet",
+  "stat.help.pot": "Right number is Potential, the most they can grow to.",
+  "stat.help.mec": "Mechanics: how fast and precisely they play. Matters most for carries and mid.",
+  "neg.asking": "Market value about {wage} a week. What they will really accept is their secret.",
+  "neg.block.locked": "They will not talk for {n} more rounds.",
+  "release.block.unknown": "This player is not in your squad.",
+  "release.confirm": "Release {name}? It costs {cost} (half of the wages still owed) and they become a free agent.",
+  "release.yes": "Yes, release them",
+  "train.squad_h": "Tap a player to change their focus"
+}

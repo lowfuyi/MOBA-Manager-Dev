@@ -66,12 +66,8 @@ PRONOUN_RE = re.compile(r"\b(he|his|him|himself|she|her|hers|herself)\b", re.I)
 DATA_KEYS = re.compile(r"^(help\.[a-z]+\.terms|gl\..+\.where)$")
 
 # Open problems in strings outside the patch (COPY-0.7.md 6.4). Warnings only.
-KNOWN_OPEN = {
-    **{k: "gendered pronoun in an existing string (COPY-0.7.md 6.4)" for k in (
-        "chem.bench_hint", "neg.asking", "neg.block.locked", "neg.pv.bench", "neg.pv.h_sign",
-        "release.block.unknown", "release.confirm", "release.yes", "season.contracts_hint",
-        "stat.help.mec", "stat.help.pot", "train.squad_h")},
-}
+KNOWN_OPEN = {}    # 0.9.3d: the 12 gendered-pronoun strings were made neutral (en_0_9_3_neutral.json); nothing is open
+
 
 # Labels a text may tell you to tap that are not strings in en.json (none yet). Case-insensitive.
 LABEL_ALLOW = set()

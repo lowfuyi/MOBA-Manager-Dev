@@ -215,8 +215,9 @@ def test_real_allow_list_shape():
     assert set(owned) <= set(en)
     patch = M.load_unique(ROOT / "docs/design/copy/en_0_7.json")
     hold = M.load_unique(ROOT / "docs/design/copy/hold_0_7.json")
-    older = ["role.short.jg", "role.short.sup", "chem.pentagon_hint"] + [
-        k for k in C.KNOWN_OPEN if k not in ("chem.pentagon_hint", "draft.meta_hint")]
+    older = ["role.short.jg", "role.short.sup", "chem.pentagon_hint"] + [    # the 12 pronoun keys, KNOWN_OPEN until 0.9.3d
+        "chem.bench_hint", "neg.asking", "neg.block.locked", "neg.pv.bench", "neg.pv.h_sign", "release.block.unknown",
+        "release.confirm", "release.yes", "season.contracts_hint", "stat.help.mec", "stat.help.pot", "train.squad_h"]
     assert len(older) == 15 and set(older) <= set(owned)
     retired = set(json.loads((ROOT / "docs/design/copy/retire_0_7.json").read_text()))    # retired in I-24 (merge_copy --retire)
     assert {k for k in patch if k not in hold and k not in retired} <= set(owned)     # the keys written by the I-00 merge
