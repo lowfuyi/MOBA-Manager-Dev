@@ -110,6 +110,16 @@ func _hero() -> void:
 	hero = HomeKit.Hero.new(me, gs.club_name(me), _when(), rank_line, last_five())
 	hero.name = "Hero"
 	body.add_child(hero)
+	# Home has no header: the "?" goes in the hero's top-right corner (kept clear for it, I-15 ruling 1) so it scrolls away with
+	# the page. Floating over the page, it covered the game card when the page scrolled.
+	if help_slot != null and help_slot.get_parent() == self:
+		remove_child(help_slot)
+		hero.add_child(help_slot)
+		help_slot.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+		help_slot.offset_left = -UI.BTN_H
+		help_slot.offset_right = 0
+		help_slot.offset_top = 0
+		help_slot.offset_bottom = UI.BTN_H
 
 
 ## The raised card, pulled up over the bottom 64 px of the hero.

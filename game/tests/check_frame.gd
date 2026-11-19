@@ -329,10 +329,25 @@ func _test_screen_frame(main: Control, v: String) -> void:
 	App.go(ScreenHub.new())
 	await frames(3)
 	var hs: Control = cur().help_slot
-	ok(hs != null and hs.get_parent() == cur() and hs.get_child_count() == 1 and hs.get_child(0) is HelpSheet.HelpButton, v + "the Home page (no header) has the '?' in its free slot (I-22)")
-	var sr: Rect2 = cur().get_global_rect()
+	var hero: Control = cur().hero
+	ok(hs != null and hs.get_parent() == hero and hs.get_child_count() == 1 and hs.get_child(0) is HelpSheet.HelpButton, v + "the Home page (no header) has the '?' in the hero's corner, so it scrolls with the page (0.9.4b)")
+	var sr: Rect2 = hero.get_global_rect()
 	var hr: Rect2 = hs.get_global_rect()
-	ok(is_equal_approx(hr.end.x, sr.end.x) and is_equal_approx(hr.position.y, sr.position.y) and is_equal_approx(hr.size.x, 96.0) and is_equal_approx(hr.size.y, 96.0), v + "the free slot is the 96 x 96 top right corner of the page (%s in %s)" % [str(hr), str(sr)])
+	ok(is_equal_approx(hr.end.x, sr.end.x) and is_equal_approx(hr.position.y, sr.position.y) and is_equal_approx(hr.size.x, 96.0) and is_equal_approx(hr.size.y, 96.0), v + "the slot is the 96 x 96 top right corner of the hero (%s in %s)" % [str(hr), str(sr)])
+	var sc: ScrollContainer = null
+	var p: Node = hero.get_parent()
+	while p != null and sc == null:
+		if p is ScrollContainer:
+			sc = p
+		p = p.get_parent()
+	if sc != null:
+		sc.scroll_vertical = 300
+		await frames(3)
+		ok(sc.scroll_vertical > 0 and hs.get_global_rect().position.y < hr.position.y - 1.0, v + "the '?' moves up with the page when Home scrolls (%.0f -> %.0f)" % [hr.position.y, hs.get_global_rect().position.y])
+		sc.scroll_vertical = 0
+		await frames(2)
+	else:
+		ok(false, v + "Home's hero is inside a scroll area")
 	# filling the slot by hand (a page with no help id gets no "?" from setup(); I-22's real button goes in the same way)
 	var scr := Screen.new()
 	scr.setup("Slot", Callable(), true)
