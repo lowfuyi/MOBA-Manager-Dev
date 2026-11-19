@@ -70,6 +70,7 @@ func _ready() -> void:
 		await _variant(variant)
 	await _colour_blind()
 	await _inplace()
+	await _window_moves()
 	await _negative_controls()
 	App.apply_large_text(false)
 	UI.set_colorblind(false)
@@ -522,6 +523,43 @@ func _inplace() -> void:
 
 
 # ---- negative controls: each audit must catch a bad sample ------------------------------------------------------------------------
+
+## 0.9.3c: the grid draws only its visible window; when the grid moves on its page (a part above it grows) or the scroll area
+## changes height, the window it drew must follow without a scroll.
+func _window_moves() -> void:
+	await _fresh_main()
+	var scr := Control.new()
+	scr.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var page := ScrollContainer.new()
+	page.set_anchors_preset(Control.PRESET_FULL_RECT)
+	page.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scr.add_child(page)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	page.add_child(col)
+	var above := Control.new()
+	col.add_child(above)
+	var grid := HeroGrid.new()
+	grid.set_heroes(_heroes())
+	col.add_child(grid)
+	App.go(scr)
+	await frames(4)
+	ok(grid._last_window == grid._window() and grid._last_window.size.y > 0.0, "window: the drawn window is the visible one at the start (%s)" % str(grid._last_window))
+	var d0 := grid.draw_count
+	await frames(3)
+	ok(grid.draw_count == d0, "window: a still grid does not redraw")
+	above.custom_minimum_size = Vector2(0, 700)    # a part above the grid grows: the grid moves 700 px down the page
+	await frames(4)
+	ok(grid._last_window == grid._window() and grid.draw_count > d0, "window: after the grid moved down 700 px the drawn window follows (%s, want %s)" % [str(grid._last_window), str(grid._window())])
+	page.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	page.size = Vector2(720, 500)    # the scroll area gets shorter
+	await frames(4)
+	ok(grid._last_window == grid._window(), "window: after the scroll area shrank the drawn window follows (%s, want %s)" % [str(grid._last_window), str(grid._window())])
+	above.custom_minimum_size = Vector2(0, 0)
+	page.size = Vector2(720, 1280)
+	await frames(4)
+	ok(grid._last_window == grid._window(), "window: back to the top, the drawn window follows (%s)" % str(grid._last_window))
+
 
 func _negative_controls() -> void:
 	App.apply_large_text(false)

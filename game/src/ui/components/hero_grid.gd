@@ -51,6 +51,7 @@ func _init(p_tut_id: String = "") -> void:
 	CompKit.tag(self, tut_id)
 	resized.connect(_on_resized)
 	visibility_changed.connect(_on_visibility)
+	set_notify_transform(true)    # 0.9.3c: the grid moved on its page (something above it grew): the visible window moved too
 	_relayout()
 
 
@@ -67,6 +68,9 @@ func _enter_tree() -> void:
 		var cb := Callable(self, "_on_clip_scrolled")
 		if not _clip.get_v_scroll_bar().value_changed.is_connected(cb):
 			_clip.get_v_scroll_bar().value_changed.connect(cb)
+		var rc := Callable(self, "_on_clip_resized")
+		if not _clip.resized.is_connected(rc):
+			_clip.resized.connect(rc)
 
 
 func _exit_tree() -> void:
@@ -75,6 +79,9 @@ func _exit_tree() -> void:
 		var cb := Callable(self, "_on_clip_scrolled")
 		if _clip.get_v_scroll_bar().value_changed.is_connected(cb):
 			_clip.get_v_scroll_bar().value_changed.disconnect(cb)
+		var rc := Callable(self, "_on_clip_resized")
+		if _clip.resized.is_connected(rc):
+			_clip.resized.disconnect(rc)
 	_clip = null
 
 
@@ -84,6 +91,17 @@ func _on_clip_scrolled(_v: float) -> void:
 	var w := _window()
 	if w != _last_window:
 		queue_redraw()
+
+
+## 0.9.3c: the window also moves when the grid moves on its page or the scroll area changes height (no scroll, no width change):
+## before, the rows that came into view stayed blank until the next scroll.
+func _on_clip_resized() -> void:
+	_on_clip_scrolled(0.0)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSFORM_CHANGED and is_inside_tree():
+		_on_clip_scrolled(0.0)
 
 
 ## The part of the grid that can be seen, in the grid's own coordinates (the whole grid when it is not in a scroll area).
