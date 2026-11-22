@@ -3,14 +3,17 @@ extends Screen
 ## Interactive draft for the managed club's game (GDD 8.7, UI-PASS-2 6.3, build plan I-16). The AI plays the other side and, on a
 ## timeout, also the managed side (the Coach's choice). The finished draft goes to the simulator through MatchRunner.finish().
 ## Built once (`_build()`), then refreshed in place on every step (`_refresh()`):
-##   header      back, the title ("Your ban", "Their pick"...), the timer ring (digits, "!" at 3 s), Auto-finish (a second tap
+##   header      back, the phase ("Ban phase" on a violet tint with the no-entry glyph, or "Pick phase") over whose turn it is
+##               ("Your ban 2 of 5"), the timer ring (digits, "!" at 3 s), Auto-finish (a second tap
 ##               within 3 s, "Sure?", lets the Coach finish), the "?" slot
-##   steps       one bar per step of the order: bans short, picks tall, done ones in their side's colour with a mark, the current
-##               one outlined
+##   steps       the order grouped by phase (a gap between phases): ban steps short and violet, picks tall; a done step carries
+##               its side's mark (circle you, hexagon them; picks also in the side's colour); the current one outlined. 20 steps
+##               with 5 bans a side stay legible at 720 px.
 ##   board       LaneBoard: you on the left, them on the right; open lanes show who would play there; bans under the lanes
 ##   needs       Frontline / Initiator / Wave clear as ticked or open chips; with three picks or more, the composition style
 ##   filter      All, Top, Jg, Mid, Bot, Sup (HeroGrid.role_filter): data plus one redraw, nothing built or freed
-##   choices     (tag draft.choices) the Coach bar ("Coach suggests: X" and Take) and the HeroGrid (one Control, 40 cards), in
+##   choices     (tag draft.choices) the line saying what the other team just did ("Ironquill Wolves ban X"), the Coach bar
+##               ("Coach suggests banning: X" with a violet Ban button, or "Coach suggests: X" with Pick) and the HeroGrid (one Control, 40 cards), in
 ##               their own scroll area; on the other side's turn the grid dims and one line says who is choosing
 ##   sheet       a tap on a hero opens a BottomSheet: details, patch arrow, power, strong against, "Plays as" (best lane
 ##               preselected, filled lanes locked; tag draft.slot_list) and the confirm button (tag draft.sheet.confirm): Pick
@@ -38,6 +41,11 @@ var _done_sent := false
 var _last_second := -1
 
 var header: HBoxContainer
+var header_panel: PanelContainer
+var phase_label: Label
+var last_label: Label
+var _last_seen := 0
+var _take_look := {}
 var title_label: Label
 var timer: _Timer
 var auto_button: Button
@@ -113,7 +121,7 @@ class _Steps extends Control:
 		size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		resized.connect(queue_redraw)
-		CompKit.set_cue(self, "height+mark")
+		CompKit.set_cue(self, "height+mark+phase gap")
 
 	func set_state(p_order: Array, p_step: int, p_mine: String) -> void:
 		if p_order == order and p_step == step and p_mine == mine:
@@ -128,21 +136,39 @@ class _Steps extends Control:
 		var n := order.size()
 		if n == 0:
 			return
-		var gap := 4.0
-		var w := (size.x - gap * float(n - 1)) / float(n)
+		var gap := 3.0
+		var pgap := 14.0
+		var phases := 1
+		for i in range(1, n):
+			if String(order[i][1]) != String(order[i - 1][1]):
+				phases += 1
+		var w := (size.x - gap * float(n - phases) - pgap * float(phases - 1)) / float(n)
 		var ops := CardKit.Ops.new()
+		var x := 0.0
+		var band_x := 0.0
 		for i in n:
 			var o: Array = order[i]
 			var pick := String(o[1]) == "pick"
-			var h := 24.0 if pick else 12.0
-			var r := Rect2(float(i) * (w + gap), size.y - h, w, h)
+			if i > 0 and String(order[i - 1][1]) != String(o[1]):
+				x += pgap - gap
+			if not pick and (i == 0 or String(order[i - 1][1]) == "pick"):
+				band_x = x
+			var h := 24.0 if pick else 14.0
+			var r := Rect2(x, size.y - h, w, h)
 			var you := String(o[0]) == mine
-			var col := (UI.ACCENT if you else UI.CORAL) if i < step else Color(UI.PANEL3, 1.0)
+			var col: Color
+			if pick:
+				col = (UI.ACCENT if you else UI.CORAL) if i < step else Color(UI.PANEL3, 1.0)
+			else:
+				col = UI.BAN if i < step else Color(UI.BAN, 0.32)
 			ops.shape("solid", r, col)
+			if not pick and (i == n - 1 or String(order[i + 1][1]) == "pick"):
+				ops.shape("solid", Rect2(band_x - 2.0, size.y - 2.0, x + w - band_x + 4.0, 2.0), UI.BAN)    # the ban phase's underline
 			if i == step:
-				ops.shape("solid", Rect2(r.position.x, r.position.y - 4.0, w, 2.0), UI.TEXT)
-			if i < step and pick:
-				ops.shape("disc" if you else "hex", Rect2(r.get_center() - Vector2(5, 5), Vector2(10, 10)), UI.BG)
+				ops.shape("solid", Rect2(r.position.x, r.position.y - 5.0, w, 3.0), UI.TEXT)
+			if i < step:
+				ops.shape("disc" if you else "hex", Rect2(r.get_center() - Vector2(5, 5), Vector2(10, 10)), UI.BG if pick else UI.INK_BAN)
+			x += w + gap
 		ops.flush(self)
 
 
@@ -302,6 +328,10 @@ func _build() -> void:
 	body.add_theme_constant_override("separation", 10)
 	header = HBoxContainer.new()
 	header.custom_minimum_size = Vector2(0, 104)
+	header_panel = PanelContainer.new()
+	header_panel.name = "HeaderPanel"
+	header_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	header_panel.add_child(header)
 	header.add_theme_constant_override("separation", 8)
 	var back := UI.button("<", go_back, "normal", UI.BTN_H)
 	back.custom_minimum_size = Vector2(UI.BTN_H, UI.BTN_H)
@@ -312,6 +342,13 @@ func _build() -> void:
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	phase_label = UI.label("", UI.S_SMALL, UI.TEXT2, HORIZONTAL_ALIGNMENT_LEFT, "SemiBold")
+	phase_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	var titles := UI.vbox()
+	titles.add_theme_constant_override("separation", 0)
+	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	titles.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	titles.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if UI.large:
 		# large text: back, timer, Auto-finish and "?" leave the title about 106 px, so "Your ban" broke into two lines with a
 		# lone word (I-22 fit audit); the title gets its own row under the header instead, and the header keeps a spacer
@@ -319,7 +356,9 @@ func _build() -> void:
 		sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		header.add_child(sp)
 	else:
-		header.add_child(title_label)
+		titles.add_child(title_label)
+		titles.add_child(phase_label)
+		header.add_child(titles)
 	timer = _Timer.new()
 	header.add_child(timer)
 	auto_button = UI.button(Strings.t("draft.auto_rest"), _on_auto, "flat")
@@ -337,10 +376,13 @@ func _build() -> void:
 		help_slot.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		help_slot.size_flags_horizontal = Control.SIZE_SHRINK_END
 		header.add_child(help_slot)
-	body.add_child(header)
+	body.add_child(header_panel)
 	if UI.large:
 		title_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-		body.add_child(title_label)
+		titles.add_child(title_label)
+		titles.add_child(phase_label)
+		phase_label.visible = false    # large text: the grid needs the room; the Coach bar and the turn line say whose turn it is
+		body.add_child(titles)
 	steps = _Steps.new()
 	body.add_child(steps)
 	board = LaneBoard.new(_compact_board(), "draft.board")
@@ -383,9 +425,21 @@ func _build() -> void:
 	take_button.custom_minimum_size = Vector2(140, UI.BTN_H)
 	take_button.size_flags_horizontal = Control.SIZE_SHRINK_END
 	UI.tag(take_button, "draft.coach_take")
+	for k in ["normal", "hover", "pressed", "focus"]:    # the Pick look, put back after a ban step
+		if take_button.has_theme_stylebox_override(k):
+			_take_look["sb:" + k] = take_button.get_theme_stylebox(k)
+	for k2 in ["font_color", "font_hover_color", "font_pressed_color"]:
+		if take_button.has_theme_color_override(k2):
+			_take_look["c:" + k2] = take_button.get_theme_color(k2)
 	row.add_child(take_button)
 	coach_bar.content.add_child(row)
 	choices.add_child(coach_bar)
+	last_label = UI.label("", UI.S_SMALL, UI.TEXT2, HORIZONTAL_ALIGNMENT_CENTER)
+	last_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	last_label.visible = false
+	UI.tag(last_label, "draft.last_move", false)
+	choices.add_child(last_label)
+	choices.move_child(last_label, 0)
 	turn_label = UI.label("", UI.S_BODY, UI.WARN, HORIZONTAL_ALIGNMENT_CENTER)
 	turn_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	choices.add_child(turn_label)
@@ -458,6 +512,8 @@ func _refresh() -> void:
 			(ban_rows["you" if t == my_side else "them"] as Array).append(w.heroes[hid])
 	board.set_bans("you", ban_rows["you"])
 	board.set_bans("them", ban_rows["them"])
+	board.set_ban_slots(draft.bans_per_side())
+	_show_last_move()
 	_refresh_needs()
 	if draft.is_done():
 		_show_done()
@@ -465,7 +521,16 @@ func _refresh() -> void:
 	var cur := draft.current()
 	var mine: bool = cur["team"] == my_side
 	var kind := String(cur["kind"])
-	title_label.text = Strings.t("draft.title.%s_%s" % ["your" if mine else "their", kind])
+	title_label.text = Strings.t("draft.phase.ban" if kind == "ban" else "draft.phase.pick")
+	var done_n := 0
+	var total := 0
+	for i in draft.order.size():
+		if draft.order[i][0] == cur["team"] and draft.order[i][1] == kind:
+			total += 1
+			if i < draft.step:
+				done_n += 1
+	phase_label.text = UI.tidy(Strings.f("draft.turn.%s_%s" % ["your" if mine else "their", kind], {"n": done_n + 1, "total": total}))
+	_phase_look(kind)
 	timer.visible = mine and timed()
 	if timer.visible:
 		_show_time()
@@ -479,7 +544,7 @@ func _refresh() -> void:
 	grid.modulate.a = 1.0 if mine else 0.5
 	if mine:
 		var rec := draft.ai_choice()
-		coach_label.text = UI.tidy(Strings.f("draft.coach_suggests", {"hero": w.heroes[rec["hero"]]["name"]}))
+		coach_label.text = UI.tidy(Strings.f("draft.coach_suggests_ban" if kind == "ban" else "draft.coach_suggests", {"hero": w.heroes[rec["hero"]]["name"]}))
 	else:
 		var team_club: String = game["blue"] if cur["team"] == "B" else game["red"]
 		turn_label.text = UI.tidy(Strings.f("draft.club_turn", {"club": App.gs.club_name(team_club), "what": Strings.t("draft.kind." + kind)}))
@@ -646,9 +711,7 @@ func _sheet_footer(f: Control, hid: String, kind: String) -> void:
 	var w := App.world
 	if kind == "ban":
 		sheet_confirm = BottomSheet.footer_button(f, Strings.f("draft.sheet.ban", {"hero": w.heroes[hid]["name"]}), _confirm.bind(hid), "normal", "draft.sheet.confirm")
-		sheet_confirm.add_theme_stylebox_override("normal", UI.box(UI.PANEL2, UI.R_BTN, 18, UI.WARN, 3))    # outlined, never a red fill
-		sheet_confirm.icon = Icons.tex("warning", 32) if Icons.has("warning") else null
-		CompKit.set_cue(sheet_confirm, "warning icon+rim")
+		ScreenDraft.ban_style(sheet_confirm)
 	else:
 		var s := String(draft.best_slot_for(my_side, hid)["slot"])
 		sheet_confirm = BottomSheet.footer_button(f, _pick_text(hid, s), _confirm.bind(hid), "play", "draft.sheet.confirm")
@@ -674,6 +737,72 @@ func _confirm(hid: String) -> void:
 	else:
 		var s := _sheet_target if _sheet_target != "" else String(draft.best_slot_for(my_side, hid)["slot"])
 		_apply({"hero": hid, "slot": s})
+
+
+# ---- the phase look, the other team's last move ------------------------------------------------------------------------------
+
+## Ban steps: a violet-tinted header with a violet rim and the no-entry glyph by the phase line; the Coach button reads "Ban"
+## in violet. Pick steps: the plain header and a "Pick" button. Never colour alone: the word and the glyph change too.
+func _phase_look(kind: String) -> void:
+	var ban := kind == "ban"
+	header_panel.add_theme_stylebox_override("panel", UI.box(UI.BAN_DEEP if ban else Color(0, 0, 0, 0), 14, 0, UI.BAN if ban else Color(0, 0, 0, 0), 2 if ban else 0))
+	phase_label.add_theme_color_override("font_color", UI.BAN if ban else UI.TEXT2)
+	title_label.add_theme_color_override("font_color", UI.BAN.lightened(0.45) if ban else UI.TEXT)
+	CompKit.set_cue(header_panel, "ban tint+rim+word" if ban else "pick word")
+	if ban:
+		take_button.text = Strings.t("draft.do_ban")
+		ScreenDraft.ban_style(take_button)
+	else:
+		take_button.text = Strings.t("draft.do_pick")
+		take_button.icon = null
+		for k0 in ["normal", "hover", "pressed", "focus"]:
+			take_button.remove_theme_stylebox_override(k0)
+		for k1 in ["font_color", "font_hover_color", "font_pressed_color"]:
+			take_button.remove_theme_color_override(k1)
+		for k in _take_look:
+			if String(k).begins_with("sb:"):
+				take_button.add_theme_stylebox_override(String(k).substr(3), _take_look[k])
+			else:
+				take_button.add_theme_color_override(String(k).substr(2), _take_look[k])
+		CompKit.set_cue(take_button, "")
+
+
+## A ban button: violet fill, dark ink, the no-entry glyph (the Coach's Ban and the hero sheet's "Ban X").
+static func ban_style(b: Button) -> void:
+	b.add_theme_stylebox_override("normal", UI.box(UI.BAN, UI.R_BTN, 18))
+	b.add_theme_stylebox_override("hover", UI.box(UI.BAN.lightened(0.08), UI.R_BTN, 18))
+	b.add_theme_stylebox_override("pressed", UI.box(UI.BAN.darkened(0.15), UI.R_BTN, 18))
+	b.add_theme_stylebox_override("focus", UI.box(Color(0, 0, 0, 0), UI.R_BTN, 18, UI.TEAL_HI, 3))
+	for k in ["font_color", "font_hover_color", "font_pressed_color"]:
+		b.add_theme_color_override(k, UI.INK_BAN)
+	b.icon = Icons.tex("ban", 32) if Icons.has("ban") else null
+	b.add_theme_color_override("icon_normal_color", UI.INK_BAN)
+	b.add_theme_color_override("icon_hover_color", UI.INK_BAN)
+	b.add_theme_color_override("icon_pressed_color", UI.INK_BAN)
+	CompKit.set_cue(b, "no-entry icon+word")
+
+
+## One line under the board for what the other team just did: "Ironquill Wolves ban X" or "... pick X (Mid)". It stays until
+## their next move, and is hidden before their first one.
+func _show_last_move() -> void:
+	var them := "R" if my_side == "B" else "B"
+	var last: Dictionary = {}
+	for e in draft.log:
+		if String(e["team"]) == them:
+			last = e
+	if last.is_empty():
+		last_label.visible = false
+		return
+	var club: String = game["blue"] if them == "B" else game["red"]
+	var hero := String(App.world.heroes[String(last["hero"])]["name"])
+	if String(last["kind"]) == "ban":
+		last_label.text = UI.tidy(Strings.f("draft.opp_ban", {"club": App.gs.club_name(club), "hero": hero}))
+		last_label.add_theme_color_override("font_color", UI.BAN.lightened(0.3))
+	else:
+		last_label.text = UI.tidy(Strings.f("draft.opp_pick", {"club": App.gs.club_name(club), "hero": hero, "role": Strings.t("role." + String(last["slot"]))}))
+		last_label.add_theme_color_override("font_color", UI.CORAL_HI)
+	last_label.visible = not draft.is_done()
+	_last_seen = draft.log.size()
 
 
 # ---- the Coach, the filter, Auto-finish --------------------------------------------------------------------------------------

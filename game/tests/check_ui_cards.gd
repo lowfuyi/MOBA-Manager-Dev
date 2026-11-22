@@ -156,7 +156,7 @@ func _units() -> void:
 		ok(String(cues[s]) != "", "cb_herocard: state %s has the cue '%s'" % [s, cues[s]])
 		distinct[cues[s]] = true
 	ok(distinct.size() == 4, "cb_herocard: the four marked states have four different cues")
-	ok(String(cues["banned"]).contains("cross") and String(cues["you"]).contains("circle") and String(cues["them"]).contains("hexagon"), "cb_herocard: banned is a cross plus a word, you is a circle, them is a hexagon (shape, not colour)")
+	ok(String(cues["banned"]).contains("no-entry") and String(cues["you"]).contains("circle") and String(cues["them"]).contains("hexagon"), "cb_herocard: banned is the no-entry sign plus a word, you is a circle, them is a hexagon (shape, not colour)")
 	ok(HeroCard.cue_of({"s": "available", "rec": true}) == HeroCard.REC_CUE, "cb_herocard: the coach's choice adds a star and an outline (%s)" % HeroCard.cue_of({"s": "available", "rec": true}))
 	ok(HeroCard.tappable("available") and HeroCard.tappable("selected") and not HeroCard.tappable("banned") and not HeroCard.tappable("you") and not HeroCard.tappable("them"), "hit_herocard: banned and picked cards cannot be tapped")
 	ok(HeroCard.norm_state("nonsense")["s"] == "available" and HeroCard.norm_state({"s": "x"})["s"] == "available", "build_herocard: an unknown state name is the available state")

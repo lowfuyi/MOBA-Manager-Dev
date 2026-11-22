@@ -880,3 +880,14 @@ settings.bans_h
 settings.bans_standard
 settings.bans_classic
 settings.bans_hint
+draft.phase.ban
+draft.phase.pick
+draft.turn.your_ban
+draft.turn.their_ban
+draft.turn.your_pick
+draft.turn.their_pick
+draft.coach_suggests_ban
+draft.do_ban
+draft.do_pick
+draft.opp_ban
+draft.opp_pick

@@ -224,7 +224,9 @@ func _build_and_fit(v: String) -> void:
 		ok(d.turn_label.visible and not d.coach_bar.visible and d.grid.modulate.a < 0.6, "build_draft_%s_theirs: their turn names who chooses, dims the grid, hides the Coach bar" % v)
 		await _fit_state(d, v, "theirs")
 	await _until_mine(d, "ban")
-	ok(UI.plain(d.title_label.text) == UI.plain(Strings.t("draft.title.your_ban")), "build_draft_%s_ban: the title says Your ban" % v)
+	ok(UI.plain(d.title_label.text) == UI.plain(Strings.t("draft.phase.ban")) and UI.plain(d.phase_label.text).begins_with(UI.plain(Strings.f("draft.turn.your_ban", {"n": 1, "total": 9})).split(" ")[0]), "build_draft_%s_ban: the heading says Ban phase and the line says Your ban" % v)
+	ok(UI.plain(d.take_button.text) == UI.plain(Strings.t("draft.do_ban")) and UI.plain(d.coach_label.text).begins_with(UI.plain(Strings.f("draft.coach_suggests_ban", {"hero": ""}))), "build_draft_%s_ban: the Coach bar says banning and the button reads Ban" % v)
+	ok(d.board.ban_slots == d.draft.bans_per_side(), "build_draft_%s_ban: the board has one ban slot per ban of the format" % v)
 	await _fit_state(d, v, "ban")
 	d._open_sheet(String(d.grid.shown_ids()[0]))
 	await frames(6)
@@ -232,6 +234,8 @@ func _build_and_fit(v: String) -> void:
 	await _close_sheet()
 	d._take()
 	await _until_mine(d, "pick")
+	ok(UI.plain(d.title_label.text) == UI.plain(Strings.t("draft.phase.pick")) and UI.plain(d.take_button.text) == UI.plain(Strings.t("draft.do_pick")), "build_draft_%s_pick: the heading says Pick phase and the button reads Pick" % v)
+	ok(d.last_label.visible and UI.plain(d.last_label.text) != "", "build_draft_%s_pick: a line says what the other team did last" % v)
 	await _fit_state(d, v, "pick")
 	d._open_sheet(String(d.grid.shown_ids()[1]))
 	await frames(6)
@@ -490,7 +494,7 @@ func _cb() -> void:
 		var s := d.grid.state_name_of(hid)
 		if c != "":
 			cues[s if not bool(d.grid.state_of(hid).get("rec", false)) else "rec"] = c
-	ok(cues.has("banned") and String(cues["banned"]).contains("cross"), "cb_draft: banned heroes carry a cross and a word (%s)" % str(cues.get("banned", "")))
+	ok(cues.has("banned") and String(cues["banned"]).contains("no-entry") and String(cues["banned"]).contains("word"), "cb_draft: banned heroes carry the no-entry sign and a word (%s)" % str(cues.get("banned", "")))
 	ok(cues.has("rec") and String(cues["rec"]).contains("star"), "cb_draft: the Coach's choice carries a star")
 	ok(cues.has("them") and String(cues["them"]).contains("hexagon"), "cb_draft: their picks carry the hexagon badge")
 	d._time_left = 2.5

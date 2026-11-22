@@ -37,6 +37,9 @@ const CORAL := Color("ff8a5c")           # the one primary action on a screen (P
 const CORAL_HI := Color("ffb594")        # coral text on overlay
 const CORAL_LO := Color("e4602f")        # pressed
 const WARN := Color("f2c14e")
+const BAN := Color("c084fc")             # bans in the draft (violet: never teal = you or coral = them); always with the no-entry glyph or the word
+const BAN_DEEP := Color("2e1f4a")        # the ban phase's header tint
+const INK_BAN := Color("16081f")         # text on a ban fill
 const GOOD_DEFAULT := Color("5bd68a")
 const BAD_DEFAULT := Color("f58080")
 const GOOD_CB := Color("7fd0ff")         # colour-blind friendly pair: sky and orange

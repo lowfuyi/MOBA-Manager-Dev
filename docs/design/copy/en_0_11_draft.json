@@ -1,0 +1,13 @@
+{
+  "draft.phase.ban": "Ban phase",
+  "draft.phase.pick": "Pick phase",
+  "draft.turn.your_ban": "Your ban {n} of {total}",
+  "draft.turn.their_ban": "Their ban {n} of {total}",
+  "draft.turn.your_pick": "Your pick {n} of {total}",
+  "draft.turn.their_pick": "Their pick {n} of {total}",
+  "draft.coach_suggests_ban": "Coach suggests banning: {hero}",
+  "draft.do_ban": "Ban",
+  "draft.do_pick": "Pick",
+  "draft.opp_ban": "{club} ban {hero}",
+  "draft.opp_pick": "{club} pick {hero} for {role}"
+}

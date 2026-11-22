@@ -19,6 +19,7 @@ var rows: Dictionary = {}          # role -> LaneRow
 var header: Control
 var bans_row: Control
 var _bans := {"you": [], "them": []}
+var ban_slots := 1                 # slots per side under "Bans" (the draft's bans per side, 1 to 5)
 
 
 ## The header: the circle glyph and "Your team" on the left, the hexagon glyph and "Opponent" on the right.
@@ -43,7 +44,9 @@ class _Header extends Control:
 		ops.flush(self)
 
 
-## The bans row: the word "Bans" between two groups of small greyed portraits, yours left and theirs right.
+## The bans row: the no-entry glyph and the word "Bans" in the middle; each team's row of `ban_slots` slots in its own column
+## (yours left, theirs right, like the lanes above). An empty slot is a faint violet well; a ban fills it with the hero's greyed
+## portrait struck through (one violet line, drawn for all slots in one call).
 class _Bans extends Control:
 	var board: LaneBoard
 	var draw_count := 0
@@ -63,17 +66,29 @@ class _Bans extends Control:
 		var m := 40.0
 		var word := Strings.t("draft.bans_short")
 		var ww := CardKit.text_w(f, UI.S_CAPTION, word)
-		ops.text(f, UI.S_CAPTION, word, size.x * 0.5 - ww * 0.5, cy, ww + 2.0, UI.TEXT2, 0)
+		var gw := 24.0 + 4.0 + ww
+		ops.icon("ban", Rect2(size.x * 0.5 - gw * 0.5, cy - 12.0, 24.0, 24.0), UI.BAN)
+		ops.text(f, UI.S_CAPTION, word, size.x * 0.5 - gw * 0.5 + 28.0, cy, ww + 2.0, UI.TEXT2, 0)
+		var strikes := PackedVector2Array()
+		var n := clampi(board.ban_slots, 1, LaneBoard.MAX_BANS)
+		var half := size.x * 0.5 - gw * 0.5 - 8.0
+		m = minf(m, (half - 4.0 - 6.0 * float(n - 1)) / float(n))
 		for side in ["you", "them"]:
 			var list: Array = board._bans[side]
-			for i in mini(list.size(), LaneBoard.MAX_BANS):
-				var hp := HeroCard.prepare(list[i])
-				var sil: Dictionary = hp["sil"]
+			for i in n:
 				var x := 4.0 + float(i) * (m + 6.0) if side == "you" else size.x - 4.0 - m - float(i) * (m + 6.0)
 				var r := Rect2(x, cy - m * 0.5, m, m)
+				if i >= list.size():
+					ops.shape("solid", r, Color(UI.BAN, 0.16))
+					continue
+				var hp := HeroCard.prepare(list[i])
+				var sil: Dictionary = hp["sil"]
 				ops.portraits.append(["hero", r, str(sil["role"]), int(sil["variant"]), float(sil["hue_shift"]), bool(sil["mirror"]), true])
-				ops.icon("cross", Rect2(r.get_center() - Vector2(12, 12), Vector2(24, 24)), UI.BAD)
+				strikes.append(r.position + Vector2(3, m - 3))
+				strikes.append(r.position + Vector2(m - 3, 3))
 		ops.flush(self)
+		if not strikes.is_empty():
+			draw_multiline(strikes, UI.BAN, 4.0)
 
 
 func _init(p_compact: bool = true, p_tut_id: String = "") -> void:
@@ -166,6 +181,16 @@ func set_bans(side: String, heroes: Array) -> void:
 	if ids_a == ids_b:
 		return
 	_bans[side] = heroes.duplicate()
+	applied += 1
+	bans_row.queue_redraw()
+
+
+## The number of ban slots per side (the draft's bans per side).
+func set_ban_slots(n: int) -> void:
+	n = clampi(n, 1, MAX_BANS)
+	if n == ban_slots:
+		return
+	ban_slots = n
 	applied += 1
 	bans_row.queue_redraw()
 

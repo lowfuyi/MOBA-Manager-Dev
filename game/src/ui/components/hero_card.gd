@@ -37,7 +37,7 @@ const H := 196.0
 const PORTRAIT := 96.0
 const STATES := ["available", "selected", "banned", "you", "them"]
 ## What a colour-blind player sees besides colour, per state ("" = the plain state).
-const CUES := {"available": "", "selected": "ring+tick", "banned": "cross+word", "you": "circle+tick+stripe", "them": "hexagon+tick+stripe"}
+const CUES := {"available": "", "selected": "ring+tick", "banned": "no-entry+word", "you": "circle+tick+stripe", "them": "hexagon+tick+stripe"}
 const REC_CUE := "star+ring"
 
 
@@ -177,7 +177,7 @@ static func _marks(ci: CanvasItem, r: Rect2, st: Dictionary, s: String) -> void:
 			IconHook.draw(ci, "check", tick, UI.INK_CORAL)
 		"banned":
 			var c := r.position + Vector2(r.size.x * 0.5, 12.0 + PORTRAIT * 0.5)
-			IconHook.draw(ci, "cross", Rect2(c - Vector2(20, 20), Vector2(40, 40)), UI.BAD)
+			IconHook.draw(ci, "ban", Rect2(c - Vector2(30, 30), Vector2(60, 60)), UI.BAN)
 	if bool(st["rec"]):
 		IconHook.draw(ci, "star", Rect2(r.position + Vector2(10, 10), Vector2(28, 28)), UI.CORAL)
 	var arrow := String(st["arrow"]) if String(st["s"]) != "banned" else ""    # a banned hero shows the word "Banned" in that row

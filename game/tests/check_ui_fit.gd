@@ -6,7 +6,7 @@ extends Node
 ## Ends with " N checks, M failures".
 
 const FitAudit = preload("res://tests/fit_audit.gd")
-const BASELINE_NODES := {"home": 37, "squad": 27, "draft": 38, "game_plan": 34, "report": 39, "standings": 36}   # I-00, fixed seed; home re-based at I-15 (37), draft at I-16 (38), game_plan at I-17 (34), report at I-18 (39), squad at I-19 (27), standings at I-20 (36)
+const BASELINE_NODES := {"home": 37, "squad": 27, "draft": 45, "game_plan": 34, "report": 39, "standings": 36}   # I-00, fixed seed; home re-based at I-15 (37), draft at I-16 (38), game_plan at I-17 (34), report at I-18 (39), squad at I-19 (27), standings at I-20 (36), draft at 0.11 A (45: the phase header panel, its title column, the phase line and the last-move line)
 const SEED := 20261109
 
 var checks := 0
