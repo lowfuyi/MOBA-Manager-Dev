@@ -28,16 +28,49 @@ var bans := {"B": [], "R": []}
 var log: Array = []              # {n, team, kind, slot, hero}
 
 
-static func make(w: World, lu: Dictionary, meta_in: Dictionary, match_seed: int, id: String, full: bool) -> Draft:
+## `fmt` is the bans per side (1, 3 or 5; DraftFormat), or the old bool (true = 3 bans, false = 1).
+static func make(w: World, lu: Dictionary, meta_in: Dictionary, match_seed: int, id: String, fmt: Variant) -> Draft:
 	var d := Draft.new()
 	d.world = w
 	d.lineups = lu
 	d.meta = meta_in
 	d.mseed = match_seed
 	d.match_id = id
-	d.order = ORDER_FULL if full else ORDER_SHORT
+	d.order = DraftFormat.order_for(DraftFormat.bans_of(fmt))
 	d.avail = w.hero_ids.duplicate()
 	return d
+
+
+## Bans per side in this draft's order.
+func bans_per_side() -> int:
+	var n := 0
+	for o in order:
+		if o[0] == "B" and o[1] == "ban":
+			n += 1
+	return n
+
+
+## The phase of step `i` (default: the current step): {"kind": "ban"|"pick", "index": 1-based phase of that kind, "first",
+## "last": the step range of the phase}. Phases are runs of steps of one kind.
+func phase_of(i: int = -1) -> Dictionary:
+	var k := step if i < 0 else i
+	if order.is_empty():
+		return {}
+	k = clampi(k, 0, order.size() - 1)
+	var kind := String(order[k][1])
+	var a := k
+	while a > 0 and String(order[a - 1][1]) == kind:
+		a -= 1
+	var b := k
+	while b < order.size() - 1 and String(order[b + 1][1]) == kind:
+		b += 1
+	var idx := 1
+	var j := 0
+	while j < a:
+		if String(order[j][1]) == kind and (j == 0 or String(order[j - 1][1]) != kind):
+			idx += 1
+		j += 1
+	return {"kind": kind, "index": idx, "first": a, "last": b}
 
 
 func is_done() -> bool:

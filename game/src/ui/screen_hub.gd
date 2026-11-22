@@ -153,7 +153,7 @@ func _next_card(g: Dictionary) -> void:
 	var theirs := App.world.team_rating(gs.lineup_for(opp))
 	versus = HomeKit.VersusPanel.new(me, gs.club_name(me), opp, gs.club_name(opp), mine, theirs)
 	c.add_child(versus)
-	var items: Array = [[Strings.t("hub.draft.full" if g["full"] else "hub.draft.short"), "neutral", ""],
+	var items: Array = [[ScreenDraft.format_text(DraftFormat.of_game(g)), "neutral", ""],
 			[Strings.f("hub.chip.chem", {"bonus": UI.pct(gs.chem_bonus())}), "accent", ""]]
 	var tired := gs.tired_starters().size()
 	if tired > 0:

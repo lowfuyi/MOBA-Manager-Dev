@@ -45,6 +45,7 @@ func _rebuild() -> void:
 	m.add_child(ab)
 	m.add_child(UI.label(Strings.t("settings.animate_hint"), UI.S_SMALL, UI.DIM))
 	_fps_card()
+	_bans_card()
 	var au := UI.card(body)
 	au.add_child(UI.label(Strings.t("settings.sound_h"), UI.S_BODY, UI.ACCENT))
 	var dv := HelpSheet.device()
@@ -96,6 +97,25 @@ func _fps_card() -> void:
 		row.add_child(b)
 	c.add_child(row)
 	c.add_child(UI.label(Strings.t("settings.fps_hint"), UI.S_SMALL, UI.DIM))
+
+
+## Draft bans (2026-11-22): Standard (3 bans each; 5 in league and playoff games) or Classic (the old 1, and 3 in game 1 of a
+## playoff series). A device setting for comparing the two; a draft in progress keeps its format.
+func _bans_card() -> void:
+	var c := UI.card(body)
+	c.add_child(UI.label(Strings.t("settings.bans_h"), UI.S_BODY, UI.ACCENT))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	var cur := HelpSheet.device().draft_bans()
+	for id in DeviceState.DRAFT_BANS:
+		var b := UI.button(Strings.t("settings.bans_standard" if id == "standard" else "settings.bans_classic"), func(): App.set_draft_bans(id); _rebuild(), "primary" if id == cur else "normal")
+		b.name = "Bans_" + id
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(b)
+	c.add_child(row)
+	var h := UI.label(Strings.t("settings.bans_hint"), UI.S_SMALL, UI.DIM)
+	h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	c.add_child(h)
 
 
 func _toggle(text: String, on: bool, cb: Callable) -> CheckButton:

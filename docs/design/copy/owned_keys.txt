@@ -873,3 +873,10 @@ draft.builds
 plan.heroes.h
 plan.heroes.v
 plan.heroes.sub
+draft.format.b1
+draft.format.b3
+draft.format.b5
+settings.bans_h
+settings.bans_standard
+settings.bans_classic
+settings.bans_hint

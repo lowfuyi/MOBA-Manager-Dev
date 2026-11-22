@@ -124,9 +124,10 @@ func _ready() -> void:
 		nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		c.content.add_child(nl)
 	c.content.add_child(HomeKit.VersusPanel.new(me, gs.club_name(me), opp, gs.club_name(opp), App.world.team_rating(gs.lineup()), App.world.team_rating(gs.lineup_for(opp))))
-	var secs: int = 15 if game["full"] else 10
+	var nb := DraftFormat.of_game(game)
+	var secs := int(DraftFormat.timer_s(nb))
 	c.content.add_child(HomeKit.ChipRow.new([[Strings.f("pre.side", {"side": Strings.t("hub.side.blue" if my_side == "B" else "hub.side.red")}), "neutral", "flag_blue" if my_side == "B" else "flag_red"],
-			[Strings.f("pre.draft_info", {"type": Strings.t("hub.draft.full" if game["full"] else "hub.draft.short"), "secs": secs}), "neutral", "clock"]]))
+			[Strings.f("pre.draft_info", {"type": ScreenDraft.format_text(nb), "secs": secs}), "neutral", "clock"]]))
 	body.add_child(c)
 	# matchups
 	var m := DepthCard.new()

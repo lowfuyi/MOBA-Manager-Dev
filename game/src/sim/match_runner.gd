@@ -15,7 +15,7 @@ static func sim_params() -> Dictionary:
 
 
 static func prepare(world: World, blue_lineup: Dictionary, red_lineup: Dictionary, meta: Dictionary,
-		save_seed: int, match_id: String, full_draft: bool) -> Draft:
+		save_seed: int, match_id: String, full_draft: Variant) -> Draft:
 	var ms := Pcg32.match_seed(save_seed, match_id)
 	return Draft.make(world, {"B": blue_lineup, "R": red_lineup}, meta, ms, match_id, full_draft)
 
@@ -60,7 +60,7 @@ static func finish(world: World, d: Draft, plans: Dictionary = {}, builds: Dicti
 			"team_a": ta, "team_b": tb, "plans": sets.duplicate(true), "picks": pick_ids, "bans": d.bans.duplicate(true), "log": d.log.duplicate(true),
 			"lineups": {"B": _ids(d.lineups["B"]), "R": _ids(d.lineups["R"])},
 			"comp": {"B": ta["comp_mod"], "R": tb["comp_mod"]}, "style": {"B": ta["style"], "R": tb["style"]},
-			"full_draft": d.order.size() == Draft.ORDER_FULL.size()}
+			"full_draft": d.bans_per_side() >= 3, "bans_per_side": d.bans_per_side()}
 
 
 ## The v1 contest model's game for a finished draft, exactly as MatchRunner.finish played it before Match Sim v2 (the analytic
@@ -87,11 +87,11 @@ static func finish_v1(world: World, d: Draft, plans: Dictionary = {}) -> Diction
 			"team_a": ta, "team_b": tb, "plans": sets.duplicate(true), "picks": pick_ids, "bans": d.bans.duplicate(true), "log": d.log.duplicate(true),
 			"lineups": {"B": _ids(d.lineups["B"]), "R": _ids(d.lineups["R"])},
 			"comp": {"B": ta["comp_mod"], "R": tb["comp_mod"]}, "style": {"B": ta["style"], "R": tb["style"]},
-			"full_draft": d.order.size() == Draft.ORDER_FULL.size()}
+			"full_draft": d.bans_per_side() >= 3, "bans_per_side": d.bans_per_side()}
 
 
 static func auto_v1(world: World, blue_lineup: Dictionary, red_lineup: Dictionary, meta: Dictionary,
-		save_seed: int, match_id: String, full_draft: bool, plans: Dictionary = {}) -> Dictionary:
+		save_seed: int, match_id: String, full_draft: Variant, plans: Dictionary = {}) -> Dictionary:
 	var d := prepare(world, blue_lineup, red_lineup, meta, save_seed, match_id, full_draft)
 	d.finish_with_ai()
 	return finish_v1(world, d, plans)
@@ -102,7 +102,7 @@ static func auto_v1(world: World, blue_lineup: Dictionary, red_lineup: Dictionar
 ## v2, because a full v2 game costs about 0.2 s on desktop (more on a phone) and a match day has four of them. The data
 ## switch `ai_games_v2` in sim_v2_params.json plays them with Match Sim v2 instead (MATCH-SIM-V2-DESIGN 16, ruling S-B-2).
 static func auto_ai(world: World, blue_lineup: Dictionary, red_lineup: Dictionary, meta: Dictionary,
-		save_seed: int, match_id: String, full_draft: bool, plans: Dictionary = {}) -> Dictionary:
+		save_seed: int, match_id: String, full_draft: Variant, plans: Dictionary = {}) -> Dictionary:
 	if bool(SimData.params().get("ai_games_v2", false)):
 		return auto(world, blue_lineup, red_lineup, meta, save_seed, match_id, full_draft, plans)
 	return auto_v1(world, blue_lineup, red_lineup, meta, save_seed, match_id, full_draft, plans)
@@ -140,7 +140,7 @@ static func _ids(lineup: Dictionary) -> Dictionary:
 
 ## Whole game decided by the AI on both sides.
 static func auto(world: World, blue_lineup: Dictionary, red_lineup: Dictionary, meta: Dictionary,
-		save_seed: int, match_id: String, full_draft: bool, plans: Dictionary = {}, builds: Dictionary = {}) -> Dictionary:
+		save_seed: int, match_id: String, full_draft: Variant, plans: Dictionary = {}, builds: Dictionary = {}) -> Dictionary:
 	var d := prepare(world, blue_lineup, red_lineup, meta, save_seed, match_id, full_draft)
 	d.finish_with_ai()
 	return finish(world, d, plans, builds)

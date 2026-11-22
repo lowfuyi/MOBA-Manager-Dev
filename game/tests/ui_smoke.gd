@@ -327,7 +327,7 @@ func _play_with_ui(g: Dictionary, manual: bool) -> void:
 		else:
 			d._process(20.0)
 	ok(d.draft.is_done(), "draft finishes (timeouts and manual picks)")
-	ok(d.draft.order.size() == (16 if g["full"] else 12), "draft profile matches game kind")
+	ok(d.draft.order.size() == DraftFormat.order_for(DraftFormat.of_game(g)).size(), "draft profile matches game kind")
 	if manual:
 		d = await _exercise_game_plan(g, d)
 	d._start_match()

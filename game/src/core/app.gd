@@ -28,6 +28,7 @@ func _ready() -> void:
 	UI.set_colorblind(bool(_read_setting("colorblind", false)))
 	apply_large_text(bool(_read_setting("large_text", false)))
 	apply_fps(DeviceState.new().fps())
+	DraftFormat.mode = DeviceState.new().draft_bans()
 	sfx = Sfx.new()
 	sfx.name = "Sfx"
 	add_child(sfx)
@@ -134,6 +135,14 @@ func set_fps(n: int) -> bool:
 	return true
 
 
+## Settings, "Draft bans": the device setting [draft] bans; games started from now on use it (DraftFormat).
+func set_draft_bans(id: String) -> bool:
+	if not HelpSheet.device().set_draft_bans(id):
+		return false
+	DraftFormat.mode = id
+	return true
+
+
 func set_animate(v: bool) -> void:
 	UI.animate = v
 	var cf := ConfigFile.new()
@@ -190,6 +199,7 @@ func debug_info() -> String:
 	lines.append("startup=%d ms  mem=%.0f MB  text=%s  colours=%s" % [startup_ms, float(Performance.get_monitor(Performance.MEMORY_STATIC)) / 1048576.0,
 			"large" if large_text() else "normal", "colour-blind" if UI.colorblind else "default"])
 	lines.append("fps cap=%d" % HelpSheet.device().fps())
+	lines.append("draft bans=%s camera=%s" % [HelpSheet.device().draft_bans(), HelpSheet.device().arena_camera()])
 	lines.append("sound=%s haptics=%s" % ["on" if HelpSheet.device().sound() else "off", "on" if HelpSheet.device().haptics() else "off"])
 	if not last_game.is_empty():
 		lines.append("last=" + str(last_game.get("id", "")))

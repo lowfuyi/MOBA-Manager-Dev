@@ -248,7 +248,7 @@ func rank_of(club_id: String) -> int:
 # ---------------------------------------------------------------- playing games
 func _sim_fixture(f: Dictionary) -> void:
 	var meta := meta_for(int(f["round"]))
-	var r := MatchRunner.auto_ai(world, lineup_for(f["blue"]), lineup_for(f["red"]), meta, int(d["save_seed"]), f["id"], false, {"B": "ai", "R": "ai"})
+	var r := MatchRunner.auto_ai(world, lineup_for(f["blue"]), lineup_for(f["red"]), meta, int(d["save_seed"]), f["id"], DraftFormat.bans_for("league"), {"B": "ai", "R": "ai"})
 	f["played"] = true
 	f["final"] = float(r["final"])
 	f["winner"] = f["blue"] if r["blue_won"] else f["red"]
@@ -264,13 +264,15 @@ func _round_fixtures(round_index: int) -> Array:
 
 
 ## The managed club's next game, or {} when there is none right now.
-## {"kind": "league"|"playoff", "id", "blue", "red", "full": bool, "round", "series", "game"}
+## {"kind": "league"|"playoff", "id", "blue", "red", "bans": bans per side (DraftFormat), "full": bans >= 3 (older readers),
+## "round", "series", "game"}
 func next_game() -> Dictionary:
 	match d["phase"]:
 		"league":
 			for f in _round_fixtures(int(d["round"])):
 				if not f["played"] and (f["blue"] == club() or f["red"] == club()):
-					return {"kind": "league", "id": f["id"], "blue": f["blue"], "red": f["red"], "full": false,
+					var nb := DraftFormat.bans_for("league")
+					return {"kind": "league", "id": f["id"], "blue": f["blue"], "red": f["red"], "bans": nb, "full": nb >= 3,
 							"round": int(d["round"]), "series": "", "game": 1}
 			return {}
 		"playoffs":
@@ -286,7 +288,8 @@ func _series_game(s: Dictionary) -> Dictionary:
 	var higher_blue: bool = g % 2 == 1
 	var blue: String = s["a"] if higher_blue else s["b"]
 	var red: String = s["b"] if higher_blue else s["a"]
-	return {"kind": "playoff", "id": "%s:%s:g%d" % [season_tag(), s["id"], g], "blue": blue, "red": red, "full": g == 1,
+	var nb := DraftFormat.bans_for("playoff_final" if s["id"] == "F" else "playoff_semi", g)
+	return {"kind": "playoff", "id": "%s:%s:g%d" % [season_tag(), s["id"], g], "blue": blue, "red": red, "bans": nb, "full": nb >= 3,
 			"round": int(d["round"]), "series": s["id"], "game": g}
 
 
@@ -420,12 +423,15 @@ func quick_match_opponent() -> String:
 
 
 ## Open a practice series against `opp` (best of 1, 3 or 5). Returns "" or a reason key.
-func start_practice(opp: String, best_of: int) -> String:
+## `quick`: started as Quick Match (its draft format, DraftFormat "quick"; an additive key of the series).
+func start_practice(opp: String, best_of: int, quick: bool = false) -> String:
 	if not practice_available():
 		return "practice.unavailable"
 	if opp == club() or not world.clubs.has(opp):
 		return "practice.bad_opponent"
 	d["exh"] = {"opp": opp, "best_of": best_of if best_of in [3, 5] else 1, "me": 0, "them": 0, "games": 0}
+	if quick:
+		d["exh"]["quick"] = true
 	return ""
 
 
@@ -441,8 +447,9 @@ func practice_game() -> Dictionary:
 	var x: Dictionary = d["exh"]
 	var g: int = int(x["games"]) + 1
 	var me_blue: bool = g % 2 == 1
+	var nb := DraftFormat.bans_for("quick" if bool(x.get("quick", false)) else "exhibition", g)
 	return {"kind": "exhibition", "id": "exh:%d:%d" % [int(d["save_seed"]), int(d.get("exh_n", 0)) + 1],
-			"blue": club() if me_blue else x["opp"], "red": x["opp"] if me_blue else club(), "full": false,
+			"blue": club() if me_blue else x["opp"], "red": x["opp"] if me_blue else club(), "bans": nb, "full": nb >= 3,
 			"round": int(d["round"]), "series": "X", "game": g, "best_of": int(x["best_of"])}
 
 
@@ -727,7 +734,7 @@ func saved_plan_set() -> Dictionary:
 
 func auto_game(g: Dictionary) -> Dictionary:
 	var meta := meta_for(int(g["round"]))
-	return MatchRunner.auto(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta, int(d["save_seed"]), g["id"], bool(g["full"]), plans_for(g), builds())
+	return MatchRunner.auto(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta, int(d["save_seed"]), g["id"], DraftFormat.of_game(g), plans_for(g), builds())
 
 
 # ---------------------------------------------------------------- training
@@ -808,7 +815,7 @@ func advance_playoffs() -> void:
 			if s["done"] or s["a"] == club() or s["b"] == club():
 				continue
 			var g := _series_game(s)
-			var r := MatchRunner.auto_ai(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta_for(0), int(d["save_seed"]), g["id"], bool(g["full"]), {"B": "ai", "R": "ai"})
+			var r := MatchRunner.auto_ai(world, lineup_for(g["blue"]), lineup_for(g["red"]), meta_for(0), int(d["save_seed"]), g["id"], DraftFormat.of_game(g), {"B": "ai", "R": "ai"})
 			_add_series_game(s, g, g["blue"] if r["blue_won"] else g["red"], float(r["final"]))
 			progressed = true
 		var all_done := true

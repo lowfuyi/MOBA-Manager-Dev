@@ -213,6 +213,43 @@ func set_arena_held(id: String) -> bool:
 	return true
 
 
+# ------------------------------------------------------------------ [draft] (2026-11-22)
+## Bans per side (Founder decision 2026-11-22): "standard" (3; 5 for league and playoffs) or "classic" (the old 1, and 3 in
+## game 1 of a playoff series), so the Founder can compare them on the phone. Unset or unreadable = standard. A device setting:
+## it changes the draft format of the games this device starts (DraftFormat.mode), never a saved result.
+const DRAFT_BANS := ["standard", "classic"]
+
+
+func draft_bans() -> String:
+	var v = _load().get_value("draft", "bans", "standard")
+	return String(v) if v is String and DRAFT_BANS.has(String(v)) else "standard"
+
+
+func set_draft_bans(id: String) -> bool:
+	if not DRAFT_BANS.has(id):
+		return false
+	_write("draft", "bans", id)
+	return true
+
+
+# ------------------------------------------------------------------ [arena] camera (2026-11-22)
+## The match view (Founder decision 2026-11-22): "field" (whole map, own team's vision), "action" (follows the action, own
+## team's vision, drag to look) or "all" (whole map, no fog). Unset or unreadable = action. Changes only what is drawn.
+const ARENA_CAMERAS := ["field", "action", "all"]
+
+
+func arena_camera() -> String:
+	var v = _load().get_value("arena", "camera", "action")
+	return String(v) if v is String and ARENA_CAMERAS.has(String(v)) else "action"
+
+
+func set_arena_camera(id: String) -> bool:
+	if not ARENA_CAMERAS.has(id):
+		return false
+	_write("arena", "camera", id)
+	return true
+
+
 # ------------------------------------------------------------------ [display] (Alpha 0.8.1)
 ## The frame-rate cap (Settings, "Frame rate"): 30 or 60 frames a second, 60 when unset or unreadable. A device setting, not
 ## part of the save (R6): it changes only how often the screen redraws, never what is shown at a given moment.

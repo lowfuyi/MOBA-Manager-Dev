@@ -1477,5 +1477,12 @@
   "story.towers": "{name} broke {n} towers",
   "story.damage": "{name} dealt {pct} of the team's damage to heroes",
   "story.healed": "{name} healed and shielded {n}",
-  "story.kda": "{name} went {k} / {d} / {a}"
+  "story.kda": "{name} went {k} / {d} / {a}",
+  "draft.format.b1": "1 ban each",
+  "draft.format.b3": "3 bans each",
+  "draft.format.b5": "5 bans each",
+  "settings.bans_h": "Draft bans",
+  "settings.bans_standard": "Standard",
+  "settings.bans_classic": "Classic",
+  "settings.bans_hint": "Standard: 3 bans each, and 5 in league and playoff games. Classic: 1 ban each, and 3 in game 1 of a playoff series. Drafts you start after a change use it."
 }

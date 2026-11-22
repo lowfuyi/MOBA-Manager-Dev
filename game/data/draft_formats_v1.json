@@ -1,0 +1,22 @@
+{
+ "_doc": "Draft formats per match type (Founder decision 2026-11-22, GDD 6 and 8.7). orders: the step order for 1, 3 and 5 bans per side. modes: bans per side by match type; an entry is a number or {game1, later} for series. timer_s: seconds per human decision by bans per side. The device setting [draft] bans chooses the mode (standard by default, classic for comparison). Tutorial and lesson games keep their own format.",
+ "orders": {
+  "1": [["B", "ban"], ["R", "ban"],
+        ["B", "pick"], ["R", "pick"], ["R", "pick"], ["B", "pick"], ["B", "pick"], ["R", "pick"],
+        ["R", "pick"], ["B", "pick"], ["B", "pick"], ["R", "pick"]],
+  "3": [["B", "ban"], ["R", "ban"], ["B", "ban"], ["R", "ban"],
+        ["B", "pick"], ["R", "pick"], ["R", "pick"], ["B", "pick"], ["B", "pick"], ["R", "pick"],
+        ["R", "ban"], ["B", "ban"],
+        ["R", "pick"], ["B", "pick"], ["B", "pick"], ["R", "pick"]],
+  "5": [["B", "ban"], ["R", "ban"], ["B", "ban"], ["R", "ban"], ["B", "ban"], ["R", "ban"],
+        ["B", "pick"], ["R", "pick"], ["R", "pick"], ["B", "pick"], ["B", "pick"], ["R", "pick"],
+        ["R", "ban"], ["B", "ban"], ["R", "ban"], ["B", "ban"],
+        ["R", "pick"], ["B", "pick"], ["B", "pick"], ["R", "pick"]]
+ },
+ "timer_s": {"1": 10, "3": 15, "5": 15},
+ "modes": {
+  "standard": {"league": 5, "playoff_semi": 5, "playoff_final": 5, "quick": 3, "exhibition": 3},
+  "classic": {"league": 1, "playoff_semi": {"game1": 3, "later": 1}, "playoff_final": {"game1": 3, "later": 1}, "quick": 1, "exhibition": 1}
+ },
+ "default_mode": "standard"
+}

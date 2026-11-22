@@ -92,12 +92,12 @@ func _set_len(n: int) -> void:
 
 
 func _quick_match() -> void:
-	_start(App.gs.quick_match_opponent(), 1)
+	_start(App.gs.quick_match_opponent(), 1, true)
 
 
-func _start(opp: String, best_of: int) -> void:
+func _start(opp: String, best_of: int, quick: bool = false) -> void:
 	var gs := App.gs
-	var why := gs.start_practice(opp, best_of)
+	var why := gs.start_practice(opp, best_of, quick)
 	if why != "":
 		App.toast(Strings.t(why), UI.WARN)
 		_rebuild()

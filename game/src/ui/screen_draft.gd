@@ -209,8 +209,8 @@ func _ready() -> void:
 	my_side = "B" if game["blue"] == gs.club() else "R"
 	if draft == null:
 		draft = MatchRunner.prepare(App.world, gs.lineup_for(game["blue"]), gs.lineup_for(game["red"]),
-				gs.meta_for(int(game["round"])), int(gs.d["save_seed"]), game["id"], bool(game["full"]))
-	_limit = 15.0 if game["full"] else 10.0
+				gs.meta_for(int(game["round"])), int(gs.d["save_seed"]), game["id"], DraftFormat.of_game(game))
+	_limit = DraftFormat.timer_s(draft.bans_per_side())
 	setup("", Callable(), false)
 	_build()
 	if App.tutorial != null:
@@ -222,6 +222,11 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if App.tutorial != null and is_instance_valid(App.tutorial):
 		App.tutorial.unregister_shortcut("draft_auto_finish", _auto_rest)
+
+
+## "1 ban each", "3 bans each", "5 bans each" (Home and Pre-match chips).
+static func format_text(bans: int) -> String:
+	return Strings.t({1: "draft.format.b1", 3: "draft.format.b3", 5: "draft.format.b5"}.get(bans, "draft.format.b1"))
 
 
 func timed() -> bool:
