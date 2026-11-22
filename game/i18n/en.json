@@ -922,9 +922,9 @@
   "help.gameplan.know": "Edge is before luck. Risk helps the underdog and hurts the favourite. Your plan is kept for the next game.",
   "help.gameplan.terms": "coach,edge,game_plan,risk,objective,teamfight",
   "help.match.title": "Match",
-  "help.match.see": "Your team is the circles at the bottom, theirs the hexagons. Above: clock, kills, towers, who leads.",
-  "help.match.do": "Watch, tap Speed x2 to go faster, or Skip to the end. Tap your plan to see it.",
-  "help.match.know": "The result was decided before you watched, so watching or skipping never changes it.",
+  "help.match.see": "Your team: circles; theirs: hexagons. Field and Action show only what your team can see; All shows everything.",
+  "help.match.do": "Pick a view: Field, Action or All. In Action, drag to look around; the camera returns after 5 seconds.",
+  "help.match.know": "The result was decided before you watched. Watching, skipping or the view never changes it.",
   "help.match.terms": "lane,objective,teamfight,base",
   "help.report.title": "Match report",
   "help.report.see": "The result, the standout player, what the game changed, one tip, and why it went this way.",
@@ -1127,7 +1127,7 @@
   "tut.why.sheet": "Each bar is how much one factor moved the result. Luck is the random part of every game.",
   "tut.shortcut.coach_rest": "Let the Coach finish",
   "tut.shortcut.apply": "Apply for me",
-  "tut.watch.arena": "Your team is the circles. Watch the fight, or use Speed x2 or Skip to the end.",
+  "tut.watch.arena": "Your team is the circles. Field shows the whole map, Action follows the fights, All shows everything. Try Speed x2.",
   "tut.squad_bench.alt": "Your five starters play every game. Tap a bench player to open their card.",
   "tut.squad_token": "Your five starters stand on the map. Tap one to see who else could play that role.",
   "tut.picker": "Each row shows the change to team rating if you pick that player. We will not change anything now.",
@@ -1495,5 +1495,8 @@
   "draft.do_ban": "Ban",
   "draft.do_pick": "Pick",
   "draft.opp_ban": "{club} ban {hero}",
-  "draft.opp_pick": "{club} pick {hero} for {role}"
+  "draft.opp_pick": "{club} pick {hero} for {role}",
+  "match.view.field": "Field",
+  "match.view.action": "Action",
+  "match.view.all": "All"
 }

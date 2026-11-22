@@ -1,9 +1,9 @@
 extends RefCounted
-## Matrix module "match" (Arena v2, Phase 4): the real Match screen (the tilted arena playing the v2 log) on the fixed-seed
-## save's next game, at four points of the show and the end, with the frame's numbers (PERF-BUDGET 3.1a: target 60 draw calls
-## and 120 nodes, hard 100 and 200):
+## Matrix module "match" (Arena v2; views since 2026-11-22): the real Match screen (the tilted arena playing the v2 log) on the
+## fixed-seed save's next game, in each view (Field, Action, All) at two points of the show, Action also at 10 and 85 percent,
+## and the end, with the frame's numbers (PERF-BUDGET 3.1a: target 60 draw calls and 120 nodes, hard 100 and 200):
 ##   MATCH|<variant>|<state>|nodes=..|draw_calls=..
-## States: p10, p35, p60, p85 (percent of the show length), end (Skip: end card and See the report).
+## States: p10, p35, p60, p85 (Action, percent of the show length), field_p35, field_p60, all_p35, all_p60, end (Skip).
 
 static func _count(n: Node) -> int:
 	var total := 1
@@ -31,9 +31,17 @@ static func run(ctx) -> void:
 	var m := ScreenMatch.new(g, res)
 	App.go(m)
 	await ctx.settle()
+	m.set_view("action", false)
 	for f in [0.10, 0.35, 0.60, 0.85]:
 		m.show_t = f * m.show_len()
-		m._apply()
+		m._apply(0.5)
 		await _measure(ctx, m, "p%d" % int(f * 100.0))
+	for vw in ["field", "all"]:
+		m.set_view(vw, false)
+		for f2 in [0.35, 0.60]:
+			m.show_t = f2 * m.show_len()
+			m._apply(0.5)
+			await _measure(ctx, m, "%s_p%d" % [vw, int(f2 * 100.0)])
+	m.set_view("action", false)
 	m._skip()
 	await _measure(ctx, m, "end")

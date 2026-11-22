@@ -6,7 +6,9 @@ extends Screen
 ## the end show the same truthful numbers. Nothing here feeds back (R7, A1).
 ## Show length: one tunable value (sim_v2_params.json show_seconds, real seconds for a median game at Speed x1); quiet
 ## stretches play faster (ArenaPlayer pacing). Speed x1, x2, x4 and Skip are always there.
-## Layout at 720 x 1280: safe 48, scoreboard 142, arena (the rest), notes 48, feed 80, controls 132 (Speed, Skip, "?").
+## Views (Founder decision 2026-11-22): a three-part control "Field | Action | All" above Speed and Skip, switchable at any time,
+## remembered in the device setting [arena] camera (default Action). See ArenaView.
+## Layout at 720 x 1280: safe 48, scoreboard 142, arena (the rest), notes 48, feed 80, views 96 + 12, controls 132.
 ## Quick mode skips the watch as before; the tutorial game always plays it.
 
 const SAFE := 48.0
@@ -32,6 +34,9 @@ var _controls: Control
 var _speed_btn: Button
 var _skip_btn: Button
 var _go_btn: Button
+var _views: HBoxContainer
+var _view_btns: Dictionary = {}
+var view_mode := "action"
 
 
 func _init(g: Dictionary = {}, r: Dictionary = {}) -> void:
@@ -77,6 +82,17 @@ func _ready() -> void:
 	_controls.add_child(_speed_btn)
 	_controls.add_child(_skip_btn)
 	UI.tag(_controls, "match.controls", false)    # tutorial step 19: Speed and Skip together (I-21a)
+	_views = HBoxContainer.new()
+	_views.add_theme_constant_override("separation", 8)
+	_views.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for id in ["field", "action", "all"]:
+		var vb := UI.button(Strings.t({"field": "match.view.field", "action": "match.view.action", "all": "match.view.all"}[id]), func(): set_view(id), "normal", UI.BTN_H)
+		vb.add_theme_font_size_override("font_size", UI.S_SMALL)
+		UI.tag(vb, "match.view." + id, false)
+		_view_btns[id] = vb
+		_views.add_child(vb)
+	UI.tag(_views, "match.views", false)
+	_stage.add_child(_views)
 	_go_btn = UI.button(Strings.t("match.report"), _continue, "play", UI.BTN_H)    # the only coral on the screen
 	UI.tag(_go_btn, "match.report_btn")    # tutorial step 20
 	_go_btn.visible = false
@@ -90,7 +106,27 @@ func _ready() -> void:
 	_stage.resized.connect(_layout)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
+	set_view(HelpSheet.device().arena_camera(), false)
 	_apply()
+
+
+## Field, Action or All: the view changes at once, the choice is remembered on this device.
+func set_view(id: String, remember: bool = true) -> void:
+	if not _view_btns.has(id):
+		id = "action"
+	view_mode = id
+	view.set_mode(id)
+	for k in _view_btns:
+		var b := _view_btns[k] as Button
+		var on: bool = k == id
+		b.add_theme_stylebox_override("normal", UI.box(UI.ACCENT.darkened(0.15) if on else UI.PANEL2, UI.R_BTN, 12))
+		b.add_theme_stylebox_override("hover", UI.box(UI.ACCENT if on else UI.PANEL3, UI.R_BTN, 12))
+		for c in ["font_color", "font_hover_color"]:
+			b.add_theme_color_override(c, UI.INK_TEAL if on else UI.TEXT)
+		CompKit.set_cue(b, "filled+word" if on else "word")
+	if remember:
+		HelpSheet.device().set_arena_camera(id)
+		_raise("match:view", {"view": id})
 
 
 func show_len() -> float:
@@ -110,8 +146,9 @@ func _layout() -> void:
 	var notes_h := 48.0
 	var feed_h := 80.0
 	var ctrl_y := o.y + h - 24.0 - UI.BTN_H
+	var views_y := ctrl_y - 12.0 - UI.BTN_H
 	var arena_top := o.y + SAFE + board_h
-	var arena_bot := ctrl_y - 12.0 - feed_h - notes_h
+	var arena_bot := views_y - 12.0 - feed_h - notes_h
 	_board.position = Vector2(o.x, o.y + SAFE)
 	_board.size = Vector2(w, board_h)
 	view.position = Vector2(o.x, arena_top)
@@ -127,6 +164,8 @@ func _layout() -> void:
 	_speed_btn.size = Vector2(200, UI.BTN_H)
 	_skip_btn.position = Vector2(212, 0)
 	_skip_btn.size = Vector2(_controls.size.x - 212.0, UI.BTN_H)
+	_views.position = Vector2(o.x + 24.0, views_y)
+	_views.size = Vector2(w - 48.0, UI.BTN_H)
 	_go_btn.position = _controls.position
 	_go_btn.size = _controls.size
 	if help_slot != null:
@@ -142,16 +181,16 @@ func _process(delta: float) -> void:
 	_watch_t += delta
 	var was := player.game_t(show_t)
 	show_t = minf(player.show_len, show_t + delta * float(SPEEDS[_speed_i]))
-	_apply()
+	_apply(delta)
 	_cues(was, player.game_t(show_t))
 	if show_t >= player.show_len - 1e-6:
 		_end()
 
 
 ## Every layer at the current show time (the map, the scoreboard, the notes and the feed read the same game time).
-func _apply() -> void:
+func _apply(real_dt: float = 0.0) -> void:
 	var gt := player.game_t(show_t)
-	view.show_game(gt)
+	view.show_game(gt, real_dt)
 	_board.show_at(gt)
 	_notes.show_at(gt)
 	_feed.show_at(gt)

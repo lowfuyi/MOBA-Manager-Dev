@@ -2,8 +2,15 @@ class_name ArenaView
 extends Control
 ## The Arena v2 view (MATCH-SIM-V2-DESIGN 11.4): the tilted ground (one quad through arena_ground.gdshader over the baked
 ## ArenaGround texture), the upright sprites (one atlas, ArenaAtlas, drawn from one canvas item and sorted far to near), the
-## labels in screen space, and the corner minimap. The camera follows ArenaPlayer.focus with easing. show(t) draws game time t.
-## Presentation only (rule A1): reads an ArenaPlayer, never the simulator.
+## labels in screen space, and the corner minimap. show_game(t, real_dt) draws game time t.
+## Three views (Founder decision 2026-11-22; data/arena_view_v1.json), chosen with set_mode():
+##   "field"   the whole island from above, fixed (no pan, zoom or chase); fog of war: only what your team sees
+##   "action"  the camera chases the action (ArenaChase: priorities, a minimum dwell, easing); fog of war; a drag pans, and
+##             5 s after the last touch the camera eases back to the chase
+##   "all"     the whole island, fixed, no fog
+## Fog: ArenaVision's low-resolution mask on the ground quad (one texture, redrawn a few times a second); enemy heroes, minions,
+## effects and labels outside your team's vision are not drawn (no extra draw calls). In Field and All the tokens, bars and
+## labels are drawn bigger (overview token_scale). Presentation only (rule A1): reads an ArenaPlayer, never the simulator.
 
 const MINI := Vector2(168, 177)
 const HERO_H := 0.040          # an upright hero, ground units
@@ -34,6 +41,20 @@ var _cam_focus := Vector2(0.5, 0.8)
 var _cam_zoom := 0.3
 var _last_t := -1.0
 var _font: Font
+var mode := "action"
+var vision: ArenaVision
+var chase: ArenaChase
+var cfg: Dictionary = {}
+var token_k := 1.0
+var bar_k := 1.0
+var manual := false             # Action: the player dragged; the chase waits
+var idle_s := 0.0               # real seconds since the last drag
+var mask_updates := 0
+var _fog_tex: ImageTexture
+var _fog_real := 99.0
+var _fog_t := -999.0
+var _manual_focus := Vector2(0.5, 0.5)
+var _dragging := false
 
 
 func _init(p_player: ArenaPlayer, p_my_side: String) -> void:
@@ -41,7 +62,11 @@ func _init(p_player: ArenaPlayer, p_my_side: String) -> void:
 	my_side = p_my_side
 	cam.flip = p_my_side == "R"
 	clip_contents = true
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	cfg = ArenaVision.cfg()
+	vision = ArenaVision.build(player, my_side, cfg)
+	chase = ArenaChase.build(player, vision, cfg)
+	_fog_tex = ImageTexture.create_from_image(vision.mask(0.0))
 	_ground_vp = ArenaGround.make_viewport()
 	add_child(_ground_vp)
 	_atlas_vp = ArenaAtlas.make_viewport()
@@ -52,6 +77,8 @@ func _init(p_player: ArenaPlayer, p_my_side: String) -> void:
 	mat.shader = load("res://src/arena/v2/arena_ground.gdshader")
 	mat.set_shader_parameter("ground_tex", _ground_vp.get_texture())
 	mat.set_shader_parameter("margin", ArenaGround.MARGIN)
+	mat.set_shader_parameter("fog_tex", _fog_tex)
+	mat.set_shader_parameter("fog_alpha", float(ArenaVision.HIDDEN_A) / 255.0)
 	_ground.material = mat
 	add_child(_ground)
 	_sprites = _Sprites.new()
@@ -92,25 +119,45 @@ func _layout() -> void:
 	cam.update()
 
 
-## Draw game time `game_t`. A jump of more than 4 s (Skip, the start) moves the camera at once; otherwise it eases.
-func show_game(game_t: float) -> void:
+## Field, Action or All. A view change jumps the camera (no easing) and forgets the chase and any drag.
+func set_mode(m: String) -> void:
+	if not ["field", "action", "all"].has(m):
+		m = "action"
+	mode = m
+	manual = false
+	_dragging = false
+	idle_s = 0.0
+	chase.reset()
+	_last_t = -1.0
+	_fog_t = -999.0
+	var ov: Dictionary = cfg["overview"]
+	token_k = float(ov["token_scale"]) if m != "action" else 1.0
+	bar_k = float(ov["bar_scale"]) if m != "action" else 1.0
+	(_ground.material as ShaderMaterial).set_shader_parameter("fog_on", 0.0 if m == "all" else 1.0)
+	if is_inside_tree():
+		show_game(t)
+
+
+func fog_on() -> bool:
+	return mode != "all"
+
+
+## Is a canonical point shown at game time t (always in All; in Field and Action, inside your team's vision).
+func shows(p: Vector2, at_t: float = -1.0) -> bool:
+	return not fog_on() or vision.sees(p, t if at_t < 0.0 else at_t)
+
+
+## Draw game time `game_t`; `real_dt` is the real time since the last call (the chase's dwell, the drag's 5 s, the fog's
+## refresh rate). A jump of more than 4 s (Skip, the start) moves the camera at once; otherwise it eases.
+func show_game(game_t: float, real_dt: float = 0.0) -> void:
 	t = game_t
-	var f := player.focus(t)
-	var want: Vector2 = f[0]
-	var want_zoom := float(f[1])
-	var dt := clampf(t - _last_t, 0.0, 1.0) if _last_t >= 0.0 else 1.0
-	if _last_t < 0.0 or absf(t - _last_t) > 4.0 or reduced_motion:
-		_cam_focus = want
-		_cam_zoom = want_zoom if not reduced_motion else 0.3
+	if mode == "action":
+		_follow(real_dt)
 	else:
-		var k := 1.0 - exp(-EASE * dt * 0.5)
-		_cam_focus = _cam_focus.lerp(want, k)
-		_cam_zoom = lerpf(_cam_zoom, want_zoom, k * 0.7)
+		_overview()
 	_last_t = t
-	cam.focus = _cam_focus + Vector2(0.0, 0.05 * (-1.0 if cam.flip else 1.0) * 0.0)
-	cam.dist = lerpf(ZOOM_FAR, ZOOM_NEAR, clampf(_cam_zoom, 0.0, 1.0))
-	cam.clamp_focus()
 	cam.update()
+	_update_fog(real_dt)
 	var u := cam.uniforms()
 	var mat := _ground.material as ShaderMaterial
 	for k2 in u:
@@ -118,6 +165,137 @@ func show_game(game_t: float) -> void:
 	_sprites.queue_redraw()
 	_labels.queue_redraw()
 	_mini.queue_redraw()
+
+
+func _follow(real_dt: float) -> void:
+	var want: Vector2
+	var want_zoom: float
+	if manual:
+		if not _dragging:
+			idle_s += maxf(0.0, real_dt)
+		if idle_s >= float(cfg["chase"]["return_s"]):
+			manual = false
+			chase.reset()
+	if manual:
+		want = _manual_focus
+		want_zoom = _cam_zoom
+	else:
+		var f := chase.update(t, real_dt)
+		want = f["pos"]
+		want_zoom = float(f["zoom"])
+	cam.pitch_deg = 56.0
+	cam.fov_deg = 30.0
+	var jump := _last_t < 0.0 or absf(t - _last_t) > 4.0
+	if manual:
+		_cam_focus = want    # a drag moves the camera with the finger
+	elif jump or reduced_motion:
+		_cam_focus = want
+		_cam_zoom = want_zoom if not reduced_motion else 0.3
+	else:
+		var k := 1.0 - exp(-float(cfg["chase"]["ease"]) * maxf(real_dt, 0.0))
+		_cam_focus = _cam_focus.lerp(want, k)
+		_cam_zoom = lerpf(_cam_zoom, want_zoom, k * 0.7)
+	cam.focus = _cam_focus
+	cam.dist = lerpf(ZOOM_FAR, ZOOM_NEAR, clampf(_cam_zoom, 0.0, 1.0))
+	cam.update()
+	cam.clamp_focus()
+	_cam_focus = cam.focus
+
+
+## Field and All: the whole island, fixed. The distance is the smallest that keeps the four corners of the map inside the view.
+func _overview() -> void:
+	var ov: Dictionary = cfg["overview"]
+	cam.pitch_deg = float(ov["pitch"])
+	cam.fov_deg = float(ov["fov"])
+	cam.focus = Vector2(0.5, 0.5)
+	var m := float(ov["fit_margin"])
+	var corners := [Vector2(-m, -m), Vector2(1.0 + m, -m), Vector2(1.0 + m, 1.0 + m), Vector2(-m, 1.0 + m)]
+	var lo := 0.5
+	var hi := 6.0
+	for i in 24:
+		var mid := (lo + hi) * 0.5
+		cam.dist = mid
+		cam.update()
+		var inside := true
+		for c in corners:
+			var pr := cam.project(c)
+			if pr.z <= 0.0 or pr.x < 0.0 or pr.x > size.x or pr.y < 0.0 or pr.y > size.y:
+				inside = false
+				break
+		if inside:
+			hi = mid
+		else:
+			lo = mid
+	cam.dist = hi
+	# centre the island vertically: the far edge is drawn smaller, so move the focus until top and bottom margins match
+	for j in 6:
+		cam.update()
+		var top := cam.project(Vector2(0.5, 0.0 if not cam.flip else 1.0)).y
+		var bot := cam.project(Vector2(0.5, 1.0 if not cam.flip else 0.0)).y
+		var off := ((size.y - bot) - top) * 0.5
+		var g := cam.unproject(Vector2(size.x * 0.5, size.y * 0.5 - off))
+		if g.x < 0.0:
+			break
+		cam.focus = g
+	_cam_focus = cam.focus
+
+
+## The fog mask, redrawn mask.hz times a real second at most (and at once after a jump).
+func _update_fog(real_dt: float) -> void:
+	if not fog_on():
+		return
+	_fog_real += maxf(0.0, real_dt)
+	if _fog_real < 1.0 / float(cfg["mask"]["hz"]) and absf(t - _fog_t) < 4.0:
+		return
+	_fog_real = 0.0
+	_fog_t = t
+	_fog_tex.update(vision.mask(t))
+	mask_updates += 1
+
+
+func fog_texture() -> Texture2D:
+	return _fog_tex
+
+
+## Action: a drag pans the camera over the island; the chase waits until 5 s after the last touch.
+func _gui_input(ev: InputEvent) -> void:
+	if mode != "action":
+		return
+	var rel := Vector2.ZERO
+	var at := Vector2.ZERO
+	if ev is InputEventScreenDrag:
+		rel = (ev as InputEventScreenDrag).relative
+		at = (ev as InputEventScreenDrag).position
+	elif ev is InputEventMouseMotion and ((ev as InputEventMouseMotion).button_mask & MOUSE_BUTTON_MASK_LEFT) != 0 and not DisplayServer.is_touchscreen_available():
+		# a phone sends the drag and an emulated mouse move for it: only the drag counts there; a mouse counts on a desktop
+		rel = (ev as InputEventMouseMotion).relative
+		at = (ev as InputEventMouseMotion).position
+	elif ev is InputEventScreenTouch or (ev is InputEventMouseButton and not DisplayServer.is_touchscreen_available()):
+		var pressed := (ev as InputEventScreenTouch).pressed if ev is InputEventScreenTouch else (ev as InputEventMouseButton).pressed
+		_dragging = pressed
+		if pressed:
+			idle_s = 0.0
+		return
+	else:
+		return
+	drag_by(at, rel)
+	accept_event()
+
+
+## Move the view so the ground point under `at - rel` comes under `at` (screen px of this control).
+func drag_by(at: Vector2, rel: Vector2) -> void:
+	if mode != "action" or rel == Vector2.ZERO:
+		return
+	var a := cam.unproject(at - rel)
+	var b := cam.unproject(at)
+	if a.x < -0.5 or b.x < -0.5:
+		return
+	if not manual:
+		_manual_focus = _cam_focus
+	manual = true
+	idle_s = 0.0
+	_manual_focus = Vector2(clampf(_manual_focus.x + (a.x - b.x), 0.22, 0.78), clampf(_manual_focus.y + (a.y - b.y), 0.18, 0.86))
+	show_game(t, 0.0)
 
 
 func team_colour(side: String) -> Color:
@@ -177,15 +355,19 @@ class _Sprites extends Control:
 					for k in 3:
 						var s2 := clampf(fr + sgn * (0.012 + 0.012 * float(k)), 0.01, 0.99)
 						var p := SimData.lane_point(lane, s2) + Vector2(0.008 * float(k - 1), 0.0)
-						items.append([0.0, "minion", p, 0.022, view.team_colour(side), null])
+						if side != view.my_side and not view.shows(p):
+							continue
+						items.append([0.0, "minion", p, 0.022 * view.token_k, view.team_colour(side), null])
 		for side in ["B", "R"]:
 			for slot in ArenaPlayer.SLOTS:
 				var key: String = side + "." + slot
 				if not pl.alive(key, t):
 					continue
 				var p2 := pl.pos(key, t)
+				if side != view.my_side and not view.shows(p2):
+					continue
 				var arch := String(SimData.heroes()[pl.hero_of[key]]["archetype"])
-				items.append([0.0, "hero_" + arch, p2, ArenaView.HERO_H, Color(1, 1, 1), ["hero", key, side]])
+				items.append([0.0, "hero_" + arch, p2, ArenaView.HERO_H * view.token_k, Color(1, 1, 1), ["hero", key, side]])
 		for it in items:
 			it[0] = view.cam.project(it[2]).y
 		items.sort_custom(func(a: Array, b: Array) -> bool: return float(a[0]) < float(b[0]))
@@ -196,12 +378,17 @@ class _Sprites extends Control:
 			var kind2 := String(e[0])
 			var age := float(e[2])
 			var col2 := view.team_colour(String(e[3]))
+			var k2 := view.token_k
 			if kind2 == "cast":
 				var at: Vector2 = e[6] if bool(e[5]) else e[1]
-				_flat(tex, "bolt" if age < 0.5 else "spark", at, 0.03 * (0.8 + 0.6 * age), Color(col2, 1.0 - age))
+				if not (view.shows(e[1]) or view.shows(at)):
+					continue
+				_flat(tex, "bolt" if age < 0.5 else "spark", at, 0.03 * k2 * (0.8 + 0.6 * age), Color(col2, 1.0 - age))
 			else:
-				_flat(tex, "burst", e[1], 0.06 * (0.5 + age), Color(1, 0.85, 0.6, 0.9 * (1.0 - age)))
-				_flat(tex, "skull", e[1], 0.03, Color(1, 1, 1, 1.0 - age))
+				if not view.shows(e[1]):
+					continue    # a kill in the fog: the feed still says it, the map does not show where
+				_flat(tex, "burst", e[1], 0.06 * k2 * (0.5 + age), Color(1, 0.85, 0.6, 0.9 * (1.0 - age)))
+				_flat(tex, "skull", e[1], 0.03 * k2, Color(1, 1, 1, 1.0 - age))
 
 	## An upright sprite standing at a canonical point, `h` ground units tall.
 	func _sprite(tex: Texture2D, it: Array) -> void:
@@ -221,8 +408,8 @@ class _Sprites extends Control:
 			var side := String(extra[2])
 			var col := view.team_colour(side)
 			var ring := "ring_you" if side == view.my_side else "ring_them"
-			_flat(tex, "shadow", p, 0.026, Color(1, 1, 1, 0.9))
-			_flat(tex, ring, p, 0.024, col)
+			_flat(tex, "shadow", p, 0.026 * view.token_k, Color(1, 1, 1, 0.9))
+			_flat(tex, ring, p, 0.024 * view.token_k, col)
 			draw_texture_rect_region(tex, Rect2(pr.x - wpx / 2.0, pr.y - hpx, wpx, hpx), src, Color(1, 1, 1))
 			_bar(tex, Vector2(pr.x, pr.y - hpx - 6.0), sc, view.player.hp(key, view.t), col)
 			return
@@ -252,8 +439,8 @@ class _Sprites extends Control:
 
 	## A thin segmented health bar (dark back, team fill, a notch every quarter).
 	func _bar(tex: Texture2D, at: Vector2, sc: float, hp: float, col: Color) -> void:
-		var w := maxf(26.0, ArenaView.BAR_W * sc)
-		var h := 5.0
+		var w := maxf(26.0 * view.bar_k, ArenaView.BAR_W * sc * view.token_k)
+		var h := 5.0 * view.bar_k
 		var src := ArenaAtlas.rect("bar")
 		draw_texture_rect_region(tex, Rect2(at.x - w / 2.0 - 1.0, at.y - 1.0, w + 2.0, h + 2.0), src, Color(0.05, 0.06, 0.08, 0.85))
 		draw_texture_rect_region(tex, Rect2(at.x - w / 2.0, at.y, w * clampf(hp, 0.0, 1.0), h), src, col)
@@ -280,11 +467,13 @@ class _Labels extends Control:
 			var text := ArenaView.intent_word(String(n[2]))
 			if text == "":
 				continue
-			shown[who] = true
 			var p := pl.pos(who, t)
+			if String(who.substr(0, 1)) != view.my_side and not view.shows(p):
+				continue
+			shown[who] = true
 			var pr := view.cam.project(p)
-			var hpx := ArenaView.HERO_H * view.cam.scale_at(p)
-			var fs := UI.S_CAPTION
+			var hpx := ArenaView.HERO_H * view.token_k * view.cam.scale_at(p)
+			var fs := UI.S_CAPTION if view.mode == "action" else UI.S_SMALL
 			var w := view._font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 			var at := Vector2(pr.x - w / 2.0, pr.y - hpx - 16.0)
 			draw_string_outline(view._font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 5, Color(0, 0, 0, 0.85))
@@ -318,9 +507,13 @@ class _Mini extends Control:
 			# mirror in y (the player's base at the bottom): a flipped transform, never a negative-size rect
 			draw_set_transform(Vector2(0, size.y), 0.0, Vector2(1, -1))
 			draw_texture_rect(gt, Rect2(Vector2.ZERO, size), false)
+			if view.fog_on():
+				draw_texture_rect(view.fog_texture(), Rect2(Vector2.ZERO, size), false)
 			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 		else:
 			draw_texture_rect(gt, Rect2(Vector2.ZERO, size), false)
+			if view.fog_on():
+				draw_texture_rect(view.fog_texture(), Rect2(Vector2.ZERO, size), false)
 		var tex := view.atlas()
 		var dot := ArenaAtlas.rect("dot")
 		var down := view.player.towers_down(view.t)
@@ -334,12 +527,17 @@ class _Mini extends Control:
 				var key: String = side + "." + slot
 				if not view.player.alive(key, view.t):
 					continue
-				var q2 := _to(view.player.pos(key, view.t))
+				var gp := view.player.pos(key, view.t)
+				if side != view.my_side and not view.shows(gp):
+					continue
+				var q2 := _to(gp)
 				var col := view.team_colour(side)
 				if side == view.my_side:
 					draw_texture_rect_region(tex, Rect2(q2 - Vector2(5, 5), Vector2(10, 10)), dot, col)
 				else:
 					draw_texture_rect_region(tex, Rect2(q2 - Vector2(4.5, 4.5), Vector2(9, 9)), ArenaAtlas.rect("bar"), col)
+		if view.mode == "all":
+			return    # All shows everything and the whole island: no frame
 		# the camera's footprint
 		var corners := [Vector2(0, 0), Vector2(view.size.x, 0), Vector2(view.size.x, view.size.y), Vector2(0, view.size.y)]
 		var poly := PackedVector2Array()

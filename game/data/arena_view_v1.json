@@ -1,0 +1,13 @@
+{
+ "_doc": "Arena v2 match views (Founder decision 2026-11-22). Display only: vision is derived from the event log's positions and never feeds the simulator (rules A1, R7). Distances are in ground units (the map is 1 unit north to south). vision: radius per kind of source. mask: the fog texture's cells per side and how often it is redrawn per real second. chase: event priorities (higher wins), the minimum time on one event and the idle time after a drag before the camera chases again, in real seconds. overview: the fixed whole-map camera of Field and All, and how much bigger tokens, bars and labels are drawn there.",
+ "vision": {"hero": 0.085, "minion": 0.05, "tower": 0.095, "cairn": 0.13, "ward": 0.075},
+ "mask": {"cells": 64, "hz": 4},
+ "chase": {
+  "dwell_s": 2.5,
+  "return_s": 5.0,
+  "ease": 2.6,
+  "priority": {"decisive": 5.0, "objective": 4.0, "tower": 3.0, "fight": 2.0, "kill": 1.5, "team": 0.0},
+  "decisive_kills": 3
+ },
+ "overview": {"pitch": 64.0, "fov": 30.0, "fit_margin": 0.03, "token_scale": 2.3, "bar_scale": 2.0}
+}

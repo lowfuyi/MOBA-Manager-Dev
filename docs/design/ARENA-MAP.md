@@ -251,6 +251,8 @@ Nothing in 7.1 or 7.2 is proven. The data holds the brief (`late_fight_variants.
 
 ## 8. Camera
 
+> **Superseded for Arena v2 (2026-11-22):** the match has three views (Field, Action, All) with fog of war; see `MATCH-SIM-V2-DESIGN.md` section 17 and GDD section 19. This section describes the retired Alpha 0.8 map.
+
 | Setting | Value |
 |---|---|
 | Default | Whole map, zoom 1.0, no pan. Lanes 1 to 4 (13 to 20 s) stay here because three scenes run at once |

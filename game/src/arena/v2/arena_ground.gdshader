@@ -16,6 +16,10 @@ uniform float margin = 0.06;
 uniform vec4 fog_near : source_color = vec4(0.055, 0.075, 0.105, 1.0);
 uniform vec4 fog_far : source_color = vec4(0.11, 0.13, 0.17, 1.0);
 uniform float vignette = 0.55;
+// fog of war (views Field and Action): fog_tex alpha is 0 where the team sees, up to fog_alpha where it does not (ArenaVision)
+uniform sampler2D fog_tex : filter_linear, repeat_disable;
+uniform float fog_on = 0.0;
+uniform float fog_alpha = 0.63;
 
 void fragment() {
 	vec2 s = UV * view;
@@ -32,7 +36,13 @@ void fragment() {
 			vec4 g = texture(ground_tex, tuv);
 			// far ground fades a little into the mist (depth cue)
 			float haze = clamp((t - 0.9) * 0.35, 0.0, 0.35);
-			col = mix(col, mix(g, fog_far, haze), g.a);
+			vec4 lit = mix(g, fog_far, haze);
+			if (fog_on > 0.5) {
+				float hid = clamp(texture(fog_tex, tuv).a / fog_alpha, 0.0, 1.0);
+				float grey = dot(lit.rgb, vec3(0.3, 0.55, 0.15));
+				lit.rgb = mix(lit.rgb, vec3(grey) * 0.34 + fog_near.rgb * 0.25, hid);
+			}
+			col = mix(col, lit, g.a);
 		}
 	}
 	vec2 q = UV - vec2(0.5, 0.55);

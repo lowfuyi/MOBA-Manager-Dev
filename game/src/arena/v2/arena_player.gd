@@ -354,6 +354,11 @@ func focus(t: float) -> Array:
 			for x in SimData.map()["towers"]:
 				if String(x["id"]) == String(tw[1]):
 					return [x["pos"], 0.6]
+	return focus_team(t)
+
+
+## Where the player's team is (its living heroes' centre), or its Cairn when all are down: [point, zoom].
+func focus_team(t: float) -> Array:
 	var c2 := Vector2.ZERO
 	var n := 0
 	for s in SLOTS:

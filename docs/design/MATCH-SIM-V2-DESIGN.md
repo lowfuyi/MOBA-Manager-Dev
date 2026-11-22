@@ -396,3 +396,23 @@ Budget: ground 1, sprites about 8 to 15 (atlas batches broken by text), minimap 
 - **The log** is sorted by time at the end (fights write ahead), cut at the Cairn's fall (kills, deaths and assists recounted from what remains), and the position track's alive flag is rewritten from the kill and respawn times.
 - **Speed, measured** (headless desktop, `tests/sim_v2_tests.gd` and the lab runs): about 180 to 260 ms per game. This is **over the 15 ms target and the 40 ms ceiling of Q3**. Fights are about 20 percent, decisions about 20 percent, the rest is the per-step world (lanes, movement, calls). An optimisation pass is owed in S6; the fallback is to run AI-vs-AI games on worker threads (the simulator holds only plain data). Not measured on a phone; at 5 to 8 times slower a game would take about 1 to 2 s there.
 - **Calibration harness:** `tests/calib_v2.tscn` (offline; env CAL_GAP, CAL_N, CAL_SEED, CAL_CON_A, CAL_CON_B, CAL_COMP).
+
+## 17. Match views: Field, Action, All (Founder decision 2026-11-22)
+
+The Founder kept the Arena v2 look after his phone test and asked for three views the player can switch at any time with a three-part control "Field | Action | All" above Speed and Skip. The choice is the device setting `[arena] camera` (default Action). Data: `game/data/arena_view_v1.json`. Code: `ArenaVision`, `ArenaChase`, `ArenaView.set_mode`.
+
+| View | Fog of war | Camera | Input |
+|---|---|---|---|
+| Field | on: only what your team sees | the whole island, fixed (pitch 64 degrees, distance fitted so the four corners stay in view) | none |
+| Action | on | chases the action (below), eases between targets | drag to look; 5 s after the last touch it eases back to the chase |
+| All | off | the whole island, fixed | none |
+
+**Vision** (`ArenaVision`, display only). Sources: your team's living heroes, its minion waves at each lane front (from 0:45), its standing towers and Cairn, and its wards (each "ward" event of the log at the warder's position, for `vision_ward_s` seconds). Radii in ground units in the data (hero 0.085, minion 0.05, tower 0.095, Cairn 0.13, ward 0.075). The fog is a 64 x 64 mask over the ground texture (alpha 0 where seen), redrawn at most 4 times a real second, read by the ground shader (fogged ground greyed and darkened) and drawn over the minimap: one texture, no extra draw call per unit. Enemy heroes, minions, casts, kill bursts and intent labels outside vision are simply not drawn. Structures and objective camps always show their state (public knowledge in the genre). Rule A1 holds (nothing calls the simulator) and so does R7 (nothing feeds a result).
+
+**Feed in fog (decided).** Kills, towers and objective takes are still announced in the text feed and the scoreboard even when they happen in the fog, as a caster would; the map shows the place only when your team sees it (a kill burst in the fog is not drawn, and the Action camera does not go there).
+
+**Chase** (`ArenaChase`). Candidates at game time t, best first by priority: a decisive play 5 (a fight with 3 or more kills, or a Cairn falling), an objective take 4 (Stoneback, Moonhulk; window 6 s before to 1.5 s after), a tower falling 3, a fight 2 (plus 0.05 per hero in it), a kill 1.5, else your team's centre 0. With fog only candidates your team can see count (a fight counts if any of its heroes is seen). The camera keeps one target at least 2.5 real seconds (the minimum dwell), then moves to a better one or, when its event is over, to the best one on; it eases (rate 2.6 per second), so it never jumps. The v2 log has no `decisive` flag; "decisive" is derived here for the camera only.
+
+**Readability.** Field and All draw tokens 2.3 times and health bars 2 times bigger than Action and labels at 26 px (24 px in Action, the floor). Screenshots at 720 x 1280 in normal, large text, colour-blind and tall are in the shots matrix (module `match`).
+
+**Cost (desktop, headless renders; not a phone).** Match screen 26 nodes and 29 to 31 draw calls in every view (was 22 nodes, 23 to 25): the mask texture on the minimap and the view control. Building the mask is about 20 sources times their bounding boxes of cells, a few thousand cell tests 4 times a second.

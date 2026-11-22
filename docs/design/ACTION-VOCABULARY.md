@@ -791,3 +791,6 @@ Per-hero kills and deaths equal Report.kda; every kill lies in its beat's kill w
 0.12 s steps); `hp_at` is 0 only during a ledger death and 1 after each rise; every action starts at a living attacker and ends at
 a living target; no ring during the Mossback or the late fight; the objective ring starts after the beat's last kill; the beat clock
 ends at 75 s at 30 and 60 fps and at x2; with Animations off there is no remap, no shake and no zoom above the focus zoom.
+
+
+> **Note (2026-11-22):** in Arena v2 the camera's chase priorities (decisive plays, objective takes, tower falls, fights, kills) live in `game/data/arena_view_v1.json` (`ArenaChase`). "Decisive" is derived for the camera (a fight with 3 or more kills, or a Cairn falling), because the v2 event log has no such flag. See `MATCH-SIM-V2-DESIGN.md` section 17.

@@ -663,3 +663,30 @@ Recorded by the Producer from the Founder's message of 2026-11-19. Where this se
 
 What stays: the draft (section 6), the Game Plan's eight controls and triggers (7.8, re-mapped onto the role behaviours), Team Bonds (7.7), Form and Morale (4.2), formats (sudden death; Bo3, finals Bo5), derived statistics that never contradict the result (9.2 test 6, now read from the event log), and determinism given a seed (8.4).
 
+
+---
+
+## 19. Founder decisions of 2026-11-22: visible bans, bans per side, three match views
+
+Recorded by the Producer from the Founder's message of 2026-11-22, after his phone test of 0.10.0. Where this section conflicts with sections 6 or 8.7, this section wins.
+
+1. **Bans are obvious on the Draft screen.** Ban steps have their own heading ("Ban phase"), a violet header tint, violet progress segments grouped by phase, and the no-entry glyph with the word, so colour is never the only cue (never teal or coral). The confirm button reads "Ban" or "Pick", and the Coach bar reads "Coach suggests banning: X" on ban steps. Ban slots sit under "Bans", one row per team. Banned heroes show greyed and struck through, and each opponent move gets a line ("Ironquill Wolves ban X").
+2. **Bans per side by match type** (data: `game/data/draft_formats_v1.json`). This replaces the profiles table in 8.7:
+
+| Match type | Standard (default) | Classic (old) |
+|---|---|---|
+| League | 5 | 1 |
+| Playoff semi-final (Bo3), every game | 5 | 3 in game 1, then 1 |
+| Final (Bo5), every game | 5 | 3 in game 1, then 1 |
+| Quick Match | 3 | 1 |
+| Exhibition (Bo1, Bo3, Bo5), every game | 3 | 1 |
+| Tutorial and lesson games | unchanged | unchanged |
+
+   The device setting `[draft] bans` (Settings, "Draft bans") picks Standard or Classic. Games 2 and later of a series use game 1's count.
+3. **The 5-ban order** (10 bans, 10 picks): ban phase 1 B R B R B R; pick phase 1 B R R B B R; ban phase 2 R B R B; pick phase 2 R B B R. The 3-ban order (section 6) and the 1-ban order are unchanged. Timers: 15 s a decision for 3 and 5 bans, 10 s for 1 ban. The worst case for a 5-ban draft is about 2 min 39 s; confirming the Coach's suggestions takes about 40 s (not measured on a person). Evidence: `docs/design/BAN-EXPERIMENT.md` (40,000 games per format, role floor never dead-ends, side balance in band).
+4. **Three match views**, chosen with the "Field | Action | All" control above Speed and remembered on the device (`[arena] camera`, default Action):
+   - **Field:** the whole island, fixed, with fog of war (your team's vision).
+   - **Action:** the camera chases fights, objective takes, tower falls, decisive plays and kills, with fog of war. Drag to look around; after 5 s without a touch it eases back.
+   - **All:** the whole island, fixed, no fog.
+
+   Vision comes from your heroes, minions, towers, the Cairn and wards, with radii in data (`game/data/arena_view_v1.json`). Fog is presentation only: the result is decided first, and no view changes it (rules A1 and R7). Kills, towers and objective takes in the fog are still announced in the feed and the scoreboard; the map shows the place only if your team sees it. Design: `MATCH-SIM-V2-DESIGN.md` section 17.

@@ -1,0 +1,6 @@
+{
+  "tut.watch.arena": "Your team is the circles. Field shows the whole map, Action follows the fights, All shows everything. Try Speed x2.",
+  "help.match.see": "Your team: circles; theirs: hexagons. Field and Action show only what your team can see; All shows everything.",
+  "help.match.do": "Pick a view: Field, Action or All. In Action, drag to look around; the camera returns after 5 seconds.",
+  "help.match.know": "The result was decided before you watched. Watching, skipping or the view never changes it."
+}
