@@ -3,7 +3,7 @@ extends RefCounted
 ## fixed-seed save's next game, in each view (Field, Action, All) at two points of the show, Action also at 10 and 85 percent,
 ## and the end, with the frame's numbers (PERF-BUDGET 3.1a: target 60 draw calls and 120 nodes, hard 100 and 200):
 ##   MATCH|<variant>|<state>|nodes=..|draw_calls=..
-## States: p10, p35, p60, p85 (Action, percent of the show length), field_p35, field_p60, all_p35, all_p60, end (Skip).
+## States: p10, p35, p60, p85 (Action, percent of the show length), field_p35, field_p60, all_p35, all_p60, comment (the first commentary line, not in large text), end (Skip).
 
 static func _count(n: Node) -> int:
 	var total := 1
@@ -43,5 +43,10 @@ static func run(ctx) -> void:
 			m._apply(0.5)
 			await _measure(ctx, m, "%s_p%d" % [vw, int(f2 * 100.0)])
 	m.set_view("action", false)
+	# 0.12 Q4: the first commentary line on screen (none in large text)
+	if m._notes.comments != null and not m._notes.comments.lines.is_empty():
+		m.show_t = m.player.show_t(float(m._notes.comments.lines[0][0]) + 0.5)
+		m._apply(0.5)
+		await _measure(ctx, m, "comment")
 	m._skip()
 	await _measure(ctx, m, "end")

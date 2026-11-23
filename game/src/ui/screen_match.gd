@@ -72,6 +72,7 @@ func _ready() -> void:
 	_board = ArenaHud2.Board.new(player, App.gs.club_name(App.gs.club()), App.gs.club_name(opp_id))
 	_stage.add_child(_board)
 	_notes = ArenaHud2.Notes.new(player)
+	_notes.comments = null if UI.large else ArenaComment.build(player)    # commentary: none in large text (Q4)
 	_stage.add_child(_notes)
 	_feed = ArenaHud2.Feed.new(player, App.gs.club_name(App.gs.club()), App.gs.club_name(opp_id))
 	_stage.add_child(_feed)

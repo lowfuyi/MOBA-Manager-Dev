@@ -218,6 +218,7 @@ class Feed extends Control:
 class Notes extends Control:
 	var pl: ArenaPlayer
 	var t := 0.0
+	var comments: ArenaComment = null    # 0.12: at most two commentary lines a game (null in large text)
 
 	func _init(p: ArenaPlayer) -> void:
 		pl = p
@@ -227,13 +228,19 @@ class Notes extends Control:
 		t = p_t
 		queue_redraw()
 
+	## A commentary line when one is up (calm moments only), else what your team is doing now.
+	func comment() -> String:
+		return comments.text_at(t) if comments != null else ""
+
 	func text() -> String:
-		return ArenaHud2.notes_line(pl, t)
+		var c := comment()
+		return c if c != "" else ArenaHud2.notes_line(pl, t)
 
 	func _draw() -> void:
 		var s := text()
 		if s == "":
 			return
 		var f := get_theme_default_font()
-		draw_circle(Vector2(10, size.y / 2.0), 7.0, UI.ACCENT)
-		draw_string(f, Vector2(26, size.y / 2.0 + 9), s, HORIZONTAL_ALIGNMENT_LEFT, size.x - 26, UI.S_SMALL, UI.TEAL_HI)
+		var is_comment := comment() != ""
+		draw_circle(Vector2(10, size.y / 2.0), 7.0, UI.WARN if is_comment else UI.ACCENT)
+		draw_string(f, Vector2(26, size.y / 2.0 + 9), s, HORIZONTAL_ALIGNMENT_LEFT, size.x - 26, UI.S_SMALL, UI.TEXT if is_comment else UI.TEAL_HI)
