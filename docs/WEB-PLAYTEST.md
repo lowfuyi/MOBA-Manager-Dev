@@ -27,7 +27,7 @@ Output: `build/web/` (git-ignored; never commit it). It holds index.html/.js/.wa
 
 1. `vercel whoami` must print the Founder's own account (lowfuyi@gmail.com). If it prints any other account, stop and run `vercel login` with that address. Never deploy into another business's team.
 2. `cd build/web && vercel deploy --prod --yes` (first time: project name `gloamline-playtest`, no framework, no build command; the folder is already the output). On this machine `npx` is the Windows Node.js, which holds the login and cannot work in an Ubuntu folder, so copy `build/web/` to a Windows folder first (e.g. `/mnt/c/Users/Fuyi/gloamline-web`) and run `npx vercel@latest deploy --prod --yes` from there.
-3. The production URL (for example `https://gloamline-playtest.vercel.app`) is the tester link. Each new deploy replaces it, and testers get the new build on their next load.
+3. The production URL, **https://gloamline-playtest.vercel.app** (first deployed 2026-11-23, build `0.11.1-alpha-web-df6213b-20261123-1243`), is the tester link. Each new deploy replaces it, and testers get the new build on their next load.
 
 Plan (Founder decision, 2026-11-22): the **free Hobby plan**. Vercel's terms (section 4, read 2026-11-22) say Hobby is "for your personal or non-commercial use"; the Founder accepted that risk for an unlisted, unpaid playtest. Vercel may disable a Hobby deployment at its discretion, so the build stays plain static files with no Vercel-only feature: no build step, no functions, no analytics, no Vercel domain settings. The only Vercel file is `vercel.json`, and it sets two headers.
 
@@ -46,7 +46,17 @@ Then send testers the new link. Saves are per site address, so testers moving ho
 
 > **Gloamline playtest** - an esports manager game for phones, early alpha.
 > Open the link in **Chrome (Android) or Safari (iPhone)**. For the best view, use **Add to Home Screen** (Safari: Share, then Add to Home Screen; Chrome: menu, then Add to Home screen) and open it from there.
-> The first load downloads about 10 MB. Later loads are quick.
+> The first load downloads about 9 MB. Later loads are quick.
 > Speed in the browser is **not** what the phone app will feel like, so please judge the game, not its speed.
 > Your season is saved in this browser. To keep it safe, open Settings, "Your save", "Copy save code" now and then.
 > **Feedback:** Settings, "Send feedback" (it copies your build number and opens the form; paste it into the first answer). Tell us what was fun, what was confusing and where you stopped.
+
+## Measured (2026-11-23, desktop, not a phone)
+
+Playwright, Pixel 7 viewport, software WebGL (SwiftShader), against the live link:
+- **Load:** the first visit transfers about 8.8 MB (wasm 7.5 MB, pck 1.3 MB, js 0.09 MB, brotli). The title screen appears 4.0 s after the page opens.
+- **Starting a game:** New game, then Home, takes 3.4 s.
+- **The flow:** a full draft with 5 bans and 5 picks, then the match, then the report, with 0 errors. A full match at speed x1 took 216 s on the local copy.
+- **Frame rates** of 5 to 19 in this test come from software rendering and say nothing about a phone. Real phone browsers use the GPU but run WebAssembly slower than a desktop. **Browser speed is not phone speed**; judge speed only on the Android APK.
+
+Vercel scope: the account (lowfuyi-1301) has one team, "InvoiceNowCheck" (Hobby). The project gloamline-playtest is in it, because it is the account's only scope.

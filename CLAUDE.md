@@ -77,3 +77,11 @@ Three changes after the Founder's phone test of 0.10.0 (DECISIONS "Producer log 
 ## 0.11.1 balance pass (2026-11-23; version 0.11.1 alpha, versionCode 18)
 
 Founder-approved: `q_k` 0.378 (+5% rating weight) and hero numbers tuned from real drafts (`tools/tune_heroes_real.py`, equal teams via `BX_GAPS=0` in `game/tests/ban_exp.gd`). `hero_balance_v2.json` now has optional `dmg` and `hp` entries (`SimData.balance_dmg`/`balance_hp`) that pin a hero's damage or health so that `scale` moves only the rest (support buffs go into healing and shields; carries keep their kill share). Fennimore and Harkin also got kit values in `tools/gen_kits.py`. Result in `docs/design/BAN-EXPERIMENT.md` (before and after): every GDD 9 row in band within tolerance (two rows 0.05 to 0.11 under the line); heroes outside 45-55 now 1/1/0 (Fennimore 42.5-45.8, a kit proposal waits for the Founder). The alpha6 kill-share check is bot > 1.4 x sup (DECISIONS 0.11.1-8). Re-run: `GODOT=... python3 tools/ban_experiment.py --game-dir <copy of game/> --jobs 7` (about 2.3 h). The synthetic calibration of record was not re-run.
+
+## Web playtest build (2026-11-23)
+
+Link: https://gloamline-playtest.vercel.app (unlisted, noindex; Vercel Hobby, plain static files). Guide, tester note and how to move hosts: `docs/WEB-PLAYTEST.md`.
+- Build with `GODOT=... [FEEDBACK_URL=...] tools/build_web.sh`, into build/web/ (never commit it).
+- Deploy: check `cd /tmp && npx --yes vercel@latest whoami` prints lowfuyi-1301, copy build/web to /mnt/c/Users/Fuyi/gloamline-web, then run `npx vercel@latest deploy --prod --yes` there. Windows npx holds the login and cannot run in a WSL folder.
+- Code: `WebBuild` (frame, build id, `?probe=1` test probe) and `SaveCode` (save code export and restore in Settings).
+- Playwright driver: ~/opt/pw/drive.js. It needs PATH=$HOME/opt/node/bin and LD_LIBRARY_PATH=$HOME/opt/libs/root/usr/lib/x86_64-linux-gnu.

@@ -450,3 +450,6 @@ Built from the 0.11.1 commit; no new APK. Guide: `docs/WEB-PLAYTEST.md`.
   - Plain static files only: no build step, functions, analytics or Vercel domain settings.
   - Moving hosts (Cloudflare Pages, Netlify, itch.io) takes minutes (`docs/WEB-PLAYTEST.md`).
   - Account checked with `vercel whoami` before every deploy.
+- W-8 Deployed 2026-11-23: https://gloamline-playtest.vercel.app (build 0.11.1-alpha-web-df6213b-20261123-1243). `vercel whoami` printed lowfuyi-1301 before the deploy.
+  - The account's only team is "InvoiceNowCheck" (Hobby), so the project sits there. The Founder is asked to confirm that this team is his own; if not, the project moves (delete and redeploy in minutes).
+  - Live checks: noindex header, meta and robots.txt present. Playwright on the live link: title at 4.0 s, about 8.8 MB transferred, draft to report with 0 errors.
