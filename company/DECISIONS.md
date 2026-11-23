@@ -508,3 +508,6 @@ The Founder is away; decisions that are his and cannot be undone are skipped and
 ### Q7: AI-vs-AI on Match Sim v2, prepared and NOT enabled
 - Q7-1 The switch `ai_games_v2` stays false. New `tests/ai_switch_tests.gd` checks it is off and that both paths give the season code the same contract.
 - Q7-2 Cost on this desktop: v2 226 ms against v1 22 ms per AI game (60 games each); about 0.9 s a round (4 AI games) and 16 s a league season. A phone is not measured. Recommendation in `docs/design/AI-GAMES-V2-COST.md`: measure on the phone first, then simulate a round's AI games during the player's match.
+
+### Q8: comeback proposal (NOT APPLIED)
+- Q8-1 `docs/design/COMEBACK-PROPOSAL.md`: on 0.12 data a 2,000 to 2,999 gold lead at 8:00 wins 82.9% (2,400 games, real ratings and drafts); the leader at 8:00 wins 78.5% overall. Three gold-based variants, tried only in a scratch copy, moved the 8:00 lead but not who wins (74.5 to 78.7%): team strength drives most of it. Proposal: set a target for equal teams (70 to 75% at a 2,400 lead), measure equal teams first, then try fight levers (defender's edge, shutdown bounty, late respawns). Founder decision; nothing changed.

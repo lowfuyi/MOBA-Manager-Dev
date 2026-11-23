@@ -98,3 +98,4 @@ The Founder queued Q0 to Q9 and the end-of-night release (0.12.0) for an unatten
 - **Q5 done:** `ItemIcons` (atlas items@64, `BuildSheet.items_view`), `ArenaFx2` cast looks.
 - **Q6 partly done:** overview `max_pitch`/`fill` in arena_view_v1.json; large-text Draft (about 25 px) and Game Plan controls still open (DECISIONS Q6-2 options).
 - **Q7 done (switch off):** `tests/ai_switch_tests.gd`, `docs/design/AI-GAMES-V2-COST.md`.
+- **Q8 done (not applied):** `docs/design/COMEBACK-PROPOSAL.md`.
