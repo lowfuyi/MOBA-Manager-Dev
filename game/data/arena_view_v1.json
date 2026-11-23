@@ -9,5 +9,5 @@
   "priority": {"decisive": 5.0, "objective": 4.0, "tower": 3.0, "fight": 2.0, "kill": 1.5, "team": 0.0},
   "decisive_kills": 3
  },
- "overview": {"pitch": 64.0, "fov": 30.0, "fit_margin": 0.03, "token_scale": 2.3, "bar_scale": 2.0}
+ "overview": {"pitch": 64.0, "max_pitch": 82.0, "fill": 0.88, "fov": 30.0, "fit_margin": 0.03, "token_scale": 2.3, "bar_scale": 2.0}
 }

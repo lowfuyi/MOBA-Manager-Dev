@@ -114,6 +114,21 @@ func _run() -> void:
 		var pr := v.cam.project(p)
 		corners_in = corners_in and pr.x >= 0.0 and pr.x <= v.size.x and pr.y >= 0.0 and pr.y <= v.size.y
 	ok(corners_in, "views: All shows the whole island")
+	# 0.12 Q6: on a tall phone the overview looks more steeply down so the island takes more height (a square island fitted
+	# to the width cannot fill a 720x1560 view: about 0.7 is the most with all four corners in)
+	var fill_std := v.overview_fill()
+	get_window().size = Vector2i(720, 1560)
+	await frames(4)
+	v.show_game(m.player.game_t(m.show_t), 0.1)
+	var fill_tall := v.overview_fill()
+	var tall_in := true
+	for p2 in [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)]:
+		var pr2 := v.cam.project(p2)
+		tall_in = tall_in and pr2.x >= -1.0 and pr2.x <= v.size.x + 1.0 and pr2.y >= -1.0 and pr2.y <= v.size.y + 1.0
+	ok(fill_tall >= 0.66 and tall_in, "views: on a tall phone All takes more of the view's height (%.2f, 0.59 before 0.12; 720x1280: %.2f) and still shows the whole island" % [fill_tall, fill_std])
+	get_window().size = Vector2i(720, 1280)
+	await frames(4)
+	v.show_game(m.player.game_t(m.show_t), 0.1)
 	await sim.tap((m._view_btns["action"] as Button).get_global_rect().get_center())
 	await frames(3)
 	ok(v.mode == "action" and v.fog_on(), "views: back to Action, fog on")

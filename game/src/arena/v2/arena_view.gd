@@ -203,9 +203,41 @@ func _follow(real_dt: float) -> void:
 
 
 ## Field and All: the whole island, fixed. The distance is the smallest that keeps the four corners of the map inside the view.
+## On a tall phone a tilted map fitted to the width leaves empty bands above and below it (0.12 Q6): the camera then looks
+## more steeply down, up to overview.max_pitch, until the island fills overview.fill of the view's height.
+var _ov_cache: Array = []    # [view size, flip, pitch, dist, focus]: the fit is computed once per view size (0.12)
+
+
 func _overview() -> void:
+	if not _ov_cache.is_empty() and _ov_cache[0] == size and _ov_cache[1] == cam.flip:
+		cam.pitch_deg = float(_ov_cache[2])
+		cam.fov_deg = float(cfg["overview"]["fov"])
+		cam.dist = float(_ov_cache[3])
+		cam.focus = _ov_cache[4]
+		_cam_focus = cam.focus
+		return
 	var ov: Dictionary = cfg["overview"]
-	cam.pitch_deg = float(ov["pitch"])
+	var pitch := float(ov["pitch"])
+	var top_pitch := float(ov.get("max_pitch", pitch))
+	var want := float(ov.get("fill", 0.0))
+	_fit_whole(pitch)
+	while overview_fill() < want and pitch < top_pitch:
+		pitch = minf(top_pitch, pitch + 2.0)
+		_fit_whole(pitch)
+	_ov_cache = [size, cam.flip, cam.pitch_deg, cam.dist, cam.focus]
+
+
+## How much of the view's height the island takes in Field and All (0 to 1).
+func overview_fill() -> float:
+	cam.update()
+	var top := cam.project(Vector2(0.5, 0.0 if not cam.flip else 1.0)).y
+	var bot := cam.project(Vector2(0.5, 1.0 if not cam.flip else 0.0)).y
+	return absf(bot - top) / maxf(1.0, size.y)
+
+
+func _fit_whole(pitch: float) -> void:
+	var ov: Dictionary = cfg["overview"]
+	cam.pitch_deg = pitch
 	cam.fov_deg = float(ov["fov"])
 	cam.focus = Vector2(0.5, 0.5)
 	var m := float(ov["fit_margin"])
