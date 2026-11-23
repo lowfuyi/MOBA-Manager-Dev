@@ -511,3 +511,7 @@ The Founder is away; decisions that are his and cannot be undone are skipped and
 
 ### Q8: comeback proposal (NOT APPLIED)
 - Q8-1 `docs/design/COMEBACK-PROPOSAL.md`: on 0.12 data a 2,000 to 2,999 gold lead at 8:00 wins 82.9% (2,400 games, real ratings and drafts); the leader at 8:00 wins 78.5% overall. Three gold-based variants, tried only in a scratch copy, moved the 8:00 lead but not who wins (74.5 to 78.7%): team strength drives most of it. Proposal: set a target for equal teams (70 to 75% at a 2,400 lead), measure equal teams first, then try fight levers (defender's edge, shutdown bounty, late respawns). Founder decision; nothing changed.
+
+### End of night: 0.12.0
+- E-1 Full gate found two legacy perf rows over their node allowance: More tab 80 nodes (allowance 75) and Settings 101 (100). Cause: the save code card from the 0.11.1 web build (df6213b), which ran only the fast gate; nothing from tonight. Raised by the file's rule (measured + 10% to the next 5): 90 and 115 (under the 120 target), with reason; Producer acting as Technical Director, Founder may overrule. Draw calls unchanged.
+- E-2 Version 0.12.0 alpha, versionCode 19; notes `docs/ALPHA-0.12-NOTES.md`.

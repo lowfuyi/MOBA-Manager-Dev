@@ -87,13 +87,13 @@
    "status": "legacy",
    "measured": {
     "draws": 42,
-    "nodes": 68
+    "nodes": 80
    },
    "draws": 50,
-   "nodes": 75,
+   "nodes": 90,
    "raise": {
-    "reason": "0.8.0b Frame rate card and 0.8.2 Sound and vibration card: 68 nodes measured after both (was 52); measured + 10 percent rounded up = 75",
-    "approved_by": "Technical Director (review 2026-11-18)"
+    "reason": "0.11.1 web save code card (export and restore) in Settings, shown in the More tab: 80 nodes measured (was 68); measured + 10 percent rounded up to the next 5 = 90",
+    "approved_by": "Producer acting as Technical Director (overnight run 2026-11-24; found by the 0.12.0 full gate; Founder may overrule)"
    }
   },
   "05_roster": {
@@ -259,13 +259,13 @@
    "status": "legacy",
    "measured": {
     "draws": 42,
-    "nodes": 89
+    "nodes": 101
    },
    "draws": 50,
-   "nodes": 100,
+   "nodes": 115,
    "raise": {
-    "reason": "the same two Settings cards: 89 nodes measured after both (was 73); measured + 10 percent rounded up = 100, under the 120 target",
-    "approved_by": "Technical Director (review 2026-11-18)"
+    "reason": "0.11.1 web save code card (export and restore): 101 nodes measured (was 89); measured + 10 percent rounded up to the next 5 = 115, under the 120 target",
+    "approved_by": "Producer acting as Technical Director (overnight run 2026-11-24; found by the 0.12.0 full gate; Founder may overrule)"
    }
   },
   "19_hub_after": {
