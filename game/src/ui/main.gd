@@ -192,7 +192,9 @@ func _notification(what: int) -> void:
 			_current.call("go_back")
 		else:
 			App.autosave()
-			get_tree().quit()
+			if not WebBuild.is_web():
+				get_tree().quit()
 	elif what == NOTIFICATION_WM_CLOSE_REQUEST:
 		App.autosave()
-		get_tree().quit()
+		if not WebBuild.is_web():
+			get_tree().quit()

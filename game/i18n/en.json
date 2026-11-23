@@ -1498,5 +1498,22 @@
   "draft.opp_pick": "{club} pick {hero} for {role}",
   "match.view.field": "Field",
   "match.view.action": "Action",
-  "match.view.all": "All"
+  "match.view.all": "All",
+  "settings.privacy_web": "This playtest keeps your game only in this browser. It has no account and no ads, and the game sends nothing anywhere.",
+  "settings.build": "Build: {id}",
+  "settings.feedback_form_body": "Send feedback copies your details, then opens the feedback form in a new tab. Paste them into the first answer.",
+  "settings.send_feedback": "Send feedback",
+  "settings.feedback_opened": "Details copied. The form opens in a new tab.",
+  "settings.save_h": "Your save",
+  "settings.save_body": "Copy a save code to keep your season somewhere safe, and restore it later from a copied code.",
+  "settings.save_body_web": "Your season lives in this browser. Clearing site data or private browsing can delete it, so copy a save code now and then.",
+  "settings.save_copy": "Copy save code",
+  "settings.save_copy_prompt": "Your save code (it is also on your clipboard if the browser allowed it). Select it all and copy it:",
+  "settings.save_copied": "Save code copied ({n} characters)",
+  "settings.save_restore": "Restore from a save code",
+  "settings.save_paste_prompt": "Paste your save code. Nothing changes until you confirm.",
+  "settings.save_bad": "That is not a Gloamline save code for this version.",
+  "settings.restore_confirm": "Replace your save with {club}, season {season}?",
+  "settings.restore_yes": "Restore this save",
+  "settings.save_restored": "Restored: {club}, season {season}"
 }

@@ -34,6 +34,10 @@ func _ready() -> void:
 	add_child(sfx)
 	sfx.on = DeviceState.new().sound()
 	haptics_on = DeviceState.new().haptics()
+	if WebBuild.is_web():
+		get_tree().root.size_changed.connect(func(): WebBuild.fit(get_tree().root))
+		WebBuild.fit.call_deferred(get_tree().root)
+		WebBuild.install_probe(get_tree())
 
 
 ## Called by Main once the first screen is up.
@@ -184,6 +188,8 @@ func autosave() -> void:
 
 func debug_info() -> String:
 	var lines: Array = ["Gloamline " + VERSION_LABEL, "godot " + Engine.get_version_info()["string"]]
+	if not WebBuild.info().is_empty():
+		lines[0] += "  build " + WebBuild.build_id(VERSION_LABEL)
 	if gs != null:
 		lines.append("club=%s season=%s phase=%s round=%s seed=%s" % [gs.d["club"], gs.d["season"], gs.d["phase"], int(gs.d["round"]) + 1, gs.d["save_seed"]])
 		var ng := gs.next_game()

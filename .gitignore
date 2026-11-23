@@ -4,3 +4,4 @@ __pycache__/
 *.import
 .pytest_cache/
 build/
+game/build_info.json

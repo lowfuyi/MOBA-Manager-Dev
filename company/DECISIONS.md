@@ -426,3 +426,27 @@ The Founder approved both B2-2 proposals as a separate increment, 0.11.1, leavin
   - Not done: tuning supports weaker just to clear a noisy 60-game line.
 - 0.11.1-8b arena_views_tests ward check: a new ward placed on the same spot before the old one ran out no longer counts as the old ward outliving its time (the new match results have one such re-ward; the test assumption, not ArenaVision, was wrong).
 - 0.11.1-9 Version 0.11.1 alpha (code 18). APK built because the bands pass in tolerance.
+
+## Producer log 2026-11-23: 0.11.1 web playtest build (Founder request of 2026-11-22)
+
+Built from the 0.11.1 commit; no new APK. Guide: `docs/WEB-PLAYTEST.md`.
+- W-1 Godot 4.3 Web export, preset "Web":
+  - GL Compatibility, single-threaded (`variant/thread_support=false`), so the host needs no cross-origin isolation headers;
+  - PWA with our own icons (`tools/gen_pwa_icons.gd`: teal circle and coral hexagon, no text);
+  - the release template, with `tests/*` excluded. Tools and docs are outside game/ and never shipped.
+- W-2 Build id `0.11.1-alpha-web-<commit>-<UTC time>`, written to `game/build_info.json` only during `tools/build_web.sh` (git-ignored). It is shown on the loading screen, in Settings and in the feedback note.
+  - "Always the newest": every load asks the service worker for an update, and every file is served with `Cache-Control: max-age=0, must-revalidate`.
+- W-3 `WebBuild` (src/core/web_build.gd):
+  - Layout: a wide window keeps 9:16 with side bars; a tall phone uses the tall layout.
+  - Input: mouse and touch both work. Sound starts on the first tap (browser rule). Vibration is skipped where the browser lacks it. There is no quit on the web (a stopped engine leaves a black page).
+  - `?probe=1` installs a read-only test probe for Playwright.
+- W-4 Saves stay in the browser (IndexedDB). Settings, "Your save":
+  - "Copy save code" and "Restore from a save code" (`SaveCode`: the save JSON, gzipped and base64; checked, then confirmed with a second tap). No new save keys.
+  - On the web, the privacy and save texts warn that the browser may clear storage.
+  - Copy came in through `merge_copy.py` (`docs/design/copy/en_0_11_web.json`, 17 new keys).
+- W-5 "Send feedback" (Settings) copies the feedback note and opens the form. It appears only when the build is made with `FEEDBACK_URL`; the Founder has not given a form address yet, so this build has "Copy feedback note" only.
+- W-6 Not indexed: robots meta, `X-Robots-Tag: noindex, nofollow, noarchive` (`tools/web/vercel.json` and `_headers`), and `robots.txt` disallowing all. Unlisted, not secret.
+- W-7 Hosting: Vercel, free Hobby plan (Founder decision 2026-11-22, accepting the "personal or non-commercial use" risk).
+  - Plain static files only: no build step, functions, analytics or Vercel domain settings.
+  - Moving hosts (Cloudflare Pages, Netlify, itch.io) takes minutes (`docs/WEB-PLAYTEST.md`).
+  - Account checked with `vercel whoami` before every deploy.

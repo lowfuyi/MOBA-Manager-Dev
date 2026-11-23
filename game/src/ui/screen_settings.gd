@@ -65,11 +65,21 @@ func _rebuild() -> void:
 	_pace_card()
 	var pv := UI.card(body)
 	pv.add_child(UI.label(Strings.t("settings.privacy_h"), UI.S_BODY, UI.ACCENT))
-	pv.add_child(UI.label(Strings.t("settings.privacy_body"), UI.S_SMALL, UI.DIM))
+	pv.add_child(UI.label(Strings.t("settings.privacy_web" if WebBuild.is_web() else "settings.privacy_body"), UI.S_SMALL, UI.DIM))
 	var fb := UI.card(body)
 	fb.add_child(UI.label(Strings.t("settings.feedback_h"), UI.S_BODY, UI.ACCENT))
 	fb.add_child(UI.label(Strings.t("settings.feedback_body"), UI.S_SMALL, UI.DIM))
-	fb.add_child(UI.button(Strings.t("settings.copy_feedback"), func(): DisplayServer.clipboard_set(App.feedback_text()); App.toast(Strings.t("settings.copied"), UI.GOOD), "primary", 76))
+	var bl := UI.label(Strings.f("settings.build", {"id": WebBuild.build_id(App.VERSION_LABEL)}), UI.S_SMALL, UI.TEXT)
+	bl.name = "BuildLabel"
+	fb.add_child(bl)
+	var form := WebBuild.feedback_url() != ""
+	if form:
+		fb.add_child(UI.label(Strings.t("settings.feedback_form_body"), UI.S_SMALL, UI.DIM))
+		var sf := UI.button(Strings.t("settings.send_feedback"), _send_feedback, "primary")
+		sf.name = "SendFeedback"
+		fb.add_child(sf)
+	fb.add_child(UI.button(Strings.t("settings.copy_feedback"), func(): DisplayServer.clipboard_set(App.feedback_text()); App.toast(Strings.t("settings.copied"), UI.GOOD), "normal" if form else "primary", 76))
+	_save_card()
 	var d := UI.card(body)
 	d.add_child(UI.label(Strings.t("settings.debug_h"), UI.S_BODY, UI.ACCENT))
 	d.add_child(UI.label(App.debug_info(), UI.S_CAPTION, UI.DIM))
@@ -82,6 +92,87 @@ func _rebuild() -> void:
 	else:
 		r.add_child(UI.button(Strings.t("settings.reset"), func(): _confirm_reset = true; _rebuild(), "danger", 76))
 	body.add_child(UI.button(Strings.t("hub.about"), func(): App.go(ScreenAbout.new())))
+
+
+var _restore: Dictionary = {}    # a checked save code waiting for "Restore this save" (the second tap)
+var last_code := ""               # the last code copied (tests read it: the headless engine has no clipboard)
+
+
+## Send feedback (web playtest): copy the feedback note (build id, club, pace) and open the form in a new tab.
+func _send_feedback() -> void:
+	DisplayServer.clipboard_set(App.feedback_text())
+	App.toast(Strings.t("settings.feedback_opened"), UI.GOOD)
+	OS.shell_open(WebBuild.feedback_url())
+
+
+## Your save (0.11.1 web): a save code to copy, and a restore from a pasted code (checked, then confirmed with a second
+## tap). On the web the browser may clear site data, so this is how a tester keeps a season.
+func _save_card() -> void:
+	var c := UI.card(body)
+	c.name = "SaveCard"
+	c.add_child(UI.label(Strings.t("settings.save_h"), UI.S_BODY, UI.ACCENT))
+	c.add_child(UI.label(Strings.t("settings.save_body_web" if WebBuild.is_web() else "settings.save_body"), UI.S_SMALL, UI.DIM))
+	if not _restore.is_empty():
+		c.add_child(UI.label(Strings.f("settings.restore_confirm", {"club": App.world.clubs[String(_restore["club"])]["name"],
+				"season": int(_restore["season"])}), UI.S_BODY, UI.WARN))
+		var yes := UI.button(Strings.t("settings.restore_yes"), _restore_now, "primary")
+		yes.name = "RestoreYes"
+		c.add_child(yes)
+		c.add_child(UI.button(Strings.t("common.cancel"), func(): _restore = {}; _rebuild()))
+		return
+	var cp := UI.button(Strings.t("settings.save_copy"), _copy_save)
+	cp.name = "SaveCopy"
+	c.add_child(cp)
+	var rs := UI.button(Strings.t("settings.save_restore"), _ask_restore)
+	rs.name = "SaveRestore"
+	c.add_child(rs)
+
+
+func _copy_save() -> void:
+	var code := SaveCode.encode(App.gs.d)
+	last_code = code
+	DisplayServer.clipboard_set(code)
+	App.toast(Strings.f("settings.save_copied", {"n": code.length()}), UI.GOOD)
+	if WebBuild.is_web():
+		# a browser may refuse the clipboard outside its own tap handler: also show the code, ready to copy by hand
+		JavaScriptBridge.eval("window.prompt(%s, %s)" % [JSON.stringify(Strings.t("settings.save_copy_prompt")), JSON.stringify(code)])
+
+
+func _ask_restore() -> void:
+	var code := ""
+	if WebBuild.is_web():
+		var v = JavaScriptBridge.eval("window.prompt(%s, '') || ''" % JSON.stringify(Strings.t("settings.save_paste_prompt")))
+		code = String(v) if v != null else ""
+	else:
+		code = DisplayServer.clipboard_get()
+	restore_from(code)
+
+
+## Check a pasted save code; a good one waits for the confirming tap. Returns whether the text was a save code.
+func restore_from(code: String) -> bool:
+	if code.strip_edges() == "":
+		return false
+	var d := SaveCode.decode(code)
+	if d.is_empty():
+		App.toast(Strings.t("settings.save_bad"), UI.WARN)
+		return false
+	_restore = d
+	_rebuild()
+	return true
+
+
+func _restore_now() -> void:
+	var d := _restore
+	_restore = {}
+	if d.is_empty():
+		return
+	var g := GameState.from_dict(App.world, d)
+	App.gs = g
+	g.save()
+	if App.tutorial != null:
+		App.tutorial.bind(true)
+	App.toast(Strings.f("settings.save_restored", {"club": g.club_name(g.d["club"]), "season": int(g.d["season"])}), UI.GOOD)
+	App.go(ScreenHub.new())
 
 
 ## Frame rate (Alpha 0.8.1): two plain choices, the chosen one filled. A device setting; the game plays the same at both.
