@@ -480,3 +480,8 @@ The Founder is away; decisions that are his and cannot be undone are skipped and
   - `arena frame ms` per view (Field, Action, All): average, worst, frames over 33.4 ms, frame count; the first second after the match screen opens is not counted (loading).
 - Q1-2 The first debug line carries a build id on every platform: the web build id as before; elsewhere version and platform (e.g. `0.11.1-alpha-android`).
 - Q1-3 The web probe (`?probe=1`) returns the timing lines, so Playwright runs read them. Browser and desktop numbers are not phone speed; only the Founder's phone gives phone numbers.
+
+### Q2: WebKit check, iPhone launch images, first-load size
+- Q2-1 Playwright WebKit (iPhone 15) and Chromium (Pixel 7) both run the full flow on the same build; the table is in `docs/WEB-PLAYTEST.md`. WebKit-only console noise (a WebGL framebuffer warning from inside Godot's renderer, and the headless audio failure) is logged, not fixed: neither comes from game code and the pictures are correct.
+- Q2-2 Added iPhone launch images and the Home Screen title to the Web preset's head; the images are made at build time by `tools/gen_pwa_splash.gd`. PWA icons were already present.
+- Q2-3 First load stays about 8.8 MB (brotli). No change made; a smaller engine build is a later job.

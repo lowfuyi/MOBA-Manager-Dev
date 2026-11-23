@@ -60,3 +60,27 @@ Playwright, Pixel 7 viewport, software WebGL (SwiftShader), against the live lin
 - **Frame rates** of 5 to 19 in this test come from software rendering and say nothing about a phone. Real phone browsers use the GPU but run WebAssembly slower than a desktop. **Browser speed is not phone speed**; judge speed only on the Android APK.
 
 Vercel scope: the account (lowfuyi-1301) has one team, "InvoiceNowCheck" (Hobby). The project gloamline-playtest is in it, because it is the account's only scope.
+
+## WebKit (iPhone Safari engine) against Chromium (2026-11-24, overnight Q2; desktop WSL, not a phone)
+
+Same build (65830da+, the Q1 timings in), served from `http://localhost:8765` (the Playwright WebKit build here has no TLS support, so the live https link cannot be opened in it). Flow: title, New game, take over a club, skip tutorial, draft (5 bans and 5 picks), full match at x1, report. Driver `~/opt/pw/drive.js` (env `BROWSER=webkit DEVICE="iPhone 15"`).
+
+| | WebKit 18.2, iPhone 15 viewport (393 x 852 at 3x) | Chromium 131, Pixel 7 viewport (412 x 915 at 2.6x) |
+|---|---|---|
+| Title screen | 3.7 s | 2.7 s |
+| Full flow to the report | yes, 0 script errors | yes, 0 errors |
+| Draft time (5 bans, 5 picks, driver taps) | 13 s | 18 s |
+| Game start (Start the match to first arena frame) | 649 ms | 674 ms |
+| Action view frame time, avg / worst | 33.5 / 135 ms | 132 / 150 ms (software GL, SwiftShader) |
+| Console | 256 x "WebGL: INVALID_OPERATION: Read and write color attachments cannot be the same image" (WebKit stops logging at 256); 17 x "Failed to start the audio device" | none |
+| Picture | correct; thin bars left and right (the iPhone viewport is wider than 9:16; the frame letterboxes by design) | correct; fills the width |
+
+Both frame times come from software rendering on this machine and say nothing about a phone. The tester timings (Q1) now give the real numbers from a tester's phone in the feedback note.
+
+**Differences and what was done**
+- WebGL warning (WebKit only): raised inside Godot 4.3's GL Compatibility renderer when it copies a framebuffer; the game uses no screen texture or back-buffer copy. Nothing renders wrong in the pictures. Not fixable in game code; it will be re-checked on a real iPhone (the Founder's test list) and after a Godot upgrade.
+- Audio start failure: headless WebKit has no sound device. On a real iPhone, Safari starts sound only after the first tap; Godot resumes the audio context on input. To check on a phone: sound after the first tap, and with the silent switch on.
+- Side bars on iPhone: by design (portrait 9:16 frame). Tall-phone layout is Q6.
+- **Added:** iPhone launch images (`apple-touch-startup-image`, four sizes 750 x 1334 to 1290 x 2796, dusk gradient with the teal circle and coral hexagon, 20 to 44 KB each), generated into the build by `tools/gen_pwa_splash.gd` (not committed, not in the APK), and `apple-mobile-web-app-title`. The PWA icons (144, 180, 512) and manifest were already there.
+
+**First load:** index.wasm 35.4 MB (gzip 8.0 MB), index.pck 1.6 MB (gzip 1.25 MB), index.js 331 KB (gzip 84 KB): about 9.3 MB gzip, about 8.8 MB brotli as Vercel serves it (measured on the live link 2026-11-23). Launch images load only when the game is added to the Home Screen. The wasm is Godot's engine; making it smaller needs a custom engine build without unused modules (a later, separate job).

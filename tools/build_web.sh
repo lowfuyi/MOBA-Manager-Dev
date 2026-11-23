@@ -26,6 +26,8 @@ sed -i "s/__GL_BUILD__/$BUILD/" "$OUT/index.html"
 cp "$ROOT/tools/web/vercel.json" "$OUT/vercel.json"   # Vercel: headers only, no build step or functions
 cp "$ROOT/tools/web/_headers" "$OUT/_headers"         # the same headers for Netlify and Cloudflare Pages
 printf 'User-agent: *\nDisallow: /\n' > "$OUT/robots.txt"
+# iPhone launch images for Home Screen use (0.12 Q2): generated into the build only, never committed or shipped in the APK
+(cd "$GD" && timeout 300 "$G" --headless --script "$ROOT/tools/gen_pwa_splash.gd" -- "$OUT" 2>&1 | grep -c "^splash" | xargs -I{} echo "  {} launch images") || true
 echo "$BUILD" > "$OUT/build.txt"
 echo "build_web: $BUILD"
 ( cd "$OUT" && for f in index.html index.js index.wasm index.pck index.audio.worklet.js index.service.worker.js index.manifest.json; do

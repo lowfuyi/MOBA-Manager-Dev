@@ -92,3 +92,4 @@ The Founder queued Q0 to Q9 and the end-of-night release (0.12.0) for an unatten
 - **Q0 done (0.11.2):** Fen Fog `ally_heal`, Leap Frog shield, `q_k` 0.385, re-tune; BAN-EXPERIMENT.md before and after; alpha6 kill-share line 1.25.
 - **Q9 done:** ART-PRODUCTION-BRIEF.md, IOS-READINESS.md.
 - **Q1 done:** `Timings` (`App.timings`), lines in `App.debug_info()`; `WebBuild.probe` returns them.
+- **Q2 done:** WebKit runs with `BROWSER=webkit DEVICE="iPhone 15" PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1` against a local http server (no TLS in that WebKit); launch images from `tools/gen_pwa_splash.gd` at build time.
