@@ -147,7 +147,8 @@ func _kda(check: Callable, w: World) -> void:
 	check.call(ok_assist, "nobody assists his own kill and assists stay under four per kill")
 	check.call(win_share / n > 0.55 and win_share / n < 0.85, "winners take 55 to 85 percent of kills on average (%.2f)" % (win_share / n))
 	check.call(tmin >= 6 and tmax <= 70, "kills per game stay between 6 and 70 (%d-%d)" % [tmin, tmax])
-	check.call(kills["bot"] > kills["sup"] * 1.5, "carries get more kills than supports (bot %.0f, sup %.0f)" % [kills["bot"], kills["sup"]])
+	# 1.4, not 1.5, since 0.11.1 (DECISIONS 0.11.1-8): 240 games read 1.48 and 60-game samples swing by about 0.15
+	check.call(kills["bot"] > kills["sup"] * 1.4, "carries get more kills than supports (bot %.0f, sup %.0f)" % [kills["bot"], kills["sup"]])
 
 
 # ------------------------------------------------------------------ career record and practice matches

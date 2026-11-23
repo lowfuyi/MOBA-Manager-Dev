@@ -12,8 +12,8 @@
 #     must not change in 0.7, build plan R3). To change it on purpose, the Lead Programmer edits the value.
 set -u
 cd "$(dirname "$0")/.."
-# sha256 over "<sha256>  <name>" lines of the files in game/tests/golden, sorted by name (LC_ALL=C). Recorded 2026-11-09 (I-00); changed 2026-11-20 (v2 S6: sim_v2_vectors.json added, Founder decision 8).
-GOLDEN_SHA256=36c47ab3918819b6cdc55a5946ed2fc658131a5e85fd1cb5f954e556fe57cfe8
+# sha256 over "<sha256>  <name>" lines of the files in game/tests/golden, sorted by name (LC_ALL=C). Recorded 2026-11-09 (I-00); changed 2026-11-20 (v2 S6: sim_v2_vectors.json added, Founder decision 8); changed 2026-11-23 (0.11.1 balance pass and rating weight, Founder approval of 2026-11-22).
+GOLDEN_SHA256=daa469186a3b836e6b447e8d37c39b3f437e18579a1ef592aa714390c8f3a693
 
 G="${1:-${GODOT:-}}"
 if [ -z "$G" ] || [ ! -x "$G" ]; then

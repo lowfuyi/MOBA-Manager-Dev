@@ -60,13 +60,37 @@ static func item(iid: String) -> Dictionary:
 
 
 static var _bal: Dictionary = {}
+static var _bal_dmg: Dictionary = {}
+static var _bal_hp: Dictionary = {}
+
+
+static func _load_bal() -> void:
+	var d = DataLoader.load_json("res://data/hero_balance_v2.json")
+	_bal = d["scale"] if d is Dictionary else {"_": 1.0}
+	_bal_dmg = d.get("dmg", {}) if d is Dictionary else {}
+	_bal_hp = d.get("hp", {}) if d is Dictionary else {}
 
 
 static func balance(hid: String) -> float:
 	if _bal.is_empty():
-		var d = DataLoader.load_json("res://data/hero_balance_v2.json")
-		_bal = d["scale"] if d is Dictionary else {"_": 1.0}
+		_load_bal()
 	return float(_bal.get(hid, 1.0))
+
+
+## Damage multiplier: the optional "dmg" entry, else the hero's scale (0.11.1: supports keep their 0.11.0 damage, so
+## a buff goes into healing, shields and health and does not move kills from carries to supports).
+static func balance_dmg(hid: String) -> float:
+	if _bal.is_empty():
+		_load_bal()
+	return float(_bal_dmg.get(hid, balance(hid)))
+
+
+## Health multiplier: the optional "hp" entry, else the hero's scale (0.11.1: healers keep their 0.11.0 health, so their
+## buff goes into healing and shields, the support's own job).
+static func balance_hp(hid: String) -> float:
+	if _bal.is_empty():
+		_load_bal()
+	return float(_bal_hp.get(hid, balance(hid)))
 
 
 static func heroes() -> Dictionary:

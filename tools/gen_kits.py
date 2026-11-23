@@ -280,7 +280,7 @@ K["harkin"] = ("Harpoon Gunner", "Hunted the whales of the grey sea; now they hu
     A("Harpoon Shot", "Fires a harpoon in a line that hurts and slows.", ["damage", "cc"], "line", cc="slow", range_x=1.2),
     A("Chain Volley", "Sprays shot over an area; clears waves.", ["damage", "wave"], "area"),
     A("Kick Back", "Fires and leaps backward.", ["mobility"], "self"),
-    A("Whaler's Mark", "A long, slow shot that hits the first enemy for heavy damage.", ["damage"], "line", range_x=3.0, hit=0.7))
+    A("Whaler's Mark", "A long, slow shot that hits the first enemy for heavy damage.", ["damage"], "line", range_x=3.0, hit=0.6))   # 0.11.1 balance: was hit 0.7
 K["pellam"] = ("Shepherd Slinger", "Kept a hillside flock and never lost a sheep to wolves.",
     P("Shepherd's Count", "Every fourth attack heals them a little.", "on_hit_nth", every=4, heal=30),
     A("Sling Stone", "Slings a stone that hurts and slows an enemy.", ["damage", "cc"], "enemy", cc="slow", range_x=1.1),
@@ -368,11 +368,11 @@ K["oriel"] = ("Window Spirit", "The light that falls through the chapel window, 
     A("Glasswall", "Shields an ally behind coloured glass.", ["shield"], "ally"),
     A("Clerestory", "Floods a wide area with light, healing every ally inside.", ["heal"], "area", radius_u=0.045, range_x=0.0))
 K["fennimore"] = ("Fen Elder", "A very old frog who has been right about everything for a very long time.",
-    P("Croak", "Every third ability also slows the enemies it hits.", "on_ability", every=3, cc="slow", cc_s=1.0),
+    P("Croak", "Every second ability also slows the enemies it hits.", "on_ability", every=2, cc="slow", cc_s=1.0),   # 0.11.1 balance: was every third
     A("Lily Lob", "Lobs a lily pad that bursts in an area, hurting and slowing; clears waves.", ["damage", "cc", "wave"], "area", cc="slow"),
-    A("Bog Bind", "Binds an enemy in bog-weed, rooting them.", ["cc"], "line", cc="root"),
+    A("Bog Bind", "Binds an enemy in bog-weed, rooting them.", ["cc"], "line", cc="root", hit=0.85, cc_x=2.0),   # 0.11.1 balance: kit values, not scale (a support with little damage)
     A("Leap Frog", "Leaps a short way.", ["mobility"], "self"),
-    A("Fen Fog", "A thick fog over an area: enemies inside are silenced and slowed.", ["cc", "zone"], "area", cc="silence", radius_u=0.04, dur_s=3.0))
+    A("Fen Fog", "A thick fog over an area: enemies inside are silenced and slowed.", ["cc", "zone"], "area", cc="silence", radius_u=0.05, dur_s=3.5))   # 0.11.1 balance: was radius 0.04, 3.0 s
 
 
 def main():

@@ -5,7 +5,8 @@ extends Node
 ## (composition, style, lane counters, kits, items) but their ratings are moved, slot by slot and phase by phase by one
 ## constant, so that their means are 50 + gap and 50: the GDD 9 rating bands can be read with real drafts. Gap 0 games give
 ## the side balance (Blue vs Red) and the hero win rates. tools/ban_experiment.py runs chunks in parallel and writes the report.
-## Env: BX_BANS (1, 3, 5), BX_N games, BX_SEED, BX_OUT (JSON path).
+## Env: BX_BANS (1, 3, 5), BX_N games, BX_SEED, BX_OUT (JSON path), BX_GAPS (optional comma list of rating gaps, e.g. "0"
+## for the hero-balance rounds of 0.11.1; default the GAPS cycle).
 
 const SLOTS := ["top", "jg", "mid", "bot", "sup"]
 const GAPS := [0.0, 0.0, 5.0, 10.0, 20.0, 30.0]
@@ -37,6 +38,11 @@ func _ready() -> void:
 	var out := {"bans": nb, "n": 0, "rows": {}, "blue_wins0": 0, "n0": 0, "hero_g": {}, "hero_w": {}, "hero_pick": {}, "hero_ban": {},
 			"comfort_lost": [], "comfort_lost_side": {"B": 0, "R": 0}, "famf": {"B": 0.0, "R": 0.0}, "raw_gap_won": [], "len": [], "kills": [],
 			"ms": 0, "ms_draft": 0, "floor_binds": 0, "lost_win": {"lost": 0, "lost_won": 0}}
+	var gaps: Array = GAPS
+	if _env("BX_GAPS", "") != "":
+		gaps = []
+		for g in _env("BX_GAPS", "").split(","):
+			gaps.append(float(g))
 	var t0 := Time.get_ticks_msec()
 	var meta := {}
 	for i in n:
@@ -82,8 +88,8 @@ func _ready() -> void:
 		for ph in ["early", "mid", "late"]:
 			for s in SLOTS:
 				raw_gap += (float(teams[0]["ratings"][ph][s]) - float(teams[1]["ratings"][ph][s])) / 15.0
-		var gap: float = GAPS[i % GAPS.size()]
-		var a_blue := (i / GAPS.size()) % 2 == 0     # the stronger team (A) alternates sides
+		var gap: float = gaps[i % gaps.size()]
+		var a_blue := (i / gaps.size()) % 2 == 0     # the stronger team (A) alternates sides
 		var tb := _shift(teams[0], 50.0 + (gap if a_blue else 0.0))
 		var tr := _shift(teams[1], 50.0 + (0.0 if a_blue else gap))
 		var ctx := MatchRunner.context(w, d, {})

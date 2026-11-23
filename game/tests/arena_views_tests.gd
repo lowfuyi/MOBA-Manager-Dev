@@ -80,7 +80,13 @@ func _vision(check: Callable, results: Array) -> void:
 				if (s2[0] as Vector2).distance_to(wd[2]) < 1e-6:
 					during = true
 			var after := false
-			for s3 in v2.sources(float(wd[1]) + 1.0):
+			# a new ward on the same spot (placed again before this one ran out) is not this ward outliving its time
+			var t_after := float(wd[1]) + 1.0
+			var replaced := false
+			for o in v2.wards:
+				if o != wd and (o[2] as Vector2).distance_to(wd[2]) < 1e-6 and float(o[0]) <= t_after and t_after <= float(o[1]):
+					replaced = true
+			for s3 in ([] if replaced else v2.sources(t_after)):
 				if (s3[0] as Vector2).distance_to(wd[2]) < 1e-6 and absf(float(s3[1]) - float(v2.radii["ward"])) < 1e-9:
 					after = true
 			ward_ok = ward_ok and during and not after

@@ -1,3 +1,20 @@
+# Gloamline Alpha 0.11.1: balance pass
+
+Version 0.11.1 alpha (versionCode 18), 2026-11-23. The Founder approved both proposals from the 0.11.0 ban experiment. **Not run on a physical phone.**
+
+- **Stronger teams win as the design says.** Rating counts about 5% more, so a team 10, 20 or 30 points stronger now wins about 67%, 82% and 90% of games. That is in the GDD bands in every ban format; before, it was 1 to 2 points under.
+- **Heroes are closer to even.** At equal teams with real AI drafts, 39 of 40 heroes now win 45 to 55% of games. Before, 13 to 15 heroes were outside, from 38.8% to 60%.
+  - Most changes are numbers. Supports that were weak got stronger healing and shields, and carries that were too strong lost health. Their damage stays as it was, so carries still get most of the kills.
+  - **Fennimore** also roots longer and more often, slows more often, and its fog is wider and longer. It is still the weakest hero (42 to 46%). The next step is a Founder decision.
+  - **Harkin**'s long shot lands a little less often.
+  - Biggest changes: Alderwyn, Sunnivah, Tanglewick and Wyncote heal and shield more; Harkin, Hegwin and Barrowick are weaker.
+- Full before and after: `docs/design/BAN-EXPERIMENT.md`.
+
+**What to test on the phone:** play a few league games with heroes you know.
+- Do Harkin and Hegwin still feel like themselves?
+- Does Fennimore's root feel fair?
+- Do upsets still happen? They should: a team 10 points weaker still wins about 1 game in 3.
+
 # Gloamline Alpha 0.11.0: visible bans, more bans, three match views
 
 Version 0.11.0 alpha (versionCode 17), 2026-11-22. Built from the Founder's feedback of 2026-11-22 on 0.10.0 (GDD 19, `company/DECISIONS.md`). The arena look of 0.10 is kept. **Nothing in this build has run on a physical phone.** Only the Founder's phone test measures touch feel, frame time and how long a draft takes a person.

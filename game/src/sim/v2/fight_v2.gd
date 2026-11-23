@@ -463,7 +463,7 @@ func _deal(att: SimHero, tgt: SimHero, raw: float, dtype: int, from_ability: boo
 	var ts: FS = st[tgt.key]
 	if t < ts.untarget:
 		return
-	var dmg := raw * att.qe(t) * team_k(att.side) * att.bal
+	var dmg := raw * att.qe(t) * team_k(att.side) * att.bal_dmg
 	var p := tgt.pas
 	var frac := tgt.hp / maxf(1.0, tgt.max_hp)
 	if p.trigger == "low_hp" and p.stat == "dr" and frac > 0.5:
