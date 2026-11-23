@@ -37,6 +37,7 @@ var _go_btn: Button
 var _views: HBoxContainer
 var _view_btns: Dictionary = {}
 var view_mode := "action"
+var _frames_seen := 0      # tester timings (Q1): the first arena frame has been drawn once the second _process runs
 
 
 func _init(g: Dictionary = {}, r: Dictionary = {}) -> void:
@@ -179,6 +180,10 @@ func _process(delta: float) -> void:
 	if BottomSheet.is_open() and not BottomSheet.current().is_closing:
 		return    # any sheet pauses the show; the result was decided before it, so nothing changes
 	_watch_t += delta
+	_frames_seen += 1
+	if _frames_seen == 2:
+		App.timings.match_shown()
+	App.timings.frame(view_mode, delta, _watch_t)
 	var was := player.game_t(show_t)
 	show_t = minf(player.show_len, show_t + delta * float(SPEEDS[_speed_i]))
 	_apply(delta)

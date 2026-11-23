@@ -467,3 +467,16 @@ The Founder is away; decisions that are his and cannot be undone are skipped and
 - 0.11.2-4 alpha6 kill-share line from bot > 1.4 x sup to bot > 1.25 x sup. Why: 240 games read 1.45 (1.48 before), while the gate's 60-game sample now reads 1.32. Carries still get clearly more kills; supports were not weakened to clear a noisy line.
 - 0.11.2-5 Golden vectors re-recorded on purpose (sim change); hash 79d256b4... in check_fast.sh.
 - 0.11.2-6 alpha6 "the winner has more kills in most games" line from 70% to 60% of the 60-game sample. Why: with Fen Fog's ally heal the losing side's fights last longer and it gets more kills back. Over 240 games the winner has more kills in 72.5% of games (79% in 0.11.1); the gate's 60 games read 37 (62%), and the standard error of a 60-game sample is about 6 points. Still guards the shape: winners have more kills in most games, and take 55 to 85% of kills on average (unchanged line).
+
+### Q9: art production brief and iOS readiness (docs only)
+- Q9-1 `docs/design/ART-PRODUCTION-BRIEF.md`: asset list, style, silhouettes, IP rules, routes A/B/C with rough cost ranges (estimates, not quotes), the commission brief. The route is the Founder's decision (spending); nothing commissioned.
+- Q9-2 `docs/design/IOS-READINESS.md`: blockers (a Mac, the USD 99 a year Apple membership, D-U-N-S, bundle id), enrolment, signing and TestFlight plan, Godot iOS risks. Nothing bought, enrolled or signed.
+
+### Q1: tester timings in the debug lines and the feedback note
+- Q1-1 New `Timings` (src/core/timings.gd), one per session on App (`App.timings`), never saved, never sent anywhere, never feeds a result (R7). Lines added to `App.debug_info()`, so they show in Settings and in "Copy feedback note":
+  - `device=` OS, model, graphics adapter, screen size, processors; `browser=` the user agent on the web build;
+  - `draft time s` from a fresh draft opening to its last pick (AI turns included; last, average, count);
+  - `game start ms` from Start the match to the first arena frame (the sim runs in between);
+  - `arena frame ms` per view (Field, Action, All): average, worst, frames over 33.4 ms, frame count; the first second after the match screen opens is not counted (loading).
+- Q1-2 The first debug line carries a build id on every platform: the web build id as before; elsewhere version and platform (e.g. `0.11.1-alpha-android`).
+- Q1-3 The web probe (`?probe=1`) returns the timing lines, so Playwright runs read them. Browser and desktop numbers are not phone speed; only the Founder's phone gives phone numbers.

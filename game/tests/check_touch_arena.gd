@@ -71,9 +71,13 @@ func _run() -> void:
 	var gs := App.gs
 	var g := gs.next_game()
 	var res := gs.auto_game(g)
+	App.timings = Timings.new()
+	App.timings.launched()    # as Start the match does (Q1 tester timings)
 	var m := ScreenMatch.new(g, res)
 	App.go(m)
 	await frames(4)
+	ok(App.timings.starts.size() == 1 and int(App.timings.starts[0]) >= 0, "timings: the game start is recorded at the first arena frame")
+	m._watch_t = 5.0          # past the settle second, so the frames below count
 	var v := m.view
 	ok(m.view_mode == "action" and v.mode == "action", "views: a new device starts in Action")
 	m.show_t = 0.4 * m.show_len()
@@ -113,6 +117,8 @@ func _run() -> void:
 	await sim.tap((m._view_btns["action"] as Button).get_global_rect().get_center())
 	await frames(3)
 	ok(v.mode == "action" and v.fog_on(), "views: back to Action, fog on")
+	ok(App.timings.frames.has("field") and App.timings.frames.has("all") and App.timings.frames.has("action"), "timings: arena frame times are kept per view (Field, Action, All)")
+	ok(App.debug_info().contains("arena frame ms: field avg="), "timings: the debug lines carry the frame times")
 	if _main != null and is_instance_valid(_main):
 		_main.queue_free()
 	GameState.delete_save()

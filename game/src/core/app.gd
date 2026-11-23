@@ -20,6 +20,7 @@ var pace_t0 := 0          # msec when the manager tapped Play on the home page (
 
 
 var startup_ms := 0       # msec from process start to the first screen (0 until Main has shown it)
+var timings := Timings.new()   # tester timings (0.12 Q1): draft time, game start, arena frames per view; session only
 
 
 func _ready() -> void:
@@ -190,6 +191,8 @@ func debug_info() -> String:
 	var lines: Array = ["Gloamline " + VERSION_LABEL, "godot " + Engine.get_version_info()["string"]]
 	if not WebBuild.info().is_empty():
 		lines[0] += "  build " + WebBuild.build_id(VERSION_LABEL)
+	else:   # APK and desktop: the version and the platform are the build id (Q1 tester timings)
+		lines[0] += "  build " + VERSION_LABEL.replace(" ", "-") + "-" + OS.get_name().to_lower()
 	if gs != null:
 		lines.append("club=%s season=%s phase=%s round=%s seed=%s" % [gs.d["club"], gs.d["season"], gs.d["phase"], int(gs.d["round"]) + 1, gs.d["save_seed"]])
 		var ng := gs.next_game()
@@ -209,4 +212,5 @@ func debug_info() -> String:
 	lines.append("sound=%s haptics=%s" % ["on" if HelpSheet.device().sound() else "off", "on" if HelpSheet.device().haptics() else "off"])
 	if not last_game.is_empty():
 		lines.append("last=" + str(last_game.get("id", "")))
+	lines.append_array(timings.lines())
 	return "\n".join(lines)

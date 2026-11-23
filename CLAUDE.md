@@ -90,3 +90,5 @@ Link: https://gloamline-playtest.vercel.app (unlisted, noindex; Vercel Hobby, pl
 
 The Founder queued Q0 to Q9 and the end-of-night release (0.12.0) for an unattended run. Rules: one increment per commit with explicit paths, fast gate ALL GREEN before each, push after each, one line per increment in `docs/OVERNIGHT-LOG.md`; Founder-only decisions (money, accounts, keys, deleting) are skipped and listed in `docs/MORNING-REPORT.md`; a task that fails twice is BLOCKED in `company/LEDGER.md`. To resume after a restart: read `docs/OVERNIGHT-LOG.md` for the last done item, then continue the queue in order.
 - **Q0 done (0.11.2):** Fen Fog `ally_heal`, Leap Frog shield, `q_k` 0.385, re-tune; BAN-EXPERIMENT.md before and after; alpha6 kill-share line 1.25.
+- **Q9 done:** ART-PRODUCTION-BRIEF.md, IOS-READINESS.md.
+- **Q1 done:** `Timings` (`App.timings`), lines in `App.debug_info()`; `WebBuild.probe` returns them.

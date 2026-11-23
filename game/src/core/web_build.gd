@@ -73,6 +73,7 @@ static func probe(tree: SceneTree) -> Dictionary:
 	if cur != null and cur.get_script() != null:
 		out["screen"] = String(cur.get_script().resource_path.get_file().get_basename())
 	_walk(tree.root, out)
+	out["timings"] = App.timings.lines()   # the tester timings (Q1), so browser runs can read them
 	return out
 
 

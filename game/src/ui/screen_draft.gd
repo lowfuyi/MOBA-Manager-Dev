@@ -234,6 +234,7 @@ func _ready() -> void:
 	var gs := App.gs
 	my_side = "B" if game["blue"] == gs.club() else "R"
 	if draft == null:
+		App.timings.draft_opened()    # a fresh draft (tester timings, Q1)
 		draft = MatchRunner.prepare(App.world, gs.lineup_for(game["blue"]), gs.lineup_for(game["red"]),
 				gs.meta_for(int(game["round"])), int(gs.d["save_seed"]), game["id"], DraftFormat.of_game(game))
 	_limit = DraftFormat.timer_s(draft.bans_per_side())
@@ -880,6 +881,7 @@ func _show_done() -> void:
 	plan_button.text = UI.tidy(Strings.f("draft.game_plan", {"state": Strings.t("gp.state.neutral" if neutral else "gp.state.set")}))
 	if not _done_sent:
 		_done_sent = true
+		App.timings.draft_done()
 		_raise("draft:done", {})
 
 
@@ -888,6 +890,7 @@ func _start_match() -> void:
 
 
 static func launch(g: Dictionary, d: Draft) -> void:
+	App.timings.launched()    # game start after the draft is timed from here to the first arena frame (Q1)
 	var res := MatchRunner.finish(App.world, d, App.gs.plans_for(g), App.gs.builds())
 	App.last_game = g
 	App.last_result = res
