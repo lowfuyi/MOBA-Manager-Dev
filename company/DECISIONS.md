@@ -485,3 +485,8 @@ The Founder is away; decisions that are his and cannot be undone are skipped and
 - Q2-1 Playwright WebKit (iPhone 15) and Chromium (Pixel 7) both run the full flow on the same build; the table is in `docs/WEB-PLAYTEST.md`. WebKit-only console noise (a WebGL framebuffer warning from inside Godot's renderer, and the headless audio failure) is logged, not fixed: neither comes from game code and the pictures are correct.
 - Q2-2 Added iPhone launch images and the Home Screen title to the Web preset's head; the images are made at build time by `tools/gen_pwa_splash.gd`. PWA icons were already present.
 - Q2-3 First load stays about 8.8 MB (brotli). No change made; a smaller engine build is a later job.
+
+### Q3: event log, exact ward spot and a real decisive flag
+- Q3-1 Ward events get a 5th field, the warder's exact position `[x, y]` (map units, 4 decimals). ArenaVision uses it when present; older logs still use the warder's interpolated position.
+- Q3-2 New log event `[t, "decisive", "fight", fight_id, kills]` when a fight ends with `decisive_kills` (3, new key in sim_v2_params) kills or more, and `[t, "decisive", "cairn", tower_id, 0]` when a Cairn falls, just before "end". ArenaChase reads the flags; for older logs it still counts kills itself.
+- Q3-3 Additive only: no random draw, result, gold, kill or tower changed. Golden vectors re-recorded on purpose because the logs (event count and log hash) changed; in all 24 cases every other field is identical. Hash c04e23d2... in check_fast.sh. Saved games keep their old logs (R6).

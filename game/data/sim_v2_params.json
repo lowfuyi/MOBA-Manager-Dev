@@ -126,6 +126,7 @@
  "join_u": 0.16,
  "fight_center_u": 0.09,
  "vision_ward_s": 90,
+ "decisive_kills": 3,
  "decide_min_s": 4.0,
  "decide_max_s": 9.0,
  "trade_every_s": 8.0,

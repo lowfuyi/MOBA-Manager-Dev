@@ -37,7 +37,10 @@ static func build(p_player: ArenaPlayer, p_side: String, p_cfg: Dictionary = {})
 	for e in p_player.log["ev"]:
 		if String(e[1]) == "ward" and ArenaPlayer.side_of(String(e[2])) == p_side:
 			var t0 := float(e[0])
-			v.wards.append([t0, t0 + dur, p_player.pos(String(e[2]), t0)])
+			var wp: Vector2 = p_player.pos(String(e[2]), t0)
+			if e.size() > 4 and e[4] is Array and (e[4] as Array).size() == 2:
+				wp = Vector2(float(e[4][0]), float(e[4][1]))    # 0.12 logs: the exact spot the warder stood on
+			v.wards.append([t0, t0 + dur, wp])
 	return v
 
 

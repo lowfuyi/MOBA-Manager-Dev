@@ -170,6 +170,13 @@ func run(p_sim: MatchSimV2, participants: Array, p_t0: float, p_center: Vector2,
 	for h in heroes:
 		h.busy_until = maxf(h.busy_until, t)
 	events.append([t, "fight_end", fid])
+	# 0.12: the log says which fights decided games (the camera used to guess): decisive_kills kills or more in this fight
+	var nk := 0
+	for e in events:
+		if String(e[1]) == "kill":
+			nk += 1
+	if nk >= int(SimData.params().get("decisive_kills", 3)):
+		events.append([t, "decisive", "fight", fid, nk])
 
 
 ## Health of everyone in the fight, every 0.5 s (the arena's health bars): [t, "hp", fid, {key: fraction}].

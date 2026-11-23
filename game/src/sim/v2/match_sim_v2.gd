@@ -786,6 +786,7 @@ func _tower_falls(tw: Dictionary, by_side: String, present: Array) -> void:
 		winner = by_side
 		end_reason = "cairn"
 		log_ev([t, "tower", String(tw["id"]), by_side, ""])
+		log_ev([t, "decisive", "cairn", String(tw["id"]), 0])   # 0.12: a Cairn falling always decides the game
 		log_ev([t, "end", winner, end_reason])
 		return
 	var spec: Dictionary = p["towers"][tier]

@@ -5,8 +5,9 @@ extends RefCounted
 ## priority (data/arena_view_v1.json "chase"); the camera stays on one event at least dwell_s real seconds so it does not jump,
 ## then moves to the best event still on. With fog, only events the team can see (ArenaVision) are chased; the feed still
 ## tells the rest. Display only (rules A1 and R7).
-## "Decisive" is not a flag in the v2 log: a fight is decisive here when it has `decisive_kills` kills or more, and a Cairn
-## falling is always decisive. Derived for the camera only.
+## "Decisive" comes from the log since 0.12: the sim writes [t, "decisive", "fight", id, kills] when a fight ends with
+## decisive_kills (sim_v2_params) kills or more, and [t, "decisive", "cairn", id, 0] when a Cairn falls. Older logs without
+## those events fall back to counting kills here with the chase's own `decisive_kills`.
 ##   candidates(t)       [{id, kind, prio, pos, zoom}], best first
 ##   update(t, real_dt)  the target to look at now: {id, kind, prio, pos, zoom}
 
@@ -19,6 +20,7 @@ var target: Dictionary = {}
 var held := 0.0                  # real seconds on the current target
 var switches := 0
 var _fight_kills: Dictionary = {}
+var from_flags := false        # 0.12: decisive fights come from the log's "decisive" events (older logs: counted here)
 
 
 static func build(p_player: ArenaPlayer, p_vision: ArenaVision, p_cfg: Dictionary = {}) -> ArenaChase:
@@ -29,6 +31,19 @@ static func build(p_player: ArenaPlayer, p_vision: ArenaVision, p_cfg: Dictionar
 	c.prio = cf["chase"]["priority"]
 	c.dwell_s = float(cf["chase"]["dwell_s"])
 	c.decisive_kills = int(cf["chase"]["decisive_kills"])
+	var flagged := {}
+	for e in p_player.log["ev"]:
+		if String(e[1]) == "decisive" and String(e[2]) == "fight":
+			flagged[int(e[3])] = int(e[4])
+	c.from_flags = false
+	for e2 in p_player.log["ev"]:
+		if String(e2[1]) == "decisive":
+			c.from_flags = true
+			break
+	if c.from_flags:
+		for f2 in p_player.fights:
+			c._fight_kills[int(f2["id"])] = int(flagged.get(int(f2["id"]), 0))
+		return c
 	for f in p_player.fights:
 		var n := 0
 		for k in p_player.kills:

@@ -357,7 +357,7 @@ static func _support(sim: MatchSimV2, h: SimHero, r: Pcg32) -> void:
 		sim.ward(h.side, "bot")
 		sim.ward(h.side, "river")
 		h.vision += 2.0
-		sim.log_ev([t, "ward", h.key, "river"])
+		sim.log_ev([t, "ward", h.key, "river", [snappedf(h.pos.x, 0.0001), snappedf(h.pos.y, 0.0001)]])   # 0.12: exact spot
 	if t >= 210.0 and h.intent != "roam":
 		var sc := gank_score(sim, h, "mid") * (0.6 + 0.5 * h.p_mac / 100.0) + 0.3 * roam
 		if sc > float(sim.p["roam_threshold"]) and r.next_float() < 0.4 + 0.3 * roam:

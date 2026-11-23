@@ -26,7 +26,7 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 2051,
+    "events": 2052,
     "gold": {
      "B": 27061,
      "R": 33783
@@ -37,7 +37,7 @@
      "R": 25
     },
     "len_s": 870,
-    "log_sha256": "e1858eb9760ea98874c5fb2d02993590148bbd5a257d98dfc2339c6a4d29cdb6",
+    "log_sha256": "6c450bff4af070b9ffbd1c6f823f420fa623ad4030cdceb638e701f06fee537c",
     "towers": {
      "B": 0,
      "R": 5
@@ -70,7 +70,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2008,
+    "events": 2010,
     "gold": {
      "B": 34510,
      "R": 33388
@@ -81,7 +81,7 @@
      "R": 17
     },
     "len_s": 980,
-    "log_sha256": "404aa1ad7758294b8e072899b0b5cd09f0e114aaa5ba1557efc00ff2fde79883",
+    "log_sha256": "5a5e3b463b0b25c8cc77593c623a28819cfc603cb10a59d3db198465d51956d4",
     "towers": {
      "B": 5,
      "R": 3
@@ -114,7 +114,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 3012,
+    "events": 3014,
     "gold": {
      "B": 37233,
      "R": 36630
@@ -125,7 +125,7 @@
      "R": 12
     },
     "len_s": 1108,
-    "log_sha256": "818bda42f860c8946e1023e61350b0e9cbda65ab54ecd5da0427e08b9ad4335e",
+    "log_sha256": "11c608fbbcb785b1cab32b7583ef9af962887506c368b217a88e84f0b92eae3f",
     "towers": {
      "B": 3,
      "R": 4
@@ -158,7 +158,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1141,
+    "events": 1142,
     "gold": {
      "B": 30022,
      "R": 27784
@@ -169,7 +169,7 @@
      "R": 5
     },
     "len_s": 856,
-    "log_sha256": "d40a2dd48984392ff14f2dc7e2c9c107278b880cd82409d94dabc14114696bd3",
+    "log_sha256": "71c6ea3ee6d09864176a8d52c2b61bc4a77e65f0306b038988cab51035078778",
     "towers": {
      "B": 3,
      "R": 3
@@ -202,7 +202,7 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 2574,
+    "events": 2577,
     "gold": {
      "B": 33827,
      "R": 35261
@@ -213,7 +213,7 @@
      "R": 19
     },
     "len_s": 1062,
-    "log_sha256": "0368925ee8f355c41930e020a194b97023afdd8ea0270080dfa850d4b9140d63",
+    "log_sha256": "1e6ed484cb1eb222d7e4e7d1cf62e0f2725febfc3a47f21a4dfb61aac4da61bd",
     "towers": {
      "B": 3,
      "R": 4
@@ -246,7 +246,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2148,
+    "events": 2149,
     "gold": {
      "B": 30850,
      "R": 29899
@@ -257,7 +257,7 @@
      "R": 23
     },
     "len_s": 856,
-    "log_sha256": "7dc8bb17307b8247af5a2148ced9da052f9c3791c7d92493bff5531cdc09dba0",
+    "log_sha256": "10473a1f1ad2998fa4e0dc66a16d159031f88e6c1fcda8d3d5fac766a0b9afc7",
     "towers": {
      "B": 2,
      "R": 2
@@ -290,7 +290,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2132,
+    "events": 2133,
     "gold": {
      "B": 30342,
      "R": 27747
@@ -301,7 +301,7 @@
      "R": 10
     },
     "len_s": 904,
-    "log_sha256": "f541ec78c175a5282e12477272f91ce8024bd72ed9c796a6d98a25ffe48b7330",
+    "log_sha256": "6b4196ecc98b86d6d046e4f8c375303fa3ed8b6ebea04715d1b7f187c421589b",
     "towers": {
      "B": 2,
      "R": 3
@@ -334,7 +334,7 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 1598,
+    "events": 1601,
     "gold": {
      "B": 28512,
      "R": 30144
@@ -345,7 +345,7 @@
      "R": 16
     },
     "len_s": 812,
-    "log_sha256": "f815495b242f7fa5f53aa063cc21fa1df4062af42334292d1e7561d146086846",
+    "log_sha256": "9b1485c38c5d1ff2c9bc9c9dcefe3a9eabb92b86326c95ff8cb3a5a8258bd260",
     "towers": {
      "B": 4,
      "R": 4
@@ -378,7 +378,7 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 2239,
+    "events": 2241,
     "gold": {
      "B": 31201,
      "R": 33826
@@ -389,7 +389,7 @@
      "R": 14
     },
     "len_s": 1020,
-    "log_sha256": "625d2a8b36959ebae5e6abededaf1c148b86c8cedd69dcb01ccdafb27bee9144",
+    "log_sha256": "4e7b55bc31c64a880148cde23f9c10ff0a4ec206ad9bdbda8f933ece48188bec",
     "towers": {
      "B": 3,
      "R": 2
@@ -422,7 +422,7 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 1540,
+    "events": 1541,
     "gold": {
      "B": 21327,
      "R": 28831
@@ -433,7 +433,7 @@
      "R": 24
     },
     "len_s": 718,
-    "log_sha256": "f5cef9094adfa577a781832bbf4871f8973e94b4c31db277ad18ed893989d5f5",
+    "log_sha256": "f1c72bc91ec08b304d97b9a0123da4e0b0b38a6f98ba2ffee0792b77bd46033c",
     "towers": {
      "B": 1,
      "R": 4
@@ -466,7 +466,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1660,
+    "events": 1661,
     "gold": {
      "B": 30428,
      "R": 22443
@@ -477,7 +477,7 @@
      "R": 4
     },
     "len_s": 786,
-    "log_sha256": "4199cef318095da70d617eb25991b41f91e535db66a5424eada94cd3e24f69be",
+    "log_sha256": "fb5c1bc2df88e161837a7b2d24515826ddcc2124627fec202742c2c2d50a5182",
     "towers": {
      "B": 4,
      "R": 1
@@ -510,7 +510,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1471,
+    "events": 1472,
     "gold": {
      "B": 28342,
      "R": 28119
@@ -521,7 +521,7 @@
      "R": 12
     },
     "len_s": 836,
-    "log_sha256": "b03091236e858c7013f5a689970b39bbd0267a452ec2e48e9374c868cb3567d4",
+    "log_sha256": "2e13f3811e16097d3f67c69fa7ba45b6ecc9ad53d9c35ef21197d91ce9a89d31",
     "towers": {
      "B": 3,
      "R": 4
@@ -554,7 +554,7 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 2547,
+    "events": 2548,
     "gold": {
      "B": 33985,
      "R": 35694
@@ -565,7 +565,7 @@
      "R": 13
     },
     "len_s": 1054,
-    "log_sha256": "b4651b6cacc371385c0cd88cf3b4efb8e608cb1e46a217f73a9560e4f4618588",
+    "log_sha256": "3ef9c83b88cf0df95da7526998bc4b28de798318aafbd65c63fc8b187f50ef5d",
     "towers": {
      "B": 4,
      "R": 3
@@ -598,7 +598,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2054,
+    "events": 2055,
     "gold": {
      "B": 32761,
      "R": 27195
@@ -609,7 +609,7 @@
      "R": 6
     },
     "len_s": 864,
-    "log_sha256": "94397c8f3d739cb2bc3ab63971989999c7cf8879ee87f2da4ff20992420a65e3",
+    "log_sha256": "150f04ad2060022692cced365078fb7ae28182576cfea84372332fb4f895cfcc",
     "towers": {
      "B": 5,
      "R": 1
@@ -642,7 +642,7 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 1941,
+    "events": 1942,
     "gold": {
      "B": 30048,
      "R": 29709
@@ -653,7 +653,7 @@
      "R": 12
     },
     "len_s": 896,
-    "log_sha256": "cbeb39562140249ee130d4322f18d951eec1d2d8002db6ad254ea33a2278097e",
+    "log_sha256": "b0196103bbbda6a3ba5df1323436bce9802264786de85a59e230051d0310a751",
     "towers": {
      "B": 3,
      "R": 2
@@ -686,7 +686,7 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 1735,
+    "events": 1736,
     "gold": {
      "B": 28076,
      "R": 28215
@@ -697,7 +697,7 @@
      "R": 9
     },
     "len_s": 830,
-    "log_sha256": "4f08ea6e92c5afe0d589de357cb7aaf717c91376061a2b45646c48588cbab097",
+    "log_sha256": "483b52aa8e39c9ed6413a81600b7c3648184d25ccd9c82d4d3cc50d837d4eec7",
     "towers": {
      "B": 3,
      "R": 4
@@ -730,7 +730,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1721,
+    "events": 1722,
     "gold": {
      "B": 31555,
      "R": 30355
@@ -741,7 +741,7 @@
      "R": 10
     },
     "len_s": 858,
-    "log_sha256": "f5339e98bd6dc7266067367a6163f66bda5897262484154b1c29e5dfe21825a2",
+    "log_sha256": "0a2cebc19fa742845b611b14c3c2abd9dc72b43a51fb7dab0549580b8fa5e471",
     "towers": {
      "B": 5,
      "R": 1
@@ -774,7 +774,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1918,
+    "events": 1919,
     "gold": {
      "B": 31615,
      "R": 30377
@@ -785,7 +785,7 @@
      "R": 14
     },
     "len_s": 876,
-    "log_sha256": "f6e5555e677060bbd6187d37635adafa61ab67bf04bb5b35b885939f9bda2598",
+    "log_sha256": "c1e3b9e1bafc6bd72579d62acb1c3229cd2d1a025e5b38a95cda3201870dd253",
     "towers": {
      "B": 4,
      "R": 2
@@ -818,7 +818,7 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 2765,
+    "events": 2766,
     "gold": {
      "B": 32362,
      "R": 32686
@@ -829,7 +829,7 @@
      "R": 8
     },
     "len_s": 968,
-    "log_sha256": "18649cb701ce3a504779cbe29a414194a6fe5d7c906630da567c6e5e1d759d76",
+    "log_sha256": "df6423ebe40e621e81d393120fe0903d864ea76f5ddd02ad4323d3974c5d2270",
     "towers": {
      "B": 4,
      "R": 2
@@ -862,7 +862,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1535,
+    "events": 1536,
     "gold": {
      "B": 31214,
      "R": 26247
@@ -873,7 +873,7 @@
      "R": 3
     },
     "len_s": 864,
-    "log_sha256": "0459fa503f435d9243587dac81839e1e63690c561b3da34c064f0a63a116b8dc",
+    "log_sha256": "873ac54bee4f1ac390460a353d381782a57a32f7b9d3e7de17415ecf03d1a98e",
     "towers": {
      "B": 5,
      "R": 1
@@ -906,7 +906,7 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 1776,
+    "events": 1777,
     "gold": {
      "B": 25932,
      "R": 29301
@@ -917,7 +917,7 @@
      "R": 15
     },
     "len_s": 828,
-    "log_sha256": "08172ff355d16376b5e77d3dc4d5d4341a0fcb77b8f433ca9e63a63cc88727c0",
+    "log_sha256": "2b2d8f32ff11606b16552615385627fa3c1e7f480846d95055257059e4739656",
     "towers": {
      "B": 3,
      "R": 2
@@ -950,7 +950,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2078,
+    "events": 2080,
     "gold": {
      "B": 35204,
      "R": 31291
@@ -961,7 +961,7 @@
      "R": 9
     },
     "len_s": 908,
-    "log_sha256": "13f0e172ce9506d081f5ef1a450e7b53ea7abacc4215b9600f1783abd49ceba7",
+    "log_sha256": "2d8deeded4c8c5c22270ddd98707585fba01dddc46ea79121afdbaa43b20ce91",
     "towers": {
      "B": 6,
      "R": 2
@@ -994,7 +994,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2160,
+    "events": 2162,
     "gold": {
      "B": 33586,
      "R": 32556
@@ -1005,7 +1005,7 @@
      "R": 9
     },
     "len_s": 896,
-    "log_sha256": "beab82061d0fb0a2acb3d593f15964338b613467b4c37757a34dc4ee557e1b4c",
+    "log_sha256": "a496958d758c23efcd38e1e65e70ab1ca1b25e20f3eb12cb024737b4d75cd1d1",
     "towers": {
      "B": 3,
      "R": 2
@@ -1038,7 +1038,7 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1633,
+    "events": 1634,
     "gold": {
      "B": 25491,
      "R": 22501
@@ -1049,7 +1049,7 @@
      "R": 5
     },
     "len_s": 728,
-    "log_sha256": "dea3c9bfaa176ad73aead46dc6b9cda2a7193b4454829e56d13fc6039cb6e00d",
+    "log_sha256": "9f7a57903d24164fb407bc02a47fb7844e5aa1cdf17c0564dfba0f0d099486d3",
     "towers": {
      "B": 2,
      "R": 2

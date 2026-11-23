@@ -19,7 +19,7 @@ Read this first. Last updated 2026-11-18 (SGT); written 2026-11-16 at the move f
 
 ## Build rules (from `docs/design/ALPHA-0.7-BUILD-PLAN.md`, v1.2)
 
-- R1 (lifted for Match Sim v2 by the Founder, 2026-11-19): changes to `game/src/sim/` are made only on purpose, with the golden vectors regenerated in that increment and the reason logged; the golden hash in `tools/check_fast.sh` (now `79d256b4...` since 0.11.2, covering the v1 and v2 vectors) must otherwise stay. R2 one increment = one commit, explicit paths. R3 migrate affected tests in the same change. R4/R5 explicit types for `:=`; no function names starting `_set`. R6 a save is only changed by additive keys; `GameState.VERSION` is unchanged. R7 presentation never feeds results.
+- R1 (lifted for Match Sim v2 by the Founder, 2026-11-19): changes to `game/src/sim/` are made only on purpose, with the golden vectors regenerated in that increment and the reason logged; the golden hash in `tools/check_fast.sh` (now `c04e23d2...` since 0.12 Q3, covering the v1 and v2 vectors) must otherwise stay. R2 one increment = one commit, explicit paths. R3 migrate affected tests in the same change. R4/R5 explicit types for `:=`; no function names starting `_set`. R6 a save is only changed by additive keys; `GameState.VERSION` is unchanged. R7 presentation never feeds results.
 - Never `git add -A`. Commit explicit paths per reviewed increment, with the attribution lines the harness asks for.
 - Perf budget in `docs/design/PERF-BUDGET.md` 3.1a (redesigned screens: target 60 draw calls and 120 nodes, hard 100/200). In Godot 4.3 GL Compatibility every `draw_colored_polygon/circle/arc` is its own draw call, so art is baked to atlases.
 - Type scale floor is 24 px (Display 64, Title 48, Big 40, Heading 36, Body 32, Small 26, Caption 24). Buttons 96 px high, tab bar 112, header 96.
@@ -93,3 +93,4 @@ The Founder queued Q0 to Q9 and the end-of-night release (0.12.0) for an unatten
 - **Q9 done:** ART-PRODUCTION-BRIEF.md, IOS-READINESS.md.
 - **Q1 done:** `Timings` (`App.timings`), lines in `App.debug_info()`; `WebBuild.probe` returns them.
 - **Q2 done:** WebKit runs with `BROWSER=webkit DEVICE="iPhone 15" PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1` against a local http server (no TLS in that WebKit); launch images from `tools/gen_pwa_splash.gd` at build time.
+- **Q3 done:** ward events carry `[x, y]`; `"decisive"` events (fight with `decisive_kills`+ kills, Cairn); golden hash `c04e23d2...`.
