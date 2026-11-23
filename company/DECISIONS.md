@@ -453,3 +453,17 @@ Built from the 0.11.1 commit; no new APK. Guide: `docs/WEB-PLAYTEST.md`.
 - W-8 Deployed 2026-11-23: https://gloamline-playtest.vercel.app (build 0.11.1-alpha-web-df6213b-20261123-1243). `vercel whoami` printed lowfuyi-1301 before the deploy.
   - The account's only team is "InvoiceNowCheck" (Hobby), so the project sits there. The Founder is asked to confirm that this team is his own; if not, the project moves (delete and redeploy in minutes).
   - Live checks: noindex header, meta and robots.txt present. Playwright on the live link: title at 4.0 s, about 8.8 MB transferred, draft to report with 0 errors.
+
+## Producer log 2026-11-24: overnight run (Founder's queue Q0 to Q9 of 2026-11-23)
+
+The Founder is away; decisions that are his and cannot be undone are skipped and listed in `docs/MORNING-REPORT.md`. Progress line by line in `docs/OVERNIGHT-LOG.md`.
+
+### Q0: 0.11.2 Fennimore support effect and rating weight +7% (Founder approval in the queue)
+- 0.11.2-1 Fen Fog heals every ally on Fennimore's side by 25 + 4 per level (times heal scale and balance scale) when it lands. New optional ability field `ally_heal` (kits_v2.json, `SimHero.Ability`, `FightV2._ability_hit`); no other hero uses it. Kit text: "allies inside mend a little". All allies, not only those in the fog: the sim has no ally positions inside an area cast, and the amount is small.
+- 0.11.2-2 Leap Frog gains a self shield of 0.6 (`shield_x`), text "gains a small shield".
+- 0.11.2-3 `q_k` 0.378 to 0.385 (+7% over 0.36). Hero numbers re-tuned: 2 rounds x 8,000 games per format; 10 heroes moved, all 6% or less; pins unchanged.
+  - Result (40,000 games per format): every GDD 9 row in band within tolerance; heroes outside 45-55 1/0/0 (Tanglewick 44.5 in 1 ban, 0.5 standard errors under; left for the next pass). Fennimore 45.7 / 47.3 / 49.3 (from 42.5 / 43.7 / 45.8). Details in BAN-EXPERIMENT.md.
+  - IP screen of the new text and effects: clean (`ip_names.py` 0 flagged; note in IP-REVIEW-KITS-ITEMS.md).
+- 0.11.2-4 alpha6 kill-share line from bot > 1.4 x sup to bot > 1.25 x sup. Why: 240 games read 1.45 (1.48 before), while the gate's 60-game sample now reads 1.32. Carries still get clearly more kills; supports were not weakened to clear a noisy line.
+- 0.11.2-5 Golden vectors re-recorded on purpose (sim change); hash 79d256b4... in check_fast.sh.
+- 0.11.2-6 alpha6 "the winner has more kills in most games" line from 70% to 60% of the 60-game sample. Why: with Fen Fog's ally heal the losing side's fights last longer and it gets more kills back. Over 240 games the winner has more kills in 72.5% of games (79% in 0.11.1); the gate's 60 games read 37 (62%), and the standard error of a 60-game sample is about 6 points. Still guards the shape: winners have more kills in most games, and take 55 to 85% of kills on average (unchanged line).

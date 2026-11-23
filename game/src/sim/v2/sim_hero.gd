@@ -29,6 +29,7 @@ class Ability:
 	var magic := false
 	var shield := 0.0
 	var heal := 0.0
+	var ally_heal := 0.0         # 0.11.2: heals every ally when the ability lands (Fen Fog); optional in kits_v2.json
 	var ratio_def := 0.0
 	var radius := 0.0
 	var cd := 1.0
@@ -63,6 +64,7 @@ class Ability:
 		x.magic = String(a["dtype"]) == "magic"
 		x.shield = float(a["shield"])
 		x.heal = float(a["heal"])
+		x.ally_heal = float(a.get("ally_heal", 0.0))
 		x.ratio_def = float(a["ratio_def"])
 		x.radius = float(a["radius_u"])
 		x.cd = float(a["cd"])

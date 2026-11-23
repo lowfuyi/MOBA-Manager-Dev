@@ -19,7 +19,7 @@ Read this first. Last updated 2026-11-18 (SGT); written 2026-11-16 at the move f
 
 ## Build rules (from `docs/design/ALPHA-0.7-BUILD-PLAN.md`, v1.2)
 
-- R1 (lifted for Match Sim v2 by the Founder, 2026-11-19): changes to `game/src/sim/` are made only on purpose, with the golden vectors regenerated in that increment and the reason logged; the golden hash in `tools/check_fast.sh` (now `daa46918...` since 0.11.1, covering the v1 and v2 vectors) must otherwise stay. R2 one increment = one commit, explicit paths. R3 migrate affected tests in the same change. R4/R5 explicit types for `:=`; no function names starting `_set`. R6 a save is only changed by additive keys; `GameState.VERSION` is unchanged. R7 presentation never feeds results.
+- R1 (lifted for Match Sim v2 by the Founder, 2026-11-19): changes to `game/src/sim/` are made only on purpose, with the golden vectors regenerated in that increment and the reason logged; the golden hash in `tools/check_fast.sh` (now `79d256b4...` since 0.11.2, covering the v1 and v2 vectors) must otherwise stay. R2 one increment = one commit, explicit paths. R3 migrate affected tests in the same change. R4/R5 explicit types for `:=`; no function names starting `_set`. R6 a save is only changed by additive keys; `GameState.VERSION` is unchanged. R7 presentation never feeds results.
 - Never `git add -A`. Commit explicit paths per reviewed increment, with the attribution lines the harness asks for.
 - Perf budget in `docs/design/PERF-BUDGET.md` 3.1a (redesigned screens: target 60 draw calls and 120 nodes, hard 100/200). In Godot 4.3 GL Compatibility every `draw_colored_polygon/circle/arc` is its own draw call, so art is baked to atlases.
 - Type scale floor is 24 px (Display 64, Title 48, Big 40, Heading 36, Body 32, Small 26, Caption 24). Buttons 96 px high, tab bar 112, header 96.
@@ -85,3 +85,8 @@ Link: https://gloamline-playtest.vercel.app (unlisted, noindex; Vercel Hobby, pl
 - Deploy: check `cd /tmp && npx --yes vercel@latest whoami` prints lowfuyi-1301, copy build/web to /mnt/c/Users/Fuyi/gloamline-web, then run `npx vercel@latest deploy --prod --yes` there. Windows npx holds the login and cannot run in a WSL folder.
 - Code: `WebBuild` (frame, build id, `?probe=1` test probe) and `SaveCode` (save code export and restore in Settings).
 - Playwright driver: ~/opt/pw/drive.js. It needs PATH=$HOME/opt/node/bin and LD_LIBRARY_PATH=$HOME/opt/libs/root/usr/lib/x86_64-linux-gnu.
+
+## Overnight run 2026-11-23 to 24 (Founder's queue Q0 to Q9)
+
+The Founder queued Q0 to Q9 and the end-of-night release (0.12.0) for an unattended run. Rules: one increment per commit with explicit paths, fast gate ALL GREEN before each, push after each, one line per increment in `docs/OVERNIGHT-LOG.md`; Founder-only decisions (money, accounts, keys, deleting) are skipped and listed in `docs/MORNING-REPORT.md`; a task that fails twice is BLOCKED in `company/LEDGER.md`. To resume after a restart: read `docs/OVERNIGHT-LOG.md` for the last done item, then continue the queue in order.
+- **Q0 done (0.11.2):** Fen Fog `ally_heal`, Leap Frog shield, `q_k` 0.385, re-tune; BAN-EXPERIMENT.md before and after; alpha6 kill-share line 1.25.

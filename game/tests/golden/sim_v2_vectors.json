@@ -26,21 +26,21 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 1389,
+    "events": 2051,
     "gold": {
-     "B": 21568,
-     "R": 23799
+     "B": 27061,
+     "R": 33783
     },
     "id": "g00",
     "kills": {
-     "B": 6,
-     "R": 12
+     "B": 7,
+     "R": 25
     },
-    "len_s": 654,
-    "log_sha256": "b505c36872d43d1c04574534dab04eadf459a215ac64d97a712740f8fdaa2a4d",
+    "len_s": 870,
+    "log_sha256": "e1858eb9760ea98874c5fb2d02993590148bbd5a257d98dfc2339c6a4d29cdb6",
     "towers": {
      "B": 0,
-     "R": 3
+     "R": 5
     }
    }
   },
@@ -70,20 +70,20 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2317,
+    "events": 2008,
     "gold": {
-     "B": 33924,
-     "R": 34386
+     "B": 34510,
+     "R": 33388
     },
     "id": "g01",
     "kills": {
-     "B": 12,
-     "R": 13
+     "B": 11,
+     "R": 17
     },
-    "len_s": 1040,
-    "log_sha256": "993e8ecf88c17c04921725c6efd2896c9a2965e5c2ff705bc7efc6f3210defa9",
+    "len_s": 980,
+    "log_sha256": "404aa1ad7758294b8e072899b0b5cd09f0e114aaa5ba1557efc00ff2fde79883",
     "towers": {
-     "B": 2,
+     "B": 5,
      "R": 3
     }
    }
@@ -113,22 +113,22 @@
     "val": 100
    },
    "expect": {
-    "blue_won": false,
-    "events": 2435,
+    "blue_won": true,
+    "events": 3012,
     "gold": {
-     "B": 36787,
-     "R": 38608
+     "B": 37233,
+     "R": 36630
     },
     "id": "g02",
     "kills": {
-     "B": 13,
-     "R": 23
+     "B": 27,
+     "R": 12
     },
-    "len_s": 1080,
-    "log_sha256": "8768003f6fe6e4d3d6e561f7128657a0c1d2349939080812249e3cc711c80caf",
+    "len_s": 1108,
+    "log_sha256": "818bda42f860c8946e1023e61350b0e9cbda65ab54ecd5da0427e08b9ad4335e",
     "towers": {
-     "B": 5,
-     "R": 5
+     "B": 3,
+     "R": 4
     }
    }
   },
@@ -158,21 +158,21 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1660,
+    "events": 1141,
     "gold": {
-     "B": 33596,
-     "R": 29312
+     "B": 30022,
+     "R": 27784
     },
     "id": "g03",
     "kills": {
-     "B": 14,
-     "R": 4
+     "B": 7,
+     "R": 5
     },
-    "len_s": 920,
-    "log_sha256": "01a34c21d6d79e7a7c96b9a02996f0927d072214dfad7b90636f654f04bed092",
+    "len_s": 856,
+    "log_sha256": "d40a2dd48984392ff14f2dc7e2c9c107278b880cd82409d94dabc14114696bd3",
     "towers": {
-     "B": 5,
-     "R": 2
+     "B": 3,
+     "R": 3
     }
    }
   },
@@ -201,22 +201,22 @@
     "val": 100
    },
    "expect": {
-    "blue_won": true,
-    "events": 2128,
+    "blue_won": false,
+    "events": 2574,
     "gold": {
-     "B": 33262,
-     "R": 28633
+     "B": 33827,
+     "R": 35261
     },
     "id": "g04",
     "kills": {
-     "B": 25,
-     "R": 8
+     "B": 22,
+     "R": 19
     },
-    "len_s": 906,
-    "log_sha256": "25e340ff2eff4e86dee3993361647c139b195aad2a3289c8ce13c466b05f379e",
+    "len_s": 1062,
+    "log_sha256": "0368925ee8f355c41930e020a194b97023afdd8ea0270080dfa850d4b9140d63",
     "towers": {
-     "B": 5,
-     "R": 2
+     "B": 3,
+     "R": 4
     }
    }
   },
@@ -246,20 +246,20 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2175,
+    "events": 2148,
     "gold": {
-     "B": 32496,
-     "R": 29252
+     "B": 30850,
+     "R": 29899
     },
     "id": "g05",
     "kills": {
-     "B": 21,
-     "R": 15
+     "B": 15,
+     "R": 23
     },
-    "len_s": 864,
-    "log_sha256": "5ae23ed630e2ddc4b522b56cc425e3db529af52c610d7ba7c50741336abb17ae",
+    "len_s": 856,
+    "log_sha256": "7dc8bb17307b8247af5a2148ced9da052f9c3791c7d92493bff5531cdc09dba0",
     "towers": {
-     "B": 4,
+     "B": 2,
      "R": 2
     }
    }
@@ -290,21 +290,21 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1646,
+    "events": 2132,
     "gold": {
-     "B": 31240,
-     "R": 27071
+     "B": 30342,
+     "R": 27747
     },
     "id": "g06",
     "kills": {
-     "B": 18,
-     "R": 3
+     "B": 16,
+     "R": 10
     },
-    "len_s": 844,
-    "log_sha256": "84c6353b86d946e3fc1a23afaba8bad53fa9b076f3a6f149766fb74f2a9be37a",
+    "len_s": 904,
+    "log_sha256": "f541ec78c175a5282e12477272f91ce8024bd72ed9c796a6d98a25ffe48b7330",
     "towers": {
      "B": 2,
-     "R": 2
+     "R": 3
     }
    }
   },
@@ -333,22 +333,22 @@
     "val": -100
    },
    "expect": {
-    "blue_won": true,
-    "events": 1943,
+    "blue_won": false,
+    "events": 1598,
     "gold": {
-     "B": 32934,
-     "R": 31719
+     "B": 28512,
+     "R": 30144
     },
     "id": "g07",
     "kills": {
-     "B": 13,
+     "B": 12,
      "R": 16
     },
-    "len_s": 902,
-    "log_sha256": "5a21c0b84d2464e2162ff01317aa4d265834de7a791d19ad733dd2e1fedbb893",
+    "len_s": 812,
+    "log_sha256": "f815495b242f7fa5f53aa063cc21fa1df4062af42334292d1e7561d146086846",
     "towers": {
-     "B": 2,
-     "R": 3
+     "B": 4,
+     "R": 4
     }
    }
   },
@@ -377,22 +377,22 @@
     "val": 100
    },
    "expect": {
-    "blue_won": true,
-    "events": 2008,
+    "blue_won": false,
+    "events": 2239,
     "gold": {
-     "B": 30250,
-     "R": 28053
+     "B": 31201,
+     "R": 33826
     },
     "id": "g08",
     "kills": {
-     "B": 15,
-     "R": 6
+     "B": 13,
+     "R": 14
     },
-    "len_s": 930,
-    "log_sha256": "62fe34ba45c470f107c523a44c526dd0e29c3c46ba56d55fabead6aae12c1290",
+    "len_s": 1020,
+    "log_sha256": "625d2a8b36959ebae5e6abededaf1c148b86c8cedd69dcb01ccdafb27bee9144",
     "towers": {
      "B": 3,
-     "R": 3
+     "R": 2
     }
    }
   },
@@ -422,20 +422,20 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 2212,
+    "events": 1540,
     "gold": {
-     "B": 32713,
-     "R": 35586
+     "B": 21327,
+     "R": 28831
     },
     "id": "g09",
     "kills": {
-     "B": 10,
-     "R": 23
+     "B": 3,
+     "R": 24
     },
-    "len_s": 1014,
-    "log_sha256": "a5753596fa8b100e4a43a26e5cee082f0edeb746c761288d9b501f74d62cbd53",
+    "len_s": 718,
+    "log_sha256": "f5cef9094adfa577a781832bbf4871f8973e94b4c31db277ad18ed893989d5f5",
     "towers": {
-     "B": 5,
+     "B": 1,
      "R": 4
     }
    }
@@ -466,21 +466,21 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1528,
+    "events": 1660,
     "gold": {
-     "B": 28240,
-     "R": 21754
+     "B": 30428,
+     "R": 22443
     },
     "id": "g10",
     "kills": {
-     "B": 20,
+     "B": 21,
      "R": 4
     },
-    "len_s": 742,
-    "log_sha256": "f804bc0dbdfab4adebabd1e585bbf66289799391092654fc36d2afc9e7faae24",
+    "len_s": 786,
+    "log_sha256": "4199cef318095da70d617eb25991b41f91e535db66a5424eada94cd3e24f69be",
     "towers": {
-     "B": 3,
-     "R": 2
+     "B": 4,
+     "R": 1
     }
    }
   },
@@ -510,21 +510,21 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2867,
+    "events": 1471,
     "gold": {
-     "B": 40305,
-     "R": 37165
+     "B": 28342,
+     "R": 28119
     },
     "id": "g11",
     "kills": {
-     "B": 19,
-     "R": 15
+     "B": 11,
+     "R": 12
     },
-    "len_s": 1164,
-    "log_sha256": "1f2404489babac0163bc10ab611465cdc08627687ee06051081c3c7771831655",
+    "len_s": 836,
+    "log_sha256": "b03091236e858c7013f5a689970b39bbd0267a452ec2e48e9374c868cb3567d4",
     "towers": {
-     "B": 4,
-     "R": 3
+     "B": 3,
+     "R": 4
     }
    }
   },
@@ -554,21 +554,21 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 3509,
+    "events": 2547,
     "gold": {
-     "B": 39166,
-     "R": 42578
+     "B": 33985,
+     "R": 35694
     },
     "id": "g12",
     "kills": {
-     "B": 20,
-     "R": 24
+     "B": 12,
+     "R": 13
     },
-    "len_s": 1240,
-    "log_sha256": "91cde5e78ddf496e4e6195a5cce97e628b70e718c5901a009975af7749025a63",
+    "len_s": 1054,
+    "log_sha256": "b4651b6cacc371385c0cd88cf3b4efb8e608cb1e46a217f73a9560e4f4618588",
     "towers": {
-     "B": 1,
-     "R": 6
+     "B": 4,
+     "R": 3
     }
    }
   },
@@ -598,10 +598,10 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2052,
+    "events": 2054,
     "gold": {
-     "B": 32753,
-     "R": 27194
+     "B": 32761,
+     "R": 27195
     },
     "id": "g13",
     "kills": {
@@ -609,7 +609,7 @@
      "R": 6
     },
     "len_s": 864,
-    "log_sha256": "12bb856b78a39c64b039425515b8c33ce444e5032c6411ce16e76a8a792b31b9",
+    "log_sha256": "94397c8f3d739cb2bc3ab63971989999c7cf8879ee87f2da4ff20992420a65e3",
     "towers": {
      "B": 5,
      "R": 1
@@ -642,21 +642,21 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 2462,
+    "events": 1941,
     "gold": {
-     "B": 36016,
-     "R": 36113
+     "B": 30048,
+     "R": 29709
     },
     "id": "g14",
     "kills": {
-     "B": 17,
-     "R": 11
+     "B": 13,
+     "R": 12
     },
-    "len_s": 1064,
-    "log_sha256": "28e85ffe4ab5dd02a6452d3a4ada30ca3194705b4aba2f5d44c8f46bc667be7e",
+    "len_s": 896,
+    "log_sha256": "cbeb39562140249ee130d4322f18d951eec1d2d8002db6ad254ea33a2278097e",
     "towers": {
      "B": 3,
-     "R": 3
+     "R": 2
     }
    }
   },
@@ -685,21 +685,21 @@
     "val": -100
    },
    "expect": {
-    "blue_won": true,
-    "events": 2701,
+    "blue_won": false,
+    "events": 1735,
     "gold": {
-     "B": 38893,
-     "R": 35300
+     "B": 28076,
+     "R": 28215
     },
     "id": "g15",
     "kills": {
-     "B": 22,
-     "R": 13
+     "B": 8,
+     "R": 9
     },
-    "len_s": 1058,
-    "log_sha256": "fd79129801b345db4652155d4ecfaba0bfbad1518ae6f8b9e7f757400bdb288a",
+    "len_s": 830,
+    "log_sha256": "4f08ea6e92c5afe0d589de357cb7aaf717c91376061a2b45646c48588cbab097",
     "towers": {
-     "B": 4,
+     "B": 3,
      "R": 4
     }
    }
@@ -730,20 +730,20 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1699,
+    "events": 1721,
     "gold": {
-     "B": 31783,
-     "R": 29144
+     "B": 31555,
+     "R": 30355
     },
     "id": "g16",
     "kills": {
      "B": 14,
-     "R": 8
+     "R": 10
     },
     "len_s": 858,
-    "log_sha256": "7df90d1aa4db1520a8b462875b0d8c1748962f9f52edb0753e24677caf09e687",
+    "log_sha256": "f5339e98bd6dc7266067367a6163f66bda5897262484154b1c29e5dfe21825a2",
     "towers": {
-     "B": 6,
+     "B": 5,
      "R": 1
     }
    }
@@ -774,21 +774,21 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1963,
+    "events": 1918,
     "gold": {
-     "B": 32887,
-     "R": 32252
+     "B": 31615,
+     "R": 30377
     },
     "id": "g17",
     "kills": {
-     "B": 12,
-     "R": 16
+     "B": 14,
+     "R": 14
     },
-    "len_s": 940,
-    "log_sha256": "ef21df6e8680049688f191bd4d1b917805e4baaed232ad699f43cd457cb2540d",
+    "len_s": 876,
+    "log_sha256": "f6e5555e677060bbd6187d37635adafa61ab67bf04bb5b35b885939f9bda2598",
     "towers": {
-     "B": 5,
-     "R": 3
+     "B": 4,
+     "R": 2
     }
    }
   },
@@ -818,20 +818,20 @@
    },
    "expect": {
     "blue_won": false,
-    "events": 2556,
+    "events": 2765,
     "gold": {
-     "B": 32488,
-     "R": 32605
+     "B": 32362,
+     "R": 32686
     },
     "id": "g18",
     "kills": {
-     "B": 14,
-     "R": 9
+     "B": 25,
+     "R": 8
     },
-    "len_s": 1018,
-    "log_sha256": "52669d6f9beea196365db2c94fabb0694ea8621c0c5b39354337bb6b644a92bf",
+    "len_s": 968,
+    "log_sha256": "18649cb701ce3a504779cbe29a414194a6fe5d7c906630da567c6e5e1d759d76",
     "towers": {
-     "B": 5,
+     "B": 4,
      "R": 2
     }
    }
@@ -862,21 +862,21 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2082,
+    "events": 1535,
     "gold": {
-     "B": 35932,
-     "R": 31441
+     "B": 31214,
+     "R": 26247
     },
     "id": "g19",
     "kills": {
      "B": 11,
-     "R": 5
+     "R": 3
     },
-    "len_s": 1014,
-    "log_sha256": "2162c9ab0627415a5396a040f3f09480f98dad586ba9cb91d096892f4ee947ab",
+    "len_s": 864,
+    "log_sha256": "0459fa503f435d9243587dac81839e1e63690c561b3da34c064f0a63a116b8dc",
     "towers": {
      "B": 5,
-     "R": 2
+     "R": 1
     }
    }
   },
@@ -905,22 +905,22 @@
     "val": 100
    },
    "expect": {
-    "blue_won": true,
-    "events": 1610,
+    "blue_won": false,
+    "events": 1776,
     "gold": {
-     "B": 29223,
-     "R": 24726
+     "B": 25932,
+     "R": 29301
     },
     "id": "g20",
     "kills": {
-     "B": 16,
-     "R": 6
+     "B": 10,
+     "R": 15
     },
-    "len_s": 816,
-    "log_sha256": "cbef48e645e6fcaaa996cb51490739b59f5eeedbb8b7a3572b57596e2d84f1b5",
+    "len_s": 828,
+    "log_sha256": "08172ff355d16376b5e77d3dc4d5d4341a0fcb77b8f433ca9e63a63cc88727c0",
     "towers": {
-     "B": 4,
-     "R": 0
+     "B": 3,
+     "R": 2
     }
    }
   },
@@ -950,20 +950,20 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 1951,
+    "events": 2078,
     "gold": {
-     "B": 32946,
-     "R": 27593
+     "B": 35204,
+     "R": 31291
     },
     "id": "g21",
     "kills": {
-     "B": 20,
-     "R": 7
+     "B": 23,
+     "R": 9
     },
-    "len_s": 838,
-    "log_sha256": "d4080a4c907802c9fa5327832ce8765b100633ca8da4435e837d0b1348c10880",
+    "len_s": 908,
+    "log_sha256": "13f0e172ce9506d081f5ef1a450e7b53ea7abacc4215b9600f1783abd49ceba7",
     "towers": {
-     "B": 5,
+     "B": 6,
      "R": 2
     }
    }
@@ -994,18 +994,18 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2095,
+    "events": 2160,
     "gold": {
-     "B": 34218,
-     "R": 32861
+     "B": 33586,
+     "R": 32556
     },
     "id": "g22",
     "kills": {
-     "B": 22,
-     "R": 14
+     "B": 21,
+     "R": 9
     },
-    "len_s": 878,
-    "log_sha256": "cf7ed52f32d8d2fd394d2debc9ebbd248de4b6602635913ad668eb5050f0101a",
+    "len_s": 896,
+    "log_sha256": "beab82061d0fb0a2acb3d593f15964338b613467b4c37757a34dc4ee557e1b4c",
     "towers": {
      "B": 3,
      "R": 2
@@ -1038,21 +1038,21 @@
    },
    "expect": {
     "blue_won": true,
-    "events": 2055,
+    "events": 1633,
     "gold": {
-     "B": 37464,
-     "R": 30327
+     "B": 25491,
+     "R": 22501
     },
     "id": "g23",
     "kills": {
-     "B": 30,
-     "R": 2
+     "B": 14,
+     "R": 5
     },
-    "len_s": 970,
-    "log_sha256": "f798bcbabdbbcd12bc1022ec6589e43bf3f2edf5863a1cbad4176400cece9598",
+    "len_s": 728,
+    "log_sha256": "dea3c9bfaa176ad73aead46dc6b9cda2a7193b4454829e56d13fc6039cb6e00d",
     "towers": {
      "B": 2,
-     "R": 3
+     "R": 2
     }
    }
   }

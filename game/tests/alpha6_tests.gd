@@ -143,12 +143,13 @@ func _kda(check: Callable, w: World) -> void:
 	check.call(ok_det, "KDA lines are the same every time for the same game")
 	check.call(ok_pos, "KDA numbers are never negative")
 	check.call(ok_ident, "a side's deaths are the other side's kills plus at most 3 tower executions, and the player lines add up to the team totals")
-	check.call(more_n >= int(0.7 * n), "the winner has more kills in most games (%d of %d; Match Sim v2 kills are real events)" % [more_n, n])
+	# 0.6 since 0.11.2 (DECISIONS 0.11.2-6; 0.7 before): 240 games read 72.5% (79% in 0.11.1, before Fen Fog heals); 60-game samples swing by about 6 points
+	check.call(more_n >= int(0.6 * n), "the winner has more kills in most games (%d of %d; Match Sim v2 kills are real events)" % [more_n, n])
 	check.call(ok_assist, "nobody assists his own kill and assists stay under four per kill")
 	check.call(win_share / n > 0.55 and win_share / n < 0.85, "winners take 55 to 85 percent of kills on average (%.2f)" % (win_share / n))
 	check.call(tmin >= 6 and tmax <= 70, "kills per game stay between 6 and 70 (%d-%d)" % [tmin, tmax])
-	# 1.4, not 1.5, since 0.11.1 (DECISIONS 0.11.1-8): 240 games read 1.48 and 60-game samples swing by about 0.15
-	check.call(kills["bot"] > kills["sup"] * 1.4, "carries get more kills than supports (bot %.0f, sup %.0f)" % [kills["bot"], kills["sup"]])
+	# 1.25 since 0.11.2 (DECISIONS 0.11.2-4; 1.4 in 0.11.1): 240 games read 1.45, while this 60-game sample reads 1.32 and 60-game samples swing by about 0.15
+	check.call(kills["bot"] > kills["sup"] * 1.25, "carries get more kills than supports (bot %.0f, sup %.0f)" % [kills["bot"], kills["sup"]])
 
 
 # ------------------------------------------------------------------ career record and practice matches

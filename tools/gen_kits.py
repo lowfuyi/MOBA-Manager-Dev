@@ -77,6 +77,9 @@ def ability(hid, slot, i, a):
         heal = (45 if arch != "mender" else 60) * (1.8 if slot == "ult" else 1.0) * kw.pop("heal_x", 1.0)
     out["shield"] = round(shield)
     out["heal"] = round(heal)
+    ally_heal = kw.pop("ally_heal", 0)
+    if ally_heal:
+        out["ally_heal"] = ally_heal   # 0.11.2: heals every ally when it lands (optional key)
     out["ratio_def"] = round(0.08 if (shield and arch in ("bulwark", "bruiser")) else (0.35 if (shield or heal) else 0.0), 2)
     rng = {"line": 0.045, "enemy": 0.035 if h["range"] != "melee" else 0.020, "area": 0.040, "ally": 0.040, "self": 0.0}[target]
     out["range_u"] = round(rng * kw.pop("range_x", 1.0), 3)
@@ -371,8 +374,8 @@ K["fennimore"] = ("Fen Elder", "A very old frog who has been right about everyth
     P("Croak", "Every second ability also slows the enemies it hits.", "on_ability", every=2, cc="slow", cc_s=1.0),   # 0.11.1 balance: was every third
     A("Lily Lob", "Lobs a lily pad that bursts in an area, hurting and slowing; clears waves.", ["damage", "cc", "wave"], "area", cc="slow"),
     A("Bog Bind", "Binds an enemy in bog-weed, rooting them.", ["cc"], "line", cc="root", hit=0.85, cc_x=2.0),   # 0.11.1 balance: kit values, not scale (a support with little damage)
-    A("Leap Frog", "Leaps a short way.", ["mobility"], "self"),
-    A("Fen Fog", "A thick fog over an area: enemies inside are silenced and slowed.", ["cc", "zone"], "area", cc="silence", radius_u=0.05, dur_s=3.5))   # 0.11.1 balance: was radius 0.04, 3.0 s
+    A("Leap Frog", "Leaps a short way and gains a small shield.", ["mobility", "shield"], "self", shield_x=0.6),   # 0.11.2: small shield (Founder)
+    A("Fen Fog", "A thick fog over an area: enemies inside are silenced and slowed, and allies inside mend a little.", ["cc", "zone"], "area", cc="silence", radius_u=0.05, dur_s=3.5, ally_heal=25))   # 0.11.1: radius 0.04 to 0.05, 3.0 to 3.5 s; 0.11.2: heals allies a little (Founder)
 
 
 def main():

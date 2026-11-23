@@ -50,6 +50,8 @@ Kits changed because their shape was too close to a well-known hero's:
 
 Checked and kept, with one shared mechanic each (genre-common, different theme and kit): Dunmarrow's tether-then-root, Hegwin's hook-and-stun, Tarskel's boar theme (a hunter wearing tusks, not a rider), Marrek's spinning ultimate, Nimbrel's delayed burst, Ellowen's silence ring, Tanglewick's line root and ally shield, Ketterick's stun after three abilities, Wyldrim's leap to an ally.
 
+0.11.2 (overnight run, 2026-11-24): Fennimore's **Fen Fog** now also heals allies a little when it lands, and **Leap Frog** gives a small self shield. Both are genre-common support effects (a healing area, a hop with a shield) with no famous pairing of name and effect; no name changed; `tools/ip_names.py` 0 flagged.
+
 Every kit keeps its hero's tags visible (a test, `test_tags_are_visible_in_the_kit`).
 
 ## 4. Items

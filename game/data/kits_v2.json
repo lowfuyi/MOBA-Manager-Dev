@@ -6490,9 +6490,10 @@
      "id": "fennimore.a3",
      "slot": "a3",
      "name": "Leap Frog",
-     "text": "Leaps a short way.",
+     "text": "Leaps a short way and gains a small shield.",
      "kind": [
-      "mobility"
+      "mobility",
+      "shield"
      ],
      "target": "self",
      "dmg": 0,
@@ -6501,9 +6502,9 @@
      "dtype": "phys",
      "cc": "",
      "cc_s": 0.0,
-     "shield": 0,
+     "shield": 36,
      "heal": 0,
-     "ratio_def": 0.0,
+     "ratio_def": 0.35,
      "range_u": 0.0,
      "radius_u": 0.0,
      "cd": 13.0,
@@ -6520,7 +6521,7 @@
      "id": "fennimore.ult",
      "slot": "ult",
      "name": "Fen Fog",
-     "text": "A thick fog over an area: enemies inside are silenced and slowed.",
+     "text": "A thick fog over an area: enemies inside are silenced and slowed, and allies inside mend a little.",
      "kind": [
       "cc",
       "zone"
@@ -6534,6 +6535,7 @@
      "cc_s": 1.62,
      "shield": 0,
      "heal": 0,
+     "ally_heal": 25,
      "ratio_def": 0.0,
      "range_u": 0.04,
      "radius_u": 0.05,

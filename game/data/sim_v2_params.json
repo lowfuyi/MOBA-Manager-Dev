@@ -159,7 +159,7 @@
  "trigger_lead_gold": 2400,
  "fortify_s": 360,
  "fortify_mult": 0.5,
- "q_k": 0.378,
+ "q_k": 0.385,
  "ai_games_v2": false,
  "final_struct": 0.03,
  "final_gold": 12000.0,

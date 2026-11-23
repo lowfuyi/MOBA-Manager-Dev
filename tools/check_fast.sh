@@ -13,7 +13,7 @@
 set -u
 cd "$(dirname "$0")/.."
 # sha256 over "<sha256>  <name>" lines of the files in game/tests/golden, sorted by name (LC_ALL=C). Recorded 2026-11-09 (I-00); changed 2026-11-20 (v2 S6: sim_v2_vectors.json added, Founder decision 8); changed 2026-11-23 (0.11.1 balance pass and rating weight, Founder approval of 2026-11-22).
-GOLDEN_SHA256=daa469186a3b836e6b447e8d37c39b3f437e18579a1ef592aa714390c8f3a693
+GOLDEN_SHA256=79d256b4c72c07dc3803ef75d2e7045fcb7b593bb75f9146cfacc5cfa501de06
 
 G="${1:-${GODOT:-}}"
 if [ -z "$G" ] || [ ! -x "$G" ]; then

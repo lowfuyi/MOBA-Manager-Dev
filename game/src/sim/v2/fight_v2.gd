@@ -425,6 +425,11 @@ func _ability_hit(h: SimHero, s: FS, a: SimHero.Ability, tgt: SimHero, i: int) -
 		_shield(h, h, a)
 	if a.heal_k:
 		_heal(h, h, _heal_amount(h, a) * 0.5)
+	if a.ally_heal > 0.0 and any_hit:
+		# 0.11.2: an enemy-side ability that also mends the caster's team a little (Fen Fog)
+		var amt := (a.ally_heal + 4.0 * float(h.level)) * _heal_scale
+		for x in _side_active(h.side):
+			_heal(h, x, amt)
 	events.append([t, "cast", h.key, a.id, tgt.key, any_hit])
 	if not a.buff.is_empty():
 		s.add_buff(t + maxf(1.0, a.dur), a.buff)
