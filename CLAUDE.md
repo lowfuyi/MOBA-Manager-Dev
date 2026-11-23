@@ -95,3 +95,4 @@ The Founder queued Q0 to Q9 and the end-of-night release (0.12.0) for an unatten
 - **Q2 done:** WebKit runs with `BROWSER=webkit DEVICE="iPhone 15" PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1` against a local http server (no TLS in that WebKit); launch images from `tools/gen_pwa_splash.gd` at build time.
 - **Q3 done:** ward events carry `[x, y]`; `"decisive"` events (fight with `decisive_kills`+ kills, Cairn); golden hash `c04e23d2...`.
 - **Q4 done:** `ArenaComment` in the notes line (not in large text); copy `en_0_12_comment.json`.
+- **Q5 done:** `ItemIcons` (atlas items@64, `BuildSheet.items_view`), `ArenaFx2` cast looks.

@@ -383,7 +383,18 @@ class _Sprites extends Control:
 				var at: Vector2 = e[6] if bool(e[5]) else e[1]
 				if not (view.shows(e[1]) or view.shows(at)):
 					continue
-				_flat(tex, "bolt" if age < 0.5 else "spark", at, 0.03 * k2 * (0.8 + 0.6 * age), Color(col2, 1.0 - age))
+				# 0.12 Q5: the ability's own look (kind and the caster's archetype), all from the arena atlas
+				var arch2 := String(SimData.heroes()[pl.hero_of[String(e[7])]]["archetype"]) if e.size() > 7 and pl.hero_of.has(String(e[7])) else ""
+				for fx in ArenaFx2.style(String(e[4]), arch2):
+					var where: Vector2 = at if String(fx[1]) == "target" else e[1]
+					if bool(fx[5]):
+						where = (e[1] as Vector2).lerp(at, minf(1.0, age * 1.6))
+					var colfx := Color(ArenaFx2.tone_colour(String(fx[2]), col2), 1.0 - age)
+					var wfx := float(fx[3]) * k2 * (0.8 + 0.6 * age)
+					if float(fx[4]) > 0.0:
+						_up(tex, String(fx[0]), where, wfx, float(fx[4]) * ArenaView.HERO_H * k2 * (1.0 + 0.4 * age), colfx)
+					else:
+						_flat(tex, String(fx[0]), where, wfx, colfx)
 			else:
 				if not view.shows(e[1]):
 					continue    # a kill in the fog: the feed still says it, the map does not show where
@@ -436,6 +447,16 @@ class _Sprites extends Control:
 		var wpx := w * sc
 		var hpx := wpx * sin(deg_to_rad(view.cam.pitch_deg))
 		draw_texture_rect_region(tex, Rect2(pr.x - wpx / 2.0, pr.y - hpx / 2.0, wpx, hpx), ArenaAtlas.rect(name), col)
+
+	## A sprite standing upright `lift` ground units above a point (heals, shields, crowd control over a hero).
+	func _up(tex: Texture2D, name: String, p: Vector2, w: float, lift: float, col: Color) -> void:
+		var pr := view.cam.project(p)
+		if pr.z <= 0.0:
+			return
+		var sc := view.cam.scale_at(p)
+		var wpx := w * sc
+		var ly := lift * sc
+		draw_texture_rect_region(tex, Rect2(pr.x - wpx / 2.0, pr.y - ly - wpx / 2.0, wpx, wpx), ArenaAtlas.rect(name), col)
 
 	## A thin segmented health bar (dark back, team fill, a notch every quarter).
 	func _bar(tex: Texture2D, at: Vector2, sc: float, hp: float, col: Color) -> void:

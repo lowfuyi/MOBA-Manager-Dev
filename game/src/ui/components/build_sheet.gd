@@ -20,6 +20,15 @@ static func items_label(build: Array) -> Label:
 	return l
 
 
+## A build as a row of item icons (one draw call) with the names under it (0.12 Q5).
+static func items_view(build: Array) -> Control:
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 6)
+	v.add_child(ItemIcons.Row.new(build))
+	v.add_child(items_label(build))
+	return v
+
+
 ## The build a player plays on a hero: the saved edit, else the coach's suggestion against `enemy`.
 static func current(pid: String, hid: String, slot: String, enemy: Array) -> Array:
 	var b: Array = App.gs.build_for(pid, hid)
@@ -41,6 +50,7 @@ static func _editor(c: Control, pid: String, hid: String, slot: String, enemy: A
 		var it := SimData.item(iid)
 		var b := UI.button("%d. %s" % [i + 1, String(it["name"])], func(): _choose(pid, hid, slot, enemy, i, on_close), "normal")
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.icon = ItemIcons.tex(iid)
 		UI.tag(b, "build.slot.%d" % i, false)
 		c.add_child(b)
 		if String(it["text"]) != "":
@@ -79,6 +89,7 @@ static func _choose(pid: String, hid: String, slot: String, enemy: Array, i: int
 				if on_close.is_valid():
 					on_close.call(), "normal")
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			b.icon = ItemIcons.tex(iid)
 			c.add_child(b)
 			if String(it["text"]) != "":
 				c.add_child(UI.label(String(it["text"]), UI.S_CAPTION, UI.TEXT2)), Callable(), "L", "build_choose")
@@ -99,7 +110,7 @@ static func open_draft(d: Draft, my_side: String) -> void:
 			var hid := String(d.picks[my_side][s]["id"])
 			var pid := String(d.lineups[my_side][s]["id"])
 			c.add_child(UI.label("%s · %s" % [Strings.t("role.short." + s), String(SimData.heroes()[hid]["name"])], UI.S_SMALL, UI.TEAL_HI, HORIZONTAL_ALIGNMENT_LEFT, "SemiBold"))
-			c.add_child(items_label(current(pid, hid, s, enemy)))
+			c.add_child(items_view(current(pid, hid, s, enemy)))
 			var eb := UI.button(Strings.t("hero.build.edit"), func():
 				BottomSheet.current().close()
 				open_for(pid, hid, s, enemy, func(): open_draft(d, my_side)), "normal")

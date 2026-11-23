@@ -325,7 +325,7 @@ func effects(t: float) -> Array:
 		if age < 0.0 or age > 1.0:
 			continue
 		var who := String(c[1])
-		out.append(["cast", pos(who, t), age, side_of(who), String(c[2]), bool(c[4]), pos(String(c[3]), t) if track.has(String(c[3])) else pos(who, t)])
+		out.append(["cast", pos(who, t), age, side_of(who), String(c[2]), bool(c[4]), pos(String(c[3]), t) if track.has(String(c[3])) else pos(who, t), who])
 	for k in kills:
 		var age2 := (t - float(k[0])) / KILL_S
 		if age2 < 0.0 or age2 > 1.0:

@@ -45,7 +45,7 @@ func _ready() -> void:
 	bc.add_child(UI.label(Strings.t("hero.build"), UI.S_HEAD, UI.ACCENT))
 	var role := String(h["role_primary"])
 	bc.add_child(UI.label(Strings.f("hero.build.coach", {"role": Strings.t("role." + role)}), UI.S_SMALL, UI.TEXT2))
-	bc.add_child(BuildSheet.items_label(Items.suggest(hid, role, [])))
+	bc.add_child(BuildSheet.items_view(Items.suggest(hid, role, [])))
 	# your players who can play the hero (primary or secondary role)
 	for p in App.world.club_players(App.gs.club()):
 		var pr := String(p["role_primary"])
@@ -58,7 +58,7 @@ func _ready() -> void:
 		var edited: bool = not cur.is_empty()
 		bc.add_child(UI.label(Strings.f("hero.build.player", {"player": String(p["name"]), "state": Strings.t("hero.build.edited" if edited else "hero.build.coach_state")}), UI.S_SMALL, UI.TEXT))
 		if edited:
-			bc.add_child(BuildSheet.items_label(cur))
+			bc.add_child(BuildSheet.items_view(cur))
 		var eb := UI.button(Strings.t("hero.build.edit"), func(): BuildSheet.open_for(pid, hid, pr, [], func(): App.go(ScreenHero.new(hid))), "normal")
 		UI.tag(eb, "hero.build.edit." + pid, false)
 		bc.add_child(eb)
