@@ -18,7 +18,7 @@ The queue (Q0 to Q5, `docs/design/ESMO-LESSONS.md`) ran unattended. Every increm
 | Q4-6 | Career tab: achievements and club records | 1ed7921 |
 | Q4-7 | Home: "Play the rest of the league", with a confirm sheet and one result line. Hidden while the first-run guide or a lesson runs | 631a1c1 |
 | Q4-8 | Hero pages: "Harder against" (up to 3 heroes, from Q2d), with the sample size; informational only | 72aecf1 |
-| Q5 | Release 0.12.2 (code 20): see section 6 | [[Q5COMMIT]] |
+| Q5 | Release 0.12.2 (code 20): see section 6 | 630545d, plus this report |
 
 ## 2. Skipped, parked or BLOCKED
 
@@ -109,4 +109,20 @@ So the players still matter more than the draft.
 
 ## 6. Release 0.12.2
 
-[[RELEASE]]
+- **Full gate** (`tools/run_all_checks.sh`): exit 0, with no allowance raised.
+  - 2,698 logic checks, all screen and touch scenes.
+  - Save compat: 219 checks.
+  - Soak: 6 seasons, 1,176 checks.
+  - Golden vectors unchanged.
+  - check_art: 7 + 37 checks.
+  - Perf: 49 states, 0 failures (9 over a target and under the hard limit, as before).
+  - The fast gate also showed ALL GREEN on the same tree.
+- **APK:** `build/gloamline-0.12.2-alpha.apk`, 25.5 MB, versionCode 20, versionName 0.12.2-alpha.
+  - Signed with the debug key; apksigner verified it.
+  - Copied to `C:\Users\Fuyi\Downloads\gloamline-0.12.2-alpha.apk`. C: had 20 GB free before the build.
+- **Web:** https://gloamline-playtest.vercel.app, build `0.12.2-alpha-web-630545d-20261124-2200`.
+  - Before the deploy, the Playwright flow passed on a local server: title to report, with 5 bans, 5 picks and a full match. 0 errors; the new Form Rating card showed on the Report.
+  - `vercel whoami` printed lowfuyi-1301.
+  - Live checks: `/build.txt` returns the build id; the `x-robots-tag: noindex, nofollow, noarchive` header is present; the title screen shows "Version 0.12.2 alpha" with 0 errors (desktop Chromium, phone viewport).
+- **Tester note:** `docs/TESTER-UPDATES.md`, 0.12.2. Saves carry over, because save compat passed.
+- **Not measured on a phone.** The web run's "arena frame" times come from software WebGL in a headless browser on this machine; they are not a phone reading.
