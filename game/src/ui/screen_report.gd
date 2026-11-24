@@ -370,6 +370,30 @@ class _Changes extends Control:
 
 # ---- life -------------------------------------------------------------------------------------------------------------------------
 
+## "Why your Form Rating moved" (0.12, ESMO Q4-4): the parts FormRating.delta really used (both ratings before, the
+## expected chance, the game's weight, the result), stored by GameState._rate as d["rate_last"]. One label. null when this
+## game did not close a rated game or series of ours.
+func rate_card() -> Control:
+	var rl: Dictionary = App.gs.d.get("rate_last", {})
+	if rl.is_empty() or game.is_empty() or String(rl.get("game", "")) != String(game.get("id", "")):
+		return null
+	var bo := int(rl["best_of"])
+	var lines: Array = [
+		Strings.f("report.rate.before", {"me": int(round(float(rl["before"]))), "club": App.gs.club_name(String(rl["opp"])), "them": int(round(float(rl["them"])))}),
+		Strings.f("report.rate.chance" if bo <= 1 else "report.rate.chance_series", {"pct": int(round(100.0 * float(rl["e"])))}),
+		Strings.f("report.rate.weight", {"stage": Strings.t("report.rate.stage." + String(rl["stage"])), "bo": bo, "imp": "%.2f" % float(rl["imp"])}),
+		Strings.f("report.rate.won" if bool(rl["won"]) else "report.rate.lost", {"delta": "%+.1f" % float(rl["delta"])}),
+		Strings.f("report.rate.rule", {"k": int(FormRating.K)})]
+	# one panel and one label (2 nodes: the Report's node baseline in check_ui_fit allows +10%)
+	var c := PanelContainer.new()
+	c.add_theme_stylebox_override("panel", UI.box(UI.PANEL2, 16, 24))
+	var l := UI.label(Strings.t("report.rate.h") + "\n" + "\n".join(PackedStringArray(lines)), UI.S_SMALL, UI.TEXT)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	c.add_child(l)
+	UI.tag(c, "report.rate", false)
+	return c
+
+
 func _init(g: Dictionary = {}, r: Dictionary = {}, quick: bool = false) -> void:
 	super._init()
 	game = g
@@ -587,6 +611,10 @@ func _build() -> void:
 			cbox.add_child(changes)
 			UI.tag(cbox, "report.payoff", false)
 			page.add_child(cbox)
+		# 0.12 Q4-4: why the Form Rating moved (only when this game closed a rated game or series)
+		var rc := rate_card()
+		if rc != null:
+			page.add_child(rc)
 		# 5. the tip
 		var t := Payoff.tip(gs)
 		tip_card = _card(Strings.t("report.tip_h"), [Strings.f(t["key"], t["args"])])

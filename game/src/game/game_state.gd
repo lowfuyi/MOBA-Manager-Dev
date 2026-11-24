@@ -311,7 +311,7 @@ func record_human_game(game: Dictionary, result: Dictionary) -> void:
 				f["played"] = true
 				f["final"] = float(result["final"])
 				f["winner"] = winner
-		_rate(game["blue"], game["red"], bool(result["blue_won"]), "league", 1)
+		_rate(game["blue"], game["red"], bool(result["blue_won"]), "league", 1, String(game["id"]))
 		_finish_round_if_done()
 	else:
 		var side := "B" if game["blue"] == club() else "R"
@@ -494,11 +494,20 @@ func _initial_frating() -> Dictionary:
 
 
 ## One rated result (a league game, or a finished playoff series). Zero-sum between the two clubs.
-func _rate(a: String, b: String, a_won: bool, stage: String, best_of: int) -> void:
+func _rate(a: String, b: String, a_won: bool, stage: String, best_of: int, gid: String = "") -> void:
 	var fr: Dictionary = d["frating"]
-	var delta := FormRating.delta(float(fr[a]), float(fr[b]), a_won, stage, best_of)
-	fr[a] = float(fr[a]) + delta
-	fr[b] = float(fr[b]) - delta
+	var fa := float(fr[a])
+	var fb := float(fr[b])
+	var delta := FormRating.delta(fa, fb, a_won, stage, best_of)
+	fr[a] = fa + delta
+	fr[b] = fb - delta
+	# 0.12 Q4-4: the real parts of our club's last change, for the Report (additive save key "rate_last"; display only)
+	if gid != "" and (a == club() or b == club()):
+		var mine := a == club()
+		var p := FormRating.expected(fa, fb) if mine else FormRating.expected(fb, fa)
+		d["rate_last"] = {"game": gid, "opp": b if mine else a, "before": fa if mine else fb, "them": fb if mine else fa, "p": p,
+				"e": FormRating.series_expected(p, best_of), "imp": FormRating.importance(stage, best_of), "stage": stage,
+				"best_of": best_of, "won": a_won == mine, "delta": delta if mine else -delta}
 
 
 func career_all() -> Dictionary:
@@ -798,7 +807,7 @@ func _add_series_game(s: Dictionary, game: Dictionary, winner: String, final: fl
 	if s["wins_a"] >= need or s["wins_b"] >= need:
 		s["done"] = true
 		s["winner"] = s["a"] if s["wins_a"] >= need else s["b"]
-		_rate(s["a"], s["b"], s["winner"] == s["a"], "final" if s["id"] == "F" else "semi", int(s["best_of"]))
+		_rate(s["a"], s["b"], s["winner"] == s["a"], "final" if s["id"] == "F" else "semi", int(s["best_of"]), String(game["id"]))
 
 
 ## Simulate every series the managed club is not part of (and everything once it is out),

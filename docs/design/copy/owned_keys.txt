@@ -954,3 +954,14 @@ scout.note.solid
 scout.pro
 scout.con
 fa.grade
+report.rate.h
+report.rate.before
+report.rate.chance
+report.rate.chance_series
+report.rate.weight
+report.rate.stage.league
+report.rate.stage.semi
+report.rate.stage.final
+report.rate.won
+report.rate.lost
+report.rate.rule

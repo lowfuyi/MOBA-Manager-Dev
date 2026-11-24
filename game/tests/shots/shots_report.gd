@@ -62,6 +62,13 @@ static func run(ctx) -> void:
 			r.result.shown = 1.0
 			await _measure(ctx, st)
 			if st == "win":
+				var rc := UI.find_tag("report.rate")    # 0.12 Q4-4: why the Form Rating moved
+				if rc != null:
+					r.page_scroll.ensure_control_visible(rc)
+					await ctx.settle()
+					await _measure(ctx, "rate")
+					r.page_scroll.scroll_vertical = 0
+					await ctx.settle()
 				r._open_why()
 				await _measure(ctx, "why")
 				BottomSheet.current().close()

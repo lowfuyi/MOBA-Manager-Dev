@@ -1,0 +1,13 @@
+{
+  "report.rate.h": "Why your Form Rating moved",
+  "report.rate.before": "Before: you {me}, {club} {them}.",
+  "report.rate.chance": "Your chance to win, from that gap: {pct}%.",
+  "report.rate.chance_series": "Your chance to win the series, from that gap: {pct}%.",
+  "report.rate.weight": "Weight: {stage}, best of {bo} (x{imp}).",
+  "report.rate.stage.league": "league game",
+  "report.rate.stage.semi": "semi-final",
+  "report.rate.stage.final": "final",
+  "report.rate.won": "You won, so it moved {delta}.",
+  "report.rate.lost": "You lost, so it moved {delta}.",
+  "report.rate.rule": "The change is {k} x weight x (1 for a win or 0 for a loss, minus your chance). An upset moves it most."
+}
