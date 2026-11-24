@@ -80,6 +80,23 @@ static func run(ctx) -> void:
 	gs.d["cash"] = 48250.0
 	await _home(ctx)
 	await _measure(ctx, "mid")
+	# 0.12 Q4-7: Auto-play the rest of the league (the button, the confirm sheet, the results), on a copy of the save
+	var keep := App.gs
+	App.gs = GameState.from_dict(App.world, JSON.parse_string(JSON.stringify(keep.d)))
+	await _home(ctx)
+	var h7 := ctx.cur() as ScreenHub
+	if h7 != null and h7.rest_button != null:
+		h7._open_rest()
+		await ctx.settle()
+		await ctx.shot("rest_confirm")
+		h7._play_rest()
+		await ctx.settle()
+		await ctx.shot("rest_done")
+		if BottomSheet.is_open():
+			BottomSheet.current().close()
+			await ctx.settle()
+	App.gs = keep
+	await _home(ctx)
 	await _scroll_bottom(ctx)
 	await ctx.shot("mid_lower")
 	gs.d["cash"] = -1200.0

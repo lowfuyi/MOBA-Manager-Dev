@@ -218,6 +218,26 @@ func _run() -> void:
 	App.go(ScreenPractice.new())
 	await get_tree().process_frame
 	ok(cur() is ScreenPractice, "practice screen shows the used day")
+	# 0.12 Q4-7: Auto-play the rest of the league, on a copy of the save (the real season below is untouched)
+	var keep_gs := App.gs
+	App.gs = GameState.from_dict(App.world, JSON.parse_string(JSON.stringify(keep_gs.d)))
+	App.gs.d["tutorial"] = {"v": 1, "state": "skipped"}    # the button waits until the first-run guide is answered
+	var left0 := ScreenHub.league_games_left()
+	var hub7 := ScreenHub.new()
+	App.go(hub7)
+	await get_tree().process_frame
+	ok(hub7.rest_button != null and hub7.rest_button.text.contains(str(left0)), "Home offers to play the rest of the league (%d games)" % left0)
+	hub7._open_rest()
+	await get_tree().process_frame
+	hub7._play_rest()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	ok(ScreenHub.league_games_left() == 0 and App.gs.d["phase"] != "league", "every league game was played (%s)" % App.gs.d["phase"])
+	var done7 := UI.find_tag("home.rest_done") as Label
+	ok(done7 != null and done7.text.contains(str(left0)), "Home shows one line of results after it")
+	if BottomSheet.is_open():
+		BottomSheet.current().close()
+	App.gs = keep_gs
 	App.go(ScreenHub.new())
 	# full-UI games, then fast ones, through the whole season
 	var played := 0

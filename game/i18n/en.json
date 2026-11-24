@@ -1588,5 +1588,11 @@
   "career.rec.games": "Most games ({n})",
   "career.rec.wins": "Most wins ({n})",
   "career.rec.kills": "Most kills in one game ({n})",
-  "career.rec.ratio": "Best KDA ratio, {n}+ games ({r})"
+  "career.rec.ratio": "Best KDA ratio, {n}+ games ({r})",
+  "hub.rest.button": "Auto-play the rest of the league ({n} games)",
+  "hub.rest.h": "Play the rest of the league?",
+  "hub.rest.body": "Plays your {n} remaining league games now, without watching, with your current lineup and saved Game Plan. Tired players are not rested. This cannot be undone.",
+  "hub.rest.go": "Play {n} games",
+  "hub.rest.done_h": "League played",
+  "hub.rest.done": "Played {n} league games: {w} won, {l} lost. You are now in place {rank} of {clubs} in the table."
 }

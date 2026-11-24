@@ -984,3 +984,9 @@ career.rec.games
 career.rec.wins
 career.rec.kills
 career.rec.ratio
+hub.rest.button
+hub.rest.h
+hub.rest.body
+hub.rest.go
+hub.rest.done_h
+hub.rest.done

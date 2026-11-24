@@ -27,6 +27,8 @@ var attention: Carousel
 var upnext: Carousel
 var tiles: HomeKit.TileGrid
 var _att_actions: Array = []
+var rest_button: Button
+static var rest_summary := ""    # 0.12 Q4-7: the results line shown once on the next Home (a String, never a node)
 var _upnext_items: Array = []
 
 
@@ -51,6 +53,8 @@ func _ready() -> void:
 	setup("", Callable())
 	body.add_theme_constant_override("separation", UI.GAP)
 	_build()
+	if rest_summary != "":
+		_show_rest_summary.call_deferred()
 
 
 func _build() -> void:
@@ -169,6 +173,16 @@ func _next_card(g: Dictionary) -> void:
 		auto.add_theme_color_override(k, UI.TEAL_HI)
 	UI.tag(auto, "home.autoplay")
 	c.add_child(auto)
+	var left := league_games_left()
+	var tstate := String((App.gs.d.get("tutorial", {}) as Dictionary).get("state", "legacy"))    # the guide offered or running
+	var guided := tstate in ["new", "running"] or (App.lessons != null and App.lessons.running())
+	# 0.12 Q4-7: play the rest of the league (not while the guide or a lesson runs: their cards point at this card's layout)
+	if g["kind"] == "league" and left >= 2 and not TutorialGame.is_tutorial(g) and not guided:
+		rest_button = UI.button(Strings.f("hub.rest.button", {"n": left}), _open_rest, "flat")
+		for k in ["font_color", "font_hover_color"]:
+			rest_button.add_theme_color_override(k, UI.TEAL_HI)
+		UI.tag(rest_button, "home.rest_league", false)
+		c.add_child(rest_button)
 
 
 ## The playoffs go on without the club (eliminated): one line and Finish the season.
@@ -410,6 +424,71 @@ static func _finish_game(g: Dictionary, res: Dictionary) -> void:
 			App.tutorial.set_game_live(false)
 	App.autosave()
 	App.go(ScreenReport.new(g, res, false))
+
+
+## The managed club's league games not played yet.
+static func league_games_left() -> int:
+	var gs := App.gs
+	var me := gs.club()
+	var n := 0
+	for f in gs.d["fixtures"]:
+		if not bool(f.get("played", false)) and (f["blue"] == me or f["red"] == me):
+			n += 1
+	return n
+
+
+## 0.12 Q4-7: confirm, then play every league game left without watching (GameState.autoplay, as Auto-play does one by
+## one), then one line of results on Home.
+func _open_rest() -> void:
+	BottomSheet.open(Strings.t("hub.rest.h"), _rest_body, _rest_footer, "M", "home_rest")
+
+
+func _rest_body(c: Control) -> void:
+	var l := UI.label(Strings.f("hub.rest.body", {"n": league_games_left()}), UI.S_BODY, UI.TEXT)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	c.add_child(l)
+
+
+func _rest_footer(f: Control) -> void:
+	BottomSheet.footer_button(f, Strings.t("common.cancel"), func(): BottomSheet.current().close(), "normal")
+	BottomSheet.footer_button(f, Strings.f("hub.rest.go", {"n": league_games_left()}), _play_rest, "primary", "home.rest_go")
+
+
+func _play_rest() -> void:
+	var gs := App.gs
+	var me := gs.club()
+	var before := {}
+	for f in gs.d["fixtures"]:
+		if bool(f.get("played", false)):
+			before[String(f["id"])] = true
+	gs.autoplay(false)
+	var w := 0
+	var l := 0
+	for f in gs.d["fixtures"]:
+		if before.has(String(f["id"])) or not bool(f.get("played", false)) or (f["blue"] != me and f["red"] != me):
+			continue
+		if f["winner"] == me:
+			w += 1
+		else:
+			l += 1
+	rest_summary = Strings.f("hub.rest.done", {"n": w + l, "w": w, "l": l, "rank": gs.rank_of(me), "clubs": App.world.club_ids.size()})
+	App.autosave()
+	if BottomSheet.is_open():
+		BottomSheet.current().close()
+	App.go(ScreenHub.new())
+
+
+func _show_rest_summary() -> void:
+	var text := rest_summary
+	rest_summary = ""
+	BottomSheet.open(Strings.t("hub.rest.done_h"), _rest_done_body.bind(text), Callable(), "S", "home_rest_done")
+
+
+func _rest_done_body(c: Control, text: String) -> void:
+	var l := UI.label(text, UI.S_BODY, UI.TEXT)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	UI.tag(l, "home.rest_done", false)
+	c.add_child(l)
 
 
 func _skip_to_end() -> void:
