@@ -2,7 +2,7 @@
 
 Read this first. Last updated 2026-11-24 (SGT); written 2026-11-16 at the move from the claude.ai session to Claude Code. Verify "current state" against `git log` and `company/DECISIONS.md`; they are the source of truth.
 
-**Now (2026-11-24):** released 0.12.0 alpha (APK versionCode 19, `build/gloamline-0.12.0-alpha.apk`) and 0.12.1 on the web only (large-text Draft and Game Plan fixes). Working the Founder's ESMO-lessons queue Q0 to Q5 (`docs/design/ESMO-LESSONS.md`; section "ESMO-lessons queue" at the end of this file); parked items in `docs/PENDING-CONFIRMATION.md`. Founder decision: the match map's bases go diagonal (P1, waits for his recordings).
+**Now (2026-11-25):** released 0.12.2 alpha (APK versionCode 20, `build/gloamline-0.12.2-alpha.apk`, and the web), the end of the Founder's ESMO-lessons queue Q0 to Q5 (`docs/design/ESMO-LESSONS.md`; section "ESMO-lessons queue" at the end of this file). Morning report `docs/MORNING-REPORT.md`; Founder decisions and parked items in `docs/PENDING-CONFIRMATION.md` (Q2 flags, Q4-9, Part B P1 to P7). Founder decision: the match map's bases go diagonal (P1, waits for his recordings).
 
 ## The project and the person
 
@@ -116,4 +116,4 @@ The Founder queued Q0 to Q9 and the end-of-night release (0.12.0) for an unatten
 ## ESMO-lessons queue (Founder, 2026-11-24)
 
 Queue in `docs/design/ESMO-LESSONS.md`: Q0 housekeeping, Q1 audit (`docs/design/ESMO-AUDIT.md`), Q2 read-only analyses (hero by role, Game Plan sweep, draft-decides metric, matchup table `game/data/hero_matchups_v1.json`), Q3 diagonal-map feasibility note, Q4 gameplay-screen items (built only where the audit says PARTIAL or MISSING and one increment is enough), Q5 release (next version, APK, web, tester note, morning report). Rules: no `src/sim/` change and the golden hash stays; fast gate ALL GREEN before each commit, push after; copy only through merge_copy.py; ideas only from the competitor, no names, text, art or layouts; anything needing the Founder goes to `docs/PENDING-CONFIRMATION.md`; two failed tries = BLOCKED in `company/LEDGER.md`. To resume: read `docs/OVERNIGHT-LOG.md` for the last done item.
-
+- **Done 2026-11-25 (0.12.2, code 20):** Q1 audit, Q2 analyses (`docs/design/Q2-ANALYSIS.md`; re-run `GODOT=... python3 tools/q2_analysis.py run --game-dir <copy of game/> --raw <dir> --jobs 6`, about 6 h, then `report --raw <dir>`), Q3 note, Q4-1 to Q4-8 (RoleFit, Scout, Economy.refusal_factors, rating card from save key `rate_last`, FinFlow, Honours, Home "Play the rest of the league" hidden during the guide, HeroMatchups from `game/data/hero_matchups_v1.json`); Q4-9 parked. Rulings in DECISIONS F-3.

@@ -3,6 +3,30 @@
 Notes for the Founder's WhatsApp group of playtesters, newest first. One per release (version bump, APK or web deploy), written
 to the rule in CLAUDE.md ("Tester update notes"). Paste the block as it is; nothing here is posted by Claude.
 
+## 0.12.2 (APK and web, 2026-11-25)
+
+```
+*[Gloamline] [0.12.2] Updates, Minor update*
+*What's new*
+• Squad: each player's card shows how well they fit every lane, and what to train to play another lane
+• Scouting: a grade (A to D), a one-line note and pros and cons for players you could sign
+• Contracts: when a player turns you down, you now see why
+• Report: why your Form Rating went up or down; Finance: a small chart of the last rounds
+• Player Career tab: achievements and club records; hero pages: the heroes each one finds harder (informational only for now)
+• Home: "Play the rest of the league" plays your remaining league games in one go
+*What to try*
+• Sign a free agent: do the grade and the refusal reasons help you decide?
+• Late in a season, try "Play the rest of the league" and check the result line
+*Known issues*
+• The hero "harder against" list comes from test games, not real players
+• Large text: Tempo's short description still needs a small scroll
+*Where to find it*
+Squad (player card), Club (free agents, Finance), the Report after a game, Plan → Heroes, Home
+*How to update*
+Web: close the tab or app and reopen it, Settings shows the build number. Android: install the new APK file over the old one. Your save carries over.
+*Feedback:* Settings → "Copy feedback note" → paste it here.
+```
+
 ## 0.12.1 (web only, 2026-11-24)
 
 ```
