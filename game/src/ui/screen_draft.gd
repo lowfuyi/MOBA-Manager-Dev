@@ -386,7 +386,7 @@ func _build() -> void:
 		body.add_child(titles)
 	steps = _Steps.new()
 	body.add_child(steps)
-	board = LaneBoard.new(_compact_board(), "draft.board")
+	board = LaneBoard.new(_compact_board(), "draft.board", UI.large)    # large text: one-line rows (DECISIONS Q6-2 (a))
 	body.add_child(board)
 	needs = HomeKit.ChipRow.new([])
 	needs.name = "Needs"

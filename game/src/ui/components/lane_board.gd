@@ -9,10 +9,14 @@ extends VBoxContainer
 
 const ROLES := ["top", "jg", "mid", "bot", "sup"]
 const HEADER_H := 56.0
+const HEADER_LINE_H := 44.0        # one-line rows (large text): a shorter header and 6 px between rows
+const SEP := 8
+const SEP_LINE := 6
 const BANS_H := 60.0
 const MAX_BANS := 5
 
 var compact := true
+var one_line := false              # large text: one-line 40 px rows (LaneRow.one_line, DECISIONS Q6-2 (a))
 var tut_id := ""
 var applied := 0
 var rows: Dictionary = {}          # role -> LaneRow
@@ -91,16 +95,19 @@ class _Bans extends Control:
 			draw_multiline(strikes, UI.BAN, 4.0)
 
 
-func _init(p_compact: bool = true, p_tut_id: String = "") -> void:
+func _init(p_compact: bool = true, p_tut_id: String = "", p_one_line: bool = false) -> void:
 	compact = p_compact
+	one_line = p_one_line
 	tut_id = p_tut_id
-	add_theme_constant_override("separation", 8)
+	add_theme_constant_override("separation", SEP_LINE if one_line else SEP)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	header = _Header.new()
+	if one_line:
+		header.custom_minimum_size = Vector2(0.0, HEADER_LINE_H)
 	add_child(header)
 	for r in ROLES:
-		var row := LaneRow.new(r, compact, "%s.%s" % [tut_id, r] if tut_id != "" else "")
+		var row := LaneRow.new(r, compact, "%s.%s" % [tut_id, r] if tut_id != "" else "", one_line)
 		rows[r] = row
 		add_child(row)
 	bans_row = _Bans.new(self)
@@ -143,6 +150,17 @@ func set_compact(v: bool) -> void:
 	applied += 1
 	for r in ROLES:
 		(rows[r] as LaneRow).set_compact(v)
+
+
+func set_one_line(v: bool) -> void:
+	if v == one_line:
+		return
+	one_line = v
+	applied += 1
+	add_theme_constant_override("separation", SEP_LINE if one_line else SEP)
+	header.custom_minimum_size = Vector2(0.0, HEADER_LINE_H if one_line else HEADER_H)
+	for r in ROLES:
+		(rows[r] as LaneRow).set_one_line(v)
 
 
 func set_slot(role: String, side: String, data: Dictionary) -> void:

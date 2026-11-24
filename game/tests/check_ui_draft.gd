@@ -2,7 +2,8 @@ extends Node
 ## I-16 checks on the REAL Draft (screen_draft.gd), headless:
 ##   build_draft / fit_draft_<v>  every state builds (their turn, your ban, your pick, both sheets, a role filter, done) in normal and
 ##                    large text; no control leaves the frame; no drawn text is cut (board rows, role bar, needs, Plays as); buttons
-##                    at least 96 px high; nodes under the target (120)
+##                    at least 96 px high; nodes under the target (120); large text: one-line lane rows and the first hero row
+##                    whole in the pick state (0.12.1, DECISIONS Q6-2 (a))
 ##   arrows           draft.meta_hint speaks of arrows, and every available hero carries a drawn up, down or flat arrow (not colour)
 ##   equivalence      a full draft played through the real controls (grid tap -> sheet -> Plays as -> confirm, Take) ends in the
 ##                    same picks and bans as the same choices through the old methods (_on_hero / _apply), on 20 seeds
@@ -237,6 +238,16 @@ func _build_and_fit(v: String) -> void:
 	ok(UI.plain(d.title_label.text) == UI.plain(Strings.t("draft.phase.pick")) and UI.plain(d.take_button.text) == UI.plain(Strings.t("draft.do_pick")), "build_draft_%s_pick: the heading says Pick phase and the button reads Pick" % v)
 	ok(d.last_label.visible and UI.plain(d.last_label.text) != "", "build_draft_%s_pick: a line says what the other team did last" % v)
 	await _fit_state(d, v, "pick")
+	if v == "large":    # DECISIONS Q6-2 (a), 0.12.1: one-line lane rows, so the first hero row is whole above the fold
+		var one := true
+		for r in d.board.rows.values():
+			one = one and (r as LaneRow).one_line and absf((r as LaneRow).size.y - LaneRow.H_LINE) < 0.5
+		ok(one and d.board.one_line, "fit_draft_large_pick: the lane rows are one line, %d px" % int(LaneRow.H_LINE))
+		var gs := d.grid_scroll.get_global_rect()
+		var c0 := d.grid.global_card_rect(String(d.grid.shown_ids()[0]))
+		ok(c0.end.y <= gs.end.y + 0.5, "fit_draft_large_pick: the first hero row is whole with the opponent move line on show (card ends %.0f, area %.0f)" % [c0.end.y, gs.end.y])
+	else:
+		ok(not d.board.one_line and not d.board.row("top").one_line, "fit_draft_normal_pick: normal text keeps two-line rows")
 	d._open_sheet(String(d.grid.shown_ids()[1]))
 	await frames(6)
 	ok(d.sheet_slot != null and d.sheet_confirm != null and d.sheet_slot.is_visible_in_tree() and d.sheet_confirm.is_visible_in_tree(), "build_draft_%s_sheet_pick: Plays as and the confirm button are both there" % v)

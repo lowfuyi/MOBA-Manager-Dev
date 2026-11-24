@@ -13,12 +13,16 @@ extends Control
 ##   player  the player's name (shown under the hero name; for "empty" it is the name of the player who plays this role)
 ## Mid column: the role glyph (32 px, role colour) and the role word (Caption 24); at large text, when the room is under 620 px,
 ## the column shrinks to the glyph alone (UI-PASS-2 11b). Names are cut with "..." and never wrap.
-## Built once; set_slot / set_compact change it in place (an equal value changes nothing). Colour-blind cue: shape and word
+## One-line rows (0.12.1, Founder's choice (a) of DECISIONS Q6-2, large text only): 40 px, one line per slot. A filled slot shows
+## the hero name only; an open slot shows the name of the player who would play there, dimmed (the dashed outline says "open";
+## "Open" only when there is no player); a ban shows the greyed name and the cross. The player's name under a hero is left out.
+## Built once; set_slot / set_compact / set_one_line change it in place (an equal value changes nothing). Colour-blind cue: shape and word
 ## (dashed, solid ring plus arrow, portrait, cross plus "Ban"), never colour alone.
 
 const SIDES := ["you", "them"]
 const H_FULL := 72.0
 const H_COMPACT := 52.0
+const H_LINE := 40.0
 const CENTER_FULL := 128.0
 const CENTER_NARROW := 76.0
 const GAP := 8.0
@@ -26,6 +30,7 @@ const NARROW_BELOW := 620.0
 
 var lane := "top"
 var compact := false
+var one_line := false          # large text: 40 px rows, one line per slot (Q6-2 (a))
 var tut_id := ""
 var applied := 0
 var draw_count := 0
@@ -37,14 +42,15 @@ var _tween: Tween
 var centre_word := true    # false when the centre column is the glyph alone (set during layout, tests read it)
 
 
-func _init(p_lane: String = "top", p_compact: bool = false, p_tut_id: String = "") -> void:
+func _init(p_lane: String = "top", p_compact: bool = false, p_tut_id: String = "", p_one_line: bool = false) -> void:
 	lane = p_lane if ArtPalette.ROLES.has(p_lane) else "top"
 	compact = p_compact
+	one_line = p_one_line
 	tut_id = p_tut_id
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	focus_mode = Control.FOCUS_NONE
-	custom_minimum_size = Vector2(0.0, H_COMPACT if compact else H_FULL)
+	custom_minimum_size = Vector2(0.0, row_h())
 	CompKit.mark_stateful(self)
 	CompKit.tag(self, tut_id)
 	_note_cue()
@@ -73,8 +79,25 @@ func set_compact(v: bool) -> void:
 		return
 	compact = v
 	applied += 1
-	custom_minimum_size = Vector2(0.0, H_COMPACT if compact else H_FULL)
+	custom_minimum_size = Vector2(0.0, row_h())
 	queue_redraw()
+
+
+func set_one_line(v: bool) -> void:
+	if v == one_line:
+		return
+	one_line = v
+	applied += 1
+	custom_minimum_size = Vector2(0.0, row_h())
+	_note_cue()
+	queue_redraw()
+
+
+## The row height: 40 px one line, else 52 px compact or 72 px full.
+func row_h() -> float:
+	if one_line:
+		return H_LINE
+	return H_COMPACT if compact else H_FULL
 
 
 ## Set one slot. `data` keys not given keep their value; an equal slot changes nothing.
@@ -111,11 +134,11 @@ func state_name() -> String:
 func cue_for(side: String) -> String:
 	match state_of(side):
 		"empty":
-			return "dashed+word"
+			return "dashed+dim name" if one_line else "dashed+word"
 		"target":
 			return "ring+arrow"
 		"banned":
-			return "cross+word"
+			return "cross+grey name" if one_line else "cross+word"
 	return "portrait"
 
 
@@ -162,14 +185,14 @@ func slot_rect(side: String, w: float = -1.0) -> Rect2:
 	var ww := size.x if w < 0.0 else w
 	var cw := centre_w(ww)
 	var sw := (ww - cw - GAP * 2.0) * 0.5
-	var h := H_COMPACT if compact else H_FULL
+	var h := row_h()
 	return Rect2(Vector2(0.0, 0.0) if side == "you" else Vector2(ww - sw, 0.0), Vector2(sw, h))
 
 
 func _layout() -> void:
 	_ops.clear()
 	var w := size.x if size.x > 0.0 else 672.0
-	var h := H_COMPACT if compact else H_FULL
+	var h := row_h()
 	var cw := centre_w(w)
 	# the centre column
 	var gx := w * 0.5
@@ -193,14 +216,14 @@ func _slot(side: String, r: Rect2) -> void:
 	var hero: Dictionary = d["hero"]
 	var mirror := side == "them"
 	var f := UI.font("SemiBold")
-	var ph := 40.0 if compact else 52.0
+	var ph := 32.0 if one_line else (40.0 if compact else 52.0)
 	var px := r.position.x + (r.size.x - ph - 6.0 if mirror else 6.0)
 	var pr := Rect2(px, r.position.y + (r.size.y - ph) * 0.5, ph, ph)
 	var tx := (r.position.x + 10.0) if mirror else (px + ph + 10.0)
 	var room := r.size.x - ph - 6.0 - 10.0 - 10.0
 	var align := 2 if mirror else 0
 	var player := String(d["player"])
-	var line1_cy := r.position.y + (r.size.y * 0.5 - 12.0 if player != "" or st == "banned" else r.size.y * 0.5)
+	var line1_cy := r.position.y + (r.size.y * 0.5 - 12.0 if (player != "" or st == "banned") and not one_line else r.size.y * 0.5)
 	var line2_cy := r.position.y + r.size.y * 0.5 + 13.0
 	# background
 	match st:
@@ -217,8 +240,11 @@ func _slot(side: String, r: Rect2) -> void:
 	var empty_look := st == "empty" or st == "target"
 	if empty_look:
 		_ops.shape("disc", pr.grow(-2.0), Color(UI.PANEL3.r, UI.PANEL3.g, UI.PANEL3.b, 0.5))
-		_ops.text(f, UI.S_SMALL, Strings.t("draft.slot_open"), tx, line1_cy, room, UI.DIM, align)
-		if player != "":
+		if one_line:
+			_ops.text(f, UI.S_SMALL, player if player != "" else Strings.t("draft.slot_open"), tx, line1_cy, room, UI.DIM, align)
+		else:
+			_ops.text(f, UI.S_SMALL, Strings.t("draft.slot_open"), tx, line1_cy, room, UI.DIM, align)
+		if player != "" and not one_line:
 			_ops.text(f, UI.S_CAPTION, player, tx, line2_cy, room, UI.TEXT2, align)
 		if st == "target":
 			var ax := r.end.x - 34.0 if not mirror else r.position.x + 6.0
@@ -230,13 +256,14 @@ func _slot(side: String, r: Rect2) -> void:
 			var sil: Dictionary = hp["sil"]
 			_ops.portraits.append(["hero", pr, str(sil["role"]), int(sil["variant"]), float(sil["hue_shift"]), bool(sil["mirror"]), banned])
 			if ph <= 56.0:
-				var dd := clampf(ph * 0.46, 20.0, 26.0)
+				var dd := 16.0 if one_line else clampf(ph * 0.46, 20.0, 26.0)
 				_ops.portraits.append(["chip", Rect2(pr.end - Vector2(dd, dd), Vector2(dd, dd)), str(sil["role"])])
 			_ops.text(f, UI.S_SMALL, str(hp["name"]), tx, line1_cy, room, UI.TEXT_OFF if banned else UI.TEXT, align)
 		if banned:
 			_ops.icon("cross", Rect2(pr.get_center() - Vector2(14, 14), Vector2(28, 28)), UI.BAD)
-			_ops.text(f, UI.S_CAPTION, Strings.t("card.banned"), tx, line2_cy, room, UI.TEXT2, align)
-		elif player != "":
+			if not one_line:
+				_ops.text(f, UI.S_CAPTION, Strings.t("card.banned"), tx, line2_cy, room, UI.TEXT2, align)
+		elif player != "" and not one_line:
 			_ops.text(f, UI.S_CAPTION, player, tx, line2_cy, room, UI.TEXT2, align)
 
 

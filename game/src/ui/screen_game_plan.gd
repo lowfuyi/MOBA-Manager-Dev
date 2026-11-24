@@ -107,7 +107,9 @@ class _Hero extends Control:
 	func _relayout() -> void:
 		# large text: the "before luck" line gives its room to the controls (UI-PASS-2 6.4 (b) allows it in the "?" help instead)
 		_note = [] if UI.large else PlanKit.wrap(UI.font(), UI.S_CAPTION, Strings.t("gp.pv.note"), _w() - 48.0, 2)
-		var h := 24.0 + 56.0 + 10.0 + 14.0 + 14.0 + 44.0 + 8.0 + float(_note.size()) * 30.0 + 16.0
+		# large text: one line (DECISIONS Q6-2 (c)): the label and the arrow with the number; the You | Them bar and the two chips
+		# ("Balanced plan", "This plan") give their room to the controls (the Coach sheet still shows the edge before and after)
+		var h := 12.0 + 56.0 + 12.0 if UI.large else 24.0 + 56.0 + 10.0 + 14.0 + 14.0 + 44.0 + 8.0 + float(_note.size()) * 30.0 + 16.0
 		if absf(custom_minimum_size.y - h) > 0.5:
 			custom_minimum_size = Vector2(0, h)
 		queue_redraw()
@@ -124,7 +126,7 @@ class _Hero extends Control:
 		var sb := UI.font("SemiBold")
 		var x0 := 24.0
 		var room := w - 48.0
-		var y := 24.0
+		var y := 12.0 if UI.large else 24.0
 		_ops.text(sb, UI.S_SMALL, Strings.t("gp.pv.edge"), x0, y + 28.0, room * 0.5, UI.DIM)
 		var col := UI.delta_color(value) if absf(value) > 0.0005 else UI.TEXT
 		var num := UI.pct(shown)
@@ -132,6 +134,9 @@ class _Hero extends Control:
 		var nw := CardKit.text_w(nf, UI.S_TITLE, num)
 		_ops.text(nf, UI.S_TITLE, num, x0 + room - nw, y + 28.0, nw + 2.0, col)
 		_ops.icon(arrow_of(value), Rect2(x0 + room - nw - 48.0, y + 8.0, 40.0, 40.0), col)
+		if UI.large:
+			_ops.flush(self)
+			return
 		y += 56.0 + 10.0
 		# the You | Them bar: your share grows with the edge (a 30 percent edge fills most of it); the notch marks even
 		var share := clampf(0.5 + value * 1.5, 0.06, 0.94)

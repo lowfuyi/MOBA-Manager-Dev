@@ -53,7 +53,7 @@ Alpha 0.7 plan finished. **Alpha 0.8 "Arena" is complete** (2026-11-18, plan `do
 - GDD still says "coach" in lines 12, 340, 278 and a comment in `game_plan.gd` line 3 (Lead Game Designer to rename); TUTORIAL 6.1 needs a `new` state row; PERF-BUDGET 3.1a rule 2 to be reworded for the `redesigned` status.
 - Not applied: kill-rate retune (`docs/design/KILL-RATE-PROPOSAL.md`); held-fight staging and closing-push density wait for tester scores.
 - Squad: show about 10 PlayerCards or fewer (about 8 draw calls each). (Names above the Top/Bot tokens: done, checked on the 0.9.4 pictures.)
-- After 0.9.3 (2026-11-19, commits 0.9.4a to c, no new APK yet): a tutorial target under an open sheet waits or falls back; Home's "?" scrolls with the page; the Draft Coach bar is 32 px shorter. Still short: large-text Draft grid on 16:9 (about 25 px; needs a shorter lane board) and the large-text Game Plan control area.
+- After 0.9.3 (2026-11-19, commits 0.9.4a to c, no new APK yet): a tutorial target under an open sheet waits or falls back; Home's "?" scrolls with the page; the Draft Coach bar is 32 px shorter. Large-text Draft grid and Game Plan controls: fixed 2026-11-24 by the Founder's options (a) and (c) of DECISIONS Q6-2 (one-line lane rows, one-line edge card).
 - Testers: two testers have the Alpha 0.6 link; the Founder is looking for more. Feedback form: `docs/ALPHA-FEEDBACK-FORM.md`.
 
 ## The "company" of roles
@@ -96,7 +96,7 @@ The Founder queued Q0 to Q9 and the end-of-night release (0.12.0) for an unatten
 - **Q3 done:** ward events carry `[x, y]`; `"decisive"` events (fight with `decisive_kills`+ kills, Cairn); golden hash `c04e23d2...`.
 - **Q4 done:** `ArenaComment` in the notes line (not in large text); copy `en_0_12_comment.json`.
 - **Q5 done:** `ItemIcons` (atlas items@64, `BuildSheet.items_view`), `ArenaFx2` cast looks.
-- **Q6 partly done:** overview `max_pitch`/`fill` in arena_view_v1.json; large-text Draft (about 25 px) and Game Plan controls still open (DECISIONS Q6-2 options).
+- **Q6 done:** overview `max_pitch`/`fill` in arena_view_v1.json; large text: the Founder chose Q6-2 (a) and (c) after the run (one-line lane rows `LaneRow.one_line`, one-line edge card), DECISIONS "Producer log 2026-11-24".
 - **Q7 done (switch off):** `tests/ai_switch_tests.gd`, `docs/design/AI-GAMES-V2-COST.md`.
 - **Q8 done (not applied):** `docs/design/COMEBACK-PROPOSAL.md`.
 - **0.12.0 released** (versionCode 19): notes `docs/ALPHA-0.12-NOTES.md`, morning report `docs/MORNING-REPORT.md`. Full gate green. Next: the Founder's phone test and decisions (MORNING-REPORT section 5).
