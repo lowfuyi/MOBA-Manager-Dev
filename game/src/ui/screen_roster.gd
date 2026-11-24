@@ -374,8 +374,9 @@ func _picker_body(c: Control, slot: String) -> void:
 			var dtext := "0.0" if absf(dl) < 0.05 else "%+.1f" % dl    # never "-0.0"
 			chips.append({"text": Strings.f("squad.delta", {"delta": dtext}), "variant": "good" if dl > 0.05 else ("bad" if dl < -0.05 else "neutral"),
 					"icon": "arrow_up" if dl > 0.05 else ("arrow_down" if dl < -0.05 else "arrow_flat")})
-		if w.player_fit(w.players[pid], slot) < 1.0:
-			chips.append({"text": Strings.t("roster.offrole"), "variant": "warn", "icon": "warning"})
+		if w.player_fit(w.players[pid], slot) < 1.0:    # 0.12 Q4-1: the real fit (second role 93%, off role 80%)
+			var fk := "squad.fit_chip_second" if RoleFit.kind(w, w.players[pid], slot) == "second" else "squad.fit_chip"
+			chips.append({"text": Strings.f(fk, {"pct": RoleFit.pct(w, w.players[pid], slot)}), "variant": "warn", "icon": "none"})    # no icon: it fits beside the team delta
 		for ch in d["chips"]:
 			chips.append(ch)
 		var row := PlayerCard.new(pid, PlayerCard.ROW, {"name": d["name"], "role": String(w.players[pid]["role_primary"]), "age": d["age"],
@@ -533,6 +534,7 @@ func _fill_card(pid: String) -> void:
 			card_box.add_child(card_stats)
 			card_box.add_child(help)
 			card_box.add_child(UI.label(Strings.t("stat.help.pot"), UI.S_CAPTION, UI.DIM))
+			card_box.add_child(role_fit_label(p))
 		"career":
 			if own:
 				PlayerView.career_section(card_box, pid, true)
@@ -567,6 +569,25 @@ func _fill_card(pid: String) -> void:
 			var det := UI.label("\n".join(PackedStringArray(lines)), UI.S_SMALL, UI.TEXT)
 			det.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			card_box.add_child(det)
+
+
+## Role fit (0.12, ESMO Q4-1): the rating in each lane with its fit, and the two stats that raise the likeliest other lane
+## most. One label (RoleFit holds the numbers: World.slot_score, World.player_fit, SLOT_W).
+static func role_fit_label(p: Dictionary) -> Label:
+	var w := App.world
+	var lines: Array = [Strings.t("squad.fit.h")]
+	for s in World.SLOTS:
+		var k := RoleFit.kind(w, p, s)
+		var fit := Strings.t("squad.fit.main") if k == "main" else Strings.f("squad.fit." + k, {"pct": RoleFit.pct(w, p, s)})
+		lines.append(Strings.f("squad.fit.line", {"lane": Strings.t("role." + s), "rating": "%.0f" % RoleFit.rating(w, p, s), "fit": fit}))
+	var mt := RoleFit.move_target(w, p)
+	if mt != "":
+		var tr := RoleFit.train_for(p, mt)
+		lines.append(Strings.f("squad.fit.train", {"lane": Strings.t("role." + mt), "a": Strings.t("stat." + String(tr[0])), "b": Strings.t("stat." + String(tr[1]))}))
+	var l := UI.label("\n".join(PackedStringArray(lines)), UI.S_SMALL, UI.TEXT2)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	UI.tag(l, "squad.card.fit", false)
+	return l
 
 
 func _heroes_text(p: Dictionary) -> String:

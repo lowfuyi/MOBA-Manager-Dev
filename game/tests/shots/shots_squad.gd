@@ -58,6 +58,9 @@ static func run(ctx) -> void:
 	await _measure(ctx, "card")
 	rs._set_card_tab("stats")
 	await _measure(ctx, "card_stats")
+	if BottomSheet.is_open():    # 0.12 Q4-1: the role fit block at the end of the Stats tab
+		BottomSheet.current()._scroll.scroll_vertical = 100000
+		await _measure(ctx, "card_stats_fit")
 	rs._set_card_tab("career")
 	await _measure(ctx, "card_career")
 	rs._ask_release(pid)

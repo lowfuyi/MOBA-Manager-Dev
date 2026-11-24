@@ -1,0 +1,10 @@
+{
+  "squad.fit.h": "Role fit (rating in each lane)",
+  "squad.fit.line": "{lane}: {rating}, {fit}",
+  "squad.fit.main": "main role",
+  "squad.fit.second": "second role, {pct}%",
+  "squad.fit.off": "off-role, {pct}%",
+  "squad.fit.train": "To play {lane} better, train {a} and {b}.",
+  "squad.fit_chip": "off-role, {pct}%",
+  "squad.fit_chip_second": "second role, {pct}%"
+}

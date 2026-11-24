@@ -492,7 +492,7 @@ func _cb() -> void:
 		if (c as PlayerCard).pid != String(gs.d["lineup"]["sup"]):
 			arrows = arrows and String(chips[0]["icon"]).begins_with("arrow_")
 		for ch in chips:
-			offrole = offrole or String(ch["text"]) == Strings.t("roster.offrole")
+			offrole = offrole or String(ch["text"]).begins_with(Strings.t("roster.offrole"))    # 0.12 Q4-1: "off-role, 80%"
 	ok(arrows and offrole, "cb_squad: picker deltas carry an arrow and a sign; off-role players say so in words")
 	await _close_sheet()
 

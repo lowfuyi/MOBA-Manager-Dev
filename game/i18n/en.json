@@ -1539,5 +1539,13 @@
   "neg.why.premium": "- As a {personality} player, they want more than their market value.",
   "neg.why.discount": "- As a {personality} player, they will take a little less than their market value.",
   "neg.why.fair": "- As a {personality} player, they want about their market value.",
-  "neg.why.length": "- A longer contract lowers what they ask a little."
+  "neg.why.length": "- A longer contract lowers what they ask a little.",
+  "squad.fit.h": "Role fit (rating in each lane)",
+  "squad.fit.line": "{lane}: {rating}, {fit}",
+  "squad.fit.main": "main role",
+  "squad.fit.second": "second role, {pct}%",
+  "squad.fit.off": "off-role, {pct}%",
+  "squad.fit.train": "To play {lane} better, train {a} and {b}.",
+  "squad.fit_chip": "off-role, {pct}%",
+  "squad.fit_chip_second": "second role, {pct}%"
 }

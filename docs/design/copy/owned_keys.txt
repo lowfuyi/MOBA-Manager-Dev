@@ -935,3 +935,11 @@ neg.why.premium
 neg.why.discount
 neg.why.fair
 neg.why.length
+squad.fit.h
+squad.fit.line
+squad.fit.main
+squad.fit.second
+squad.fit.off
+squad.fit.train
+squad.fit_chip
+squad.fit_chip_second
