@@ -1,0 +1,6 @@
+{
+  "hero.vs.h": "Harder against",
+  "hero.vs.item": "{name} ({d} pts lower)",
+  "hero.vs.none": "No clear counter in our test games.",
+  "hero.vs.note": "From {n} test games with equal teams. Informational only."
+}

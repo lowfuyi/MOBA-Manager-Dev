@@ -990,3 +990,7 @@ hub.rest.body
 hub.rest.go
 hub.rest.done_h
 hub.rest.done
+hero.vs.h
+hero.vs.item
+hero.vs.none
+hero.vs.note

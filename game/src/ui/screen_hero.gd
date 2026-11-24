@@ -35,6 +35,7 @@ func _ready() -> void:
 	top.add_child(UI.label(Strings.f("hero.line", {"arch": Strings.t("arch." + String(h["archetype"])), "role": Strings.t("role." + String(h["role_primary"])),
 			"tags": ", ".join(tags)}), UI.S_SMALL, UI.TEXT))
 	top.add_child(UI.label(Strings.f("hero.power", {"e": int(h["power_early"]), "m": int(h["power_mid"]), "l": int(h["power_late"])}), UI.S_SMALL, UI.TEXT2))
+	top.add_child(matchup_label(hid))
 	var kc := UI.card(body)
 	UI.tag(kc, "hero.kit", false)
 	kc.add_child(UI.label(Strings.t("hero.kit"), UI.S_HEAD, UI.ACCENT))
@@ -72,3 +73,34 @@ func _ability(c: VBoxContainer, a: Dictionary, slot_word: String) -> void:
 	var t := UI.label(String(a["text"]), UI.S_SMALL, UI.TEXT)
 	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	c.add_child(t)
+
+
+## The hero's hardest opponents from game/data/hero_matchups_v1.json (ESMO Q4-8): up to three heroes this one wins clearly
+## less often against, with the drop in points, or a "no clear counter" line. One label; display only.
+static func matchup_label(p_hid: String) -> Label:
+	var rows: Array = HeroMatchups.struggles(p_hid)
+	var n := int(HeroMatchups.doc().get("games", 0))
+	var text := ""
+	if rows.is_empty():
+		text = Strings.t("hero.vs.none")
+	else:
+		var parts: Array = []
+		for r in rows:
+			var vs := String(r["vs"])
+			var nm := String((App.world.heroes.get(vs, {}) as Dictionary).get("name", vs))
+			parts.append(Strings.f("hero.vs.item", {"name": nm, "d": "%.1f" % absf(float(r["delta_pts"]))}))
+		text = Strings.t("hero.vs.h") + ": " + ", ".join(parts)
+	text += "\n" + Strings.f("hero.vs.note", {"n": _grouped(n)})
+	var l := UI.label(text, UI.S_SMALL, UI.TEXT2)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	UI.tag(l, "hero.matchups", false)
+	return l
+
+
+static func _grouped(n: int) -> String:
+	var s := str(n)
+	var out := ""
+	while s.length() > 3:
+		out = "," + s.substr(s.length() - 3) + out
+		s = s.substr(0, s.length() - 3)
+	return s + out

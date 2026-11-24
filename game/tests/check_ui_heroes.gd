@@ -64,6 +64,25 @@ func _heroes() -> void:
 			if not UI.plain(text).contains(UI.plain(String(a["name"]))):
 				bad.append(hid + ":" + String(a["name"]))
 	ok(bad.is_empty(), "heroes: every page shows the passive and the four ability names %s" % str(bad.slice(0, 5)))
+	var hard := ""
+	var none := ""
+	for hid in App.world.hero_ids:
+		if hard == "" and not HeroMatchups.struggles(hid).is_empty():
+			hard = hid
+		if none == "" and HeroMatchups.struggles(hid).is_empty():
+			none = hid
+	for hid in [hard, none]:
+		if hid == "":
+			continue
+		App.go(ScreenHero.new(hid))
+		await frames(2)
+		var ml := UI.find_tag("hero.matchups") as Label
+		var mrows: Array = HeroMatchups.struggles(hid)
+		var want := UI.plain(Strings.t("hero.vs.h")) if not mrows.is_empty() else UI.plain(Strings.t("hero.vs.none"))
+		var named := true
+		for r in mrows:
+			named = named and ml != null and UI.plain(ml.text).contains(UI.plain(String(App.world.heroes[String(r["vs"])]["name"])))
+		ok(ml != null and UI.plain(ml.text).begins_with(want) and named, "heroes: the matchup line on %s names its hardest opponents or says there is none" % hid)
 
 
 func _builds() -> void:
