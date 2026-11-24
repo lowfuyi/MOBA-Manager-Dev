@@ -65,6 +65,26 @@ static func response(w: World, p: Dictionary, wage: int, length: int) -> String:
 	return "close"
 
 
+## The real factors behind a refused offer (0.12, ESMO Q4-3), for the negotiation screen: [[copy key, vars], ...]. Only what
+## `response` weighs: the offer against his market value, his personality's threshold and the contract length. The hidden
+## +-5 percent is never named, and nothing that is not in the decision (the squad, the club) is ever given as a reason.
+static func refusal_factors(w: World, p: Dictionary, wage: int, length: int) -> Array:
+	var d := data()
+	var out: Array = []
+	var ask := maxf(1.0, float(asking_wage(w, p)))
+	out.append(["neg.why.value", {"pct": int(round(100.0 * float(wage) / ask))}])
+	var thr := float(d["personality_accept"][p["personality"]])
+	var key := "neg.why.fair"
+	if thr > 1.0001:
+		key = "neg.why.premium"
+	elif thr < 0.9999:
+		key = "neg.why.discount"
+	out.append([key, {"personality": String(p["personality"])}])    # the id: the screen puts the word in
+	if length < int(d["max_length"]) and float(d["length_adjust"]) > 0.0:
+		out.append(["neg.why.length", {}])
+	return out
+
+
 ## The contract an existing player starts the game with: close to his asking wage, 1 to 3 seasons left.
 static func initial_contract(w: World, p: Dictionary) -> Dictionary:
 	var jitter := 0.92 + 0.16 * World._u("wage0:" + String(p["id"]))

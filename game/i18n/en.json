@@ -1533,5 +1533,11 @@
   "arena2.comment.stone_you.3": "Stoneback taken. Good early work.",
   "arena2.comment.stone_them.1": "They claim Stoneback. Still early.",
   "arena2.comment.stone_them.2": "Stoneback goes to them. Plenty of game left.",
-  "arena2.comment.stone_them.3": "They take Stoneback. Stay calm."
+  "arena2.comment.stone_them.3": "They take Stoneback. Stay calm.",
+  "neg.why.h": "What they weigh:",
+  "neg.why.value": "- Your offer is {pct}% of their market value.",
+  "neg.why.premium": "- As a {personality} player, they want more than their market value.",
+  "neg.why.discount": "- As a {personality} player, they will take a little less than their market value.",
+  "neg.why.fair": "- As a {personality} player, they want about their market value.",
+  "neg.why.length": "- A longer contract lowers what they ask a little."
 }

@@ -1,0 +1,8 @@
+{
+  "neg.why.h": "What they weigh:",
+  "neg.why.value": "- Your offer is {pct}% of their market value.",
+  "neg.why.premium": "- As a {personality} player, they want more than their market value.",
+  "neg.why.discount": "- As a {personality} player, they will take a little less than their market value.",
+  "neg.why.fair": "- As a {personality} player, they want about their market value.",
+  "neg.why.length": "- A longer contract lowers what they ask a little."
+}

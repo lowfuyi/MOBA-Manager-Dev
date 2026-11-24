@@ -147,6 +147,8 @@ func _run() -> void:
 	neg._wage = 1
 	neg._make_offer()
 	ok(neg._msg != "" and not neg._done, "a low offer is answered and the talks go on")
+	await get_tree().process_frame
+	ok(UI.find_tag("neg.why") != null and neg._why.size() >= 2, "a refusal says what the player weighs (offer against market value, personality)")
 	neg._wage = int(ceil(Economy.required_wage(App.world, App.world.players[cand], 3))) + 1
 	neg._make_offer()
 	ok(neg._done and (App.gs.d["roster"] as Array).has(cand), "a fair offer signs the player")

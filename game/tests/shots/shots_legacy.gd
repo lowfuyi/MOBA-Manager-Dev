@@ -33,10 +33,21 @@ static func run(ctx) -> void:
 	_scroll(ctx, 640)
 	await ctx.shot("chemistry_grid")
 	var cand: String = gs.d["fa"][0]
-	App.go(ScreenNegotiation.new(cand, false, "fa:hub"))
+	var negs := ScreenNegotiation.new(cand, false, "fa:hub")
+	App.go(negs)
 	await ctx.shot("negotiation_top")
 	_scroll(ctx, 1500)
 	await ctx.shot("negotiation_stats")
+	var starters: Array = gs.lineup().values().map(func(x): return String(x["id"]))
+	for rid in (gs.d["roster"] as Array).duplicate():    # make room on a full squad so the offer can be made
+		if gs.roster_slots_used() < int(Economy.data()["max_roster"]):
+			break
+		if not starters.has(String(rid)):
+			gs.release(String(rid))
+	negs._wage = maxi(1, int(round(float(gs.asking_wage(cand)) * 0.85)))
+	negs._make_offer()    # a refusal with the factors it weighed (0.12, Q4-3)
+	_scroll(ctx, 520)
+	await ctx.shot("negotiation_refused")
 	var trs := ScreenTraining.new()
 	App.go(trs)
 	trs._toggle(App.world.club_players(gs.club())[0]["id"])

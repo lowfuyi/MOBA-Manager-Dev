@@ -11,6 +11,7 @@ var _len := 2
 var _msg := ""
 var _msg_color: Color = UI.DIM
 var _done := false
+var _why: Array = []        # after a refusal: Economy.refusal_factors, the real factors of the decision (0.12, Q4-3)
 
 
 func _init(pid: String = "", renewal: bool = false, from: String = "fa:hub") -> void:
@@ -77,6 +78,20 @@ func _rebuild() -> void:
 		c.add_child(UI.label(_block_text(block), UI.S_SMALL, UI.WARN))
 	if _msg != "":
 		c.add_child(UI.label(_msg, UI.S_BODY, _msg_color))
+		if not _why.is_empty():    # the real factors behind the refusal (0.12, Q4-3): Economy.refusal_factors
+			var wb := VBoxContainer.new()
+			wb.name = "Why"
+			wb.add_theme_constant_override("separation", 2)
+			UI.tag(wb, "neg.why", false)
+			wb.add_child(UI.label(Strings.t("neg.why.h"), UI.S_SMALL, UI.TEXT2))
+			for f in _why:
+				var vars: Dictionary = (f[1] as Dictionary).duplicate()
+				if vars.has("personality"):
+					vars["personality"] = Strings.t("personality." + String(vars["personality"])).to_lower()
+				var l := UI.label(Strings.f(String(f[0]), vars), UI.S_SMALL, UI.TEXT2)
+				l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				wb.add_child(l)
+			c.add_child(wb)
 	var left := int(Economy.data()["negotiation_rounds"]) - gs.negotiation_rounds_used(_pid)
 	c.add_child(UI.label(Strings.f("neg.rounds_left", {"n": left}), UI.S_SMALL, UI.DIM))
 	var b := UI.button(Strings.t("neg.make_offer"), _make_offer, "primary")
@@ -149,6 +164,7 @@ func _set_len(n: int) -> void:
 
 func _make_offer() -> void:
 	var gs := App.gs
+	_why = []
 	var res := gs.offer(_pid, _wage, _len, _renewal)
 	var code: String = res["code"]
 	var name: String = App.world.players[_pid]["name"]
@@ -160,6 +176,7 @@ func _make_offer() -> void:
 		"close", "below", "far":
 			_msg = Strings.f("neg.say." + code, {"name": name})
 			_msg_color = UI.WARN if code == "close" else UI.BAD
+			_why = Economy.refusal_factors(App.world, App.world.players[_pid], _wage, _len)
 		"walked":
 			_msg = Strings.f("neg.say.walked", {"name": name, "n": gs.lockout_left(_pid)})
 			_msg_color = UI.BAD

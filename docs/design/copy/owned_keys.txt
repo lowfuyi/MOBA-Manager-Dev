@@ -929,3 +929,9 @@ arena2.comment.stone_you.3
 arena2.comment.stone_them.1
 arena2.comment.stone_them.2
 arena2.comment.stone_them.3
+neg.why.h
+neg.why.value
+neg.why.premium
+neg.why.discount
+neg.why.fair
+neg.why.length
