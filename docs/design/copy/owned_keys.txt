@@ -965,3 +965,11 @@ report.rate.stage.final
 report.rate.won
 report.rate.lost
 report.rate.rule
+fin.flow.h
+fin.flow.legend
+fin.flow.sum
+fin.cat.h
+fin.cat.in
+fin.cat.out
+fin.cat.item
+fin.cat.none

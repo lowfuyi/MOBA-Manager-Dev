@@ -1,0 +1,10 @@
+{
+  "fin.flow.h": "Last rounds",
+  "fin.flow.legend": "Each round: income above the line, costs below it. Newest on the right.",
+  "fin.flow.sum": "Over these {n} rounds: income {in}, costs {out}, net {net}.",
+  "fin.cat.h": "This season by category",
+  "fin.cat.in": "Income: {list}",
+  "fin.cat.out": "Costs: {list}",
+  "fin.cat.item": "{what} {amount}",
+  "fin.cat.none": "Nothing yet this season."
+}

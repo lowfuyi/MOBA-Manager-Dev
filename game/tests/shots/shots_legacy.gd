@@ -28,6 +28,17 @@ static func run(ctx) -> void:
 	gs.set_quick(false)
 	App.go(ScreenFinance.new())
 	await ctx.shot("finance")
+	# 0.12 Q4-5: the Last rounds chart with data: six games played on a copy of the save, then the real save is back
+	var keep := App.gs
+	App.gs = GameState.from_dict(App.world, JSON.parse_string(JSON.stringify(keep.d)))
+	for i in 6:
+		var g6 := App.gs.next_game()
+		if g6.is_empty():
+			break
+		App.gs.record_human_game(g6, App.gs.auto_game(g6))
+	App.go(ScreenFinance.new())
+	await ctx.shot("finance_flow")
+	App.gs = keep
 	App.go(ScreenChemistry.new())
 	await ctx.shot("chemistry_top")
 	_scroll(ctx, 640)

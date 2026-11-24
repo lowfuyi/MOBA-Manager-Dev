@@ -32,8 +32,44 @@ func _rebuild() -> void:
 	o.add_child(UI.label(Strings.t("fin.week_note"), UI.S_SMALL, UI.DIM))
 	if gs.cash() < 0.0:
 		o.add_child(UI.label(Strings.f("fin.debt", {"n": gs.debt_rounds_left()}), UI.S_BODY, UI.BAD))
+	_flow_card()
 	_sponsor_card()
 	_history_card()
+
+
+## 0.12 Q4-5: the last rounds as a small chart, and this season's income and costs by category (FinFlow, from the ledger).
+func _flow_card() -> void:
+	var gs := App.gs
+	var led: Array = gs.d["ledger"]
+	var c := UI.card(body)
+	UI.tag(c.get_parent() as Control, "fin.flow", false)
+	c.add_child(UI.label(Strings.t("fin.flow.h"), UI.S_BODY, UI.ACCENT))
+	var rs := FinFlow.rounds(led)
+	if rs.is_empty():
+		c.add_child(UI.label(Strings.t("fin.history_none"), UI.S_SMALL, UI.DIM))
+		return
+	c.add_child(FinFlow.Chart.new(rs))
+	var tin := 0.0
+	var tout := 0.0
+	for r in rs:
+		tin += float(r["in"])
+		tout += float(r["out"])
+	var lines: Array = [Strings.t("fin.flow.legend")]
+	if rs.size() >= 2:
+		lines.append(Strings.f("fin.flow.sum", {"n": rs.size(), "in": PlayerView.money(tin), "out": PlayerView.money(tout), "net": "%+d" % int(round(tin - tout))}))
+	lines.append(Strings.t("fin.cat.h"))
+	var bk := FinFlow.by_kind(led, int(gs.d["season"]))
+	if (bk["in"] as Array).is_empty() and (bk["out"] as Array).is_empty():
+		lines.append(Strings.t("fin.cat.none"))
+	for side in ["in", "out"]:
+		var parts: Array = []
+		for e in bk[side]:
+			parts.append(Strings.f("fin.cat.item", {"what": Strings.t("fin.k." + String(e[0])), "amount": PlayerView.money(float(e[1]))}))
+		if not parts.is_empty():
+			lines.append(Strings.f("fin.cat." + side, {"list": ", ".join(PackedStringArray(parts))}))
+	var l := UI.label("\n".join(PackedStringArray(lines)), UI.S_SMALL, UI.TEXT2)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	c.add_child(l)
 
 
 func _sponsor_line(offer: Dictionary) -> String:
