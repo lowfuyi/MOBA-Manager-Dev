@@ -1,0 +1,829 @@
+{
+ "_doc": "Hero matchups (Founder's queue 2026-11-24, Q2d). Display only: nothing in the simulation reads this file. From simulated games with equal teams (both moved to the same mean rating) and real AI drafts in the 1, 3 and 5 ban formats (tools/q2_analysis.py). For hero X, 'struggles_against' lists up to 3 heroes Y such that X's win rate in games where Y is on the other team is at least 3 points below X's own win rate (win_pct), with z <= -2.5 and at least 400 games for the pair (games). delta_pts = X's win rate against Y minus X's own, in points. Regenerate only with tools/q2_analysis.py.",
+ "games": 120000,
+ "heroes": {
+  "alderwyn": {
+   "games": 17332,
+   "struggles_against": [
+    {
+     "delta_pts": -5.4,
+     "games": 1201,
+     "vs": "orrick",
+     "win_pct": 42.5
+    },
+    {
+     "delta_pts": -4.1,
+     "games": 3935,
+     "vs": "harkin",
+     "win_pct": 43.8
+    },
+    {
+     "delta_pts": -4.0,
+     "games": 1095,
+     "vs": "ketterick",
+     "win_pct": 44.0
+    }
+   ],
+   "win_pct": 48.0
+  },
+  "barrowick": {
+   "games": 17319,
+   "struggles_against": [
+    {
+     "delta_pts": -5.1,
+     "games": 655,
+     "vs": "ellowen",
+     "win_pct": 46.0
+    },
+    {
+     "delta_pts": -3.6,
+     "games": 2976,
+     "vs": "harkin",
+     "win_pct": 47.4
+    }
+   ],
+   "win_pct": 51.0
+  },
+  "bastrel": {
+   "games": 54300,
+   "struggles_against": [
+    {
+     "delta_pts": -3.8,
+     "games": 8716,
+     "vs": "dunmarrow",
+     "win_pct": 46.8
+    },
+    {
+     "delta_pts": -3.3,
+     "games": 8829,
+     "vs": "quillith",
+     "win_pct": 47.3
+    },
+    {
+     "delta_pts": -3.2,
+     "games": 7775,
+     "vs": "tuskal",
+     "win_pct": 47.4
+    }
+   ],
+   "win_pct": 50.6
+  },
+  "brannoch": {
+   "games": 33931,
+   "struggles_against": [
+    {
+     "delta_pts": -4.7,
+     "games": 7956,
+     "vs": "harkin",
+     "win_pct": 43.8
+    },
+    {
+     "delta_pts": -4.1,
+     "games": 5026,
+     "vs": "quillith",
+     "win_pct": 44.5
+    },
+    {
+     "delta_pts": -3.6,
+     "games": 6267,
+     "vs": "embrel",
+     "win_pct": 44.9
+    }
+   ],
+   "win_pct": 48.6
+  },
+  "brixley": {
+   "games": 22698,
+   "struggles_against": [
+    {
+     "delta_pts": -4.6,
+     "games": 2777,
+     "vs": "harkin",
+     "win_pct": 45.8
+    },
+    {
+     "delta_pts": -3.1,
+     "games": 1634,
+     "vs": "ellowen",
+     "win_pct": 47.3
+    }
+   ],
+   "win_pct": 50.4
+  },
+  "cindrel": {
+   "games": 18148,
+   "struggles_against": [
+    {
+     "delta_pts": -5.6,
+     "games": 3251,
+     "vs": "embrel",
+     "win_pct": 43.2
+    },
+    {
+     "delta_pts": -5.5,
+     "games": 780,
+     "vs": "brannoch",
+     "win_pct": 43.2
+    }
+   ],
+   "win_pct": 48.7
+  },
+  "corvane": {
+   "games": 48117,
+   "struggles_against": [
+    {
+     "delta_pts": -5.4,
+     "games": 3689,
+     "vs": "pellam",
+     "win_pct": 44.8
+    },
+    {
+     "delta_pts": -4.5,
+     "games": 1760,
+     "vs": "tessarine",
+     "win_pct": 45.7
+    },
+    {
+     "delta_pts": -3.5,
+     "games": 5357,
+     "vs": "dovrin",
+     "win_pct": 46.7
+    }
+   ],
+   "win_pct": 50.2
+  },
+  "dovrin": {
+   "games": 25889,
+   "struggles_against": [
+    {
+     "delta_pts": -5.8,
+     "games": 1445,
+     "vs": "wyldrim",
+     "win_pct": 45.9
+    },
+    {
+     "delta_pts": -4.5,
+     "games": 2691,
+     "vs": "embrel",
+     "win_pct": 47.2
+    },
+    {
+     "delta_pts": -3.7,
+     "games": 3580,
+     "vs": "quillith",
+     "win_pct": 48.0
+    }
+   ],
+   "win_pct": 51.7
+  },
+  "dunmarrow": {
+   "games": 29945,
+   "struggles_against": [
+    {
+     "delta_pts": -3.7,
+     "games": 4310,
+     "vs": "maurelle",
+     "win_pct": 47.1
+    },
+    {
+     "delta_pts": -3.5,
+     "games": 4767,
+     "vs": "nimbrel",
+     "win_pct": 47.3
+    },
+    {
+     "delta_pts": -3.3,
+     "games": 1503,
+     "vs": "dusken",
+     "win_pct": 47.5
+    }
+   ],
+   "win_pct": 50.8
+  },
+  "dusken": {
+   "games": 28022,
+   "struggles_against": [
+    {
+     "delta_pts": -4.8,
+     "games": 1097,
+     "vs": "pellam",
+     "win_pct": 44.6
+    },
+    {
+     "delta_pts": -3.6,
+     "games": 3404,
+     "vs": "ellowen",
+     "win_pct": 45.7
+    },
+    {
+     "delta_pts": -3.5,
+     "games": 3622,
+     "vs": "ottomere",
+     "win_pct": 45.9
+    }
+   ],
+   "win_pct": 49.3
+  },
+  "ellowen": {
+   "games": 22616,
+   "struggles_against": [
+    {
+     "delta_pts": -4.1,
+     "games": 2930,
+     "vs": "sparrowe",
+     "win_pct": 46.7
+    },
+    {
+     "delta_pts": -3.8,
+     "games": 3292,
+     "vs": "dunmarrow",
+     "win_pct": 46.9
+    },
+    {
+     "delta_pts": -3.0,
+     "games": 3997,
+     "vs": "vellgrim",
+     "win_pct": 47.7
+    }
+   ],
+   "win_pct": 50.7
+  },
+  "embrel": {
+   "games": 47280,
+   "struggles_against": [
+    {
+     "delta_pts": -5.4,
+     "games": 9148,
+     "vs": "harkin",
+     "win_pct": 45.2
+    },
+    {
+     "delta_pts": -4.8,
+     "games": 2766,
+     "vs": "wyldrim",
+     "win_pct": 45.8
+    },
+    {
+     "delta_pts": -4.1,
+     "games": 8006,
+     "vs": "pellam",
+     "win_pct": 46.5
+    }
+   ],
+   "win_pct": 50.6
+  },
+  "fennimore": {
+   "games": 38076,
+   "struggles_against": [
+    {
+     "delta_pts": -5.1,
+     "games": 3186,
+     "vs": "dusken",
+     "win_pct": 43.0
+    },
+    {
+     "delta_pts": -3.8,
+     "games": 5783,
+     "vs": "tuskal",
+     "win_pct": 44.3
+    },
+    {
+     "delta_pts": -3.6,
+     "games": 2086,
+     "vs": "orrick",
+     "win_pct": 44.5
+    }
+   ],
+   "win_pct": 48.1
+  },
+  "gravenstone": {
+   "games": 39707,
+   "struggles_against": [
+    {
+     "delta_pts": -6.6,
+     "games": 4869,
+     "vs": "embrel",
+     "win_pct": 42.0
+    },
+    {
+     "delta_pts": -5.7,
+     "games": 1394,
+     "vs": "wyldrim",
+     "win_pct": 42.9
+    },
+    {
+     "delta_pts": -3.7,
+     "games": 7222,
+     "vs": "corvane",
+     "win_pct": 44.9
+    }
+   ],
+   "win_pct": 48.6
+  },
+  "harkin": {
+   "games": 44386,
+   "struggles_against": [
+    {
+     "delta_pts": -5.6,
+     "games": 7512,
+     "vs": "pellam",
+     "win_pct": 47.3
+    },
+    {
+     "delta_pts": -3.6,
+     "games": 3747,
+     "vs": "dunmarrow",
+     "win_pct": 49.3
+    },
+    {
+     "delta_pts": -3.4,
+     "games": 6522,
+     "vs": "ottomere",
+     "win_pct": 49.5
+    }
+   ],
+   "win_pct": 52.9
+  },
+  "hegwin": {
+   "games": 26657,
+   "struggles_against": [
+    {
+     "delta_pts": -5.5,
+     "games": 1664,
+     "vs": "wyldrim",
+     "win_pct": 45.3
+    },
+    {
+     "delta_pts": -4.4,
+     "games": 1177,
+     "vs": "tessarine",
+     "win_pct": 46.4
+    },
+    {
+     "delta_pts": -3.9,
+     "games": 3108,
+     "vs": "harkin",
+     "win_pct": 46.8
+    }
+   ],
+   "win_pct": 50.8
+  },
+  "jorreck": {
+   "games": 30910,
+   "struggles_against": [
+    {
+     "delta_pts": -3.0,
+     "games": 2998,
+     "vs": "dunmarrow",
+     "win_pct": 46.7
+    },
+    {
+     "delta_pts": -3.0,
+     "games": 5505,
+     "vs": "embrel",
+     "win_pct": 46.7
+    }
+   ],
+   "win_pct": 49.7
+  },
+  "ketterick": {
+   "games": 26062,
+   "struggles_against": [
+    {
+     "delta_pts": -4.4,
+     "games": 1506,
+     "vs": "harkin",
+     "win_pct": 46.1
+    },
+    {
+     "delta_pts": -3.7,
+     "games": 3015,
+     "vs": "sootwing",
+     "win_pct": 46.9
+    },
+    {
+     "delta_pts": -3.4,
+     "games": 3736,
+     "vs": "tuskal",
+     "win_pct": 47.1
+    }
+   ],
+   "win_pct": 50.5
+  },
+  "lanthorn": {
+   "games": 33984,
+   "struggles_against": [
+    {
+     "delta_pts": -3.2,
+     "games": 1915,
+     "vs": "ellowen",
+     "win_pct": 45.0
+    }
+   ],
+   "win_pct": 48.1
+  },
+  "marrek": {
+   "games": 24434,
+   "struggles_against": [
+    {
+     "delta_pts": -3.9,
+     "games": 2540,
+     "vs": "dovrin",
+     "win_pct": 46.1
+    },
+    {
+     "delta_pts": -3.3,
+     "games": 4435,
+     "vs": "tuskal",
+     "win_pct": 46.7
+    }
+   ],
+   "win_pct": 50.0
+  },
+  "maurelle": {
+   "games": 33643,
+   "struggles_against": [
+    {
+     "delta_pts": -6.5,
+     "games": 3103,
+     "vs": "dovrin",
+     "win_pct": 42.6
+    },
+    {
+     "delta_pts": -4.0,
+     "games": 5864,
+     "vs": "embrel",
+     "win_pct": 45.1
+    },
+    {
+     "delta_pts": -3.4,
+     "games": 3020,
+     "vs": "brannoch",
+     "win_pct": 45.8
+    }
+   ],
+   "win_pct": 49.1
+  },
+  "nimbrel": {
+   "games": 23881,
+   "struggles_against": [
+    {
+     "delta_pts": -4.9,
+     "games": 1729,
+     "vs": "dovrin",
+     "win_pct": 44.7
+    },
+    {
+     "delta_pts": -4.5,
+     "games": 2953,
+     "vs": "embrel",
+     "win_pct": 45.1
+    },
+    {
+     "delta_pts": -3.6,
+     "games": 6757,
+     "vs": "tuskal",
+     "win_pct": 46.0
+    }
+   ],
+   "win_pct": 49.6
+  },
+  "oriel": {
+   "games": 38985,
+   "struggles_against": [],
+   "win_pct": 48.6
+  },
+  "orisande": {
+   "games": 34512,
+   "struggles_against": [
+    {
+     "delta_pts": -3.5,
+     "games": 4251,
+     "vs": "ottomere",
+     "win_pct": 44.7
+    }
+   ],
+   "win_pct": 48.3
+  },
+  "orrick": {
+   "games": 26353,
+   "struggles_against": [
+    {
+     "delta_pts": -5.1,
+     "games": 1616,
+     "vs": "hegwin",
+     "win_pct": 45.4
+    },
+    {
+     "delta_pts": -4.9,
+     "games": 1677,
+     "vs": "dusken",
+     "win_pct": 45.6
+    },
+    {
+     "delta_pts": -4.2,
+     "games": 1063,
+     "vs": "pellam",
+     "win_pct": 46.3
+    }
+   ],
+   "win_pct": 50.5
+  },
+  "ottomere": {
+   "games": 35378,
+   "struggles_against": [
+    {
+     "delta_pts": -4.2,
+     "games": 4766,
+     "vs": "sootwing",
+     "win_pct": 47.0
+    }
+   ],
+   "win_pct": 51.1
+  },
+  "pellam": {
+   "games": 25587,
+   "struggles_against": [
+    {
+     "delta_pts": -4.3,
+     "games": 1585,
+     "vs": "ellowen",
+     "win_pct": 48.1
+    },
+    {
+     "delta_pts": -3.4,
+     "games": 4521,
+     "vs": "brixley",
+     "win_pct": 49.1
+    },
+    {
+     "delta_pts": -3.2,
+     "games": 3121,
+     "vs": "ottomere",
+     "win_pct": 49.3
+    }
+   ],
+   "win_pct": 52.5
+  },
+  "quillith": {
+   "games": 33052,
+   "struggles_against": [
+    {
+     "delta_pts": -6.2,
+     "games": 2494,
+     "vs": "ketterick",
+     "win_pct": 45.0
+    },
+    {
+     "delta_pts": -5.9,
+     "games": 3612,
+     "vs": "pellam",
+     "win_pct": 45.2
+    },
+    {
+     "delta_pts": -4.8,
+     "games": 2520,
+     "vs": "maurelle",
+     "win_pct": 46.3
+    }
+   ],
+   "win_pct": 51.2
+  },
+  "skarrow": {
+   "games": 32407,
+   "struggles_against": [
+    {
+     "delta_pts": -5.1,
+     "games": 5485,
+     "vs": "harkin",
+     "win_pct": 44.8
+    },
+    {
+     "delta_pts": -4.5,
+     "games": 3084,
+     "vs": "sootwing",
+     "win_pct": 45.4
+    },
+    {
+     "delta_pts": -3.3,
+     "games": 6600,
+     "vs": "tuskal",
+     "win_pct": 46.5
+    }
+   ],
+   "win_pct": 49.8
+  },
+  "sootwing": {
+   "games": 29495,
+   "struggles_against": [
+    {
+     "delta_pts": -4.6,
+     "games": 6465,
+     "vs": "harkin",
+     "win_pct": 47.1
+    },
+    {
+     "delta_pts": -4.2,
+     "games": 4417,
+     "vs": "tuskal",
+     "win_pct": 47.5
+    }
+   ],
+   "win_pct": 51.7
+  },
+  "sparrowe": {
+   "games": 31791,
+   "struggles_against": [
+    {
+     "delta_pts": -3.6,
+     "games": 1449,
+     "vs": "dovrin",
+     "win_pct": 47.0
+    },
+    {
+     "delta_pts": -3.2,
+     "games": 5340,
+     "vs": "corvane",
+     "win_pct": 47.4
+    },
+    {
+     "delta_pts": -3.1,
+     "games": 4453,
+     "vs": "embrel",
+     "win_pct": 47.5
+    }
+   ],
+   "win_pct": 50.6
+  },
+  "sunnivah": {
+   "games": 28324,
+   "struggles_against": [
+    {
+     "delta_pts": -6.0,
+     "games": 547,
+     "vs": "tessarine",
+     "win_pct": 41.7
+    },
+    {
+     "delta_pts": -5.2,
+     "games": 2196,
+     "vs": "dunmarrow",
+     "win_pct": 42.5
+    },
+    {
+     "delta_pts": -5.2,
+     "games": 5009,
+     "vs": "harkin",
+     "win_pct": 42.5
+    }
+   ],
+   "win_pct": 47.7
+  },
+  "tamsel": {
+   "games": 20696,
+   "struggles_against": [
+    {
+     "delta_pts": -5.9,
+     "games": 2340,
+     "vs": "tuskal",
+     "win_pct": 43.4
+    },
+    {
+     "delta_pts": -5.0,
+     "games": 2469,
+     "vs": "harkin",
+     "win_pct": 44.3
+    },
+    {
+     "delta_pts": -3.3,
+     "games": 2861,
+     "vs": "quillith",
+     "win_pct": 46.0
+    }
+   ],
+   "win_pct": 49.3
+  },
+  "tanglewick": {
+   "games": 24048,
+   "struggles_against": [
+    {
+     "delta_pts": -5.6,
+     "games": 1216,
+     "vs": "jorreck",
+     "win_pct": 41.2
+    },
+    {
+     "delta_pts": -3.4,
+     "games": 5830,
+     "vs": "tuskal",
+     "win_pct": 43.4
+    },
+    {
+     "delta_pts": -3.2,
+     "games": 3289,
+     "vs": "pellam",
+     "win_pct": 43.6
+    }
+   ],
+   "win_pct": 46.8
+  },
+  "tessarine": {
+   "games": 8807,
+   "struggles_against": [
+    {
+     "delta_pts": -5.9,
+     "games": 1177,
+     "vs": "marrek",
+     "win_pct": 44.9
+    }
+   ],
+   "win_pct": 50.7
+  },
+  "tuskal": {
+   "games": 45464,
+   "struggles_against": [
+    {
+     "delta_pts": -4.1,
+     "games": 4502,
+     "vs": "hegwin",
+     "win_pct": 48.2
+    },
+    {
+     "delta_pts": -4.0,
+     "games": 9050,
+     "vs": "harkin",
+     "win_pct": 48.3
+    },
+    {
+     "delta_pts": -3.9,
+     "games": 5357,
+     "vs": "quillith",
+     "win_pct": 48.4
+    }
+   ],
+   "win_pct": 52.3
+  },
+  "vellgrim": {
+   "games": 41325,
+   "struggles_against": [],
+   "win_pct": 50.6
+  },
+  "veshra": {
+   "games": 18292,
+   "struggles_against": [
+    {
+     "delta_pts": -4.0,
+     "games": 1335,
+     "vs": "pellam",
+     "win_pct": 45.9
+    },
+    {
+     "delta_pts": -3.6,
+     "games": 2325,
+     "vs": "sparrowe",
+     "win_pct": 46.2
+    }
+   ],
+   "win_pct": 49.9
+  },
+  "wyldrim": {
+   "games": 19246,
+   "struggles_against": [
+    {
+     "delta_pts": -4.5,
+     "games": 2794,
+     "vs": "pellam",
+     "win_pct": 46.1
+    },
+    {
+     "delta_pts": -3.6,
+     "games": 1467,
+     "vs": "barrowick",
+     "win_pct": 47.0
+    }
+   ],
+   "win_pct": 50.6
+  },
+  "wyncote": {
+   "games": 18901,
+   "struggles_against": [
+    {
+     "delta_pts": -6.2,
+     "games": 1246,
+     "vs": "hegwin",
+     "win_pct": 40.0
+    },
+    {
+     "delta_pts": -3.8,
+     "games": 3017,
+     "vs": "harkin",
+     "win_pct": 42.5
+    }
+   ],
+   "win_pct": 46.2
+  }
+ },
+ "min_pair_games": 400,
+ "struggle_pts": 3.0,
+ "struggle_z": 2.5
+}
