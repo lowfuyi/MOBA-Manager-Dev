@@ -1,0 +1,13 @@
+{
+  "career.ach.h": "Achievements",
+  "career.ach.games": "{n} games for the club",
+  "career.ach.wins": "{n} wins",
+  "career.ach.kills": "A {n}-kill game",
+  "career.ach.titles": "Champion x{n}",
+  "career.ach.finals": "Runner-up x{n}",
+  "career.rec.h": "Club records held",
+  "career.rec.games": "Most games ({n})",
+  "career.rec.wins": "Most wins ({n})",
+  "career.rec.kills": "Most kills in one game ({n})",
+  "career.rec.ratio": "Best KDA ratio, {n}+ games ({r})"
+}

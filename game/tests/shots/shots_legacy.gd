@@ -31,13 +31,25 @@ static func run(ctx) -> void:
 	# 0.12 Q4-5: the Last rounds chart with data: six games played on a copy of the save, then the real save is back
 	var keep := App.gs
 	App.gs = GameState.from_dict(App.world, JSON.parse_string(JSON.stringify(keep.d)))
-	for i in 6:
+	for i in 12:
 		var g6 := App.gs.next_game()
 		if g6.is_empty():
 			break
 		App.gs.record_human_game(g6, App.gs.auto_game(g6))
 	App.go(ScreenFinance.new())
 	await ctx.shot("finance_flow")
+	# 0.12 Q4-6: achievements and club records on a starter's Career tab (same played copy)
+	var rs := ScreenRoster.new("hub")
+	App.go(rs)
+	await ctx.settle()
+	rs._toggle_player(String(App.gs.d["lineup"]["jg"]))
+	await ctx.settle()
+	rs._set_card_tab("career")
+	await ctx.settle()
+	await ctx.shot("career_honours")
+	if BottomSheet.is_open():
+		BottomSheet.current().close()
+		await ctx.settle()
 	App.gs = keep
 	App.go(ScreenChemistry.new())
 	await ctx.shot("chemistry_top")

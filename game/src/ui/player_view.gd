@@ -79,6 +79,23 @@ static func career_section(parent: VBoxContainer, pid: String, open: bool = fals
 		var se: Dictionary = (c["by_season"] as Dictionary).get(str(int(gs.d["season"])), {})
 		if not se.is_empty():
 			UI.kv_row(box, Strings.t("career.season"), "%d / %d / %d  (%dg)" % [int(se["k"]), int(se["d"]), int(se["a"]), int(se["g"])])
+	# 0.12 Q4-6: achievements and the club records this player holds (Honours, from the same career data); one label
+	var hl: Array = []
+	var ach: Array = []
+	for e in Honours.achievements(c):
+		ach.append(Strings.f(String(e[0]), e[1]))
+	if not ach.is_empty():
+		hl.append(Strings.t("career.ach.h") + ": " + ", ".join(PackedStringArray(ach)))
+	var rec: Array = []
+	for e in Honours.records(gs.career_all(), pid):
+		rec.append(Strings.f(String(e[0]), e[1]))
+	if not rec.is_empty():
+		hl.append(Strings.t("career.rec.h") + ": " + ", ".join(PackedStringArray(rec)))
+	if not hl.is_empty():
+		var hlab := UI.label("\n".join(PackedStringArray(hl)), UI.S_SMALL, UI.GOOD)
+		hlab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		UI.tag(hlab, "career.honours", false)
+		box.add_child(hlab)
 	var log: Array = c["log"]
 	if not log.is_empty():
 		box.add_child(UI.label(Strings.t("career.log_h"), UI.S_SMALL, UI.TEXT))

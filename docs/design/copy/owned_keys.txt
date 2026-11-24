@@ -973,3 +973,14 @@ fin.cat.in
 fin.cat.out
 fin.cat.item
 fin.cat.none
+career.ach.h
+career.ach.games
+career.ach.wins
+career.ach.kills
+career.ach.titles
+career.ach.finals
+career.rec.h
+career.rec.games
+career.rec.wins
+career.rec.kills
+career.rec.ratio
