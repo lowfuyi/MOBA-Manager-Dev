@@ -943,3 +943,14 @@ squad.fit.off
 squad.fit.train
 squad.fit_chip
 squad.fit_chip_second
+scout.h
+scout.grade
+scout.grade_help
+scout.note.star
+scout.note.prospect
+scout.note.growth
+scout.note.ready
+scout.note.solid
+scout.pro
+scout.con
+fa.grade

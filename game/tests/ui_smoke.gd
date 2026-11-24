@@ -141,6 +141,8 @@ func _run() -> void:
 	App.go(neg)
 	await get_tree().process_frame
 	ok(cur() is ScreenNegotiation, "negotiation screen opens")
+	var sc := UI.find_tag("scout.summary") as Label
+	ok(sc != null and sc.text.contains(Strings.t("scout.h")), "the negotiation screen shows a scout report (grade, note, pros and cons)")
 	neg._adj(5)
 	neg._adj(-5)
 	neg._set_len(3)

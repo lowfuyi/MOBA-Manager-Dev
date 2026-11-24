@@ -1,0 +1,13 @@
+{
+  "scout.h": "Scout report",
+  "scout.grade": "Grade {g}",
+  "scout.grade_help": "Compared with every player: A is the top 10% by rating, B the next 20%, C the next 30%, D the rest.",
+  "scout.note.star": "One of the best {role} players around, close to their peak.",
+  "scout.note.prospect": "Young, with a lot of room to grow.",
+  "scout.note.growth": "Still improving: about {n} rating points left to their potential.",
+  "scout.note.ready": "Ready now, with little room left to grow.",
+  "scout.note.solid": "A steady {role} player with some room to grow.",
+  "scout.pro": "+ {stat} {v}: better than {pct}% of players",
+  "scout.con": "- {stat} {v}: {pct}% of players are better",
+  "fa.grade": "Grade {g}"
+}

@@ -52,6 +52,7 @@ func _rebuild() -> void:
 			"pot": "%.0f" % Economy.potential_rating(w, p)}), UI.S_BODY, UI.ACCENT))
 	head.add_child(UI.label(Strings.f("roster.detail", {"personality": Strings.t("personality." + p["personality"]), "country": p["country"]}), UI.S_SMALL, UI.DIM))
 	head.add_child(UI.label(Strings.t("neg.personality_hint." + p["personality"]), UI.S_SMALL, UI.DIM))
+	head.add_child(PlayerView.scout_label(p))    # 0.12 Q4-2
 	if _done:
 		var okc := UI.card(body, UI.PANEL2)
 		okc.add_child(UI.label(_msg, UI.S_BODY, UI.GOOD))

@@ -569,6 +569,7 @@ func _fill_card(pid: String) -> void:
 			var det := UI.label("\n".join(PackedStringArray(lines)), UI.S_SMALL, UI.TEXT)
 			det.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			card_box.add_child(det)
+			card_box.add_child(PlayerView.scout_label(p))    # 0.12 Q4-2
 
 
 ## Role fit (0.12, ESMO Q4-1): the rating in each lane with its fit, and the two stats that raise the likeliest other lane

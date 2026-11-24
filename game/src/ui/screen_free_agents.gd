@@ -73,11 +73,13 @@ func _rebuild() -> void:
 		return ka > kb or (ka == kb and String(a["id"]) < String(b["id"])))
 	if list.is_empty():
 		body.add_child(UI.label(Strings.t("fa.none"), UI.S_BODY, UI.DIM))
+	var scout := Scout.table(w)    # 0.12 Q4-2: one table for every row
 	for p in list:
 		var tag := ""
 		if gs.lockout_left(p["id"]) > 0:
 			tag = "  -  " + Strings.t("fa.locked")
-		var line := Strings.f("fa.row1", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "age": w.age_of(p)}) + "\n" \
+		var line := Strings.f("fa.row1", {"name": p["name"], "role": Strings.t("role." + p["role_primary"]), "age": w.age_of(p)}) \
+				+ "  -  " + Strings.f("fa.grade", {"g": Scout.grade(w, p, scout)}) + "\n" \
 				+ Strings.f("fa.row2", {"rating": "%.0f" % Economy.best_slot_rating(w, p), "pot": "%.0f" % Economy.potential_rating(w, p), "wage": gs.asking_wage(p["id"])}) + tag
 		var row := UI.button(line, _open.bind(p["id"]), "normal", 104)
 		body.add_child(row)

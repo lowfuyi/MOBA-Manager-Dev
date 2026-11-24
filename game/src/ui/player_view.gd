@@ -105,6 +105,33 @@ static func best_heroes_line(parent: VBoxContainer, p: Dictionary) -> void:
 
 
 ## "52 a week, 2 seasons left" for a player under contract.
+## Scouting summary (0.12, ESMO Q4-2): grade, note, up to two pros and two cons (Scout), as one label. `t` is Scout.table();
+## pass it when many players are shown, or leave it empty to build it here.
+static func scout_text(p: Dictionary, t: Dictionary = {}) -> String:
+	var w := App.world
+	if t.is_empty():
+		t = Scout.table(w)
+	var s := Scout.summary(w, p, t)
+	var lines: Array = [Strings.t("scout.h") + ": " + Strings.f("scout.grade", {"g": s["grade"]})]
+	var nv: Dictionary = (s["note"][1] as Dictionary).duplicate()
+	if nv.has("role"):
+		nv["role"] = Strings.t("role." + String(nv["role"]))
+	lines.append(Strings.f(String(s["note"][0]), nv))
+	for e in (s["pros"] as Array) + (s["cons"] as Array):
+		var v: Dictionary = (e[1] as Dictionary).duplicate()
+		v["stat"] = Strings.t("stat." + String(v["stat"]))
+		lines.append(Strings.f(String(e[0]), v))
+	lines.append(Strings.t("scout.grade_help"))
+	return "\n".join(PackedStringArray(lines))
+
+
+static func scout_label(p: Dictionary, t: Dictionary = {}) -> Label:
+	var l := UI.label(scout_text(p, t), UI.S_SMALL, UI.TEXT2)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	UI.tag(l, "scout.summary", false)
+	return l
+
+
 static func contract_text(pid: String) -> String:
 	var gs := App.gs
 	var c := gs.contract_of(pid)
