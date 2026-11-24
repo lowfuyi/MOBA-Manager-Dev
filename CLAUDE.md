@@ -17,6 +17,15 @@ Read this first. Last updated 2026-11-18 (SGT); written 2026-11-16 at the move f
 - Founder decisions on record: about 5 minutes per game; sudden death for quick/casual/league games; tournaments Bo3 (finals Bo5); subscriptions postponed; Game Plan and Team Bonds approved; Arena Dusk look with about 15% bigger text and Barlow Semi Condensed; teal circle = you, coral hexagon = them (Blue/Red only as a word plus flag glyph); Squad as a lane map; Standings in three views; build order Alpha 0.7 "Guide and Look" then Alpha 0.8 "Arena"; coaches' decisions shown as labels; **no mid-match interventions** (spectator only; the simulation decides the result first); held-fight staging decided later by tester scores. Alpha scope is the Founder's call.
 - He delegated the game name (Gloamline), the placeholder renames and similar choices to you. Trademark search for the name is still owed before any public release.
 
+## Tester update notes (Founder's standing rule, 2026-11-24)
+
+For every release (every version bump, APK or web deploy), write a tester update note, append it newest first to `docs/TESTER-UPDATES.md`, commit it with the release, and give it to the Founder in the final summary, ready to paste into his WhatsApp playtester group. Never post it anywhere yourself.
+- Format (WhatsApp, asterisks for bold): `*[Gloamline] [<version>] Updates, <Major|Minor> update*`, then *What's new* (3 to 6 bullets), *What to try* (1 to 3 bullets), *Known issues* (honest, short), *How to update* (Web: close the tab or app and reopen it, Settings shows the build number. Android: install the new APK file over the old one), and `*Feedback:* Settings → "Copy feedback note" → paste it here.`
+- Major = the middle version number changes (e.g. 0.12.0) or players will notice a big change in play or look; Minor = only the last number changes.
+- Plain player words: no code names, constants, gates, tests, golden vectors, calibration or file names. At most 12 lines. No promised dates or features not in the build. Nothing about trademarks, vendors, costs or legal matters.
+- Saves: say they carry over only if `check_save_compat` passed; otherwise say progress may reset and tell testers to use Settings → "Your save" → "Copy save code" first.
+- APKs (Founder, 2026-11-24): hold the APK until a major update; minor releases go to the web only.
+
 ## Build rules (from `docs/design/ALPHA-0.7-BUILD-PLAN.md`, v1.2)
 
 - R1 (lifted for Match Sim v2 by the Founder, 2026-11-19): changes to `game/src/sim/` are made only on purpose, with the golden vectors regenerated in that increment and the reason logged; the golden hash in `tools/check_fast.sh` (now `c04e23d2...` since 0.12 Q3, covering the v1 and v2 vectors) must otherwise stay. R2 one increment = one commit, explicit paths. R3 migrate affected tests in the same change. R4/R5 explicit types for `:=`; no function names starting `_set`. R6 a save is only changed by additive keys; `GameState.VERSION` is unchanged. R7 presentation never feeds results.
