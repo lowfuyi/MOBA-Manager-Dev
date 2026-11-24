@@ -523,3 +523,7 @@ The Founder is away; decisions that are his and cannot be undone are skipped and
 
 - L-4 Founder, 2026-11-24: the web build is updated now; the APK is held until a major update. The in-game version is 0.12.1 alpha (Minor: the large-text fixes above). The Android preset stays 0.12.0-alpha, versionCode 19, because no APK is built; the next APK bumps both.
 - L-5 Founder's standing rule: every release gets a tester update note (CLAUDE.md "Tester update notes", `docs/TESTER-UPDATES.md`). The rule said to start with 0.11.2, which was already folded into 0.12.0, so the first note is 0.12.1.
+
+## Founder's queue of 2026-11-24 (ESMO lessons; `docs/design/ESMO-LESSONS.md`)
+- F-1 Founder decision 2026-11-24: the in-match map's bases go DIAGONAL (opposite corners, the genre standard), not at the top and bottom ends. Implementation waits for the Founder's recordings (P1 in `docs/PENDING-CONFIRMATION.md`); Q3 writes the feasibility note only.
+- F-2 IP: the match view name "Field" matches a competitor's "Cam: Field" button; a generic word, low risk; IP Checker confirms (IP-RISK-LOG, rows of 2026-11-24).

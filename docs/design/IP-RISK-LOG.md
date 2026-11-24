@@ -163,3 +163,10 @@ the style tile, the role glyph SVGs, the arena fight frames and the new token si
 
 Still open after Scan 2: the trademark search (Founder), the Hollowmere-era "Watch" names Moonhulk and Mossback (kept; Watch),
 and the side-by-side look at ESMO's map (section G) that needs a person with the reference.
+
+## Rows added 2026-11-24 (Founder's queue Q0b)
+
+| Date | Item | Concern | Verdict | Action |
+|---|---|---|---|---|
+| 2026-11-24 | Match view name "Field" (one of Field, Action, All) | The competitor's match screen has a camera button reading "Cam: Field". "Field" is a generic English word for a playing area, used alone and not as part of a phrase or a button design | Pass, low risk (IP Checker, 2026-11-24) | Keep "Field". Our button is a segmented control with our own words and layout; never add a "Cam:" prefix or a matching button look. Re-check if the diagonal map (P1) or the HUD pass (P2) adds camera controls |
+| 2026-11-24 | Diagonal base layout (P1, Founder decision) | Bases in opposite corners is the genre standard shared by many games, not one game's design | Pass (layout convention) | The map concept for P1 gets its own screen before build: lane shapes, the lake, camp and objective spots must be our own, not traced from any reference map |

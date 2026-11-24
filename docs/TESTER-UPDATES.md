@@ -19,3 +19,27 @@ to the rule in CLAUDE.md ("Tester update notes"). Paste the block as it is; noth
 Web: close the tab or app and reopen it, Settings shows the build number. Android: no new APK this time, keep 0.12.0. Your save carries over.
 *Feedback:* Settings → "Copy feedback note" → paste it here.
 ```
+
+## 0.12.0 (APK and web, 2026-11-24; written afterwards at the Founder's request)
+
+```
+*[Gloamline] [0.12.0] Updates, Major update: Reading the Fight*
+*What's new*
+• Fennimore: Fen Fog now heals nearby allies a little, and Leap Frog gives a small shield
+• Hero strength retuned using real drafts; team rating counts a little more
+• Short commentary lines under the map, at most two a game, in quiet moments (informational only for now)
+• Item icons in the build editor and on hero pages (placeholder art, informational only for now)
+• Ability effects now look different by hero type; Field and All use more of tall screens
+• The feedback note now includes how long your draft took and how smoothly the match ran
+*What to try*
+• Play Fennimore and watch for the heal and the shield; switch between Field, Action and All in a big fight
+*Known issues*
+• Large text: the Draft's first hero row and the Game Plan's Tempo control are cut off (fixed in 0.12.1 on the web)
+• No commentary in large text; effects can be small when zoomed in on Action
+*Where to find it*
+Match screen (map, views, commentary), Heroes → a hero page, Draft → Builds, Settings → "Copy feedback note"
+*How to update*
+Web: close the tab or app and reopen it, Settings shows the build number. Android: install the new APK file over the old one. Your save carries over.
+*Feedback:* Settings → "Copy feedback note" → paste it here.
+```
+
