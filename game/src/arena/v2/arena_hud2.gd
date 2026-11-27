@@ -216,31 +216,67 @@ class Feed extends Control:
 
 
 class Notes extends Control:
+	## The commentary strip (Match Day M4, the Broadcast): the casters' line at the show time, wrapped to fit (3 lines, 2 in
+	## large text, never under 26 px; a peak line at 32 px Bold), with the speaker's name and a mark by voice (a filled dot for
+	## the play-by-play caster, a ring for the analyst: shape, not colour alone). Without a line: what your team is doing now.
 	var pl: ArenaPlayer
 	var t := 0.0
-	var comments: ArenaComment = null    # 0.12: at most two commentary lines a game (null in large text)
+	var show_s := 0.0
+	var speed := 1.0
+	var cast: ArenaCast = null
+	var line_count := 0             # lines drawn last frame (tests)
+	var px := 0                     # type size used last frame (tests)
 
 	func _init(p: ArenaPlayer) -> void:
 		pl = p
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	func show_at(p_t: float) -> void:
+	func show_at(p_t: float, p_show_s: float = -1.0, p_speed: float = 1.0) -> void:
 		t = p_t
+		show_s = p_show_s if p_show_s >= 0.0 else (pl.show_t(p_t) if pl != null else 0.0)
+		speed = p_speed
 		queue_redraw()
 
-	## A commentary line when one is up (calm moments only), else what your team is doing now.
+	## The Broadcast line on screen now, or {}.
+	func line() -> Dictionary:
+		return cast.line_at(show_s, speed) if cast != null else {}
+
 	func comment() -> String:
-		return comments.text_at(t) if comments != null else ""
+		return String(line().get("text", ""))
 
 	func text() -> String:
 		var c := comment()
 		return c if c != "" else ArenaHud2.notes_line(pl, t)
 
+	func max_lines() -> int:
+		return 2 if UI.large else 3
+
 	func _draw() -> void:
-		var s := text()
-		if s == "":
+		line_count = 0
+		var l := line()
+		if l.is_empty():
+			var s0 := ArenaHud2.notes_line(pl, t)
+			if s0 == "":
+				return
+			var f0 := get_theme_default_font()
+			draw_circle(Vector2(10, 24), 7.0, UI.ACCENT)
+			draw_string(f0, Vector2(26, 33), s0, HORIZONTAL_ALIGNMENT_LEFT, size.x - 26, UI.S_SMALL, UI.TEAL_HI)
+			line_count = 1
+			px = UI.S_SMALL
 			return
-		var f := get_theme_default_font()
-		var is_comment := comment() != ""
-		draw_circle(Vector2(10, size.y / 2.0), 7.0, UI.WARN if is_comment else UI.ACCENT)
-		draw_string(f, Vector2(26, size.y / 2.0 + 9), s, HORIZONTAL_ALIGNMENT_LEFT, size.x - 26, UI.S_SMALL, UI.TEXT if is_comment else UI.TEAL_HI)
+		var peak := String(l["tier"]) == "peak"
+		var f := UI.font("Bold") if peak else get_theme_default_font()
+		px = maxi(32 if peak else UI.S_SMALL, 26)
+		var who := Strings.t("arena.cast.name." + String(l["voice"]))
+		var rows := PlanKit.wrap(f, px, "%s: %s" % [who, String(l["text"])], size.x - 26.0, max_lines())
+		var lh := PlanKit.line_h(f, px)
+		var y := 4.0
+		if String(l["voice"]) == "p":
+			draw_circle(Vector2(10, y + lh * 0.5), 7.0, UI.WARN)
+		else:
+			draw_arc(Vector2(10, y + lh * 0.5), 6.0, 0.0, TAU, 16, UI.WARN, 2.5)
+		for r in rows:
+			draw_string(f, Vector2(26, y + lh * 0.78), String(r), HORIZONTAL_ALIGNMENT_LEFT, size.x - 26, px, UI.TEXT)
+			y += lh
+		line_count = rows.size()
+		return

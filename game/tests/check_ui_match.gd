@@ -81,7 +81,7 @@ func _geometry(v: String) -> void:
 	var c := m._controls.get_global_rect()
 	var hs := m.help_slot.get_global_rect()
 	var large := v == "large"
-	ok(absf(a.size.x - view.x) < 0.5 and absf(a.position.x) < 0.5 and a.size.y >= (560.0 if large else 600.0), "%s: the arena is full width and tall (600 px, 560 in large text under the view row), %.0f x %.0f" % [v, a.size.x, a.size.y])
+	ok(absf(a.size.x - view.x) < 0.5 and absf(a.position.x) < 0.5 and a.size.y >= (480.0 if large else 600.0), "%s: the arena is full width and tall (600 px; 480 in large text, Founder's Match Day M2), %.0f x %.0f" % [v, a.size.x, a.size.y])
 	ok(b.end.y <= a.position.y + 0.5 and a.end.y <= n.position.y + 0.5 and n.end.y <= f.position.y + 0.5 and f.end.y <= c.position.y + 0.5, "%s: scoreboard, arena, notes, feed and controls stack without overlap" % v)
 	ok(absf(b.size.y - (122.0 if large else 142.0)) < 0.5 and absf(b.position.y - 48.0) < 0.5, "%s: the scoreboard is %d px under the 48 px safe area" % [v, int(b.size.y)])
 	ok(absf(c.end.y - (view.y - 24.0)) < 0.5 and m._speed_btn.size.y >= UI.BTN_H and m._skip_btn.size.y >= UI.BTN_H and absf(m._speed_btn.size.x - 200.0) < 0.5, "%s: Speed (200 px) and Skip are 96 px high, 24 px above the bottom" % v)

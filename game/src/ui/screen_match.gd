@@ -8,7 +8,8 @@ extends Screen
 ## stretches play faster (ArenaPlayer pacing). Speed x1, x2, x4 and Skip are always there.
 ## Views (Founder decision 2026-11-22): a three-part control "Field | Action | All" above Speed and Skip, switchable at any time,
 ## remembered in the device setting [arena] camera (default Action). See ArenaView.
-## Layout at 720 x 1280: safe 48, scoreboard 142, arena (the rest), notes 48, feed 80, views 96 + 12, controls 132.
+## Layout at 720 x 1280: safe 48, scoreboard 142, arena (the rest), commentary 112 (84 in large text), feed 80, views 96 + 12,
+## controls 132.
 ## Quick mode skips the watch as before; the tutorial game always plays it.
 
 const SAFE := 48.0
@@ -72,7 +73,9 @@ func _ready() -> void:
 	_board = ArenaHud2.Board.new(player, App.gs.club_name(App.gs.club()), App.gs.club_name(opp_id))
 	_stage.add_child(_board)
 	_notes = ArenaHud2.Notes.new(player)
-	_notes.comments = null if UI.large else ArenaComment.build(player)    # commentary: none in large text (Q4)
+	# the Broadcast (Match Day M4): two casters for the whole match, in large text too (two lines)
+	_notes.cast = ArenaCast.build(player, String(game.get("id", "")), {my_side: App.gs.club_name(App.gs.club()), ("R" if my_side == "B" else "B"): App.gs.club_name(opp_id)},
+			{"tutorial": TutorialGame.is_tutorial(game)})
 	_stage.add_child(_notes)
 	_feed = ArenaHud2.Feed.new(player, App.gs.club_name(App.gs.club()), App.gs.club_name(opp_id))
 	_stage.add_child(_feed)
@@ -145,7 +148,7 @@ func _layout() -> void:
 	var h := vsz.y
 	var large := UI.large
 	var board_h := 122.0 if large else 142.0
-	var notes_h := 48.0
+	var notes_h := 84.0 if large else 112.0    # the commentary strip: 3 lines (2 in large text)
 	var feed_h := 80.0
 	var ctrl_y := o.y + h - 24.0 - UI.BTN_H
 	var views_y := ctrl_y - 12.0 - UI.BTN_H
@@ -198,7 +201,7 @@ func _apply(real_dt: float = 0.0) -> void:
 	var gt := player.game_t(show_t)
 	view.show_game(gt, real_dt)
 	_board.show_at(gt)
-	_notes.show_at(gt)
+	_notes.show_at(gt, show_t, float(SPEEDS[_speed_i]))
 	_feed.show_at(gt)
 
 

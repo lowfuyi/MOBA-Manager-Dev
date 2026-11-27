@@ -31,6 +31,11 @@ func t(key: String) -> String:
 	return "[[" + key + "]]"
 
 
+## Whether the table has the key (no warning when it does not; ArenaCast counts its variants with it).
+func has_key(key: String) -> bool:
+	return _table.has(key) or _fallback.has(key)
+
+
 func f(key: String, args: Dictionary) -> String:
 	var text := t(key)
 	for k in args:
