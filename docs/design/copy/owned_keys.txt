@@ -1659,3 +1659,6 @@ match.view.toast
 match.chip.paused
 match.intro.skip
 match.panel.respawn
+arena2.intent.call_group
+arena2.intent.call_siege
+arena2.intent.call_defend

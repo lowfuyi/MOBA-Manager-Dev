@@ -502,14 +502,22 @@ class _Sprites extends Control:
 
 
 class _Labels extends Control:
+	## Words and numbers over the map: intents over heroes, team calls, levels (Action), objective countdowns. Every text is
+	## queued, then drawn in two passes (all outlines, then all fills), so they batch into a few draw calls instead of two per
+	## label (Match Day M5: drawn one by one they cost about 20 more calls).
 	var view: ArenaView
+	var _q: Array = []        # [position, text, size, colour]
 
 	func _init() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
+	func _put(at: Vector2, text: String, fs: int, col: Color) -> void:
+		_q.append([at, text, fs, col])
+
 	func _draw() -> void:
 		if view == null or view._font == null:
 			return
+		_q.clear()
 		var pl := view.player
 		var t := view.t
 		var shown := {}
@@ -528,14 +536,102 @@ class _Labels extends Control:
 			var hpx := ArenaView.HERO_H * view.token_k * view.cam.scale_at(p)
 			var fs := UI.S_CAPTION if view.mode == "action" else UI.S_SMALL
 			var w := view._font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-			var at := Vector2(pr.x - w / 2.0, pr.y - hpx - 16.0)
-			draw_string_outline(view._font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 5, Color(0, 0, 0, 0.85))
-			draw_string(view._font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, view.team_colour(String(who.substr(0, 1))).lightened(0.35))
+			_put(Vector2(pr.x - w / 2.0, pr.y - hpx - 16.0), text, fs, view.team_colour(String(who.substr(0, 1))).lightened(0.35))
+		_calls(pl, t)
+		_levels(pl, t)
+		_countdowns(pl, t)
+		for q in _q:
+			draw_string_outline(view._font, q[0], q[1], HORIZONTAL_ALIGNMENT_LEFT, -1, q[2], 5, Color(0, 0, 0, 0.88))
+		for q in _q:
+			draw_string(view._font, q[0], q[1], HORIZONTAL_ALIGNMENT_LEFT, -1, q[2], q[3])
+
+	## Match Day M5: a team call (group, siege, defend) as one word over the calling team's heroes (their centre), for 3 s.
+	func _calls(pl: ArenaPlayer, t: float) -> void:
+		for n in pl.notes(t):
+			var who := String(n[1])
+			if not who.begins_with("team."):
+				continue
+			var side := who.substr(5, 1)
+			var text := ArenaView.intent_word(String(n[2]))
+			if text == "":
+				continue
+			var c := Vector2.ZERO
+			var k := 0
+			for slot in ArenaPlayer.SLOTS:
+				var key: String = side + "." + slot
+				if pl.alive(key, t):
+					c += pl.pos(key, t)
+					k += 1
+			if k == 0:
+				continue
+			c /= float(k)
+			if side != view.my_side and not view.shows(c):
+				continue
+			var pr := view.cam.project(c)
+			var w := view._font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, UI.S_SMALL).x
+			_put(Vector2(pr.x - w / 2.0, pr.y - 70.0), text, UI.S_SMALL, view.team_colour(side).lightened(0.5))
+
+	## Match Day M5 (ARENA-HUD-2 2.4): each visible hero's level beside its token, in Action only (the overview tokens are small).
+	func _levels(pl: ArenaPlayer, t: float) -> void:
+		if view.mode != "action":
+			return
+		for side in ["B", "R"]:
+			for slot in ArenaPlayer.SLOTS:
+				var key: String = side + "." + slot
+				if not pl.alive(key, t):
+					continue
+				var p := pl.pos(key, t)
+				if side != view.my_side and not view.shows(p):
+					continue
+				var pr := view.cam.project(p)
+				var hpx := ArenaView.HERO_H * view.token_k * view.cam.scale_at(p)
+				_put(Vector2(pr.x + hpx * 0.30, pr.y + 4.0), str(pl.level_of(key, t)), UI.S_CAPTION, view.team_colour(side).lightened(0.45))
+
+	## Match Day M5 (ARENA-HUD-2 2.2): an objective that is down shows a ring that empties and the time until it is back (or
+	## until it first appears). Positions come from the map data, so they move with any map change. Public: shown in fog too.
+	func _countdowns(pl: ArenaPlayer, t: float) -> void:
+		for oid in ["stoneback", "moonhulk", "mossback"]:
+			var cd := ArenaView.countdown(pl, oid, t)
+			if cd.is_empty():
+				continue
+			var nxt := float(cd["back"])
+			var prev := float(cd["since"])
+			var p: Vector2 = SimData.map()["objectives"][oid]["pos"]
+			var pr := view.cam.project(p)
+			if pr.x < -40.0 or pr.y < -40.0 or pr.x > size.x + 40.0 or pr.y > size.y + 40.0:
+				continue
+			var r := 22.0
+			var left := nxt - t
+			var whole := maxf(1.0, nxt - prev)
+			var col := Color(1.0, 0.82, 0.35) if oid == "stoneback" else (Color(0.65, 0.8, 1.0) if oid == "moonhulk" else Color(0.55, 0.85, 0.55))
+			var c2 := Vector2(pr.x, pr.y)
+			draw_arc(c2, r, -PI / 2.0, -PI / 2.0 + TAU * clampf(left / whole, 0.0, 1.0), 32, col, 4.0)
+			var txt := ArenaHud2.mmss(left)
+			var w := view._font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, UI.S_CAPTION).x
+			_put(Vector2(pr.x - w / 2.0, pr.y + r + 26.0), txt, UI.S_CAPTION, Color(1, 1, 1))
+
+
+## Match Day M5: for an objective that is down at t, {"back": game time it returns, "since": when it was taken (0 before its
+## first appearance)}; {} while it is up or when it does not return before the game ends. Display only.
+static func countdown(pl: ArenaPlayer, oid: String, t: float) -> Dictionary:
+	if pl.objective(oid, t) == "up":
+		return {}
+	var nxt := INF
+	var prev := 0.0
+	for u in pl.obj_up:
+		if String(u[1]) == oid and float(u[0]) > t:
+			nxt = minf(nxt, float(u[0]))
+	for o in pl.objs:
+		if String(o[1]) == oid and float(o[0]) <= t:
+			prev = maxf(prev, float(o[0]))
+	if nxt == INF or nxt > pl.end_t:
+		return {}
+	return {"back": nxt, "since": prev}
 
 
 ## The short word over a hero for a notable intent (copy keys arena2.intent.*); "" for none.
 static func intent_word(intent: String) -> String:
-	if intent in ["gank", "roam", "back_off", "ward"]:
+	if intent in ["gank", "roam", "back_off", "ward", "call_group", "call_siege", "call_defend"]:
 		return Strings.t("arena2.intent." + intent)
 	return ""
 

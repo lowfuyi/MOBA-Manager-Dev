@@ -2263,5 +2263,8 @@
   "match.view.toast": "View: {view}",
   "match.chip.paused": "Paused",
   "match.intro.skip": "Tap to skip the intro",
-  "match.panel.respawn": "Back in {n}s"
+  "match.panel.respawn": "Back in {n}s",
+  "arena2.intent.call_group": "Group up",
+  "arena2.intent.call_siege": "Siege",
+  "arena2.intent.call_defend": "Defend"
 }
