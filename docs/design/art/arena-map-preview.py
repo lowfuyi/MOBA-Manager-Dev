@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 """Draws docs/design/art/arena-map-preview.svg (and .focus.svg) from game/data/arena_map.json.
 
-Usage:  python3 docs/design/art/arena-map-preview.py [--flip]
+Usage:  python3 docs/design/art/arena-map-preview.py [--flip] [--diagonal c1|c2|c3]
 Writes arena-map-preview.svg (full view, zoom 1.0) and arena-map-preview.focus.svg (zoom 1.3 on the map centre, which is
 where the place-name labels are shown). --flip draws the picture for a player on the Red side (y mirrored).
 Colour values are READ from docs/design/ART-BIBLE.md (tokens of 3.1 to 3.9); nothing is typed twice. Render to PNG with
 any browser or rsvg; for the Barlow Semi Condensed face load the font files (they are not in the repo, see ART-BIBLE 5.1).
 Strips follow UI-PASS-2 6.7.2: scoreboard 0 to 190, arena 190 to 950, text strip 950 to 1148, controls 1148 to 1280.
-The header, text strip and buttons are placeholders for layout only."""
+The header, text strip and buttons are placeholders for layout only.
+--diagonal draws a CONCEPT of the diagonal base-to-base layout (Founder decision 2026-11-24, route A of
+MAP-DIAGONAL-FEASIBILITY.md): the same map data pushed through a display-only warp (`warp()` below), Blue's base in the
+south-west corner and Red's in the north-east. Writes arena-map-diagonal-<concept>.svg and prints lane lengths and
+objective distances (docs/design/MAP-DIAGONAL-CONCEPTS.md). Concept only: nothing in game/ reads it."""
 import json, math, pathlib, random, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 D = json.loads((ROOT / "game/data/arena_map.json").read_text())
 BIBLE = (ROOT / "docs/design/ART-BIBLE.md").read_text()
 FLIP = "--flip" in sys.argv
+DIAG = next((a.split("=", 1)[1] if "=" in a else sys.argv[sys.argv.index(a) + 1] for a in sys.argv if a.startswith("--diagonal")), "")
 
 # ---- tokens from the bible ---------------------------------------------------------------------------------------
 TOK = {}
@@ -40,9 +45,64 @@ def f(v):
     return f"{v:.1f}".rstrip("0").rstrip(".")
 
 
+# ---- diagonal concepts (display-only warp) -----------------------------------------------------------------------
+# Canonical frame: x 0 west .. 1 east, y 0 Red's end .. 1 Blue's end. t = progress from Blue's cairn to Red's, s = lateral
+# position (-1 Top lane, 0 Mid, +1 Bot lane). Drawn frame: a square, Blue's cairn in the south-west corner, Red's in the
+# north-east. drawn = L(t) + g(s) * h(t) * D (+ the winding term of c3), where L(t) is the straight diagonal, D points from
+# the centre to the south-east corner, h(t) is how far a side lane leaves the diagonal along the way (the corner shape) and
+# g(s) the lateral profile (uneven on purpose, so the two neutral objectives are not a mirror pair).
+CONCEPTS = {
+    "c1": {"name": "Corner roads", "h": "corner", "g_west": 0.80, "g_east": 1.45, "wind": 0.0},
+    "c2": {"name": "Long bows", "h": "bow", "g_west": 1.45, "g_east": 0.80, "wind": 0.0},
+    "c3": {"name": "Winding causeway", "h": "bow", "g_west": 0.75, "g_east": 1.40, "wind": 0.10},
+}
+SQ, M = 700.0, 0.075            # drawn square (px) inside the 720 x 760 arena, and the corner inset
+CB = (M, 1 - M)
+CR = (1 - M, M)
+CK = (1 - M, 1 - M)             # south-east corner (Bot lane's turn); the north-west one is its mirror
+T_B, T_R = 0.925, 0.075         # cairn y in the canonical frame
+S_LANE = 0.39                   # |x - 0.5| of the side lanes at the centre line
+BOW = 0.80                      # a bow stays inside the square (a full sine would bulge past the corner edges)
+
+
+def _h(t, kind):
+    if kind == "corner":
+        e = 0.012                # a rounded corner, not a sharp one
+        return 1.0 - (math.sqrt((2 * t - 1) ** 2 + e) - math.sqrt(e)) / (math.sqrt(1 + e) - math.sqrt(e))
+    return BOW * math.sin(math.pi * min(1.0, max(0.0, t)))
+
+
+def _g(s, c):
+    a = min(1.25, abs(s))
+    return math.copysign(a ** (c["g_west"] if s < 0 else c["g_east"]), s)
+
+
+def warp(p, c):
+    t = (T_B - p[1]) / (T_B - T_R)
+    s = (p[0] - 0.5) / S_LANE
+    lx, ly = CB[0] + t * (CR[0] - CB[0]), CB[1] + t * (CR[1] - CB[1])
+    dx, dy = CK[0] - 0.5, CK[1] - 0.5
+    k = _g(s, c) * _h(t, c["h"])
+    u, v = lx + k * dx, ly + k * dy
+    if c["wind"]:
+        w = math.exp(-(s / 0.45) ** 2) * c["wind"] * math.sin(2 * math.pi * min(1.0, max(0.0, t)))
+        u, v = u + w * dx / 0.425, v + w * dy / 0.425
+    return u, v
+
+
 def P(p, zoom=1.0, focus=(360, 380)):
+    if DIAG:
+        u, v = warp(p, CONCEPTS[DIAG])
+        return (10 + u * SQ, 30 + v * SQ)
     y = p[1] if not FLIP else 1 - p[1]
     return (p[0] * W, y * H)
+
+
+ROT = ' transform="rotate(45 {x} {y})"'
+
+
+def rot(x, y):
+    return ROT.format(x=f(x), y=f(y)) if DIAG else ""
 
 
 def side_col(side):
@@ -81,7 +141,10 @@ def sample_curve(pts, n=24):
 def build(zoom):
     o = []
     add = o.append
-    lane_px = {l["id"]: [P(nodes[i]["p"]) for i in l["nodes"]] for l in D["lanes"]}
+    if DIAG:
+        lane_px = {l["id"]: [P(q) for q in sample_curve([nodes[i]["p"] for i in l["nodes"]], 12)][::3] for l in D["lanes"]}
+    else:
+        lane_px = {l["id"]: [P(nodes[i]["p"]) for i in l["nodes"]] for l in D["lanes"]}
     mc = P(D["terrain"]["mere"]["c"])
     mr, ir = D["terrain"]["mere"]["r_px"], D["terrain"]["island"]["r_px"]
     c_you, c_them = T("plate_rim_you"), T("plate_rim_them")
@@ -94,7 +157,7 @@ def build(zoom):
     else:
         tx = ty = 0
     add(f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1280" width="720" height="1280" font-family="{FONT}">
-<title>Wrenfell arena map preview (720 x 1280 phone, arena 720 x 760, camera zoom {zoom:g})</title>
+<title>Wrenfell arena map {("diagonal concept " + DIAG + ": " + CONCEPTS[DIAG]["name"]) if DIAG else "preview"} (720 x 1280 phone, arena 720 x 760, camera zoom {zoom:g})</title>
 <desc>Drawn from game/data/arena_map.json by arena-map-preview.py; colours are the ART-BIBLE tokens. You are a teal circle, them a coral flat-top hexagon, Stoneback a gold rhombus (the hexagon means "them"). Guard towers are dimmer: scenery, never counted. Labels are 24 px Bold with a 5 px VOID outline. Header, text strip and buttons are placeholders for layout only.</desc>
 <defs>
   <radialGradient id="glowYou" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="{c_you}" stop-opacity="0.30"/><stop offset="0.6" stop-color="{c_you}" stop-opacity="0.10"/><stop offset="1" stop-color="{c_you}" stop-opacity="0"/></radialGradient>
@@ -119,14 +182,14 @@ def build(zoom):
     blobs = [((0.222, 0.60), 78, 128), ((0.222, 0.40), 78, 128), ((0.745, 0.60), 70, 128), ((0.745, 0.40), 70, 128)]
     for (c, rx, ry) in blobs:
         cx, cy = P(c)
-        add(f'<ellipse cx="{f(cx)}" cy="{f(cy)}" rx="{rx}" ry="{ry}" fill="{jr}" opacity="0.07" filter="url(#soft)"/>')
+        add(f'<ellipse cx="{f(cx)}" cy="{f(cy)}" rx="{rx}" ry="{ry}" fill="{jr}" opacity="0.07" filter="url(#soft)"{rot(cx, cy)}/>')
     rnd = random.Random(11)
     for (c, rx, ry) in blobs[::2]:
-        cx, cy = P(c)
         for _ in range(60):
             a, rr = rnd.random() * 6.283, math.sqrt(rnd.random())
-            x, y = cx + math.cos(a) * rx * 0.85 * rr, cy + math.sin(a) * ry * 0.85 * rr
-            for yy in (y, H - y):
+            q = (c[0] + math.cos(a) * rx * 0.85 * rr / W, c[1] + math.sin(a) * ry * 0.85 * rr / H)
+            for qq in (q, (q[0], 1 - q[1])):
+                x, yy = P(qq)
                 add(f'<circle cx="{f(x)}" cy="{f(yy)}" r="{rnd.choice([1.4, 1.8, 2.2])}" fill="#5fae7a" opacity="0.28"/>')
     # the Mere
     add(f'<circle cx="{f(mc[0])}" cy="{f(mc[1])}" r="{mr}" fill="{T("lake")}" stroke="{T("shore_stroke")}" stroke-width="3"/>')
@@ -171,15 +234,18 @@ def build(zoom):
     # plazas
     for side in "BR":
         cx, cy = P((0.5, 0.875 if side == "B" else 0.125))
-        add(f'<ellipse cx="{f(cx)}" cy="{f(cy)}" rx="196" ry="80" fill="{T("plaza")}" stroke="{side_col(side)}" stroke-opacity="0.45" stroke-width="3"/>')
-        add(f'<ellipse cx="{f(cx)}" cy="{f(cy)}" rx="182" ry="67" fill="none" stroke="#ffffff" stroke-opacity="0.07" stroke-width="2" stroke-dasharray="6 8"/>')
+        sc = 0.52 if DIAG else 1.0      # the corner leaves less room
+        add(f'<ellipse cx="{f(cx)}" cy="{f(cy)}" rx="{f(196 * sc)}" ry="{f(80 * sc)}" fill="{T("plaza")}" stroke="{side_col(side)}" stroke-opacity="0.45" stroke-width="3"{rot(cx, cy)}/>')
+        add(f'<ellipse cx="{f(cx)}" cy="{f(cy)}" rx="{f(182 * sc)}" ry="{f(67 * sc)}" fill="none" stroke="#ffffff" stroke-opacity="0.07" stroke-width="2" stroke-dasharray="6 8"{rot(cx, cy)}/>')
     # jungle trails
     lane_pairs = {frozenset(p) for l in D["lanes"] for p in zip(l["nodes"], l["nodes"][1:])}
     for e in D["edges"]:
         if frozenset((e["a"], e["b"])) in lane_pairs or "spawn" in e["a"] or "spawn" in e["b"] or e["a"].endswith("cairn") or e["b"].endswith("cairn"):
             continue
-        a, b = P(nodes[e["a"]]["p"]), P(nodes[e["b"]]["p"])
-        add(f'<path d="M{f(a[0])} {f(a[1])} L{f(b[0])} {f(b[1])}" stroke="#a8d8c0" stroke-opacity="0.30" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round"/>')
+        pa, pb = nodes[e["a"]]["p"], nodes[e["b"]]["p"]
+        seg = [P((pa[0] + (pb[0] - pa[0]) * k / 8, pa[1] + (pb[1] - pa[1]) * k / 8)) for k in range(9)]
+        dd = "M" + " L".join(f"{f(x)} {f(y)}" for x, y in seg)
+        add(f'<path d="{dd}" fill="none" stroke="#a8d8c0" stroke-opacity="0.30" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round"/>')
     # spawn pads
     for side in "BR":
         for slot, p in D["spawns"][side].items():
@@ -319,7 +385,37 @@ def build(zoom):
     return "\n".join(o)
 
 
+def lane_len(pts):
+    return sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(pts, pts[1:]))
+
+
+def report():
+    """Drawn against simulated lane lengths, and where the neutral objectives land (concept note numbers)."""
+    xs = D["arena"]["x_scale"]
+    out = {}
+    for l in D["lanes"]:
+        canon = sample_curve([nodes[i]["p"] for i in l["nodes"]], 40)
+        sim = lane_len([(q[0] * xs, q[1]) for q in canon]) * D["arena"]["unit_px"]
+        drawn = lane_len([P(q) for q in canon])
+        out[l["id"]] = (sim, drawn)
+    mid = out["mid"][1] / out["mid"][0]
+    rows = {k: {"sim_px": round(v[0]), "drawn_px": round(v[1]), "look_factor": round(v[1] / v[0] / mid, 2),
+                "replay_factor": round(mid * v[0] / v[1], 2)} for k, v in out.items()}
+    cen = P(D["terrain"]["mere"]["c"])
+    cb, cr = P(D["bases"]["B"]["cairn"]), P(D["bases"]["R"]["cairn"])
+    obj = {}
+    for ob in [o for o in D["objectives"] if o["side"] == "N"] + [{"id": "N.mossback", "p": nodes["N.mossback"]["p"]}]:
+        x, y = P(ob["p"])
+        obj[ob["id"]] = {"from_lake_px": round(math.hypot(x - cen[0], y - cen[1])),
+                         "from_blue_px": round(math.hypot(x - cb[0], y - cb[1])), "from_red_px": round(math.hypot(x - cr[0], y - cr[1]))}
+    return {"concept": DIAG, "lanes": rows, "objectives": obj}
+
+
 out = pathlib.Path(__file__).resolve().parent
+if DIAG:
+    (out / f"arena-map-diagonal-{DIAG}.svg").write_text(build(1.0))
+    print(json.dumps(report()))
+    sys.exit(0)
 suffix = ".flipped" if FLIP else ""
 (out / f"arena-map-preview{suffix}.svg").write_text(build(1.0))
 (out / f"arena-map-preview{suffix}.focus.svg").write_text(build(1.3))
