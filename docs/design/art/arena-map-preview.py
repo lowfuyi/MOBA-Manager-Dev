@@ -55,6 +55,14 @@ CONCEPTS = {
     "c1": {"name": "Corner roads", "h": "corner", "g_west": 0.80, "g_east": 1.45, "wind": 0.0},
     "c2": {"name": "Long bows", "h": "bow", "g_west": 1.45, "g_east": 0.80, "wind": 0.0},
     "c3": {"name": "Winding causeway", "h": "bow", "g_west": 0.75, "g_east": 1.40, "wind": 0.10},
+    # Match Day queue M3 (Founder decision D1, 2026-11-27): the same warp WITH a river on the other diagonal. The river is a
+    # drawing of the simulation's centre line (y = 0.5: Mossback, the Mere and Moonhulk, Stoneback), so it stays display only.
+    "d1": {"name": "River cross", "h": "corner", "corner_e": 0.035, "g_west": 0.85, "g_east": 1.30, "wind": 0.0,
+           "river": "straight", "mere_r": 128, "plaza": "quarter", "land": "rounded_nw", "walls": 1},
+    "d2": {"name": "Bending river", "h": "bow", "g_west": 1.30, "g_east": 0.85, "wind": 0.0,
+           "river": "curved", "mere_r": 128, "plaza": "quarter", "land": "square", "walls": 1},
+    "d3": {"name": "Wrenfell water", "h": "bow", "g_west": 0.80, "g_east": 1.35, "wind": 0.10,
+           "river": "uneven", "mere_r": 160, "plaza": "ellipse", "land": "lobed", "walls": 2},
 }
 SQ, M = 700.0, 0.075            # drawn square (px) inside the 720 x 760 arena, and the corner inset
 CB = (M, 1 - M)
@@ -65,9 +73,8 @@ S_LANE = 0.39                   # |x - 0.5| of the side lanes at the centre line
 BOW = 0.80                      # a bow stays inside the square (a full sine would bulge past the corner edges)
 
 
-def _h(t, kind):
-    if kind == "corner":
-        e = 0.012                # a rounded corner, not a sharp one
+def _h(t, kind, e=0.012):
+    if kind == "corner":         # e: how round the corner is (a rounded corner, not a sharp one)
         return 1.0 - (math.sqrt((2 * t - 1) ** 2 + e) - math.sqrt(e)) / (math.sqrt(1 + e) - math.sqrt(e))
     return BOW * math.sin(math.pi * min(1.0, max(0.0, t)))
 
@@ -82,7 +89,7 @@ def warp(p, c):
     s = (p[0] - 0.5) / S_LANE
     lx, ly = CB[0] + t * (CR[0] - CB[0]), CB[1] + t * (CR[1] - CB[1])
     dx, dy = CK[0] - 0.5, CK[1] - 0.5
-    k = _g(s, c) * _h(t, c["h"])
+    k = _g(s, c) * _h(t, c["h"], c.get("corner_e", 0.012))
     u, v = lx + k * dx, ly + k * dy
     if c["wind"]:
         w = math.exp(-(s / 0.45) ** 2) * c["wind"] * math.sin(2 * math.pi * min(1.0, max(0.0, t)))
@@ -147,6 +154,8 @@ def build(zoom):
         lane_px = {l["id"]: [P(nodes[i]["p"]) for i in l["nodes"]] for l in D["lanes"]}
     mc = P(D["terrain"]["mere"]["c"])
     mr, ir = D["terrain"]["mere"]["r_px"], D["terrain"]["island"]["r_px"]
+    CC = CONCEPTS.get(DIAG, {})
+    mr = CC.get("mere_r", mr)
     c_you, c_them = T("plate_rim_you"), T("plate_rim_them")
     focus = (360, 380)
     cam = ""
@@ -171,7 +180,10 @@ def build(zoom):
 <rect width="720" height="1280" fill="{TOK['BG']}"/>
 ''')
     add(f'<g transform="translate(0 {OY})"><g clip-path="url(#arenaClip)"><g{cam}>')
-    add(f'<rect width="{W}" height="{H}" fill="{T("land")}"/>')
+    if CC.get("land"):
+        add(land_path(CC))
+    else:
+        add(f'<rect width="{W}" height="{H}" fill="{T("land")}"/>')
     for side in "BR":
         cx, cy = P(D["bases"][side]["cairn"])
         r = D["bases"][side]["yard_r_u"] * D["arena"]["unit_px"]
@@ -191,6 +203,10 @@ def build(zoom):
             for qq in (q, (q[0], 1 - q[1])):
                 x, yy = P(qq)
                 add(f'<circle cx="{f(x)}" cy="{f(yy)}" r="{rnd.choice([1.4, 1.8, 2.2])}" fill="#5fae7a" opacity="0.28"/>')
+    if CC.get("river"):
+        add(river_svg(CC, mr))
+    if CC.get("walls"):
+        add(walls_svg(CC))
     # the Mere
     add(f'<circle cx="{f(mc[0])}" cy="{f(mc[1])}" r="{mr}" fill="{T("lake")}" stroke="{T("shore_stroke")}" stroke-width="3"/>')
     for rr, op in ((mr - 10, 0.35), (mr - 24, 0.22), (ir + 24, 0.22), (ir + 10, 0.30)):
@@ -233,6 +249,11 @@ def build(zoom):
         add(f'<circle cx="{f(mc[0] + math.cos(math.radians(ang)) * (ir - 5))}" cy="{f(mc[1] + math.sin(math.radians(ang)) * (ir - 5))}" r="2.6" fill="{T("moonhulk_disc")}" opacity="0.45"/>')
     # plazas
     for side in "BR":
+        if CC.get("plaza") == "quarter":    # a quarter-disc plaza in the base's corner
+            qx, qy = (10, 30 + SQ) if side == "B" else (10 + SQ, 30)
+            add(f'<circle cx="{f(qx)}" cy="{f(qy)}" r="{f(0.27 * SQ)}" fill="{T("plaza")}" stroke="{side_col(side)}" stroke-opacity="0.45" stroke-width="3"/>')
+            add(f'<circle cx="{f(qx)}" cy="{f(qy)}" r="{f(0.25 * SQ)}" fill="none" stroke="#ffffff" stroke-opacity="0.07" stroke-width="2" stroke-dasharray="6 8"/>')
+            continue
         cx, cy = P((0.5, 0.875 if side == "B" else 0.125))
         sc = 0.52 if DIAG else 1.0      # the corner leaves less room
         add(f'<ellipse cx="{f(cx)}" cy="{f(cy)}" rx="{f(196 * sc)}" ry="{f(80 * sc)}" fill="{T("plaza")}" stroke="{side_col(side)}" stroke-opacity="0.45" stroke-width="3"{rot(cx, cy)}/>')
@@ -332,6 +353,8 @@ def build(zoom):
         for slot in ("top", "jg", "mid", "bot", "sup"):
             x, y = P(D["spawns"][side][slot])
             add(hero(x, y, side, letters[slot]))
+    if CC.get("river"):
+        add(river_label(CC))
     add('</g>')   # end camera group
 
     # labels: screen space, 24 px Bold, +1.5 px tracking, TEXT with a 5 px VOID outline; the camera moves their anchor only
@@ -383,6 +406,90 @@ def build(zoom):
 </g>
 </svg>''')
     return "\n".join(o)
+
+
+RIVER_NAME = "The Wend"          # our river's name (the Mere is where it widens around the Moonhulk isle)
+
+
+def _river_pts(c):
+    """The river's centre line: the simulation's centre line y = 0.5 pushed through the warp, plus the concept's bend."""
+    pts = []
+    for k in range(61):
+        x = 0.125 + 0.75 * k / 60      # from Top's crossing to Bot's: it ends at the side lanes, short of the corners
+        u, v = P((x, 0.5))
+        s = (x - 0.5) / S_LANE
+        bend = 0.0
+        if c["river"] == "curved":     # zero at the centre and at both objective pits, so the pits stay in the water
+            bend = 40.0 * math.sin(math.pi * s / 0.725)    # IP screen: at least 0.04 of the map deep, so it shows if abs(s) <= 1.2 else 0.0
+        elif c["river"] == "uneven":
+            bend = 34.0 * math.sin(2.0 * math.pi * s / 0.725) if abs(s) <= 1.2 else 0.0
+        # the river runs north-west to south-east, direction (1, 1); its bend moves across it, along (1, -1)
+        pts.append((u + bend * 0.7071, v - bend * 0.7071, s))
+    return pts
+
+
+def river_svg(c, mr):
+    pts = _river_pts(c)
+    o = []
+    widths = [(abs(s), (0.13 * SQ) * (1.0 + (0.38 * math.cos(3.0 * s) if c["river"] == "uneven" else 0.0))) for _, _, s in pts]
+    # drawn as short segments so the width can change along it; shore first, water over it
+    for col, extra, op in ((T("shore_stroke"), 8, 0.9), (T("lake"), 0, 1.0)):
+        for i in range(len(pts) - 1):
+            a, b = pts[i], pts[i + 1]
+            w = widths[i][1] + extra
+            o.append(f'<path d="M{f(a[0])} {f(a[1])} L{f(b[0])} {f(b[1])}" stroke="{col}" stroke-opacity="{op}" stroke-width="{f(w)}" stroke-linecap="round"/>')
+    # ripples along the flow
+    for i in range(3, len(pts) - 3, 6):
+        a, b = pts[i], pts[i + 2]
+        o.append(f'<path d="M{f(a[0])} {f(a[1])} L{f(b[0])} {f(b[1])}" stroke="{T("shore_stroke")}" stroke-opacity="0.35" stroke-width="1.5" stroke-dasharray="10 8"/>')
+    return "\n".join(o)
+
+
+def river_label(c):
+    """Drawn last so the Mere and the lanes never cover it: on the north-west arm, between Mossback and the lake."""
+    lx, ly, _ = _river_pts(c)[18]
+    return (f'<text x="{f(lx)}" y="{f(ly)}" text-anchor="middle" font-size="24" font-weight="700" fill="{T("label")}" stroke="{T("label_outline")}" stroke-width="5" paint-order="stroke" transform="rotate(45 {f(lx)} {f(ly)})">{RIVER_NAME}</text>')
+
+
+def walls_svg(c):
+    """Our own jungle walls: low ridges bent around each quarter's three camps (never the reference's wall pattern),
+    and brush patches beside the river crossings of the side lanes."""
+    o = []
+    quarters = [("B.w1", "B.w2", "B.w3"), ("R.w1", "R.w2", "R.w3"), ("B.e1", "B.e2", "B.e3"), ("R.e1", "R.e2", "R.e3")]
+    for qi, q in enumerate(quarters):
+        ps = [nodes[k]["p"] for k in q]
+        cx = sum(p[0] for p in ps) / 3
+        cy = sum(p[1] for p in ps) / 3
+        for j in range(int(c["walls"]) + 1):
+            r = 0.055 + 0.03 * j
+            a0 = (0.3 + 0.9 * qi + 1.7 * j)
+            arc = [P((cx + r * math.cos(a0 + 0.12 * k), cy + r * 1.2 * math.sin(a0 + 0.12 * k))) for k in range(14)]
+            o.append('<path d="M' + " L".join(f"{f(x)} {f(y)}" for x, y in arc) + '" fill="none" stroke="#16302a" stroke-width="11" stroke-linecap="round"/>')
+            o.append('<path d="M' + " L".join(f"{f(x)} {f(y - 3)}" for x, y in arc) + '" fill="none" stroke="#5c8a6e" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"/>')
+    for bp in ((0.17, 0.455), (0.17, 0.545), (0.83, 0.455), (0.83, 0.545), (0.38, 0.47), (0.62, 0.53)):
+        x, y = P(bp)
+        o.append(f'<ellipse cx="{f(x)}" cy="{f(y)}" rx="22" ry="12" fill="#2f6b45" opacity="0.55"{rot(x, y)}/>')
+    return "\n".join(o)
+
+
+def land_path(c):
+    """The island's outline: a square with a rounded north-west corner (d1, d2) or softly lobed edges (d3)."""
+    x0, y0, x1, y1 = 10, 30, 10 + SQ, 30 + SQ
+    if c["land"] == "square":
+        d = f"M{x0 + 40} {y0} L{x1 - 40} {y0} Q{x1} {y0} {x1} {y0 + 40} L{x1} {y1 - 40} Q{x1} {y1} {x1 - 40} {y1} L{x0 + 40} {y1} Q{x0} {y1} {x0} {y1 - 40} L{x0} {y0 + 40} Q{x0} {y0} {x0 + 40} {y0} Z"
+    elif c["land"] == "rounded_nw":
+        R, r = 150, 40
+        d = (f"M{x0 + R} {y0} L{x1 - r} {y0} Q{x1} {y0} {x1} {y0 + r} L{x1} {y1 - r} Q{x1} {y1} {x1 - r} {y1} "
+             f"L{x0 + r} {y1} Q{x0} {y1} {x0} {y1 - r} L{x0} {y0 + R} Q{x0} {y0} {x0 + R} {y0} Z")
+    else:
+        pts = []
+        for k in range(120):
+            a = 2 * math.pi * k / 120
+            sq = 1.0 / max(abs(math.cos(a)), abs(math.sin(a))) ** 0.9
+            rr = 0.5 * SQ * min(sq, 1.32) * (1.0 + 0.025 * math.sin(5 * a))
+            pts.append((10 + SQ / 2 + rr * math.cos(a), 30 + SQ / 2 + rr * math.sin(a)))
+        d = "M" + " L".join(f"{f(x)} {f(y)}" for x, y in pts) + " Z"
+    return f'<rect width="{W}" height="{H}" fill="{TOK["BG"]}"/><path d="{d}" fill="{T("land")}" stroke="{T("shore_stroke")}" stroke-opacity="0.5" stroke-width="3"/>'
 
 
 def lane_len(pts):
