@@ -43,6 +43,12 @@ var _view_btn: Button
 var _menu_btn: Button
 var _chip: Label
 var _go_btn: Button
+var _replay_btn: Button
+var _replay := false        # Match Day M7: watching the replay after the end (a timeline to scrub; the result stays decided)
+var _timeline: ArenaTimeline
+var _play_btn: Button
+var _done_btn: Button
+var _end_text := ""
 var _paused := false
 var _intro_i := -1          # the intro line on screen (-1: no intro or it is over)
 var _intro_t := 0.0
@@ -57,7 +63,9 @@ func _init(g: Dictionary = {}, r: Dictionary = {}) -> void:
 
 
 func go_back() -> void:
-	if _finished:
+	if _replay:
+		stop_replay()    # Back during the replay: back to the result (M7)
+	elif _finished:
 		_continue()    # Android Back after the show: See the report
 	else:
 		_skip()
@@ -110,6 +118,24 @@ func _ready() -> void:
 	UI.tag(_go_btn, "match.report_btn")    # tutorial step 20
 	_go_btn.visible = false
 	_stage.add_child(_go_btn)
+	_replay_btn = UI.button(Strings.t("match.replay"), start_replay, "normal", UI.BTN_H)
+	UI.tag(_replay_btn, "match.replay", false)
+	_replay_btn.visible = false
+	_stage.add_child(_replay_btn)
+	_timeline = ArenaTimeline.new(player)
+	_timeline.seek.connect(seek_frac)
+	UI.tag(_timeline, "match.timeline", false)
+	_timeline.visible = false
+	_stage.add_child(_timeline)
+	_play_btn = UI.button(Strings.t("match.pause"), _toggle_replay_pause, "normal", UI.BTN_H)
+	_play_btn.add_theme_font_size_override("font_size", UI.S_SMALL)
+	_play_btn.visible = false
+	_stage.add_child(_play_btn)
+	_done_btn = UI.button(Strings.t("match.replay.done"), stop_replay, "normal", UI.BTN_H)
+	_done_btn.add_theme_font_size_override("font_size", UI.S_SMALL)
+	UI.tag(_done_btn, "match.replay.done", false)
+	_done_btn.visible = false
+	_stage.add_child(_done_btn)
 	if help_slot != null and help_slot.get_parent() != null:
 		help_slot.get_parent().remove_child(help_slot)
 		help_slot.set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -202,15 +228,26 @@ func _layout() -> void:
 	view.size = Vector2(w, maxf(200.0, strip_y - arena_top))
 	_notes.position = Vector2(o.x + 24.0, strip_y)
 	_notes.size = Vector2(w - 48.0, notes_h)
-	_notes.visible = not _finished
-	_feed.position = Vector2(o.x + 24.0, strip_y + (0.0 if _finished else notes_h))
-	_feed.size = Vector2(w - 48.0, strip_h if _finished else feed_h)
-	_feed.max_lines = 2 if _finished else 1
-	_feed.visible = _finished or feed_h > 0.0
+	var at_end := _finished and not _replay     # the result card; during the replay the strip carries the commentary again
+	_notes.visible = not at_end
+	_feed.position = Vector2(o.x + 24.0, strip_y + (0.0 if at_end else notes_h))
+	_feed.size = Vector2(w - 48.0, strip_h if at_end else feed_h)
+	_feed.max_lines = 2 if at_end else 1
+	_feed.visible = at_end or feed_h > 0.0
 	_lineup.position = Vector2(o.x + 16.0, panel_y)
 	_lineup.size = Vector2(w - 32.0, panel_h)
-	_go_btn.position = Vector2(o.x + 24.0, go_y + 6.0)
-	_go_btn.size = Vector2(w - 48.0, UI.BTN_H)
+	# at the end: Watch replay (left) and See the report (right); during the replay: Play/Pause, the timeline, Done
+	var half := (w - 48.0 - 12.0) * 0.42
+	_replay_btn.position = Vector2(o.x + 24.0, go_y + 6.0)
+	_replay_btn.size = Vector2(half, UI.BTN_H)
+	_go_btn.position = Vector2(o.x + 24.0 + half + 12.0, go_y + 6.0)
+	_go_btn.size = Vector2(w - 48.0 - half - 12.0, UI.BTN_H)
+	_play_btn.position = Vector2(o.x + 16.0, go_y + 6.0)
+	_play_btn.size = Vector2(110.0, UI.BTN_H)
+	_done_btn.position = Vector2(o.x + w - 16.0 - 110.0, go_y + 6.0)
+	_done_btn.size = Vector2(110.0, UI.BTN_H)
+	_timeline.position = Vector2(o.x + 16.0 + 110.0 + 8.0, go_y + 6.0)
+	_timeline.size = Vector2(w - 32.0 - 220.0 - 16.0, UI.BTN_H)
 	if help_slot != null:
 		help_slot.position = Vector2(o.x + 12.0, arena_top + 12.0)
 		help_slot.size = Vector2(UI.BTN_H, UI.BTN_H)
@@ -218,7 +255,11 @@ func _layout() -> void:
 
 
 func _process(delta: float) -> void:
-	if _finished or player == null:
+	if player == null:
+		return
+	if _finished:
+		if _replay:
+			_replay_step(delta)
 		return
 	if BottomSheet.is_open() and not BottomSheet.current().is_closing:
 		return    # any sheet pauses the show; the result was decided before it, so nothing changes
@@ -248,6 +289,8 @@ func _apply(real_dt: float = 0.0) -> void:
 	_notes.show_at(gt, show_t, float(SPEEDS[_speed_i]))
 	_notes.intro = (_notes.cast.intro[_intro_i] as Dictionary) if _intro_i >= 0 and _notes.cast != null else {}
 	_lineup.show_at(gt)
+	if _timeline != null and _timeline.visible:
+		_timeline.set_frac(show_t / maxf(1.0, player.show_len))
 	_chip.visible = (_speed_i > 0 or _paused) and not _finished
 	_chip.text = Strings.t("match.chip.paused") if _paused else Strings.t(["match.speed1", "match.speed2", "match.speed4"][_speed_i])
 	_chip.size = _chip.get_minimum_size()
@@ -289,12 +332,79 @@ func _end() -> void:
 	_apply()
 	_intro_i = -1
 	_paused = false
-	_menu_btn.visible = false    # after the end, See the report is the one action
+	_menu_btn.visible = false    # after the end: See the report, and Watch replay beside it (M7)
 	_go_btn.visible = true
+	_replay_btn.visible = true
+	_end_text = _feed.end_text
 	_layout()
 	App.sound("victory" if won else "defeat")
 	App.buzz(150 if won else 90)
 	_raise("match:end")
+
+
+# ---- the replay (Match Day M7): after the end only; every layer is a function of the show time, so nothing is re-played
+func start_replay() -> void:
+	if not _finished or _replay:
+		return
+	_replay = true
+	_paused = false
+	show_t = 0.0
+	_feed.end_text = ""
+	_feed.decided = ""
+	_go_btn.visible = false
+	_replay_btn.visible = false
+	_timeline.visible = true
+	_play_btn.visible = true
+	_done_btn.visible = true
+	_play_btn.text = Strings.t("match.pause")
+	_layout()
+	_apply()
+	_raise("match:replay")
+
+
+func stop_replay() -> void:
+	if not _replay:
+		return
+	_replay = false
+	_paused = false
+	show_t = player.show_len
+	_feed.end_text = _end_text
+	_feed.decided = decided
+	_timeline.visible = false
+	_play_btn.visible = false
+	_done_btn.visible = false
+	_go_btn.visible = true
+	_replay_btn.visible = true
+	_layout()
+	_apply()
+
+
+func _replay_step(delta: float) -> void:
+	if BottomSheet.is_open() and not BottomSheet.current().is_closing:
+		return
+	if _paused:
+		return
+	show_t = minf(player.show_len, show_t + delta * float(SPEEDS[_speed_i]))
+	if show_t >= player.show_len - 1e-6:
+		_paused = true    # the replay waits at the end; Done goes back to the result
+		_play_btn.text = Strings.t("match.replay.play")
+	_apply(delta)
+
+
+func _toggle_replay_pause() -> void:
+	if show_t >= player.show_len - 1e-6 and _paused:
+		show_t = 0.0    # Play at the end starts the replay again
+	_paused = not _paused
+	_play_btn.text = Strings.t("match.replay.play" if _paused else "match.pause")
+	_apply()
+
+
+## Jump to a point of the show (the timeline). Only during the replay.
+func seek_frac(f: float) -> void:
+	if not _replay:
+		return
+	show_t = clampf(f, 0.0, 1.0) * player.show_len
+	_apply()
 
 
 ## "Decided by: <the biggest factor>", the same factor the Report leads with.

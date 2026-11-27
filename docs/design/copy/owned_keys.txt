@@ -1683,3 +1683,6 @@ match.doing.siege
 match.doing.defend
 match.doing.lane
 match.doing.jungle
+match.replay
+match.replay.play
+match.replay.done

@@ -3,7 +3,7 @@ extends RefCounted
 ## fixed-seed save's next game, in each view (Field, Action, All) at two points of the show, Action also at 10 and 85 percent,
 ## and the end, with the frame's numbers (PERF-BUDGET 3.1a: target 60 draw calls and 120 nodes, hard 100 and 200):
 ##   MATCH|<variant>|<state>|nodes=..|draw_calls=..
-## States: intro (the Broadcast intro), p10, p35, p60, p85 (Action, percent of the show length), field_p35, field_p60, all_p35, all_p60, comment (a long calm Broadcast line), comment_peak (the first peak line), menu (the match menu open), speed_chip (x2), hero_sheet and teams_sheet (M6), end (Skip).
+## States: intro (the Broadcast intro), p10, p35, p60, p85 (Action, percent of the show length), field_p35, field_p60, all_p35, all_p60, comment (a long calm Broadcast line), comment_peak (the first peak line), menu (the match menu open), speed_chip (x2), hero_sheet and teams_sheet (M6), end (Skip), replay (M7, paused at 45%).
 
 static func _count(n: Node) -> int:
 	var total := 1
@@ -86,3 +86,9 @@ static func run(ctx) -> void:
 	await ctx.settle()
 	m._skip()
 	await _measure(ctx, m, "end")
+	# Match Day M7: the replay, paused in the middle
+	m.start_replay()
+	m.seek_frac(0.45)
+	m._toggle_replay_pause()
+	await ctx.settle()
+	await _measure(ctx, m, "replay")

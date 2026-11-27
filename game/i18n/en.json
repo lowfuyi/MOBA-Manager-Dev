@@ -2287,5 +2287,8 @@
   "match.doing.siege": "pushing a tower with the team",
   "match.doing.defend": "defending the base",
   "match.doing.lane": "in {lane} lane",
-  "match.doing.jungle": "moving through the jungle"
+  "match.doing.jungle": "moving through the jungle",
+  "match.replay": "Watch replay",
+  "match.replay.play": "Play",
+  "match.replay.done": "Done"
 }

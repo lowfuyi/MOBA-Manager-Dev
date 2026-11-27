@@ -20,6 +20,8 @@ static func make(text: String, color: Color = UI.TEXT, action: String = "", cb: 
 	if has_action:
 		pc.custom_minimum_size = Vector2(0, UI.BTN_H)
 	var row := HBoxContainer.new()
+	if not has_action:
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE    # the row too, or it still catches the tap (found in M7)
 	row.add_child(UI.label(text, UI.S_SMALL, UI.TEXT))
 	if has_action:
 		var on_tap := func() -> void:

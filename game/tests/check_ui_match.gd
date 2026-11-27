@@ -178,6 +178,34 @@ func _play() -> void:
 	ok(int(v["kills_you"]) == int(kd["team"][me]["k"]) and int(v["kills_them"]) == int(kd["team"][them]["k"]), "play: after Skip the board shows the final kills %d-%d (Report.kda)" % [int(v["kills_you"]), int(v["kills_them"])])
 	ok(m._go_btn.visible and not m._menu_btn.visible and m._lineup.visible, "play: See the report is the one action at the end; the line-ups stay")
 	ok(JSON.stringify(m.res) == res_text and JSON.stringify(gs.d) == before, "play: watching changed neither the result nor the save (R7)")
+	# Match Day M7: the replay with a timeline, after the end only
+	ok(m._replay_btn.visible and not m._timeline.visible, "replay: Watch replay shows at the end; no timeline before it")
+	m.start_replay()
+	ok(m._replay and is_equal_approx(m.show_t, 0.0) and m._timeline.visible and m._play_btn.visible and m._done_btn.visible and not m._go_btn.visible and m._notes.visible, "replay: it starts at 0 with Play/Pause, the timeline and Done; the commentary is back")
+	var tk := m._timeline.ticks()
+	var kinds := {}
+	for x in tk:
+		kinds[String(x[1])] = true
+	ok(tk.size() >= 10 and kinds.has("kill") and kinds.has("tower"), "replay: the timeline has %d ticks (kills, towers, objectives)" % tk.size())
+	var tr0 := m.show_t
+	m._process(3.0)
+	ok(is_equal_approx(m.show_t - tr0, 3.0), "replay: it plays (+%.1f)" % (m.show_t - tr0))
+	m.seek_frac(0.5)
+	var vh := ArenaHud2.board_values(m.player, m.player.game_t(m.show_t))
+	var vd := ArenaHud2.board_values(m.player, m.player.game_t(0.5 * m.show_len()))
+	ok(is_equal_approx(m.show_t, 0.5 * m.show_len()) and vh["clock"] == vd["clock"] and int(vh["kills_you"]) == int(vd["kills_you"]), "replay: a seek to the middle shows the middle (clock %s)" % vh["clock"])
+	m._toggle_replay_pause()
+	var tpz := m.show_t
+	m._process(2.0)
+	ok(is_equal_approx(m.show_t, tpz), "replay: Pause stops it")
+	m._toggle_replay_pause()
+	m.seek_frac(0.999)
+	m._process(5.0)
+	ok(m._finished and is_equal_approx(m.show_t, m.show_len()) and m._paused, "replay: it waits at the end (no second result)")
+	m.go_back()    # Back during the replay: back to the result
+	await frames(2)
+	ok(not m._replay and m._go_btn.visible and m._replay_btn.visible and not m._timeline.visible and m._feed.end_text != "", "replay: Back returns to the result card with See the report")
+	ok(JSON.stringify(m.res) == res_text and JSON.stringify(gs.d) == before, "replay: the replay changed neither the result nor the save (R7)")
 	m.go_back()    # Back after the show: See the report
 	await frames(4)
 	var cur: Node = null

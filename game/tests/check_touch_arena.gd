@@ -171,6 +171,18 @@ func _run() -> void:
 	await sim.drag(v.get_global_rect().get_center(), Vector2(-160, 90), 8)
 	await frames(6)
 	ok(BottomSheet.current() == null, "sheets: a drag on the map opens nothing")
+	# Match Day M7: after the end, a finger on the replay timeline jumps there
+	m._skip()
+	await frames(3)
+	m.start_replay()
+	await frames(3)
+	var tl7 := m._timeline.get_global_rect()
+	var tr7 := m._timeline._track()
+	var pt7 := tl7.position + Vector2(tr7.position.x + tr7.size.x * 0.75, tl7.size.y * 0.5)
+	await sim.tap(pt7)
+	await frames(3)
+	var f7 := m.show_t / m.show_len()
+	ok(m._replay and absf(f7 - 0.75) < 0.03, "replay: a tap at 75%% of the timeline jumps there (%.3f)" % f7)
 	if _main != null and is_instance_valid(_main):
 		_main.queue_free()
 	GameState.delete_save()
