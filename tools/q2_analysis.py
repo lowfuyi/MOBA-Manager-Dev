@@ -65,6 +65,8 @@ def cmd_run(a):
     plan.append(("plans", 5, a.plans, 40))
     for nb in (1, 3, 5):
         plan.append(("heroes", nb, a.heroes, 1000))
+    if a.only:
+        plan = [x for x in plan if x[0] in a.only.split(",")]
     for mode, nb, total, chunk in plan:
         target = raw / f"{mode}_{nb}.json"
         if target.exists():
@@ -279,6 +281,14 @@ def cmd_report(a):
     print(json.dumps({"a_outside": len(sec_a), "b_flags": flags, "d": [n, with_rows, total]}))
 
 
+def cmd_plans_report(a):
+    """Print only the Game Plan sweep section (markdown) for a re-measure; writes nothing."""
+    md = []
+    flags = section_b(pathlib.Path(a.raw), md)
+    print("\n".join(md))
+    print(json.dumps({"b_flags": flags}))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -289,10 +299,13 @@ def main():
     r.add_argument("--heroes", type=int, default=40000)
     r.add_argument("--draft", type=int, default=5000)
     r.add_argument("--plans", type=int, default=2000)
+    r.add_argument("--only", default="", help="comma list of modes to run: draft, plans, heroes")
     p = sub.add_parser("report")
     p.add_argument("--raw", required=True)
+    pr = sub.add_parser("plans-report")
+    pr.add_argument("--raw", required=True)
     a = ap.parse_args()
-    cmd_run(a) if a.cmd == "run" else cmd_report(a)
+    {"run": cmd_run, "report": cmd_report, "plans-report": cmd_plans_report}[a.cmd](a)
 
 
 if __name__ == "__main__":
