@@ -6,7 +6,7 @@ extends Control
 ## hero dims and shows its respawn seconds instead of the health bar. The middle column names the lane; the gold difference
 ## of the pair (an arrow towards the leader) joins it when the log carries per-player gold (M1).
 ## Drawn by one control: shapes and text through one CardKit display list, item icons from the items atlas in one run.
-## A display, not a row of buttons: the whole panel is one tap target (the Teams sheet, M6). Reads the ArenaPlayer at game
+## A display, not a row of buttons: the whole panel is one tap target that opens the Teams sheet (M6). Reads the ArenaPlayer at game
 ## time t; never the simulation (A1, R7).
 
 const SLOTS := ["top", "jg", "mid", "bot", "sup"]
@@ -21,11 +21,28 @@ var draw_count := 0
 var _ops := CardKit.Ops.new()
 
 
+## Match Day M6: one tap anywhere on the panel (press and release within 12 px) opens the Teams sheet; the screen listens.
+signal tapped
+var _press_at := Vector2(-1, -1)
+
+
 func _init(p: ArenaPlayer, side: String) -> void:
 	pl = p
 	my_side = side
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	resized.connect(queue_redraw)
+
+
+func _gui_input(ev: InputEvent) -> void:
+	if ev is InputEventScreenTouch or (ev is InputEventMouseButton and not DisplayServer.is_touchscreen_available() and (ev as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT):
+		var pr := (ev as InputEventScreenTouch).pressed if ev is InputEventScreenTouch else (ev as InputEventMouseButton).pressed
+		var at: Vector2 = (ev as InputEventScreenTouch).position if ev is InputEventScreenTouch else (ev as InputEventMouseButton).position
+		if pr:
+			_press_at = at
+		elif _press_at.x >= 0.0 and _press_at.distance_to(at) <= 12.0:
+			_press_at = Vector2(-1, -1)
+			tapped.emit()
+			accept_event()
 
 
 func show_at(p_t: float) -> void:

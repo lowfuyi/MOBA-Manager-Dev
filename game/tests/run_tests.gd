@@ -47,6 +47,10 @@ func _discover() -> void:
 		if inst != null and inst.has_method("run"):
 			n += 1
 			inst.call("run", _check)
+			# a runtime error stops a file's run() quietly and its last checks never run; a file that declares
+			# `var finished := false` and sets it at its end is caught here (Match Day M6)
+			if inst.get("finished") != null:
+				_check(bool(inst.get("finished")), "%s ran to its end (no script error part way)" % name)
 	print("auto-discovered test files run: %d" % n)
 
 

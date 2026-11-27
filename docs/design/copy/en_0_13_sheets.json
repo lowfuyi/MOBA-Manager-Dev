@@ -1,0 +1,23 @@
+{
+  "match.hero.line": "{arch}, {role}, {team}",
+  "match.hero.stats": "Level {lv}, health {hp}%, {k}/{d}/{a}",
+  "match.hero.doing": "Now: {what}",
+  "match.hero.items": "Items so far",
+  "match.hero.no_items": "No items yet",
+  "match.hero.kit": "Passive and abilities",
+  "match.teams.h": "Both teams",
+  "match.teams.row": "{lane}: {hero}, level {lv}, {k}/{d}/{a}",
+  "match.doing.down": "down, back in {n}s",
+  "match.doing.fight": "in a fight",
+  "match.doing.recall": "heading back to base",
+  "match.doing.gank": "going for a gank in {lane}",
+  "match.doing.roam": "roaming to {lane}",
+  "match.doing.back_off": "backing off",
+  "match.doing.camp": "clearing a camp",
+  "match.doing.ward": "placing a ward",
+  "match.doing.group": "gathering with the team",
+  "match.doing.siege": "pushing a tower with the team",
+  "match.doing.defend": "defending the base",
+  "match.doing.lane": "in {lane} lane",
+  "match.doing.jungle": "moving through the jungle"
+}

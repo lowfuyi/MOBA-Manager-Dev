@@ -41,3 +41,4 @@ One line per increment: time (SGT), what was done, gate result, commit. Founder'
 - 2026-11-27 15:15 SGT: M4 follow-up: IP Checker screen of the commentary (Pass; two lines reworded; IP-RISK-LOG rows). Fast gate ALL GREEN.
 - 2026-11-27 17:30 SGT: M2 match layout (line-up panel, View and Menu, gold-lead bar, intro before the show, speed chip); laptop restart at about 17:00 lost the R1 sweep, the baseline and a gate run: long runs now live in ~/moba-runs (resumable chunks, setsid). Fast gate ALL GREEN.
 - 2026-11-27 18:30 SGT: M5 map layers (countdown rings, levels in Action, call words; labels batched). Fast gate ALL GREEN.
+- 2026-11-27 21:50 SGT: M6 tap sheets (hero and Teams); toasts without a button let taps through; run_tests catches a file stopped by a script error (opt-in finished flag). Fast gate ALL GREEN.

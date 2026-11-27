@@ -13,8 +13,10 @@ const LIFE_ACTION := 4.5
 static func make(text: String, color: Color = UI.TEXT, action: String = "", cb: Callable = Callable()) -> PanelContainer:
 	var pc := PanelContainer.new()
 	pc.add_theme_stylebox_override("panel", UI.box(UI.PANEL3, 20, 16, color, 2))
-	pc.mouse_filter = Control.MOUSE_FILTER_PASS
 	var has_action := action != "" and cb.is_valid()
+	# a toast without a button lets taps through to what is under it (Match Day M6: a "View: Action" toast sat over the
+	# line-up panel and ate its tap); one with a button keeps them
+	pc.mouse_filter = Control.MOUSE_FILTER_PASS if has_action else Control.MOUSE_FILTER_IGNORE
 	if has_action:
 		pc.custom_minimum_size = Vector2(0, UI.BTN_H)
 	var row := HBoxContainer.new()

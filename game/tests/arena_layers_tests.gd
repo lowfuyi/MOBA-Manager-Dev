@@ -4,6 +4,9 @@ extends RefCounted
 ## the line-up panel's numbers (K/D/A equal Report.kda at the end). Display only: nothing here reads the simulation.
 
 
+var finished := false    # run_tests fails the file if a script error stops it before the end
+
+
 func run(check: Callable) -> void:
 	var w := World.load_default()
 	var meta := w.make_meta("layers-test")
@@ -51,4 +54,19 @@ func run(check: Callable) -> void:
 	var src_v := FileAccess.get_file_as_string("res://src/arena/v2/arena_view.gd")
 	check.call(src_v.contains('"call_group", "call_siege", "call_defend"'), "layers: intent_word accepts the three team calls")
 	var src := FileAccess.get_file_as_string("res://src/arena/v2/arena_view.gd") + FileAccess.get_file_as_string("res://src/arena/v2/arena_lineup.gd")
+	# Match Day M6: what a hero is doing names an existing line for every hero at every 20 s of a game
+	var w2 := World.load_default()
+	var r2 := MatchRunner.auto(w2, w2.best_lineup(w2.club_ids[1]), w2.best_lineup(w2.club_ids[6]), w2.make_meta("doing"), 7400, "doing:0", 5, {"B": "ai", "R": "ai"})
+	var pl2 := ArenaPlayer.build(r2, "B")
+	var doing_ok := true
+	var kinds := {}
+	var g2 := 0.0
+	while g2 <= pl2.end_t:
+		for key in pl2.hero_of:
+			var dn := MatchSheets.doing(pl2, String(key), g2)
+			doing_ok = doing_ok and en.has(String(dn[0]))
+			kinds[String(dn[0])] = true
+		g2 += 20.0
+	check.call(doing_ok and kinds.size() >= 5, "sheets: 'now' names an existing line for every hero all game (%d kinds)" % kinds.size())
 	check.call(not src.contains("MatchSim") and not src.contains("GamePlan.simulate") and not src.contains("Report.attribution"), "layers: display only (A1)")
+	finished = true

@@ -131,6 +131,46 @@ func _run() -> void:
 	ok(v.mode == "action" and v.fog_on(), "views: back to Action, fog on")
 	ok(App.timings.frames.has("field") and App.timings.frames.has("all") and App.timings.frames.has("action"), "timings: arena frame times are kept per view (Field, Action, All)")
 	ok(App.debug_info().contains("arena frame ms: field avg="), "timings: the debug lines carry the frame times")
+	# Match Day M6: a tap on a hero opens its sheet (the show waits), a tap on the panel opens the Teams sheet
+	m.skip_intro()
+	m.set_view("all", false)
+	m.show_t = 0.3 * m.show_len()
+	m._apply(0.1)
+	await frames(3)
+	var gt6 := m.player.game_t(m.show_t)
+	var key6 := ""
+	for s in ["mid", "top", "bot", "jg", "sup"]:
+		if m.player.alive(m.my_side + "." + s, gt6):
+			key6 = m.my_side + "." + s
+			break
+	var hp6 := m.player.pos(key6, gt6)
+	var pr6 := v.cam.project(hp6)
+	var hpx6 := ArenaView.HERO_H * v.token_k * v.cam.scale_at(hp6)
+	await sim.tap(v.get_global_rect().position + Vector2(pr6.x, pr6.y - hpx6 * 0.5))
+	await frames(8)
+	var cur6 := BottomSheet.current()
+	ok(cur6 != null and cur6.sheet_id == "match_hero", "sheets: a tap on a hero opens its sheet (%s)" % key6)
+	var st6 := m.show_t
+	m._process(2.0)
+	ok(is_equal_approx(m.show_t, st6), "sheets: the show waits while the sheet is open")
+	if cur6 != null:
+		cur6.close()
+	await get_tree().create_timer(0.8).timeout    # the closing sheet's backdrop is gone (headless frames are very short)
+	await frames(4)
+	var lp6 := m._lineup.get_global_rect()
+	await sim.tap(lp6.position + Vector2(lp6.size.x * 0.5, lp6.size.y * 0.5))
+	await frames(8)
+	cur6 = BottomSheet.current()
+	ok(cur6 != null and cur6.sheet_id == "match_teams", "sheets: a tap on the line-up panel opens the Teams sheet")
+	if cur6 != null:
+		cur6.close()
+	await get_tree().create_timer(0.8).timeout
+	await frames(4)
+	m.set_view("action", false)
+	await frames(2)
+	await sim.drag(v.get_global_rect().get_center(), Vector2(-160, 90), 8)
+	await frames(6)
+	ok(BottomSheet.current() == null, "sheets: a drag on the map opens nothing")
 	if _main != null and is_instance_valid(_main):
 		_main.queue_free()
 	GameState.delete_save()

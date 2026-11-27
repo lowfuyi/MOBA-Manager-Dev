@@ -290,7 +290,47 @@ func fog_texture() -> Texture2D:
 
 
 ## Action: a drag pans the camera over the island; the chase waits until 5 s after the last touch.
+## Match Day M6: a tap (press and release within 12 px) on a hero opens its sheet; the screen listens.
+signal hero_tapped(key: String)
+var _press_at := Vector2(-1, -1)
+
+
+## The visible hero whose token is nearest to `at` (px of this control), within 96 px; "" if none.
+func hero_at(at: Vector2) -> String:
+	var best := ""
+	var bd := 96.0
+	for side in ["B", "R"]:
+		for slot in ArenaPlayer.SLOTS:
+			var key: String = side + "." + slot
+			if not player.alive(key, t):
+				continue
+			var p := player.pos(key, t)
+			if side != my_side and not shows(p):
+				continue
+			var pr := cam.project(p)
+			var hpx := ArenaView.HERO_H * token_k * cam.scale_at(p)
+			var d := Vector2(pr.x, pr.y - hpx * 0.5).distance_to(at)
+			if d < bd:
+				bd = d
+				best = key
+	return best
+
+
 func _gui_input(ev: InputEvent) -> void:
+	# a tap on a hero, in every view (a drag in Action is not a tap)
+	if ev is InputEventScreenTouch or (ev is InputEventMouseButton and not DisplayServer.is_touchscreen_available() and (ev as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT):
+		var pr_ := (ev as InputEventScreenTouch).pressed if ev is InputEventScreenTouch else (ev as InputEventMouseButton).pressed
+		var pos_: Vector2 = (ev as InputEventScreenTouch).position if ev is InputEventScreenTouch else (ev as InputEventMouseButton).position
+		if pr_:
+			_press_at = pos_
+		elif _press_at.x >= 0.0 and _press_at.distance_to(pos_) <= 12.0:
+			var key := hero_at(pos_)
+			_press_at = Vector2(-1, -1)
+			if key != "":
+				_dragging = false
+				hero_tapped.emit(key)
+				accept_event()
+				return
 	if mode != "action":
 		return
 	var rel := Vector2.ZERO

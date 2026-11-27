@@ -89,7 +89,10 @@ func _ready() -> void:
 	_feed = ArenaHud2.Feed.new(player, App.gs.club_name(App.gs.club()), App.gs.club_name(opp_id))
 	_stage.add_child(_feed)
 	_lineup = ArenaLineup.new(player, my_side)
+	_lineup.tapped.connect(open_teams)
+	UI.tag(_lineup, "match.lineup", false)
 	_stage.add_child(_lineup)
+	view.hero_tapped.connect(open_hero)
 	_view_btn = UI.button("", _cycle_view, "normal", UI.BTN_H)
 	_view_btn.add_theme_font_size_override("font_size", UI.S_SMALL)
 	UI.tag(_view_btn, "match.views", false)
@@ -142,6 +145,26 @@ func _cycle_view() -> void:
 	var nx: String = VIEWS[(VIEWS.find(view_mode) + 1) % VIEWS.size()]
 	set_view(nx)
 	App.toast(Strings.f("match.view.toast", {"view": Strings.t("match.view." + nx)}))
+
+
+## Match Day M6: the sheets (any open sheet pauses the show).
+func names() -> Dictionary:
+	var opp_id: String = game["red"] if my_side == "B" else game["blue"]
+	return {my_side: App.gs.club_name(App.gs.club()), ("R" if my_side == "B" else "B"): App.gs.club_name(opp_id)}
+
+
+func open_hero(key: String) -> void:
+	if player == null or _intro_i >= 0:
+		return
+	MatchSheets.open_hero(player, key, player.game_t(show_t), names())
+	_raise("match:hero", {"key": key})
+
+
+func open_teams() -> void:
+	if player == null or _intro_i >= 0:
+		return
+	MatchSheets.open_teams(player, player.game_t(show_t), names())
+	_raise("match:teams")
 
 
 func show_len() -> float:
