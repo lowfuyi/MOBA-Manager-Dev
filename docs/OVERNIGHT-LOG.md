@@ -34,3 +34,4 @@ One line per increment: time (SGT), what was done, gate result, commit. Founder'
 - 2026-11-27 12:31 SGT: R6 tools/summarise_feedback.py (table per note, one line per tester) with tools/test_summarise_feedback.py (6 checks). Fast gate ALL GREEN.
 - 2026-11-27 12:32 SGT: R7 docs: GDD v1.13 (section 20, 0.12 features; two more "coach" uses), CLAUDE.md open items corrected (the TUTORIAL and PERF-BUDGET items were done in 0.9). Fast gate ALL GREEN.
 - 2026-11-27 12:33 SGT: R3 docs/design/MAP-DIAGONAL-CONCEPTS.md and docs/design/art/arena-map-diagonal-c1..c3 (svg, png) from arena-map-preview.py --diagonal; recommendation c3 "Winding causeway". No game file changed. Fast gate ALL GREEN.
+- 2026-11-27 12:34 SGT: R4 docs/design/ARENA-HUD-2.md (four display-only parts adopted, lane gold as a sheet waiting for a log field, no ability chips); PENDING-CONFIRMATION section 3 (map concept, HUD, per-player gold). Fast gate ALL GREEN.
