@@ -79,7 +79,7 @@ class Stub extends Control:
 				bus.emit("gp:coach_apply")
 				close_sheet()
 			"match.controls":
-				bus.emit("match:speed")
+				bus.emit("match:menu")
 			"report.why":
 				bus.emit("open:report_why")
 				_sheet("Why", "report.why_sheet", "", "")

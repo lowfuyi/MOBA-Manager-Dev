@@ -118,7 +118,7 @@ TUTORIAL_TAGS = {
 # TUTORIAL.md 7.5, plus the three card-button events the machine reads (Start, Next, Go to Home).
 TUTORIAL_EVENTS = {"open:player_card", "open:lane_picker", "open:training_picker", "draft:sheet", "draft:ban",
                    "draft:pick", "draft:done", "gp:coach_open", "gp:coach_apply", "gp:coach_close",
-                   "open:report_why", "stand:metric", "match:speed", "match:skip", "match:end"}
+                   "open:report_why", "stand:metric", "match:menu", "match:speed", "match:skip", "match:end"}
 TUTORIAL_BUTTON_EVENTS = {"tut:start", "tut:next", "tut:finish"}
 TUTORIAL_KINDS = {"modal": 2, "info": 5, "do": 20}      # TUTORIAL.md 3.2 "Counts"
 

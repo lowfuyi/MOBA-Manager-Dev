@@ -595,7 +595,7 @@ Steps list events, not buttons, so a different route to the same result still co
 | `gp:coach` | **retired.** v1 raised it when the old button filled the plan at once |
 | `open:report_why` | the Report's factor sheet opened (from the hero stat or its "all factors" link) |
 | `stand:metric` | the Standings Points / Form switch changed |
-| `match:speed`, `match:skip`, `match:end` | the match screen (0.7) or the arena controls (0.8) |
+| `match:menu`, `match:speed`, `match:skip`, `match:end` | the match screen (0.7), the arena controls (0.8), the Menu (Match Day M2, 0.13) |
 
 ### 7.6 Step data
 

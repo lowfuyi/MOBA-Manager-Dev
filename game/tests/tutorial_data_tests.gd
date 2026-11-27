@@ -15,7 +15,7 @@ const CHAPTER_STARTS := [1, 5, 7, 12, 16, 21, 24]
 ## TUTORIAL 7.5 (the three tut: events are the card buttons).
 const EVENTS := ["open:player_card", "open:lane_picker", "open:training_picker", "draft:sheet", "draft:ban", "draft:pick",
 		"draft:done", "gp:coach_open", "gp:coach_apply", "gp:coach_close", "open:report_why", "stand:metric",
-		"match:speed", "match:skip", "match:end", "tut:start", "tut:next", "tut:finish"]
+		"match:menu", "match:speed", "match:skip", "match:end", "tut:start", "tut:next", "tut:finish"]
 ## The first-run tags of TUTORIAL 8 (the stars).
 const TAGS := ["tabbar", "tab.squad", "tab.plan", "tab.club", "home.next_card", "squad.bench.0", "roster.card.head",
 		"plan.tile.practice", "practice.quick", "prematch.matchups", "prematch.start_draft", "draft.choices", "draft.slot_list",

@@ -9,7 +9,7 @@ extends Node
 ##   words       every line's template is inside its tier's word range
 ##   determinism the same game gives the same broadcast
 ##   tiers       a quiet game stays calm; a five-kill fight reaches peak; a lead flip raises e
-##   display     the strip draws at 26 px or more (32 px Bold at peak), 3 lines at most (2 in large text)
+##   display     the strip draws at 26 px or more (32 px Bold at peak), 3 lines at most
 ##   A1          nothing in src/arena calls the simulation, GamePlan.simulate or Report.attribution
 ## Nothing is measured on a phone.
 
@@ -360,20 +360,24 @@ func _display(pl: ArenaPlayer, c: ArenaCast) -> void:
 		App.apply_large_text(large)
 		var n := ArenaHud2.Notes.new(pl)
 		n.cast = c
-		n.size = Vector2(672, 84 if large else 112)
+		n.size = Vector2(672, 110)
 		add_child(n)
 		var worst_px := 99
 		var most := 0
 		var peak_px := 0
-		for l in c.lines:
-			n.show_at(pl.game_t(float(l["s0"]) + 0.01), float(l["s0"]) + 0.01, 1.0)
+		for l in c.intro + c.lines:
+			if l in c.intro:
+				n.intro = l
+			else:
+				n.intro = {}
+			n.show_at(pl.game_t(float(l.get("s0", 0.0)) + 0.01), float(l.get("s0", 0.0)) + 0.01, 1.0)
 			await get_tree().process_frame
 			if n.line_count > 0:
 				worst_px = mini(worst_px, n.px)
 				most = maxi(most, n.line_count)
 				if String(l["tier"]) == "peak":
 					peak_px = maxi(peak_px, n.px)
-		ok(worst_px >= 26 and most <= (2 if large else 3), "display (%s): commentary at %d px or more, at most %d lines" % ["large" if large else "normal", worst_px, most])
+		ok(worst_px >= 26 and most <= 3 and n.cut_count == 0, "display (%s): commentary at %d px or more, at most %d lines (3 allowed), %d cut" % ["large" if large else "normal", worst_px, most, n.cut_count])
 		if not large:
 			ok(peak_px == 0 or peak_px >= 32, "display: a peak line at 32 px (%d)" % peak_px)
 		n.queue_free()

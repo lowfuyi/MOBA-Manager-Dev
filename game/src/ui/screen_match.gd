@@ -8,12 +8,19 @@ extends Screen
 ## stretches play faster (ArenaPlayer pacing). Speed x1, x2, x4 and Skip are always there.
 ## Views (Founder decision 2026-11-22): a three-part control "Field | Action | All" above Speed and Skip, switchable at any time,
 ## remembered in the device setting [arena] camera (default Action). See ArenaView.
-## Layout at 720 x 1280: safe 48, scoreboard 142, arena (the rest), commentary 112 (84 in large text), feed 80, views 96 + 12,
-## controls 132.
+## Layout at 720 x 1280 (Match Day M2): safe 48, scoreboard 150 with two header buttons (View cycles Field, Action and All;
+## Menu holds speed, pause, skip, view and sound), the arena (the rest), the commentary strip 110 (the Broadcast, 3 lines at 26 px;
+## the feed's two lines at the end), the line-up panel 300 with both teams' five heroes always visible, 24 px
+## margin. After the end, See the report sits between the strip and the panel. Speed always starts at x1; a small chip on
+## the map shows a speed above x1 or a pause. Before the show, the Broadcast intro (tap the strip to skip).
 ## Quick mode skips the watch as before; the tutorial game always plays it.
 
 const SAFE := 48.0
 const SPEEDS := [1.0, 2.0, 4.0]
+const VIEWS := ["field", "action", "all"]
+## The Broadcast intro before the show (Match Day M2). Screen tests that play a match straight to its end switch it off, the way
+## they switch off TutorialRunner.home_offers; check_ui_match tests the intro itself.
+static var intro_on := true
 
 var game: Dictionary
 var res: Dictionary
@@ -31,12 +38,14 @@ var _stage: Control
 var _board: ArenaHud2.Board
 var _feed: ArenaHud2.Feed
 var _notes: ArenaHud2.Notes
-var _controls: Control
-var _speed_btn: Button
-var _skip_btn: Button
+var _lineup: ArenaLineup
+var _view_btn: Button
+var _menu_btn: Button
+var _chip: Label
 var _go_btn: Button
-var _views: HBoxContainer
-var _view_btns: Dictionary = {}
+var _paused := false
+var _intro_i := -1          # the intro line on screen (-1: no intro or it is over)
+var _intro_t := 0.0
 var view_mode := "action"
 var _frames_seen := 0      # tester timings (Q1): the first arena frame has been drawn once the second _process runs
 
@@ -79,25 +88,21 @@ func _ready() -> void:
 	_stage.add_child(_notes)
 	_feed = ArenaHud2.Feed.new(player, App.gs.club_name(App.gs.club()), App.gs.club_name(opp_id))
 	_stage.add_child(_feed)
-	_controls = Control.new()
-	_controls.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_stage.add_child(_controls)
-	_speed_btn = UI.button(Strings.t("match.speed1"), _toggle_speed, "normal", UI.BTN_H)
-	_skip_btn = UI.button(Strings.t("match.skip"), _skip, "normal", UI.BTN_H)
-	_controls.add_child(_speed_btn)
-	_controls.add_child(_skip_btn)
-	UI.tag(_controls, "match.controls", false)    # tutorial step 19: Speed and Skip together (I-21a)
-	_views = HBoxContainer.new()
-	_views.add_theme_constant_override("separation", 8)
-	_views.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for id in ["field", "action", "all"]:
-		var vb := UI.button(Strings.t({"field": "match.view.field", "action": "match.view.action", "all": "match.view.all"}[id]), func(): set_view(id), "normal", UI.BTN_H)
-		vb.add_theme_font_size_override("font_size", UI.S_SMALL)
-		UI.tag(vb, "match.view." + id, false)
-		_view_btns[id] = vb
-		_views.add_child(vb)
-	UI.tag(_views, "match.views", false)
-	_stage.add_child(_views)
+	_lineup = ArenaLineup.new(player, my_side)
+	_stage.add_child(_lineup)
+	_view_btn = UI.button("", _cycle_view, "normal", UI.BTN_H)
+	_view_btn.add_theme_font_size_override("font_size", UI.S_SMALL)
+	UI.tag(_view_btn, "match.views", false)
+	_stage.add_child(_view_btn)
+	_menu_btn = UI.button(Strings.t("match.menu"), _open_menu, "normal", UI.BTN_H)
+	_menu_btn.add_theme_font_size_override("font_size", UI.S_SMALL)
+	UI.tag(_menu_btn, "match.controls", false)    # tutorial step 19: speed and skip live in the menu (Match Day M2)
+	_stage.add_child(_menu_btn)
+	_chip = UI.label("", UI.S_CAPTION, UI.TEXT)
+	_chip.add_theme_stylebox_override("normal", UI.box(Color(UI.PANEL2, 0.92), 16, 10))
+	_chip.autowrap_mode = TextServer.AUTOWRAP_OFF    # one short word on one line (the first render wrapped it letter by letter)
+	_chip.visible = false
+	_stage.add_child(_chip)
 	_go_btn = UI.button(Strings.t("match.report"), _continue, "play", UI.BTN_H)    # the only coral on the screen
 	UI.tag(_go_btn, "match.report_btn")    # tutorial step 20
 	_go_btn.visible = false
@@ -112,26 +117,31 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	set_view(HelpSheet.device().arena_camera(), false)
+	if intro_on and _notes.cast != null and not _notes.cast.intro.is_empty():
+		_intro_i = 0
+		_notes.mouse_filter = Control.MOUSE_FILTER_STOP
+		_notes.gui_input.connect(_on_strip_input)
 	_apply()
 
 
 ## Field, Action or All: the view changes at once, the choice is remembered on this device.
 func set_view(id: String, remember: bool = true) -> void:
-	if not _view_btns.has(id):
+	if not VIEWS.has(id):
 		id = "action"
 	view_mode = id
 	view.set_mode(id)
-	for k in _view_btns:
-		var b := _view_btns[k] as Button
-		var on: bool = k == id
-		b.add_theme_stylebox_override("normal", UI.box(UI.ACCENT.darkened(0.15) if on else UI.PANEL2, UI.R_BTN, 12))
-		b.add_theme_stylebox_override("hover", UI.box(UI.ACCENT if on else UI.PANEL3, UI.R_BTN, 12))
-		for c in ["font_color", "font_hover_color"]:
-			b.add_theme_color_override(c, UI.INK_TEAL if on else UI.TEXT)
-		CompKit.set_cue(b, "filled+word" if on else "word")
+	_view_btn.text = Strings.t("match.view." + id)
+	CompKit.set_cue(_view_btn, "word")
 	if remember:
 		HelpSheet.device().set_arena_camera(id)
 		_raise("match:view", {"view": id})
+
+
+## The View button: the next of Field, Action, All, with a short toast naming it.
+func _cycle_view() -> void:
+	var nx: String = VIEWS[(VIEWS.find(view_mode) + 1) % VIEWS.size()]
+	set_view(nx)
+	App.toast(Strings.f("match.view.toast", {"view": Strings.t("match.view." + nx)}))
 
 
 func show_len() -> float:
@@ -147,35 +157,41 @@ func _layout() -> void:
 	var w := vsz.x
 	var h := vsz.y
 	var large := UI.large
-	var board_h := 122.0 if large else 142.0
-	var notes_h := 84.0 if large else 112.0    # the commentary strip: 3 lines (2 in large text)
-	var feed_h := 80.0
-	var ctrl_y := o.y + h - 24.0 - UI.BTN_H
-	var views_y := ctrl_y - 12.0 - UI.BTN_H
+	var board_h := 150.0
+	var notes_h := 110.0         # the Broadcast: 3 lines at 26 px in both text sizes (the queue's floor for commentary)
+	var feed_h := 0.0            # the feed shows its two lines at the end only (the commentary calls every moment)
+	var strip_h := notes_h + feed_h
+	var panel_h := 300.0
+	var go_h := (UI.BTN_H + 12.0) if _finished else 0.0
+	var panel_y := o.y + h - 24.0 - panel_h
+	var go_y := panel_y - go_h
+	var strip_y := go_y - strip_h
 	var arena_top := o.y + SAFE + board_h
-	var arena_bot := views_y - 12.0 - feed_h - notes_h
+	var pill_w := 110.0
 	_board.position = Vector2(o.x, o.y + SAFE)
 	_board.size = Vector2(w, board_h)
+	_board.side_w = 12.0 + pill_w
+	_view_btn.position = Vector2(o.x + 12.0, o.y + SAFE + 44.0)
+	_view_btn.size = Vector2(pill_w, UI.BTN_H)
+	_menu_btn.position = Vector2(o.x + w - 12.0 - pill_w, o.y + SAFE + 44.0)
+	_menu_btn.size = Vector2(pill_w, UI.BTN_H)
 	view.position = Vector2(o.x, arena_top)
-	view.size = Vector2(w, maxf(200.0, arena_bot - arena_top))
-	_notes.position = Vector2(o.x + 24.0, arena_bot)
+	view.size = Vector2(w, maxf(200.0, strip_y - arena_top))
+	_notes.position = Vector2(o.x + 24.0, strip_y)
 	_notes.size = Vector2(w - 48.0, notes_h)
-	_feed.position = Vector2(o.x + 24.0, arena_bot + notes_h)
-	_feed.size = Vector2(w - 48.0, feed_h)
-	var help_w := UI.BTN_H
-	_controls.position = Vector2(o.x + 24.0, ctrl_y)
-	_controls.size = Vector2(w - 48.0 - help_w - 12.0, UI.BTN_H)
-	_speed_btn.position = Vector2.ZERO
-	_speed_btn.size = Vector2(200, UI.BTN_H)
-	_skip_btn.position = Vector2(212, 0)
-	_skip_btn.size = Vector2(_controls.size.x - 212.0, UI.BTN_H)
-	_views.position = Vector2(o.x + 24.0, views_y)
-	_views.size = Vector2(w - 48.0, UI.BTN_H)
-	_go_btn.position = _controls.position
-	_go_btn.size = _controls.size
+	_notes.visible = not _finished
+	_feed.position = Vector2(o.x + 24.0, strip_y + (0.0 if _finished else notes_h))
+	_feed.size = Vector2(w - 48.0, strip_h if _finished else feed_h)
+	_feed.max_lines = 2 if _finished else 1
+	_feed.visible = _finished or feed_h > 0.0
+	_lineup.position = Vector2(o.x + 16.0, panel_y)
+	_lineup.size = Vector2(w - 32.0, panel_h)
+	_go_btn.position = Vector2(o.x + 24.0, go_y + 6.0)
+	_go_btn.size = Vector2(w - 48.0, UI.BTN_H)
 	if help_slot != null:
-		help_slot.position = Vector2(o.x + w - 24.0 - help_w, ctrl_y)
-		help_slot.size = Vector2(help_w, UI.BTN_H)
+		help_slot.position = Vector2(o.x + 12.0, arena_top + 12.0)
+		help_slot.size = Vector2(UI.BTN_H, UI.BTN_H)
+	_chip.position = Vector2(o.x + 16.0, arena_top + 24.0 + UI.BTN_H)
 
 
 func _process(delta: float) -> void:
@@ -188,6 +204,11 @@ func _process(delta: float) -> void:
 	if _frames_seen == 2:
 		App.timings.match_shown()
 	App.timings.frame(view_mode, delta, _watch_t)
+	if _intro_i >= 0:
+		_intro_step(delta)    # the arena is drawn during the intro, so the frame timings above count it
+		return
+	if _paused:
+		return
 	var was := player.game_t(show_t)
 	show_t = minf(player.show_len, show_t + delta * float(SPEEDS[_speed_i]))
 	_apply(delta)
@@ -202,6 +223,11 @@ func _apply(real_dt: float = 0.0) -> void:
 	view.show_game(gt, real_dt)
 	_board.show_at(gt)
 	_notes.show_at(gt, show_t, float(SPEEDS[_speed_i]))
+	_notes.intro = (_notes.cast.intro[_intro_i] as Dictionary) if _intro_i >= 0 and _notes.cast != null else {}
+	_lineup.show_at(gt)
+	_chip.visible = (_speed_i > 0 or _paused) and not _finished
+	_chip.text = Strings.t("match.chip.paused") if _paused else Strings.t(["match.speed1", "match.speed2", "match.speed4"][_speed_i])
+	_chip.size = _chip.get_minimum_size()
 	_feed.show_at(gt)
 
 
@@ -238,9 +264,11 @@ func _end() -> void:
 	_feed.end_text = Strings.f("match.result.won" if won else "match.result.lost", {"team": App.gs.club_name(App.gs.club()), "score": score})
 	_feed.decided = decided
 	_apply()
-	_speed_btn.visible = false
-	_skip_btn.visible = false
+	_intro_i = -1
+	_paused = false
+	_menu_btn.visible = false    # after the end, See the report is the one action
 	_go_btn.visible = true
+	_layout()
 	App.sound("victory" if won else "defeat")
 	App.buzz(150 if won else 90)
 	_raise("match:end")
@@ -259,10 +287,97 @@ static func decided_text(r: Dictionary, side: String) -> String:
 
 
 func _toggle_speed() -> void:
-	_speed_i = (_speed_i + 1) % SPEEDS.size()
+	_set_speed((_speed_i + 1) % SPEEDS.size())
+
+
+func _set_speed(i: int) -> void:
+	_speed_i = clampi(i, 0, SPEEDS.size() - 1)
 	_used_fast = _used_fast or _speed_i > 0
-	_speed_btn.text = Strings.t(["match.speed1", "match.speed2", "match.speed4"][_speed_i])
 	_raise("match:speed", {"fast": _speed_i > 0, "speed": float(SPEEDS[_speed_i])})
+	_apply()
+
+
+func speed() -> float:
+	return float(SPEEDS[_speed_i])
+
+
+## Pause or resume the show (the menu). The result is already decided; a pause changes nothing in it.
+func _toggle_pause() -> void:
+	_paused = not _paused
+	_apply()
+
+
+# ---- the intro (the Broadcast's welcome, line-ups and matchups; tap the strip to skip) -------------------------------------
+func _intro_step(delta: float) -> void:
+	_intro_t += delta
+	var l: Dictionary = _notes.cast.intro[_intro_i]
+	var p := ArenaCast.params()
+	if _intro_t >= maxf(float(p["min_show_s"]) + 0.5, float(p["per_word_s"]) * float(ArenaCast.words(String(l["text"]))) + 0.5):
+		_intro_t = 0.0
+		_intro_i += 1
+		if _intro_i >= _notes.cast.intro.size():
+			skip_intro()
+			return
+	_apply()
+
+
+func skip_intro() -> void:
+	if _intro_i < 0:
+		return
+	_intro_i = -1
+	_notes.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_raise("match:intro_end")
+	_apply()
+
+
+func _on_strip_input(ev: InputEvent) -> void:
+	if _intro_i >= 0 and ((ev is InputEventMouseButton and ev.pressed) or (ev is InputEventScreenTouch and ev.pressed)):
+		skip_intro()
+
+
+# ---- the menu (Match Day M2): speed, pause, skip, view, sound --------------------------------------------------------------
+func _open_menu() -> void:
+	_raise("match:menu")    # the guide's watch step (19) finishes when the player opens the Menu (Match Day M2)
+	BottomSheet.open(Strings.t("match.menu.h"), _menu_body, Callable(), "L", "match_menu")
+
+
+func _close_menu() -> void:
+	var cur := BottomSheet.current()
+	if cur != null:
+		cur.close()
+
+
+func _menu_body(c: Control) -> void:
+	c.add_child(UI.label(Strings.t("match.menu.speed"), UI.S_BODY, UI.ACCENT))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	for i in SPEEDS.size():
+		var b := UI.button(Strings.t(["match.speed1", "match.speed2", "match.speed4"][i]), func(): _set_speed(i); _close_menu(), "primary" if i == _speed_i else "normal", UI.BTN_H)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", UI.S_SMALL)
+		UI.tag(b, "match.menu.speed%d" % int(SPEEDS[i]), false)
+		row.add_child(b)
+	c.add_child(row)
+	var pb := UI.button(Strings.t("match.resume" if _paused else "match.pause"), func(): _toggle_pause(); _close_menu(), "normal", UI.BTN_H)
+	UI.tag(pb, "match.menu.pause", false)
+	c.add_child(pb)
+	var sk := UI.button(Strings.t("match.skip"), func(): _close_menu(); _skip(), "normal", UI.BTN_H)
+	UI.tag(sk, "match.menu.skip", false)
+	c.add_child(sk)
+	c.add_child(UI.label(Strings.t("match.menu.view"), UI.S_BODY, UI.ACCENT))
+	var vr := HBoxContainer.new()
+	vr.add_theme_constant_override("separation", 8)
+	for id in VIEWS:
+		var vb := UI.button(Strings.t("match.view." + id), func(): set_view(id); _close_menu(), "primary" if id == view_mode else "normal", UI.BTN_H)
+		vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		vb.add_theme_font_size_override("font_size", UI.S_SMALL)
+		UI.tag(vb, "match.view." + id, false)
+		vr.add_child(vb)
+	c.add_child(vr)
+	var on := HelpSheet.device().sound()
+	var sb := UI.button(Strings.t("match.sound_on" if on else "match.sound_off"), func(): App.set_sound(not HelpSheet.device().sound()); _close_menu(), "normal", UI.BTN_H)
+	UI.tag(sb, "match.menu.sound", false)
+	c.add_child(sb)
 
 
 ## Skip to the end: one tap, no confirm; the scoreboard shows its final state in one frame.

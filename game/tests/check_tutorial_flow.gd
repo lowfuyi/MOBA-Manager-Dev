@@ -49,6 +49,7 @@ func until(cond: Callable, max_ms: int = 3000) -> bool:
 
 
 func _ready() -> void:
+	ScreenMatch.intro_on = false    # Match Day M2: the scripted walk plays the match straight on; check_ui_match tests the intro
 	get_window().size = Vector2i(720, 1280)
 	await frames(2)
 	await _fresh_device()
@@ -534,6 +535,8 @@ func _tapper() -> void:
 	while guard < 400 and r.m != null and r.m.state() != "done":
 		guard += 1
 		if r.m.step_id() == "see_report" and _cur() is ScreenMatch:
+			(_cur() as ScreenMatch)._close_menu()    # Match Day M2: step 19 opened the Menu; the player closes it (or taps Skip in it)
+			await frames(6)
 			(_cur() as ScreenMatch)._skip()    # the player watches to the end or taps Skip: the Report button shows at the end
 			await frames(3)
 		var shown := await until(func(): return _overlay() != null and (_overlay().mode == "shown" or _overlay().mode == "fallback") and _overlay().step_id == r.m.step_id(), 8000)

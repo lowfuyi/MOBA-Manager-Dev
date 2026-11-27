@@ -38,6 +38,8 @@ var plan_ev: Array = []        # [t, side, name]
 var end_t := 0.0
 var winner := "B"
 var hero_of: Dictionary = {}   # key -> hero id
+var levels: Dictionary = {}    # key -> [[t, level], ...] from the log's level events
+var buys: Dictionary = {}      # key -> [[t, item id], ...] from the log's buy events
 var _pace: Array = []          # [[show_t0, game_t0, rate], ...] rate = game seconds per show second
 var show_len := 180.0
 
@@ -93,6 +95,14 @@ func _build() -> void:
 				intents.append([t, String(e[2]), String(e[3]), String(e[4])])
 			"plan":
 				plan_ev.append([t, String(e[2]), String(e[3])])
+			"level":
+				if not levels.has(String(e[2])):
+					levels[String(e[2])] = []
+				(levels[String(e[2])] as Array).append([t, int(e[3])])
+			"buy":
+				if not buys.has(String(e[2])):
+					buys[String(e[2])] = []
+				(buys[String(e[2])] as Array).append([t, String(e[3])])
 			"end":
 				end_t = t
 	if end_t <= 0.0:
@@ -254,6 +264,59 @@ func hp(key: String, t: float) -> float:
 		if last >= 0.0:
 			return last
 	return clampf(float(_sample(key, t)[1]), 0.0, 1.0)
+
+
+## A hero's level at t (1 before any level event). Display only (Match Day M2).
+func level_of(key: String, t: float) -> int:
+	var lv := 1
+	for x in levels.get(key, []):
+		if float(x[0]) <= t:
+			lv = int(x[1])
+		else:
+			break
+	return lv
+
+
+## A hero's items at t, in buying order: a finished item takes the place of the parts it was built from (items_v2 components).
+func items_of(key: String, t: float) -> Array:
+	var inv: Array = []
+	for x in buys.get(key, []):
+		if float(x[0]) > t:
+			break
+		var iid := String(x[1])
+		for part in SimData.item(iid).get("components", []):
+			var i := inv.find(String(part))
+			if i >= 0:
+				inv.remove_at(i)
+		inv.append(iid)
+	return inv
+
+
+## [kills, deaths, assists] of a hero at t (kills by towers count as deaths only).
+func kda_of(key: String, t: float) -> Array:
+	var k := 0
+	var d := 0
+	var a := 0
+	for x in kills:
+		if float(x[0]) > t:
+			continue
+		if String(x[1]) == key:
+			k += 1
+		if String(x[2]) == key:
+			d += 1
+		if x[3] is Array and (x[3] as Array).has(key):
+			a += 1
+	return [k, d, a]
+
+
+## Seconds of game time until a dead hero is back (0 when alive).
+func respawn_in(key: String, t: float) -> float:
+	if alive(key, t):
+		return 0.0
+	for r in respawns.get(key, []):
+		if float(r) > t:
+			return float(r) - t
+	return 0.0
 
 
 func towers_down(t: float) -> Dictionary:

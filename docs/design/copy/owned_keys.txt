@@ -1647,3 +1647,15 @@ arena.cast.place.mid
 arena.cast.place.bot
 arena.cast.place.jungle
 arena.cast.place.base
+match.menu
+match.menu.h
+match.menu.speed
+match.menu.view
+match.pause
+match.resume
+match.sound_on
+match.sound_off
+match.view.toast
+match.chip.paused
+match.intro.skip
+match.panel.respawn

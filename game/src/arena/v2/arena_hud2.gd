@@ -135,30 +135,56 @@ class Board extends Control:
 		t = p_t
 		queue_redraw()
 
+	## Match Day M2 layout (150 px): the two header buttons sit in the side columns (`side_w` each, placed by the screen); the
+	## middle shows the club names and the clock, the kills and towers, and the gold-lead bar (ARENA-HUD-2 2.1): centred, teal
+	## to the left with a circle end when you lead, coral to the right with a hexagon end when they lead, the difference
+	## written on it; who holds Stoneback and Moonhulk at the bar's ends.
+	var side_w := 0.0
+
 	func _draw() -> void:
 		var f := get_theme_default_font()
 		var v := ArenaHud2.board_values(pl, t)
 		draw_rect(Rect2(Vector2.ZERO, size), Color(UI.BG, 0.92))
-		var top := 34.0
-		_text(f, mine, Vector2(20, top), UI.S_SMALL, you, HORIZONTAL_ALIGNMENT_LEFT, size.x * 0.4)
-		_text(f, theirs, Vector2(size.x - 20, top), UI.S_SMALL, them, HORIZONTAL_ALIGNMENT_RIGHT, size.x * 0.4)
-		_text(f, String(v["clock"]), Vector2(size.x / 2.0, top), UI.S_SMALL, UI.TEXT2, HORIZONTAL_ALIGNMENT_CENTER, 120)
-		var mid := size.y * 0.62
-		_text(f, str(v["kills_you"]), Vector2(size.x / 2.0 - 30, mid + 16), UI.S_TITLE, you, HORIZONTAL_ALIGNMENT_RIGHT, 120)
-		_text(f, "–", Vector2(size.x / 2.0, mid + 12), UI.S_HEAD, UI.TEXT2, HORIZONTAL_ALIGNMENT_CENTER, 40)
-		_text(f, str(v["kills_them"]), Vector2(size.x / 2.0 + 30, mid + 16), UI.S_TITLE, them, HORIZONTAL_ALIGNMENT_LEFT, 120)
-		# side marks and towers: circle for you, hexagon for them
-		draw_circle(Vector2(26, mid), 9.0, you)
-		_text(f, Strings.f("arena2.board.towers", {"n": v["towers_you"]}), Vector2(44, mid + 9), UI.S_CAPTION, UI.TEXT, HORIZONTAL_ALIGNMENT_LEFT, 200)
-		_hex(Vector2(size.x - 26, mid), 10.0, them)
-		_text(f, Strings.f("arena2.board.towers", {"n": v["towers_them"]}), Vector2(size.x - 44, mid + 9), UI.S_CAPTION, UI.TEXT, HORIZONTAL_ALIGNMENT_RIGHT, 200)
-		var lead_col := UI.TEXT2 if String(v["gold_leader"]) == "" else (you if String(v["gold_leader"]) == "you" else them)
-		var gold := Strings.f("arena2.board.gold", {"n": v["gold_text"]})
-		_text(f, gold, Vector2(size.x / 2.0, size.y - 10), UI.S_CAPTION, lead_col, HORIZONTAL_ALIGNMENT_CENTER, 260)
-		for pair in [["stone", Strings.t("arena2.place.stoneback"), 0.22], ["moon", Strings.t("arena2.place.moonhulk"), 0.78]]:
+		# row A, full width: the club names and the clock (the header buttons sit below it)
+		var top := 26.0
+		_text(f, mine, Vector2(16, top), UI.S_CAPTION, you, HORIZONTAL_ALIGNMENT_LEFT, size.x * 0.40)
+		_text(f, theirs, Vector2(size.x - 16, top), UI.S_CAPTION, them, HORIZONTAL_ALIGNMENT_RIGHT, size.x * 0.40)
+		_text(f, String(v["clock"]), Vector2(size.x * 0.5, top), UI.S_CAPTION, UI.TEXT2, HORIZONTAL_ALIGNMENT_CENTER, 90)
+		# rows B and C, between the buttons
+		var x0 := side_w + 6.0
+		var x1 := size.x - side_w - 6.0
+		var cx := (x0 + x1) * 0.5
+		var mw := x1 - x0
+		var blk := (mw - 120.0) * 0.5
+		var mid := 72.0
+		_text(f, str(v["kills_you"]), Vector2(cx - 20, mid + 14), UI.S_TITLE, you, HORIZONTAL_ALIGNMENT_RIGHT, 60)
+		_text(f, "–", Vector2(cx, mid + 10), UI.S_HEAD, UI.TEXT2, HORIZONTAL_ALIGNMENT_CENTER, 40)
+		_text(f, str(v["kills_them"]), Vector2(cx + 20, mid + 14), UI.S_TITLE, them, HORIZONTAL_ALIGNMENT_LEFT, 60)
+		draw_circle(Vector2(x0 + 8, mid - 6), 8.0, you)
+		_text(f, Strings.f("arena2.board.towers", {"n": v["towers_you"]}), Vector2(x0 + 22, mid + 2), UI.S_CAPTION, UI.TEXT, HORIZONTAL_ALIGNMENT_LEFT, blk - 22.0)
+		_hex(Vector2(x1 - 9, mid - 6), 9.0, them)
+		_text(f, Strings.f("arena2.board.towers", {"n": v["towers_them"]}), Vector2(x1 - 22, mid + 2), UI.S_CAPTION, UI.TEXT, HORIZONTAL_ALIGNMENT_RIGHT, blk - 22.0)
+		for pair in [["stone", Strings.t("arena2.place.stoneback"), x0, HORIZONTAL_ALIGNMENT_LEFT], ["moon", Strings.t("arena2.place.moonhulk"), x1, HORIZONTAL_ALIGNMENT_RIGHT]]:
 			var holder := String(v[pair[0]])
 			var col := UI.TEXT2 if holder == "" else (you if holder == "you" else them)
-			_text(f, String(pair[1]), Vector2(size.x * float(pair[2]), size.y - 10), UI.S_CAPTION, col, HORIZONTAL_ALIGNMENT_CENTER, 200)
+			_text(f, String(pair[1]), Vector2(float(pair[2]), mid + 30.0), UI.S_CAPTION, col, int(pair[3]), blk)
+		# the gold-lead bar (ARENA-HUD-2 2.1)
+		var by := size.y - 14.0
+		var bar := Rect2(x0, by - 5.0, mw, 10.0)
+		draw_rect(bar, UI.PANEL3)
+		var lead := int(v["gold"])
+		var half := bar.size.x * 0.5
+		var fill := clampf(absf(float(lead)) / 10000.0, 0.0, 1.0) * half
+		var c := bar.position.x + half
+		if lead > 0:
+			draw_rect(Rect2(c - fill, bar.position.y, fill, bar.size.y), you)
+			draw_circle(Vector2(c - fill, by), 8.0, you)
+		elif lead < 0:
+			draw_rect(Rect2(c, bar.position.y, fill, bar.size.y), them)
+			_hex(Vector2(c + fill, by), 9.0, them)
+		draw_rect(Rect2(c - 1.0, bar.position.y - 4.0, 2.0, bar.size.y + 8.0), UI.TEXT2)
+		var lead_col := UI.TEXT2 if String(v["gold_leader"]) == "" else (you if String(v["gold_leader"]) == "you" else them)
+		_text(f, Strings.f("arena2.board.gold", {"n": v["gold_text"]}), Vector2(cx, by - 14.0), UI.S_CAPTION, lead_col, HORIZONTAL_ALIGNMENT_CENTER, 200)
 
 	func _text(f: Font, s: String, at: Vector2, fs: int, col: Color, align: int, w: float) -> void:
 		var x := at.x
@@ -177,6 +203,7 @@ class Board extends Control:
 
 
 class Feed extends Control:
+	var max_lines := 2              # Match Day M2: one line under the commentary during the show (both at the end)
 	var pl: ArenaPlayer
 	var t := 0.0
 	var mine := ""
@@ -210,6 +237,8 @@ class Feed extends Control:
 			var col := UI.TEXT if side == "" else (UI.ACCENT if side == pl.my_side else UI.CORAL)
 			if i > 0 and end_text == "":
 				col = Color(col, 0.6)
+			if i >= max_lines and end_text == "":
+				break
 			draw_string(f, Vector2(0, y), String(l["text"]), HORIZONTAL_ALIGNMENT_LEFT, size.x, UI.S_SMALL if i == 0 else UI.S_CAPTION, col)
 			y += 38.0
 			i += 1
@@ -224,7 +253,9 @@ class Notes extends Control:
 	var show_s := 0.0
 	var speed := 1.0
 	var cast: ArenaCast = null
+	var intro: Dictionary = {}      # an intro line on screen before the show (the screen sets it), else {}
 	var line_count := 0             # lines drawn last frame (tests)
+	var cut_count := 0              # lines that did not fit and were cut (tests: must stay 0)
 	var px := 0                     # type size used last frame (tests)
 
 	func _init(p: ArenaPlayer) -> void:
@@ -239,6 +270,8 @@ class Notes extends Control:
 
 	## The Broadcast line on screen now, or {}.
 	func line() -> Dictionary:
+		if not intro.is_empty():
+			return intro
 		return cast.line_at(show_s, speed) if cast != null else {}
 
 	func comment() -> String:
@@ -249,7 +282,7 @@ class Notes extends Control:
 		return c if c != "" else ArenaHud2.notes_line(pl, t)
 
 	func max_lines() -> int:
-		return 2 if UI.large else 3
+		return 3
 
 	func _draw() -> void:
 		line_count = 0
@@ -266,9 +299,12 @@ class Notes extends Control:
 			return
 		var peak := String(l["tier"]) == "peak"
 		var f := UI.font("Bold") if peak else get_theme_default_font()
-		px = maxi(32 if peak else UI.S_SMALL, 26)
+		px = 32 if peak else 26      # 26 px in both text sizes: three lines fit the strip (Match Day M2)
 		var who := Strings.t("arena.cast.name." + String(l["voice"]))
-		var rows := PlanKit.wrap(f, px, "%s: %s" % [who, String(l["text"])], size.x - 26.0, max_lines())
+		var full := "%s: %s" % [who, String(l["text"])]
+		var rows := PlanKit.wrap(f, px, full, size.x - 26.0, max_lines())
+		if PlanKit.was_cut(rows, full):
+			cut_count += 1
 		var lh := PlanKit.line_h(f, px)
 		var y := 4.0
 		if String(l["voice"]) == "p":
@@ -279,4 +315,10 @@ class Notes extends Control:
 			draw_string(f, Vector2(26, y + lh * 0.78), String(r), HORIZONTAL_ALIGNMENT_LEFT, size.x - 26, px, UI.TEXT)
 			y += lh
 		line_count = rows.size()
+		if not intro.is_empty():
+			var hint := Strings.t("match.intro.skip")
+			var hf := get_theme_default_font()
+			var hw := hf.get_string_size(hint, HORIZONTAL_ALIGNMENT_LEFT, -1, UI.S_CAPTION).x
+			draw_style_box(UI.box(Color(UI.BG, 0.85), 14), Rect2(size.x - hw - 20.0, -42.0, hw + 20.0, 36.0))
+			draw_string(hf, Vector2(size.x - hw - 10.0, -16.0), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, UI.S_CAPTION, UI.TEXT2)
 		return

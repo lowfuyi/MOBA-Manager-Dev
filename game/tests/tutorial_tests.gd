@@ -237,8 +237,8 @@ func _stages_and_shortcuts(check: Callable) -> void:
 	var s2 := _running("ban")
 	s2.feed("draft:sheet", {"kind": "ban"})
 	check.call(s2.feed("draft:sheet", {"kind": "ban"}).is_empty() and s2.stage == "b", "the stage event twice moves the hole once")
-	# step 19: any of three events, and the watch step passes taps
-	for e in ["match:speed", "match:skip", "match:end"]:
+	# step 19: any of four events (Match Day M2: opening the Menu, which holds speed and skip), and the watch step passes taps
+	for e in ["match:menu", "match:speed", "match:skip", "match:end"]:
 		var wm := _running("watch")
 		wm.feed(e)
 		check.call(wm.step_id() == "see_report", "step 19 is completed by " + e)

@@ -3,7 +3,7 @@ extends RefCounted
 ## fixed-seed save's next game, in each view (Field, Action, All) at two points of the show, Action also at 10 and 85 percent,
 ## and the end, with the frame's numbers (PERF-BUDGET 3.1a: target 60 draw calls and 120 nodes, hard 100 and 200):
 ##   MATCH|<variant>|<state>|nodes=..|draw_calls=..
-## States: p10, p35, p60, p85 (Action, percent of the show length), field_p35, field_p60, all_p35, all_p60, comment (a long calm Broadcast line), comment_peak (the first peak line), end (Skip).
+## States: intro (the Broadcast intro), p10, p35, p60, p85 (Action, percent of the show length), field_p35, field_p60, all_p35, all_p60, comment (a long calm Broadcast line), comment_peak (the first peak line), menu (the match menu open), speed_chip (x2), end (Skip).
 
 static func _count(n: Node) -> int:
 	var total := 1
@@ -32,6 +32,8 @@ static func run(ctx) -> void:
 	App.go(m)
 	await ctx.settle()
 	m.set_view("action", false)
+	await _measure(ctx, m, "intro")    # Match Day M2: the Broadcast intro before the show
+	m.skip_intro()
 	for f in [0.10, 0.35, 0.60, 0.85]:
 		m.show_t = f * m.show_len()
 		m._apply(0.5)
@@ -57,5 +59,13 @@ static func run(ctx) -> void:
 				m.show_t = float(pair[1]["s0"]) + 0.3
 				m._apply(0.5)
 				await _measure(ctx, m, String(pair[0]))
+	m._set_speed(1)
+	m._open_menu()
+	await ctx.settle()
+	await _measure(ctx, m, "menu")
+	m._close_menu()
+	await ctx.settle()
+	await _measure(ctx, m, "speed_chip")
+	m._set_speed(0)
 	m._skip()
 	await _measure(ctx, m, "end")

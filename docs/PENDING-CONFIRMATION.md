@@ -33,3 +33,12 @@ started. Each item: why it waits, the options, and the Producer's recommendation
 | R3 diagonal map concept | Founder's choice, then his recordings, the IP Checker's screen and sign-off (P1) | c1 "Corner roads", c2 "Long bows", c3 "Winding causeway" (`docs/design/MAP-DIAGONAL-CONCEPTS.md`, pictures in `docs/design/art/arena-map-diagonal-*.png`) | c3: our own S-shaped causeway, the objectives fair but not a mirror pair, and all lanes look the same speed (no replay factor) |
 | R4 HUD ideas (P2) | Need the recording; one needs a simulation change | Camera button in the Board, gold-lead bar, respawn countdowns, level badge (all display only); lane gold as a sheet; no ability chips (our heroes have no ability ranks) (`docs/design/ARENA-HUD-2.md`) | Build the four display-only parts after the recording, camera button first (+about 100 px of arena) |
 | Per-player gold in the game log | The lane gold sheet (R4 2.3) needs gold per player over time; the log has team gold only. Adding it is an additive log field written by `src/sim/`, so the golden vectors' log hash changes: outside the R2 approval | Approve with the next simulation change, or drop the lane gold idea | Approve together with the next approved sim change, so the golden vectors are re-recorded once |
+
+## 4. Raised in the Match Day run (queue `docs/design/QUEUE-MATCH-DAY.md`)
+
+| Item | Why it waits | Options | Recommendation |
+|---|---|---|---|
+| M3 map concept | Founder's pick (d1, d2 or d3, `MAP-RIVER-CONCEPTS.md`); M9 waits for it | d1 River cross (IP Checker: Change), d2 Bending river (Watch medium), d3 Wrenfell water (Watch low) | d3, or the IP Checker's d2/d3 mix |
+| Line-up panel rows below the 96 px floor (DECISIONS H-9) | The rows are 60 px; ruled a display, one tap target for the whole panel | Confirm, or ask for bigger rows (the arena gets shorter) | Confirm |
+| Caster names Rosco and Imogen | Narrative Designer's placeholders; name and trademark search owed before release | Keep, or choose others | Keep for the alpha |
+| How loud the commentary is | About 56 lines a game, a line on screen almost all the time | Keep, thin it (more calm gaps), or a setting | Keep for the phone test; decide after testers |

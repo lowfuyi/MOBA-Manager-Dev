@@ -35,6 +35,7 @@ func frames(n: int = 3) -> void:
 
 
 func _ready() -> void:
+	ScreenMatch.intro_on = false    # Match Day M2: these flows play a match straight to its end; check_ui_match tests the intro
 	TutorialRunner.home_offers = false
 	get_window().size = Vector2i(720, 1280)
 	await frames(2)

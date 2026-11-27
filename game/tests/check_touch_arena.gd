@@ -98,16 +98,14 @@ func _run() -> void:
 		v.show_game(gt, 0.1)
 	var tgt: Vector2 = v.chase.target["pos"]
 	ok(v.cam.focus.distance_to(tgt) < held.distance_to(tgt) + 1e-6, "views: it eases back toward the chased event")
-	await sim.tap((m._view_btns["field"] as Button).get_global_rect().get_center())
-	await frames(3)
+	await _tap_view(m, sim, "field")
 	ok(v.mode == "field" and App.tutorial.device.arena_camera() == "field", "views: tapping Field shows Field and remembers it")
 	var f0 := v.cam.focus
 	var d0 := v.cam.dist
 	await sim.drag(c, Vector2(-200, 100), 8)
 	await frames(2)
 	ok(not v.manual and v.cam.focus.distance_to(f0) < 1e-4 and absf(v.cam.dist - d0) < 1e-4, "views: Field is fixed (a drag does nothing)")
-	await sim.tap((m._view_btns["all"] as Button).get_global_rect().get_center())
-	await frames(3)
+	await _tap_view(m, sim, "all")
 	ok(v.mode == "all" and not v.fog_on() and App.tutorial.device.arena_camera() == "all", "views: All has no fog and is remembered")
 	var corners_in := true
 	for p in [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)]:
@@ -129,8 +127,7 @@ func _run() -> void:
 	get_window().size = Vector2i(720, 1280)
 	await frames(4)
 	v.show_game(m.player.game_t(m.show_t), 0.1)
-	await sim.tap((m._view_btns["action"] as Button).get_global_rect().get_center())
-	await frames(3)
+	await _tap_view(m, sim, "action")
 	ok(v.mode == "action" and v.fog_on(), "views: back to Action, fog on")
 	ok(App.timings.frames.has("field") and App.timings.frames.has("all") and App.timings.frames.has("action"), "timings: arena frame times are kept per view (Field, Action, All)")
 	ok(App.debug_info().contains("arena frame ms: field avg="), "timings: the debug lines carry the frame times")
@@ -153,3 +150,12 @@ func _boot() -> void:
 	App.tutorial.device = DeviceState.new(TEMP_CFG)
 	App.tutorial.bind()
 	await frames(2)
+
+
+## Match Day M2: one View button cycles Field, Action and All; tap it (a real simulated finger) until `want` is on.
+func _tap_view(m: ScreenMatch, sim, want: String) -> void:
+	for i in 3:
+		if m.view_mode == want:
+			return
+		await sim.tap(m._view_btn.get_global_rect().get_center())
+		await frames(3)

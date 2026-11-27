@@ -1,0 +1,14 @@
+{
+  "match.menu": "Menu",
+  "match.menu.h": "Match menu",
+  "match.menu.speed": "Speed",
+  "match.menu.view": "View",
+  "match.pause": "Pause",
+  "match.resume": "Resume",
+  "match.sound_on": "Sound: on",
+  "match.sound_off": "Sound: off",
+  "match.view.toast": "View: {view}",
+  "match.chip.paused": "Paused",
+  "match.intro.skip": "Tap to skip the intro",
+  "match.panel.respawn": "Back in {n}s"
+}

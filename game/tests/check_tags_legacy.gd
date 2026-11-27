@@ -6,7 +6,7 @@ extends Node
 ##                  the phase or the practice day says, and writes nothing to the save but the tutorial key
 ##   tags_prematch  prematch.matchups (the card) and prematch.start_draft; no old Pre-match tip card
 ##   tags_club      club.tile.form / finance / fa; Form Rating opens Standings on form
-##   tags_match     match.controls, match.report_btn; match:speed, match:skip, match:end fire; watching changes neither the result
+##   tags_match     match.controls (the Menu), match.report_btn; match:speed, match:skip, match:end fire from the menu; watching changes neither the result
 ##                  nor the save (R7): same seed, same result with the tags present
 ##   steps_         tutorial steps 8, 9, 10, 11, 19, 20 and 25 find their targets on the old screens (shown, never the fallback card),
 ##                  and the hole is the target plus 8 px
@@ -244,15 +244,19 @@ func _tags_match() -> void:
 	var sm := ScreenMatch.new(g, res)
 	await _go(sm)
 	var mc := UI.find_tag("match.controls")
-	ok(mc != null and _visible_in_viewport(mc), "tags_match: match.controls (Speed and Skip) is on screen")
-	ok(mc != null and mc.get_global_rect().encloses(sm._speed_btn.get_global_rect()) and mc.get_global_rect().encloses(sm._skip_btn.get_global_rect()), "tags_match: it covers both Speed and Skip")
+	ok(mc != null and _visible_in_viewport(mc), "tags_match: match.controls (the Menu with speed and skip, Match Day M2) is on screen")
+	ok(mc == sm._menu_btn, "tags_match: it is the Menu button")
 	ok(UI.find_tag("match.report_btn") == null, "tags_match: the report button is hidden while the match runs")
 	_events.clear()
-	sm._speed_btn.pressed.emit()
-	await frames(1)
-	ok(_events.has("match:speed"), "tags_match: Speed raises match:speed")
-	sm._skip_btn.pressed.emit()
-	await frames(2)
+	sm._menu_btn.pressed.emit()
+	await frames(4)
+	(UI.find_tag("match.menu.speed2") as Button).pressed.emit()
+	await frames(4)
+	ok(_events.has("match:speed"), "tags_match: Speed x2 in the menu raises match:speed")
+	sm._menu_btn.pressed.emit()
+	await frames(4)
+	(UI.find_tag("match.menu.skip") as Button).pressed.emit()
+	await frames(4)
 	ok(_events.has("match:skip") and _events.has("match:end"), "tags_match: Skip raises match:skip, then match:end")
 	ok(_events.find("match:skip") < _events.find("match:end"), "tags_match: in that order")
 	var rb := UI.find_tag("match.report_btn")
