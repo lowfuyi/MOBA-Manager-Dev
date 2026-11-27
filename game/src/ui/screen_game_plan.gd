@@ -178,6 +178,7 @@ class _Stand extends Control:
 	var draw_count := 0
 	var _ops := CardKit.Ops.new()
 	const CELL_H := 76.0
+	const CELL_H_ONE := 50.0      # large text: name, bar and number on one line (queue 2026-11-27 R5), so Tempo's lines fit
 
 	func _init() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -188,12 +189,15 @@ class _Stand extends Control:
 	func cols() -> int:
 		return 1 if UI.large else 2
 
+	func cell_h() -> float:
+		return CELL_H_ONE if UI.large else CELL_H
+
 	func set_rows(r: Array) -> void:
 		if r == rows:
 			return
 		rows = r.duplicate(true)
 		var n := ceili(float(rows.size()) / float(cols()))
-		custom_minimum_size = Vector2(0, 48.0 + float(n) * CELL_H if not rows.is_empty() else 0.0)
+		custom_minimum_size = Vector2(0, 48.0 + float(n) * cell_h() if not rows.is_empty() else 0.0)
 		queue_redraw()
 
 	func _draw() -> void:
@@ -207,16 +211,22 @@ class _Stand extends Control:
 		var c := cols()
 		var gap := 24.0
 		var cw := (size.x - gap * float(c - 1)) / float(c)
+		var one := UI.large
+		var num_col := 0.0          # one line: every bar ends at the same x, so the zero ticks line up
+		for r in rows:
+			num_col = maxf(num_col, CardKit.text_w(UI.font("SemiBold", true), UI.S_SMALL, UI.pct(float(r[1]))))
 		for i in rows.size():
 			var x := float(i % c) * (cw + gap)
-			var y := 48.0 + float(i / c) * CELL_H
+			var y := 48.0 + float(i / c) * cell_h()
 			var e := float(rows[i][1])
 			var num := UI.pct(e)
 			var nf := UI.font("SemiBold", true)
 			var nw := CardKit.text_w(nf, UI.S_SMALL, num)
-			_ops.text(UI.font(), UI.S_SMALL, String(rows[i][0]), x, y + 18.0, cw - nw - 12.0, UI.TEXT)
-			_ops.text(nf, UI.S_SMALL, num, x + cw - nw, y + 18.0, nw + 2.0, UI.delta_color(e) if absf(e) > 0.0005 else UI.DIM)
-			var bar := Rect2(x, y + 42.0, cw, 10.0)
+			var name_w := cw * 0.34 if one else cw - nw - 12.0
+			var ty := y + 22.0 if one else y + 18.0
+			_ops.text(UI.font(), UI.S_SMALL, String(rows[i][0]), x, ty, name_w, UI.TEXT)
+			_ops.text(nf, UI.S_SMALL, num, x + cw - nw, ty, nw + 2.0, UI.delta_color(e) if absf(e) > 0.0005 else UI.DIM)
+			var bar := Rect2(x + cw * 0.36, y + 17.0, cw * 0.64 - num_col - 16.0, 10.0) if one else Rect2(x, y + 42.0, cw, 10.0)
 			_ops.shape("solid", bar, UI.PANEL3)
 			var half := bar.size.x * 0.5
 			var f := maxf(clampf(absf(e) / 0.20, 0.0, 1.0) * half, 3.0)

@@ -3,7 +3,8 @@ extends Node
 ##   build_gp / fit_gp_<v>  every state builds (Overall, Early, Mid, Late, If behind off and on, the Coach sheet, the plan sheet) in
 ##                    normal and large text; no control leaves the frame; no drawn text is cut (hero, stand, tracks, strip, Jungle
 ##                    focus); buttons at least 96 px high; nodes under the target (120); the expected edge stays on screen; large text: the edge is
-##                    one line and the Tempo slider is on screen on the Early page (0.12.1, DECISIONS Q6-2 (c))
+##                    one line and the Tempo slider is on screen on the Early page (0.12.1, DECISIONS Q6-2 (c)); the meters are one
+##                    line each, so Tempo's description is on screen too (queue 2026-11-27 R5)
 ##   equivalence      30 random sequences of taps on the real controls (plan sheet rows and switches, the off card, phase nodes,
 ##                    detents, Jungle focus, Coach and Apply, Reset) leave the same plan set in the save as the old screen's logic
 ##                    given the same actions (the old methods' bodies, copied below as the reference model)
@@ -238,6 +239,8 @@ func _build_and_fit(v: String) -> void:
 			var tr := (gp.tracks["t"] as Control).get_global_rect()
 			var slider_end := tr.position.y + DetentTrack.HEAD_H + DetentTrack.TRACK_H
 			ok(gp.hero.size.y <= 80.5 and slider_end <= pr.end.y + 0.5, "fit_gp_large_early: the edge is one line (%.0f px) and the Tempo slider is on screen (ends %.0f, page %.0f)" % [gp.hero.size.y, slider_end, pr.end.y])
+			# queue 2026-11-27 R5: the meters are one line each in large text, so Tempo's description lines fit too (no scroll)
+			ok(gp.stand.cell_h() <= 50.5 and tr.end.y <= pr.end.y + 0.5, "fit_gp_large_early_tempo: Tempo's description is on screen without a scroll (track ends %.0f, page %.0f)" % [tr.end.y, pr.end.y])
 	gp._set_tab("behind_early")
 	await frames(2)
 	ok(gp.off_card.visible and not gp.tracks["l"].visible and gp.coach_button.disabled, "build_gp_%s_behind_off: a trigger plan that is off shows the switch-on card, no controls" % v)
