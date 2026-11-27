@@ -6,6 +6,7 @@ merges the chunks and writes:
   game/data/hero_matchups_v1.json     d) "struggles against" per hero (display only)
 
     GODOT=/path/to/godot python3 tools/q2_analysis.py run --game-dir <copy of game/> --raw <dir> [--jobs 6]
+    (each finished chunk is kept in <raw>/chunks/, so the same command resumes a run that was cut short)
     python3 tools/q2_analysis.py report --raw <dir>
 
 Not part of the fast gate (several hours of CPU). Defaults: heroes 40,000 games per format (1, 3, 5 bans), draft 5,000 per
@@ -74,8 +75,21 @@ def cmd_run(a):
             continue
         seeds = list(range(1, total // chunk + 1))
         base = {"draft": 5000, "plans": 7000, "heroes": 9000}[mode] + nb * 100
+        cdir = raw / "chunks"
+        cdir.mkdir(exist_ok=True)
+
+        def one(s, mode=mode, nb=nb, chunk=chunk, base=base):
+            # each finished chunk is kept, so a run cut short (a restart) resumes where it stopped
+            cf_ = cdir / f"{mode}_{nb}_{chunk}_{base + s}.json"
+            if cf_.exists():
+                return json.loads(cf_.read_text())
+            r = run_chunk(godot, a.game_dir, mode, nb, chunk, base + s)
+            if r is not None:
+                cf_.write_text(json.dumps(r))
+            return r
+
         with cf.ThreadPoolExecutor(a.jobs) as ex:
-            parts = list(ex.map(lambda s: run_chunk(godot, a.game_dir, mode, nb, chunk, base + s), seeds))
+            parts = list(ex.map(one, seeds))
         bad = sum(1 for p in parts if p is None)
         m = merge(parts)
         m["failed_chunks"] = bad
