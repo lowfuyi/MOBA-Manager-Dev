@@ -1,6 +1,6 @@
-# Game Design Document v1.12
+# Game Design Document v1.13
 
-Status: DRAFT v1.12. **v1.12 records the Founder decisions of 2026-11-19 (section 18): Match Sim v2 with full hero kits, items and role-driven players; Arena v2; a tunable show length. Where section 18 conflicts with an earlier section, section 18 wins.** v1.11 v1.11 records how Exhibition, Quick Match, the Form Rating, the career log, derived kills/deaths/assists and the stat help were implemented in Alpha 0.6 (sections 4.2, 7.9, 10.1, Implementation notes), the Alpha exit checklist (`docs/ALPHA-EXIT-CHECKLIST.md`) and the comfort options (large text, colour-blind colours, one-time tips; section 17). v1.10 records the Founder-approved UI direction (Arena Dusk, bottom tab bar, payoff screen, preview-before-commit) and fixes the watch time of one game at about 75 seconds (sections 8.7 and 17; Alpha 0.5). v1.9 records how Team Bonds, Form and Morale were implemented in Alpha 0.4 (sections 4.2, 7.3, 7.7, 8.6, Implementation notes) and settles one conflict inside the document (the scrim bonus, below). v1.8 records how recruitment of free agents, contracts, the cash ledger and the sponsor were implemented in Alpha 0.3 (sections 7.2 and 7.6, Implementation notes). v1.7 records how training, fatigue and ageing were implemented in Alpha 0.2 (section 7.3, Implementation notes) and the Game Plan QA result (CALIBRATION-9.1 addendum). v1.6 adds the Founder's match formats and pacing rule (section 8.7). v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 to v1.11 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
+Status: DRAFT v1.13. **v1.13 brings the document up to the 0.12 features (section 20: tester timings, commentary, item icons, ability looks, role fit, scouting summary, contract refusal reasons, Form Rating card, finance chart, achievements and records, playing the rest of the league, hero matchups).** v1.12: **v1.12 records the Founder decisions of 2026-11-19 (section 18): Match Sim v2 with full hero kits, items and role-driven players; Arena v2; a tunable show length. Where section 18 conflicts with an earlier section, section 18 wins.** v1.11 v1.11 records how Exhibition, Quick Match, the Form Rating, the career log, derived kills/deaths/assists and the stat help were implemented in Alpha 0.6 (sections 4.2, 7.9, 10.1, Implementation notes), the Alpha exit checklist (`docs/ALPHA-EXIT-CHECKLIST.md`) and the comfort options (large text, colour-blind colours, one-time tips; section 17). v1.10 records the Founder-approved UI direction (Arena Dusk, bottom tab bar, payoff screen, preview-before-commit) and fixes the watch time of one game at about 75 seconds (sections 8.7 and 17; Alpha 0.5). v1.9 records how Team Bonds, Form and Morale were implemented in Alpha 0.4 (sections 4.2, 7.3, 7.7, 8.6, Implementation notes) and settles one conflict inside the document (the scrim bonus, below). v1.8 records how recruitment of free agents, contracts, the cash ledger and the sponsor were implemented in Alpha 0.3 (sections 7.2 and 7.6, Implementation notes). v1.7 records how training, fatigue and ageing were implemented in Alpha 0.2 (section 7.3, Implementation notes) and the Game Plan QA result (CALIBRATION-9.1 addendum). v1.6 adds the Founder's match formats and pacing rule (section 8.7). v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). v1.4 answered the independent QA review of v1.3; v1.5 re-tunes the draft constants after the full-pipeline calibration (section 9.1, P-003). Findings and fixes are in section 16. **v1.4 to v1.11 have not had a second independent review yet.** Author: Game Design Lead and Systems Lead. Date: 2026-11-07.
 Next: Founder review. Done: P-001 (skeleton), P-002 (simulator with golden tests), content data, P-003 first pass (9.1). Open: paired lever tests, Phase 1 rating-scale calibration, joint Game Plan test.
 
 All numbers in this document are **v0 placeholders** unless marked otherwise. They exist so the rules can be tested. QA & Balance tunes them against the targets in section 9, using `tools/proto_sim.py` as the reference model.
@@ -255,7 +255,7 @@ Time advances in **days** when the player taps Continue. A **full season** has t
 - **Negotiation:** 3 offers, then a 4-round lockout. A Temperamental player walks after the second refusal. A released player is locked out for 4 rounds as well. Offers are blocked (before they count) when the squad is full (10), the balance is negative or below the signing fee, or the new wage bill would pass the wage cap.
 - **Signing fee** is 2 weeks of wages; renewing a final-year contract has no fee and adds the new length to the seasons left. **Release** costs 50 percent of the wages still owed (weeks left in this season plus the full later seasons) and needs at least 6 players on the roster. The roster maximum is 10.
 - **Season change:** every contract loses one season; players whose contract ran out leave to the free-agent pool. If that would leave fewer than 6 players the board keeps the best of them on one-year deals. After the season is over the expiring players no longer take a squad place, so replacements can be signed before the new season starts.
-- **Free agents** train on the coach's plan and age like everybody else; released and expired players join the pool. AI clubs do not sign, release or pay anybody (their rosters are the data files').
+- **Free agents** train on the suggested training (the Coach's pick, 7.3) and age like everybody else; released and expired players join the pool. AI clubs do not sign, release or pay anybody (their rosters are the data files').
 
 ### 7.3 Training and fatigue
 
@@ -626,6 +626,7 @@ Founder questions are in `company/DECISIONS.md`. Parameters still to define are 
 | 2026-11-08 | v1.9 implementation notes for 4.2, 7.3, 7.7 and 8.6 (Team Bonds, Form, Morale, Team scrim); scrim bonus set to +1.5 a week to satisfy the 20 percent bond-farming limit of 9.2 test 2 | Systems Lead |
 | 2026-11-08 | v1.10 Founder-approved UI direction (Arena Dusk, bottom tab bar, payoff screen, preview-before-commit, section 17); fixed 75-second watch window per game and a local pace log (8.7) | Producer, UI/UX |
 | 2026-11-08 | v1.11 implementation notes for 4.2 (career record, derived KDA, stat help), 7.9 (Exhibition, Quick Match), 10.1 (Form Rating, trophy cabinet) and comfort options (17); Alpha exit checklist | Producer, Systems Lead |
+| 2026-11-27 | v1.13 section 20: the 0.12.0 and 0.12.2 features as built (tester timings, commentary, item icons, ability looks, overview camera, large-text layouts, role fit, scouting summary, refusal reasons, Form Rating card, finance chart, achievements and records, play the rest of the league, hero matchups); "coach" wording in 7.2 and 18 | Producer (acting as Lead Game Designer) |
 | 2026-11-19 | v1.12 Founder decisions of 2026-11-19 (section 18): scope opened for hero kits and items; full kits for 40 heroes; coach-suggested, manager-editable builds; show length tunable (75 s window and 5-minute game lifted); Arena v2 tilted follow camera with an original layout; role-driven players; Match Sim v2 approved with new golden vectors replacing R1 and the golden hash | Producer (recording the Founder) |
 
 ---
@@ -654,7 +655,7 @@ Recorded by the Producer from the Founder's message of 2026-11-19. Where this se
 
 1. **Scope opens now** for hero identity and items, before the art phase. Art stays placeholder (the Arena Dusk style) until the Founder chooses an art route.
 2. **Full kits.** Each of the 40 heroes gets a passive and four abilities: three basic and one ultimate, all original (names and effects screened by the IP & Originality Checker).
-3. **Builds.** Items are bought during the game from a build. The coach suggests a build per hero and slot; the manager can edit it before the game (Phase 5).
+3. **Builds.** Items are bought during the game from a build. The Coach (the helper, never the player) suggests a build per hero and slot; the manager can edit it before the game (Phase 5).
 4. **Show length** is no longer fixed. The 75-second window and the 5-minute game rule (8.7) are lifted. The show length is one tunable value.
 5. **Match map.** A steep, tilted camera that follows the action with a corner minimap; material zones (stone, dirt, grass, water); upright units with thin team-coloured bars; team-colour glow only at structures and floor emblems; a floating rounded island in fog. The layout, landmarks and shapes are ORIGINAL. The orientation (portrait or landscape) is the Producer's call, logged in `company/DECISIONS.md`.
 6. **Players act out their roles.** Each player follows a role behaviour (top, jungle, mid, bot, support) inside the simulation, not scripted orders.
@@ -690,3 +691,69 @@ Recorded by the Producer from the Founder's message of 2026-11-22, after his pho
    - **All:** the whole island, fixed, no fog.
 
    Vision comes from your heroes, minions, towers, the Cairn and wards, with radii in data (`game/data/arena_view_v1.json`). Fog is presentation only: the result is decided first, and no view changes it (rules A1 and R7). Kills, towers and objective takes in the fog are still announced in the feed and the scoreboard; the map shows the place only if your team sees it. Design: `MATCH-SIM-V2-DESIGN.md` section 17.
+
+---
+
+## 20. What 0.12 added (0.12.0 of 2026-11-24 and 0.12.2 of 2026-11-25, as built)
+
+Recorded by the Producer (acting as Lead Game Designer) on 2026-11-27. Rules here describe the build; numbers are the
+shipped values. Every item is presentation or management information unless it says otherwise: none of them changes how a
+match is simulated (R7), except the 0.11.2 support pass at the top of 0.12.0. Rulings are in `company/DECISIONS.md`
+(overnight queue Q0 to Q9 and F-3).
+
+### 20.1 Match and arena (0.12.0)
+
+1. **Support pass (0.11.2, simulation).** Fennimore's Fen Fog also heals allies a little where it lands; Leap Frog gives a
+   small shield. Rating weight `q_k` 0.385 (+7% over 0.11.0). Before and after: `BAN-EXPERIMENT.md`.
+2. **Commentary.** At most two lines a game in the notes line under the map, each up 3 show seconds, at least 2 game
+   minutes apart, only in a calm moment (no fight, kill, tower or objective from 2 s before to 1 s after; it may slide up
+   to 30 s later, else it is dropped). Sources in order: the first decisive fight, the first Moonhulk (else a Stoneback
+   before 15:00), the gold lead at 8:00 (1,500+), the lead a minute before the end (2,000+). None in large text.
+3. **Decisive fights and ward places** are in the game log: a fight with `decisive_kills` or more kills, or the Cairn,
+   is flagged; each ward carries its map position. The fog of war and the Action camera read them.
+4. **Item icons** (placeholder art): plate colour = tier, edge = item class, glyph = main stat, gold pip = special effect.
+   In the build editor, the draft Builds sheet and the hero pages.
+5. **Ability looks** by archetype: slash (bruiser, bulwark, shade), travelling bolt (gunner), ring (spellcaster, binder),
+   sparks (mender); heals rise as a plus, shields arc, crowd control circles over the target, ultimates are larger.
+6. **Overview camera** (Field and All): pitch from 64 degrees up to 82 until the island fills 0.88 of the view height
+   (`arena_view_v1.json` `overview`).
+7. **Large text:** Draft lane rows are one line (hero name only; an open slot shows the dimmed player name) and the
+   Game Plan's expected-edge card is one line (Founder's options (a) and (c), 2026-11-24).
+
+### 20.2 Tester timings (0.12.0)
+
+Settings, "Copy feedback note" carries the build id, the device (and browser on the web), the last and average draft time,
+the time from Start the match to the first arena frame, and per match view the average and worst arena frame time and the
+count of frames slower than 30 fps (the first second after the screen opens is not counted). Session only: nothing is
+saved or sent. `tools/summarise_feedback.py` turns pasted notes into a table and one line per tester.
+
+### 20.3 Management information (0.12.2, ESMO-lessons queue; ideas only, our own names and layouts)
+
+1. **Role fit per lane** on the Squad: the player card's Stats tab shows how well the player fits each lane (a
+   lane rating from the lane's stat weights and the player's fit: main role 100%, second role 93%, off role 80%) and "to
+   play X better, train A and B" (that lane's two heaviest stat weights). The lane picker chip shows the fit. Draft and Game Plan set heroes and plans, not
+   roles, so they show nothing new.
+2. **Scouting summary** for players you could sign: a grade A to D, a one-line note and up to two pros and two cons, from
+   values the game already has (best lane rating, potential rating, stats and age), graded against every player in the
+   world (A = top 10%, B = top 30%, C = top 60%); a stat in the best 30% is a pro, in the worst 30% a con. On the Negotiation screen and the Squad card; the grade also on free-agent rows.
+3. **Why a player refused** a contract: what the player weighs (the offer against the market value, personality,
+   contract length). The decision rule (7.2) is unchanged.
+4. **Form Rating card** on the Report after a rated game: both ratings before, the expected chance, the weight, the result
+   and the change (10.1), from the real inputs only (additive save key `rate_last`).
+5. **Finance chart**: income and costs of the last 8 rounds and this season by category, from the existing ledger (7.6).
+6. **Achievements and club records** on a player's Career tab, counted from the career log.
+7. **Play the rest of the league** from Home's next-game card (league, 2 or more games left): a confirm sheet (your
+   lineup and saved plan are used, tired players are not rested, it cannot be undone), then the games are played as
+   automatic games and one line gives the result (won, lost, table place). Hidden while the first-run guide is offered or
+   running and while a lesson runs.
+8. **Hero matchups** on the hero pages: "Harder against" lists up to three heroes this hero wins at least 3 points less
+   against (400+ games for the pair, z <= -2.5), with the sample size, or "No clear counter in our test games".
+   From simulated equal-team games (`game/data/hero_matchups_v1.json`, regenerated with `tools/q2_analysis.py` after a
+   balance change). Informational only: nothing in the simulation reads it.
+
+### 20.4 Not in 0.12 (parked or waiting for the Founder)
+
+Saved draft plan per opponent, player labels and multi-sort, a prize leaderboard for all clubs, the diagonal map (route A,
+`MAP-DIAGONAL-FEASIBILITY.md`), the in-match HUD ideas (P2), new Game Plan choices and comeback levers (P3).
+`docs/PENDING-CONFIRMATION.md` holds the list.
+

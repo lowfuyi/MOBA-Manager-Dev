@@ -62,7 +62,7 @@ Alpha 0.7 plan finished. **Alpha 0.8 "Arena" is complete** (2026-11-18, plan `do
 - Trademark search for "Gloamline"; IP Scan 2 (new glyphs, badges, silhouettes, icons listed by I-05).
 - Re-baseline `perf_allowances.json` after I-04 (QA owns it). Add an Xvfb step for `check_art` picture checks to `run_all_checks.sh`.
 - Copy: card age and Banned have their own keys since 0.9.3 ("rating here" ruled not needed); still open: the "dot" icon for the All filter (placeholder acceptable).
-- GDD still says "coach" in lines 12, 340, 278 and a comment in `game_plan.gd` line 3 (Lead Game Designer to rename); TUTORIAL 6.1 needs a `new` state row; PERF-BUDGET 3.1a rule 2 to be reworded for the `redesigned` status.
+- Docs: the GDD "coach" lines, the TUTORIAL 6.1 `new` row and the PERF-BUDGET 3.1a rule 2 rewording were done at Alpha 0.9 (DECISIONS "Housekeeping accepted"); the GDD is at v1.13 with the 0.12 features (section 20). Still open: the comment in `game/src/sim/game_plan.gd` line 3 ("the coach's second lever"), left until a sim change that the Founder has approved touches that file.
 - Not applied: kill-rate retune (`docs/design/KILL-RATE-PROPOSAL.md`); held-fight staging and closing-push density wait for tester scores.
 - Squad: show about 10 PlayerCards or fewer (about 8 draw calls each). (Names above the Top/Bot tokens: done, checked on the 0.9.4 pictures.)
 - After 0.9.3 (2026-11-19, commits 0.9.4a to c, no new APK yet): a tutorial target under an open sheet waits or falls back; Home's "?" scrolls with the page; the Draft Coach bar is 32 px shorter. Large-text Draft grid and Game Plan controls: fixed 2026-11-24 by the Founder's options (a) and (c) of DECISIONS Q6-2 (one-line lane rows, one-line edge card).
