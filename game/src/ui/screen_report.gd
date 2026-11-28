@@ -10,6 +10,8 @@ extends Screen
 ##            A tap on a phase opens its moments (sheet report_phase)
 ##   why      (tag report.why) the biggest factor of Report.attribution as one big number and one sentence (luck said plainly),
 ##            best and worst chips; a tap opens the factor bars (sheet report_why; the bars carry tag report.why_sheet)
+##   plan     (tag report.plan; Match Day M8) your game plan in the Game Plan screen's words, a switch plan with its time, its share
+##            of the result; not in the tutorial game
 ##   changed  (tag report.payoff) the five starters with form and morale changes, then bonds, chemistry and cash; for a practice
 ##            game the practice card instead, for the tutorial game the tutorial card (tut.report_card.*)
 ##   tip      (tag report.tip) "Before the next game", with Open squad for the tired-players and contracts tips
@@ -37,6 +39,7 @@ var stat: HeroStat
 var why_bars: _Bars                   # the bars in the open Why sheet (null when none)
 var changes: _Changes
 var practice_card: DepthCard
+var plan_card: _Plan    # Match Day M8: your game plan (not in the tutorial game)
 var tip_card: DepthCard
 var tip_button: Button
 var dig_button: Button
@@ -592,6 +595,10 @@ func _build() -> void:
 	stat_tile.add_child(hit)
 	UI.tag_tile(stat_tile, "report.why")
 	page.add_child(stat_tile)
+	# 3b. your game plan (Match Day M8)
+	if not is_tutorial():
+		plan_card = _plan_card()
+		page.add_child(plan_card)
 	# 4. what changed / the practice card / the tutorial card
 	if is_tutorial():
 		practice_card = _card(Strings.t("tut.report_card.h"), [Strings.t("tut.report_card.body")])
@@ -647,6 +654,140 @@ func _build() -> void:
 	if UI.animate:
 		result.modulate.a = 0.0
 		result.create_tween().tween_property(result, "modulate:a", 1.0, UI.T_FADE)
+
+
+# ---------------------------------------------------------------- your game plan (Match Day M8)
+## The plan you played, in the Game Plan screen's own words: the default plan and, when a switch plan took over, its
+## game time (the log's "plan" event) and settings; then its share of the result from the attribution above. Reads `res`
+## and `att` only (R7). [[text, kind]], kind "sub" (a small heading), "row" (one setting) or "note".
+func plan_lines() -> Array:
+	var out: Array = []
+	var all_sets: Variant = res.get("plans", {})
+	var ps: Variant = (all_sets as Dictionary).get(my_side, {}) if all_sets is Dictionary else {}
+	if not ps is Dictionary:
+		ps = {}
+	var def: Dictionary = (ps as Dictionary).get("default", GamePlan.neutral())
+	var trig: Array = (ps as Dictionary).get("triggers", [])
+	var sim: Dictionary = res.get("sim", {})
+	var used_d: Dictionary = sim.get("plan_used", res.get("plan_used", {}))
+	var used := String(used_d.get(my_side, "default"))
+	if not trig.is_empty():
+		out.append([Strings.t("report.plan.default_h"), "sub"])
+	for r in plan_rows(def):
+		out.append([r, "row"])
+	if not trig.is_empty():
+		var switched := {}
+		for t in trig:
+			if String(t["when"]) == used:
+				switched = t["plan"]
+		if used != "default" and not switched.is_empty():
+			var at := -1.0
+			for e in (sim.get("log", {}) as Dictionary).get("ev", []):
+				if String(e[1]) == "plan" and String(e[2]) == my_side:
+					at = float(e[0])
+					break
+			var when := Strings.t("report.plan.when." + used)
+			out.append([Strings.f("report.plan.switch", {"t": ScreenMatch._mmss(at / 60.0) if at >= 0.0 else "--:--", "when": when}), "sub"])
+			for r in plan_rows(switched):
+				out.append([r, "row"])
+		else:
+			out.append([Strings.t("report.plan.no_switch"), "note"])
+	for f in att.get("factors", []):
+		if String(f["id"]) == "plan":
+			var pct := int(round(absf(float(f["share"])) * 100.0))
+			if pct == 0:
+				out.append([Strings.t("report.plan.none"), "note"])
+			else:
+				out.append([Strings.f("report.plan.helped" if float(f["value"]) >= 0.0 else "report.plan.hurt", {"pct": pct}), "note"])
+	return out
+
+
+## One plan's settings that are not balanced, as "Name: word" lines (half steps say "half way"); "Balanced" when none.
+static func plan_rows(plan: Dictionary) -> Array:
+	var out: Array = []
+	for id in GamePlan.SLIDERS:
+		var v := int(plan.get(id, 0))
+		if v == 0:
+			continue
+		var word := Strings.t("gp.end.%s.%s" % [id, "pos" if v > 0 else "neg"])
+		out.append(Strings.f("report.plan.row" if absi(v) >= 100 else "report.plan.row_half", {"name": Strings.t("gp.c.%s.name" % id), "word": word}))
+	var jf := String(plan.get("jf", "none"))
+	if jf != "none":
+		out.append(Strings.f("report.plan.row", {"name": Strings.t("gp.c.jf.name"), "word": Strings.t("gp.jf." + jf)}))
+	if out.is_empty():
+		out.append(Strings.t("report.plan.balanced"))
+	return out
+
+
+func _plan_card() -> _Plan:
+	var c := _Plan.new(plan_lines())
+	UI.tag(c, "report.plan", false)
+	return c
+
+
+## The plan card drawn by one control (the Report's node budget: a DepthCard and a label per setting were 16 nodes): a card
+## background, the heading, the small headings, one line per setting, the notes; wrapped to the width (PlanKit.wrap).
+class _Plan extends Control:
+	const PAD := 24.0
+	var lines: Array = []              # [[text, kind]] from plan_lines()
+	var draw_count := 0
+	var _ops := CardKit.Ops.new()
+	var _laid: Array = []              # [[line text, size, colour, font, y centre]]
+
+	func _init(p_lines: Array) -> void:
+		lines = p_lines
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		resized.connect(_relayout)
+		_relayout()
+
+	func _style(kind: String) -> Array:    # [size, colour, font]
+		match kind:
+			"head":
+				return [UI.S_SMALL, UI.TEAL_HI, UI.font("SemiBold")]
+			"sub":
+				return [UI.S_SMALL, UI.TEXT2, UI.font("SemiBold")]
+			"note":    # the rows' font and size in the dimmer colour: one text draw call fewer
+				return [UI.S_BODY, UI.TEXT2, UI.font()]
+		return [UI.S_BODY, UI.TEXT, UI.font()]
+
+	func _relayout() -> void:
+		_laid.clear()
+		var room := maxf(80.0, (size.x if size.x > 0.0 else 600.0) - 2.0 * PAD)
+		var y := PAD
+		var all: Array = [[Strings.t("report.plan.h"), "head"]] + lines
+		for i in all.size():
+			var st := _style(String(all[i][1]))
+			var lh := PlanKit.line_h(st[2], int(st[0]))
+			if i > 0 and String(all[i][1]) == "sub":
+				y += 8.0
+			for w in PlanKit.wrap(st[2], int(st[0]), String(all[i][0]), room):
+				_laid.append([String(w), int(st[0]), st[1], st[2], y + lh * 0.5])
+				y += lh
+			y += 4.0
+		var h := ceilf(y + PAD - 4.0)
+		if absf(custom_minimum_size.y - h) > 0.5:
+			custom_minimum_size = Vector2(0, h)
+		queue_redraw()
+
+	## The words on the card, line by line (tests read this; _draw shows exactly these).
+	func shown_text() -> String:
+		var out: Array = []
+		for l in _laid:
+			out.append(String(l[0]))
+		return " ".join(PackedStringArray(out))
+
+	func _draw() -> void:
+		draw_count += 1
+		ArtWire.ensure()
+		_ops.clear()
+		_ops.bg("card", Rect2(Vector2.ZERO, size), UI.PANEL)
+		for l in _laid:
+			_ops.text(l[3], int(l[1]), String(l[0]), PAD, float(l[4]), size.x - 2.0 * PAD, l[2])
+		_ops.flush(self)
+
+	func clipped() -> Array:
+		return _ops.clipped
 
 
 func _card(head: String, lines: Array) -> DepthCard:

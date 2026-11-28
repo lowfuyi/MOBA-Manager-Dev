@@ -3,7 +3,7 @@ extends RefCounted
 ## 3.1a (a redesigned screen: target 60 draw calls and 120 nodes, hard 100 and 200):
 ##   REPORT|<variant>|<state>|nodes=..|draw_calls=..
 ## States: win, win_lower (scrolled to the bottom with More detail open), loss, tutorial (the tutorial game's report), why (the
-## factor sheet open). A screen state over the target, or any state over the hard limit, is added to ctx.problems.
+## factor sheet open), plan (Match Day M8: a game played with a set plan and two switch plans, scrolled to Your game plan). A screen state over the target, or any state over the hard limit, is added to ctx.problems.
 ##   SHOT_DIR=<dir> SCREENS=report VARIANTS=normal,large,cb,tall xvfb-run -a -s "-screen 0 720x1280x24" \
 ##     godot --rendering-driver opengl3 res://tests/shots_matrix.tscn
 
@@ -80,6 +80,21 @@ static func run(ctx) -> void:
 				await _measure(ctx, "win_lower")
 		r._leave()
 		await ctx.settle()
+	# Match Day M8: a set plan with both switches, scrolled to the plan card
+	var ps := App.gs.plan_set()
+	ps["default"]["a"] = 100
+	ps["default"]["t"] = -50
+	ps["default"]["jf"] = "bot"
+	var sw := GamePlan.neutral()
+	sw["g"] = 100
+	ps["triggers"] = [{"when": "behind_early", "plan": sw}, {"when": "ahead_early", "plan": sw.duplicate()}]
+	var rp := await _play(ctx)
+	rp.result.shown = 1.0
+	rp.page_scroll.ensure_control_visible(rp.plan_card)
+	await ctx.settle()
+	await _measure(ctx, "plan")
+	rp._leave()
+	await ctx.settle()
 	# the tutorial game's report
 	var tg := TutorialGame.start(App.gs)
 	var d2 := ScreenDraft.new(tg)

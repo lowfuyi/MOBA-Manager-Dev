@@ -2290,5 +2290,20 @@
   "match.doing.jungle": "moving through the jungle",
   "match.replay": "Watch replay",
   "match.replay.play": "Play",
-  "match.replay.done": "Done"
+  "match.replay.done": "Done",
+  "report.plan.h": "Your game plan",
+  "report.plan.balanced": "Balanced: every setting was left in the middle.",
+  "report.plan.row": "{name}: {word}",
+  "report.plan.row_half": "{name}: {word}, half way",
+  "report.plan.default_h": "From the start",
+  "report.plan.switch": "At {t} your switch plan took over: {when}",
+  "report.plan.no_switch": "Your switch plans did not trigger, so this plan ran all game.",
+  "report.plan.when.behind_early": "If behind",
+  "report.plan.when.ahead_early": "If ahead",
+  "report.plan.when.vs_dive": "vs Dive",
+  "report.plan.when.vs_siege": "vs Siege",
+  "report.plan.when.vs_protect": "vs Protect",
+  "report.plan.helped": "It helped you. It decided {pct}% of the result.",
+  "report.plan.hurt": "It cost you. It decided {pct}% of the result.",
+  "report.plan.none": "It made almost no difference to the result."
 }

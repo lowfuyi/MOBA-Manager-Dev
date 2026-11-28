@@ -62,6 +62,8 @@ func _ready() -> void:
 	await _events_report()
 	await _boot()
 	await _tags()
+	await _boot()
+	await _plan_card()
 	if _main != null and is_instance_valid(_main):
 		_main.queue_free()
 		await frames(2)
@@ -155,6 +157,9 @@ func _cut(r: ScreenReport) -> Array:
 		out.append("story: " + String(t))
 	for t in r.strip.clipped:
 		out.append("strip: " + String(t))
+	if r.plan_card != null:
+		for t in r.plan_card.clipped():
+			out.append("plan: " + String(t))
 	if r.changes != null:
 		for t in r.changes.clipped():
 			out.append("changes: " + String(t))
@@ -168,7 +173,7 @@ func _cut(r: ScreenReport) -> Array:
 
 
 func _redraw_all(r: ScreenReport) -> void:
-	for c in [r.result, r.bands, r.strip, r.changes, r.why_bars, r.dig_bar]:
+	for c in [r.result, r.bands, r.strip, r.plan_card, r.changes, r.why_bars, r.dig_bar]:
 		if c != null and is_instance_valid(c):
 			(c as Control).queue_redraw()
 	await frames(3)
@@ -248,9 +253,69 @@ func _build_and_fit(v: String) -> void:
 	ok(seen.size() == 2, "build_report_%s: a win and a loss were both seen (%s)" % [v, str(seen.keys())])
 	var tg := TutorialGame.start(App.gs)
 	var tr := await _play(tg)
-	ok(tr != null and tr.is_tutorial() and tr.practice_card != null and tr.changes == null and tr.tip_card == null, "build_report_%s_tutorial: the tutorial card, no payoff, no tip" % v)
+	ok(tr != null and tr.is_tutorial() and tr.practice_card != null and tr.changes == null and tr.tip_card == null and tr.plan_card == null, "build_report_%s_tutorial: the tutorial card, no payoff, no tip, no plan card" % v)
 	if tr != null:
 		await _fit_state(tr, v, "tutorial")
+
+
+## Match Day M8: the Report shows the plan you played, in the Game Plan screen's words, the switch plan when it took over
+## (at the log's time), and the plan's share of the result from the attribution. A balanced plan says so.
+func _plan_card() -> void:
+	var r := await _play()
+	ok(r != null and r.plan_card != null and r.plan_card.is_visible_in_tree(), "plan_card: a league report shows Your game plan")
+	if r != null:
+		var rows := r.plan_lines()
+		ok(rows.size() == 1 and String(rows[0][0]) == Strings.t("report.plan.balanced"), "plan_card: a neutral plan says Balanced and nothing else (%s)" % str(rows))
+		r._leave()
+		await frames(2)
+	var ps := App.gs.plan_set()
+	ps["default"]["a"] = 100
+	ps["default"]["t"] = -50
+	ps["default"]["jf"] = "bot"
+	var sw := GamePlan.neutral()
+	sw["g"] = 100
+	ps["triggers"] = [{"when": "behind_early", "plan": sw}, {"when": "ahead_early", "plan": sw.duplicate()}]
+	var seen_switch := false
+	for i in 4:
+		var rr := await _play()
+		if rr == null:
+			break
+		var txt: Array = []
+		for ln in rr.plan_lines():
+			txt.append(String(ln[0]))
+		var want := [Strings.t("report.plan.default_h"),
+				Strings.f("report.plan.row_half", {"name": Strings.t("gp.c.t.name"), "word": Strings.t("gp.end.t.neg")}),    # the screen's order
+				Strings.f("report.plan.row", {"name": Strings.t("gp.c.a.name"), "word": Strings.t("gp.end.a.pos")}),
+				Strings.f("report.plan.row", {"name": Strings.t("gp.c.jf.name"), "word": Strings.t("gp.jf.bot")})]
+		ok(txt.slice(0, 4) == want, "plan_card_%d: the default plan in the Game Plan screen's words (%s)" % [i, str(txt.slice(0, 4))])
+		var used := String(rr.res["sim"]["plan_used"][rr.my_side])
+		if used == "default":
+			ok(txt.has(Strings.t("report.plan.no_switch")), "plan_card_%d: no switch fired, and the card says so" % i)
+		else:
+			seen_switch = true
+			var at := -1.0
+			for e in rr.res["sim"]["log"]["ev"]:
+				if String(e[1]) == "plan" and String(e[2]) == rr.my_side:
+					at = float(e[0])
+					break
+			var line := Strings.f("report.plan.switch", {"t": ScreenMatch._mmss(at / 60.0), "when": Strings.t("report.plan.when." + used)})
+			var gi := txt.find(line)
+			ok(at >= 0.0 and gi == 4 and txt[5] == Strings.f("report.plan.row", {"name": Strings.t("gp.c.g.name"), "word": Strings.t("gp.end.g.pos")}),
+					"plan_card_%d: the switch plan (%s) at its log time, then its settings (%s)" % [i, used, str(txt)])
+		var pf := {}
+		for f in rr.att["factors"]:
+			if String(f["id"]) == "plan":
+				pf = f
+		var pct := int(round(absf(float(pf.get("share", 0.0))) * 100.0))
+		var eff := Strings.t("report.plan.none") if pct == 0 else Strings.f("report.plan.helped" if float(pf.get("value", 0.0)) >= 0.0 else "report.plan.hurt", {"pct": pct})
+		ok(not pf.is_empty() and txt[txt.size() - 1] == eff, "plan_card_%d: the last line is the plan's share of the result from the attribution (%s)" % [i, eff])
+		var shown := UI.plain(rr.plan_card.shown_text())
+		ok(shown.contains(UI.plain(want[2])) and shown.contains(UI.plain(eff)), "plan_card_%d: the card shows those lines" % i)
+		rr._leave()
+		await frames(2)
+		if seen_switch and i >= 1:
+			break
+	ok(seen_switch, "plan_card: a switch plan took over in at least one game (both switches set)")
 
 
 ## Per-report truths: score, story, stat, no tips, one coral action.
