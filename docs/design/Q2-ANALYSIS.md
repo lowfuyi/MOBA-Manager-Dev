@@ -144,6 +144,69 @@ Teams are moved to the same mean rating, so a hero's win rate is the hero, the d
 
 Best single option: m-100 (+3.7). Dominant combinations (beat the best single option by more than two standard errors): none.
 
+## b2) Game Plan sweep re-run with 6,000 games (R1, 2026-11-28)
+
+Founder queue 2026-11-27 R1: the same sweep as b) with three times the games, so the paired error falls from about 1.3 to about 0.75 points. Run from a clean copy of game/ taken before any R2 change (`tools/q2_analysis.py run --plans 6000 --only plans`, 150 resumable chunks on 6 processes, finished 2026-11-28 10:23 SGT; it was cut by two laptop restarts and resumed from saved chunks, 0 failed chunks). Desktop only; nothing was measured on a phone.
+
+Key: g Fight style, t Tempo, m Mid-game objectives, l Late objectives, a Lane aggression, s Support, r Risk (each -100 to +100); jf Jungle focus.
+
+6,000 base games. Each is played with both plans neutral (side A wins 49.9%), then once per option with only that option on side A, same draft and seed. Delta = option's win rate minus neutral, in points; the error is the paired standard error. Flag: delta above +3 points. Nothing was tuned.
+
+| Option (side A) | Games | Win % | Delta | +-SE | Flag |
+|---|---|---|---|---|---|
+| a+100 jf=bot | 6,000 | 54.5 | +4.7 | 0.7 | FLAG |
+| g+100 t+100 | 6,000 | 54.0 | +4.1 | 0.8 | FLAG |
+| m-100 | 6,000 | 53.6 | +3.8 | 0.8 | FLAG |
+| jf=bot | 6,000 | 53.6 | +3.7 | 0.7 | FLAG |
+| t+100 a+100 m+100 l+100 g+100 r+100 | 6,000 | 53.5 | +3.7 | 0.7 | FLAG |
+| m-50 | 6,000 | 52.8 | +2.9 | 0.8 |  |
+| g+100 | 6,000 | 52.1 | +2.2 | 0.8 |  |
+| t+100 a+100 | 6,000 | 52.1 | +2.2 | 0.7 |  |
+| g+100 r+100 | 6,000 | 51.7 | +1.9 | 0.8 |  |
+| a+100 jf=mid_lane | 6,000 | 51.3 | +1.4 | 0.8 |  |
+| t+100 m+100 | 6,000 | 51.3 | +1.4 | 0.8 |  |
+| r+50 | 6,000 | 51.0 | +1.1 | 0.8 |  |
+| r+100 l+100 | 6,000 | 51.0 | +1.1 | 0.8 |  |
+| g+50 | 6,000 | 50.9 | +1.0 | 0.7 |  |
+| a+100 | 6,000 | 50.8 | +0.9 | 0.8 |  |
+| t+100 | 6,000 | 50.8 | +0.9 | 0.8 |  |
+| jf=mid_lane | 6,000 | 50.7 | +0.8 | 0.8 |  |
+| a+100 jf=top | 6,000 | 50.7 | +0.8 | 0.8 |  |
+| a+50 | 6,000 | 50.5 | +0.7 | 0.8 |  |
+| a-50 | 6,000 | 50.5 | +0.6 | 0.8 |  |
+| r-50 | 6,000 | 50.2 | +0.4 | 0.8 |  |
+| r+100 | 6,000 | 50.2 | +0.4 | 0.8 |  |
+| t+50 | 6,000 | 50.0 | +0.2 | 0.8 |  |
+| t-50 | 6,000 | 50.0 | +0.1 | 0.7 |  |
+| m+100 l+100 | 6,000 | 49.9 | +0.0 | 0.7 |  |
+| l+100 | 6,000 | 49.8 | -0.1 | 0.7 |  |
+| r-100 | 6,000 | 49.8 | -0.1 | 0.8 |  |
+| s-100 | 6,000 | 49.6 | -0.2 | 0.7 |  |
+| l+50 | 6,000 | 49.6 | -0.2 | 0.6 |  |
+| s-50 | 6,000 | 49.5 | -0.4 | 0.6 |  |
+| m+100 | 6,000 | 49.5 | -0.4 | 0.7 |  |
+| jf=top | 6,000 | 49.5 | -0.4 | 0.8 |  |
+| m+50 | 6,000 | 49.4 | -0.5 | 0.7 |  |
+| t-100 l+100 | 6,000 | 49.3 | -0.6 | 0.8 |  |
+| t-100 | 6,000 | 49.2 | -0.7 | 0.8 |  |
+| a-100 | 6,000 | 48.9 | -1.0 | 0.7 |  |
+| l-50 | 6,000 | 48.8 | -1.1 | 0.6 |  |
+| s+50 | 6,000 | 48.6 | -1.3 | 0.7 |  |
+| l-100 | 6,000 | 48.6 | -1.3 | 0.6 |  |
+| g-50 | 6,000 | 47.7 | -2.2 | 0.8 |  |
+| s+100 a+100 | 6,000 | 47.5 | -2.4 | 0.8 |  |
+| g-100 | 6,000 | 46.8 | -3.1 | 0.7 |  |
+| g-100 r-100 | 6,000 | 46.6 | -3.3 | 0.8 |  |
+| s+100 | 6,000 | 46.3 | -3.6 | 0.8 |  |
+
+Best single option: m-100 (+3.8). Dominant combinations (beat the best single option by more than two standard errors): none.
+
+**Compared with b) (2,000 games):**
+- Still flagged: Lane aggression full + Jungle focus Bot, +4.7 (was +5.5); all six sliders full, +3.7 (was +4.0); Mid-game objectives -100, +3.8 (was +3.7); Fight style + Tempo full, +4.1 (was +3.4).
+- Newly flagged: Jungle focus Bot alone, +3.7 (was +2.2, inside its old error).
+- No combination beats the best single option by more than two errors, so no plan dominates.
+- R2a's condition ("only if R1 still shows it above +3") is met: +4.7, about six errors above zero and 2.2 errors above +3. Most of it is Jungle focus Bot itself (+3.7 alone), not the pairing with Lane aggression (+0.9 alone).
+
 ## c) Does the draft decide too much?
 
 **Draft score** of a side = the mean of the 15 phase ratings the match is given, divided by the same players' mean with a plain hero in every lane (own lane, full familiarity, no difficulty, power 50, patch 1.0), times (1 + composition bonus x its fight weight). 1.00 = the draft adds nothing; it holds hero fit, familiarity, hero power, the patch and the composition. The lane matchup bonus is not in it. **Player gap** = the difference of the plain-hero means (rating points). Natural ratings, real clubs, real AI drafts. A tie in draft score (under 0.001) is left out.
